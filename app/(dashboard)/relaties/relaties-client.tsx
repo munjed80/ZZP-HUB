@@ -222,7 +222,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                 )}
               </div>
 
-              <div className="md:col-span-2 flex justify-end gap-2">
+              <div className="flex justify-end gap-2 md:col-span-2">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
