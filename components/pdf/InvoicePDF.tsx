@@ -230,7 +230,7 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
 
           <View style={styles.companyBlock}>
             {companyProfile?.logoUrl ? (
-              <Image src={companyProfile.logoUrl} style={styles.logo} />
+              <Image src={companyProfile.logoUrl} style={styles.logo} alt="Bedrijfslogo" />
             ) : (
               <Text style={styles.companyNameFallback}>
                 {companyProfile?.companyName ?? "Bedrijfsnaam"}

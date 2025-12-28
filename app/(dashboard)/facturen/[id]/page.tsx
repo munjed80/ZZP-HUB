@@ -192,10 +192,10 @@ export default async function FactuurDetailPagina({ params }: PageProps) {
               <span className="text-right">Bedrag</span>
             </div>
             <div className="divide-y divide-slate-200">
-              {pdfInvoice.lines.map((line) => {
+              {pdfInvoice.lines.map((line, index) => {
                 const lineTotal = line.quantity * line.price;
                 return (
-                  <div key={`${line.description}-${line.unit}-${line.vatRate}`} className="grid grid-cols-6 px-4 py-3 text-sm text-slate-800">
+                  <div key={index} className="grid grid-cols-6 px-4 py-3 text-sm text-slate-800">
                     <span className="pr-4">{line.description}</span>
                     <span className="text-center">{line.quantity}</span>
                     <span className="text-center">{line.unit}</span>
