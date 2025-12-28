@@ -1,4 +1,5 @@
 import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { formatBedrag } from "@/lib/utils";
 
 export type InvoicePdfLine = {
   description: string;
@@ -203,14 +204,6 @@ const styles = StyleSheet.create({
   },
 });
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 2,
-  }).format(value);
-}
-
 export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
   const { companyProfile, lines } = invoice;
   const totals = calculateInvoiceTotals(lines);
@@ -230,11 +223,7 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
 
           <View style={styles.companyBlock}>
             {companyProfile?.logoUrl ? (
-              <>
-                {/* react-pdf does not support alt text on Image; logo is decorative within PDF context */}
-                {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                <Image src={companyProfile.logoUrl} style={styles.logo} />
-              </>
+              <Image src={companyProfile.logoUrl} style={styles.logo} alt="Bedrijfslogo" />
             ) : (
               <Text style={styles.companyNameFallback}>
                 {companyProfile?.companyName ?? "Bedrijfsnaam"}
@@ -282,9 +271,9 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
                 <Text style={[styles.text, styles.description]}>{line.description}</Text>
                 <Text style={[styles.text, styles.qty]}>{line.quantity}</Text>
                 <Text style={[styles.text, styles.unit]}>{line.unit}</Text>
-                <Text style={[styles.text, styles.price]}>{formatCurrency(line.price)}</Text>
+                <Text style={[styles.text, styles.price]}>{formatBedrag(line.price)}</Text>
                 <Text style={[styles.text, styles.vat]}>{line.vatRate}%</Text>
-                <Text style={[styles.text, styles.amount]}>{formatCurrency(amount)}</Text>
+                <Text style={[styles.text, styles.amount]}>{formatBedrag(amount)}</Text>
               </View>
             );
           })}
@@ -293,19 +282,19 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
         <View style={styles.totals}>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Subtotaal (excl. BTW)</Text>
-            <Text style={styles.totalValue}>{formatCurrency(totals.subtotal)}</Text>
+            <Text style={styles.totalValue}>{formatBedrag(totals.subtotal)}</Text>
           </View>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>BTW Hoog (21%)</Text>
-            <Text style={styles.totalValue}>{formatCurrency(totals.vatHigh)}</Text>
+            <Text style={styles.totalValue}>{formatBedrag(totals.vatHigh)}</Text>
           </View>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>BTW Laag (9%)</Text>
-            <Text style={styles.totalValue}>{formatCurrency(totals.vatLow)}</Text>
+            <Text style={styles.totalValue}>{formatBedrag(totals.vatLow)}</Text>
           </View>
           <View style={[styles.totalRow, styles.grandTotal]}>
             <Text style={styles.totalLabel}>Totaal</Text>
-            <Text style={styles.totalValue}>{formatCurrency(totals.total)}</Text>
+            <Text style={styles.totalValue}>{formatBedrag(totals.total)}</Text>
           </View>
         </View>
 
