@@ -17,11 +17,10 @@ export const expenseSchema = z.object({
     required_error: "BTW tarief is verplicht",
   }),
   date: z.string().min(1, "Datum is verplicht"),
-  receiptUrl: z
-    .string()
-    .url("Voer een geldige URL in")
-    .optional()
-    .or(z.literal("")),
+  receiptUrl: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.string().url("Voer een geldige URL in").optional(),
+  ),
 });
 
 export type ExpenseFormValues = z.infer<typeof expenseSchema>;

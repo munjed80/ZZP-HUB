@@ -14,6 +14,7 @@ import { CalendarClock, Euro, Loader2, PieChart, Plus, ReceiptText, UploadCloud 
 
 type UitgavenClientProps = {
   expenses: ExpenseClientShape[];
+  errorMessage?: string;
 };
 
 const vatPercentages: Record<BtwTarief, number> = {
@@ -31,6 +32,10 @@ const vatLabels: Record<BtwTarief, string> = {
   VRIJGESTELD: "Vrijgesteld",
   VERLEGD: "Verlegd",
 };
+
+// Rounding factor for currency values (100 = 10^2 for two decimals)
+const CURRENCY_ROUNDING_FACTOR = 100;
+const RECEIPT_UPLOAD_NOTE = "Upload integratie volgt; we tonen nu alleen de bestandsnaam.";
 
 const defaultFormValues = (): ExpenseFormValues => ({
   description: "",
@@ -50,18 +55,27 @@ function formatDate(value: string) {
   }).format(date);
 }
 
-function calculateTotals(expense: Pick<ExpenseClientShape, "amountExcl" | "vatRate">) {
+function calculateExpenseAmounts(expense: Pick<ExpenseClientShape, "amountExcl" | "vatRate">) {
   const vatRate = vatPercentages[expense.vatRate] ?? 0;
   const vatAmount = expense.amountExcl * vatRate;
   const total = expense.amountExcl + vatAmount;
   return { vatAmount, total };
 }
 
-export function UitgavenClient({ expenses }: UitgavenClientProps) {
+function getLargestCategory(categoryTotals: Record<string, number>) {
+  if (Object.keys(categoryTotals).length === 0) {
+    return "Geen uitgaven";
+  }
+
+  return Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Nog niets";
+}
+
+export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseSchema),
@@ -78,7 +92,8 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
       : "";
 
   const handleAmountInclChange = (value: string) => {
-    const parsed = parseFloat(value.replace(",", "."));
+    const normalizedValue = value.replace(/\s/g, "").replace(",", ".");
+    const parsed = Number.parseFloat(normalizedValue);
     const targetValue = Number.isNaN(parsed) ? Number.NaN : parsed;
     const excl = Number.isNaN(targetValue)
       ? Number.NaN
@@ -86,7 +101,11 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
         ? targetValue
         : targetValue / (1 + vatPercentage);
 
-    form.setValue("amountExcl", parseFloat(excl.toFixed(2)), {
+    const roundedExcl = Number.isNaN(excl)
+      ? 0
+      : Math.round(excl * CURRENCY_ROUNDING_FACTOR) / CURRENCY_ROUNDING_FACTOR;
+
+    form.setValue("amountExcl", roundedExcl, {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -102,7 +121,7 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
     const categoryTotals: Record<string, number> = {};
 
     expenses.forEach((expense) => {
-      const { vatAmount, total } = calculateTotals(expense);
+      const { vatAmount, total } = calculateExpenseAmounts(expense);
       pageTotal += total;
       vatRecoverable += vatAmount;
 
@@ -114,12 +133,14 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
       categoryTotals[expense.category] = (categoryTotals[expense.category] ?? 0) + total;
     });
 
-    const largestCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Nog niets";
+    const largestCategory = getLargestCategory(categoryTotals);
 
     return { monthTotal, vatRecoverable, pageTotal, largestCategory };
   }, [expenses]);
 
   const onSubmit = form.handleSubmit((values) => {
+    setFormError(null);
+
     startTransition(async () => {
       try {
         await createExpense(values);
@@ -129,6 +150,7 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
         router.refresh();
       } catch (error) {
         console.error("Uitgave opslaan mislukt", error);
+        setFormError("Opslaan van uitgave is mislukt. Probeer het later opnieuw.");
       }
     });
   });
@@ -153,6 +175,12 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
           </button>
         </div>
       </div>
+
+      {errorMessage && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          {errorMessage}
+        </div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -224,7 +252,7 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {expenses.map((expense) => {
-                    const { vatAmount, total } = calculateTotals(expense);
+                    const { vatAmount, total } = calculateExpenseAmounts(expense);
                     return (
                       <tr key={expense.id} className="hover:bg-slate-50">
                         <td className="px-3 py-3 text-slate-700">{formatDate(expense.date)}</td>
@@ -381,10 +409,11 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
                   <UploadCloud className="h-5 w-5 text-slate-500" aria-hidden />
                   <div className="text-center">
                     <p className="font-semibold text-slate-800">Sleep je bonnetje hierheen of kies bestand</p>
-                    <p className="text-xs text-slate-500">Upload integratie volgt; we tonen nu alleen de bestandsnaam.</p>
+                    <p className="text-xs text-slate-500">{RECEIPT_UPLOAD_NOTE}</p>
                   </div>
                   <input
                     type="file"
+                    accept="image/*,application/pdf"
                     className="sr-only"
                     onChange={(event) => {
                       const file = event.target.files?.[0];
@@ -408,6 +437,8 @@ export function UitgavenClient({ expenses }: UitgavenClientProps) {
                   <p className="text-xs text-amber-700">{form.formState.errors.receiptUrl.message}</p>
                 )}
               </div>
+
+              {formError && <p className="text-xs text-amber-700 md:col-span-2">{formError}</p>}
 
               <div className="flex items-center gap-3 md:col-span-2">
                 <button

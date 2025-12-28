@@ -6,15 +6,19 @@ import { getCurrentUserId } from "@/lib/auth";
 import { expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { Prisma } from "@prisma/client";
 
+const DEMO_USER = {
+  email: "demo@zzp-hub.nl",
+  passwordHash: "demo-placeholder-hash",
+  naam: "Demo gebruiker",
+};
+
 async function ensureUser(userId: string) {
   await prisma.user.upsert({
     where: { id: userId },
     update: {},
     create: {
       id: userId,
-      email: "demo@zzp-hub.nl",
-      passwordHash: "demo-placeholder-hash",
-      naam: "Demo gebruiker",
+      ...DEMO_USER,
     },
   });
 }
@@ -35,34 +39,39 @@ export async function getExpenses(): Promise<ExpenseClientShape[]> {
       category: expense.category,
       amountExcl: Number(expense.amountExcl),
       vatRate: expense.vatRate,
-      date: expense.date.toISOString(),
+      date: expense.date.toISOString().split("T")[0],
       receiptUrl: expense.receiptUrl ?? null,
     }));
   } catch (error) {
     console.error("Kon uitgaven niet ophalen", error);
-    return [];
+    throw new Error("Uitgaven konden niet worden opgehaald. Controleer de databaseverbinding en probeer opnieuw.");
   }
 }
 
 export async function createExpense(values: ExpenseFormValues) {
-  "use server";
-
   const userId = getCurrentUserId();
   const data = expenseSchema.parse(values);
 
-  await ensureUser(userId);
+  try {
+    await ensureUser(userId);
 
-  await prisma.expense.create({
-    data: {
-      userId,
-      description: data.description,
-      category: data.category,
-      amountExcl: new Prisma.Decimal(data.amountExcl),
-      vatRate: data.vatRate,
-      date: new Date(data.date),
-      receiptUrl: data.receiptUrl?.trim() ? data.receiptUrl.trim() : null,
-    },
-  });
+    const trimmedUrl = data.receiptUrl?.trim() || null;
 
-  revalidatePath("/uitgaven");
+    await prisma.expense.create({
+      data: {
+        userId,
+        description: data.description,
+        category: data.category,
+        amountExcl: new Prisma.Decimal(data.amountExcl),
+        vatRate: data.vatRate,
+        date: new Date(data.date),
+        receiptUrl: trimmedUrl,
+      },
+    });
+
+    revalidatePath("/uitgaven");
+  } catch (error) {
+    console.error("Uitgave opslaan mislukt", error);
+    throw new Error("Uitgave opslaan mislukt. Controleer je invoer en probeer het later opnieuw.");
+  }
 }
