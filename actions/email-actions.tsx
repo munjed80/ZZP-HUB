@@ -8,6 +8,19 @@ import { InvoicePDF, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+const APP_BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL ??
+  process.env.APP_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.APP_FALLBACK_URL ?? "https://zzp-hub.nl");
+
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "no-reply@zzp-hub.nl";
+const ALLOWED_LOGO_HOSTS = (process.env.ALLOWED_LOGO_HOSTS ?? "")
+  .split(",")
+  .map((host) => host.trim())
+  .filter(Boolean);
+
 type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
   include: { client: true; lines: true; user: { include: { companyProfile: true } } };
 }>;
@@ -68,14 +81,7 @@ function buildCompanyDetails(companyProfile: InvoiceWithRelations["user"]["compa
 }
 
 function buildInvoiceUrl(invoiceId: string) {
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL ??
-    process.env.APP_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "https://zzp-hub.nl");
-
-  return new URL(`/facturen/${invoiceId}`, base).toString();
+  return new URL(`/facturen/${invoiceId}`, APP_BASE_URL).toString();
 }
 
 export async function sendInvoiceEmail(invoiceId: string) {
@@ -87,11 +93,23 @@ export async function sendInvoiceEmail(invoiceId: string) {
   try {
     const sanitizedInvoiceId = invoiceId.trim();
 
-    if (!/^[a-zA-Z0-9-]+$/.test(sanitizedInvoiceId)) {
+    const uuidPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    const isUuid = uuidPattern.test(sanitizedInvoiceId);
+    const isDemoId = sanitizedInvoiceId.startsWith("demo-") || sanitizedInvoiceId === "demo";
+
+    if (!isUuid && !isDemoId) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const userId = getCurrentUserId();
+    let userId: string;
+
+    try {
+      userId = getCurrentUserId();
+    } catch (error) {
+      console.error("Kon gebruiker niet bepalen voor e-mailverzending", error);
+      return { success: false, message: "Gebruiker niet gevonden." };
+    }
+
     const invoice = await prisma.invoice.findFirst({
       where: { id: sanitizedInvoiceId, userId },
       include: { client: true, lines: true, user: { include: { companyProfile: true } } },
@@ -107,10 +125,22 @@ export async function sendInvoiceEmail(invoiceId: string) {
     const viewUrl = buildInvoiceUrl(invoice.id);
     const companyDetails = buildCompanyDetails(invoice.user.companyProfile);
     const logoUrl = pdfInvoice.companyProfile?.logoUrl;
-    const trustedLogoUrl = logoUrl?.startsWith("http") ? logoUrl : undefined;
+    const trustedLogoUrl = (() => {
+      if (!logoUrl) return undefined;
+      try {
+        const parsed = new URL(logoUrl);
+        if (parsed.protocol !== "https:") return undefined;
+        if (ALLOWED_LOGO_HOSTS.length > 0 && !ALLOWED_LOGO_HOSTS.includes(parsed.hostname)) {
+          return undefined;
+        }
+        return parsed.toString();
+      } catch {
+        return undefined;
+      }
+    })();
 
     const { error } = await resend.emails.send({
-      from: `${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"} <no-reply@zzp-hub.nl>`,
+      from: `${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"} <${FROM_EMAIL}>`,
       to: invoice.client.email,
       subject: `Factuur ${pdfInvoice.invoiceNum} van ${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"}`,
       react: (

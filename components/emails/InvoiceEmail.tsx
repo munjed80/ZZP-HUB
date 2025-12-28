@@ -39,7 +39,7 @@ export default function InvoiceEmail({
         <Container style={container}>
           <Section style={header}>
             {logoUrl ? (
-              <Img src={logoUrl} alt={companyName ?? "Bedrijf"} width="140" height="48" style={logo} />
+              <Img src={logoUrl} alt={`${companyName ?? "Bedrijf"} logo`} width="140" height="48" style={logo} />
             ) : (
               <Text style={companyTitle}>{companyName}</Text>
             )}
