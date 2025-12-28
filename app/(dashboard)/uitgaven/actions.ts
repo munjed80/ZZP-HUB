@@ -3,18 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
-import { expenseSchema, type ExpenseFormValues } from "./schema";
-import { Prisma, type BtwTarief } from "@prisma/client";
-
-type ExpenseClientShape = {
-  id: string;
-  description: string;
-  category: string;
-  amountExcl: number;
-  vatRate: BtwTarief;
-  date: string;
-  receiptUrl: string | null;
-};
+import { expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
+import { Prisma } from "@prisma/client";
 
 async function ensureUser(userId: string) {
   await prisma.user.upsert({
@@ -76,5 +66,3 @@ export async function createExpense(values: ExpenseFormValues) {
 
   revalidatePath("/uitgaven");
 }
-
-export type { ExpenseClientShape };

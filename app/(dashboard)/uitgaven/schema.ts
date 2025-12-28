@@ -25,3 +25,13 @@ export const expenseSchema = z.object({
 });
 
 export type ExpenseFormValues = z.infer<typeof expenseSchema>;
+
+export type ExpenseClientShape = {
+  id: string;
+  description: string;
+  category: (typeof categories)[number];
+  amountExcl: number;
+  vatRate: BtwTarief;
+  date: string;
+  receiptUrl: string | null;
+};

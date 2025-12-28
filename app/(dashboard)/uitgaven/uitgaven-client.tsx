@@ -7,8 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBedrag } from "@/lib/utils";
-import { createExpense, type ExpenseClientShape } from "./actions";
-import { categories, expenseSchema, type ExpenseFormValues } from "./schema";
+import { createExpense } from "./actions";
+import { categories, expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { type BtwTarief } from "@prisma/client";
 import { CalendarClock, Euro, Loader2, PieChart, Plus, ReceiptText, UploadCloud } from "lucide-react";
 
