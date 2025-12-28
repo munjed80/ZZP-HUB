@@ -6,7 +6,7 @@ import { formatBedrag } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { createQuotation } from "../actions";
 import { quotationSchema, type QuotationFormValues } from "../schema";
@@ -27,8 +27,9 @@ function formatDateInput(date: Date) {
 }
 
 function generateQuotationNumber() {
-  const year = new Date().getFullYear();
-  const suffix = Math.floor(Math.random() * 900 + 100);
+  const now = Date.now();
+  const year = new Date(now).getFullYear();
+  const suffix = String(now).slice(-5);
   return `off-${year}-${suffix}`;
 }
 
@@ -37,6 +38,7 @@ export function QuotationForm({ clients }: { clients: Client[] }) {
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState(() => clients[0]?.name ?? "");
   const [openList, setOpenList] = useState(false);
+  const blurTimeoutRef = useRef<number | null>(null);
 
   const today = useMemo(() => new Date(), []);
   const defaultValidUntil = useMemo(() => {
@@ -183,17 +185,22 @@ export function QuotationForm({ clients }: { clients: Client[] }) {
             <div className="space-y-1">
               <label className="text-sm font-medium text-slate-800">Relatie</label>
               <div className="relative">
-                <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                  placeholder="Zoek op naam, e-mail of stad"
-                  value={searchTerm}
-                  onFocus={() => setOpenList(true)}
-                  onBlur={() => setTimeout(() => setOpenList(false), 100)}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setOpenList(true);
-                    if (e.target.value === "") {
-                      form.setValue("clientId", "");
+              <input
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="Zoek op naam, e-mail of stad"
+                value={searchTerm}
+                onFocus={() => setOpenList(true)}
+                onBlur={() => {
+                  if (blurTimeoutRef.current) {
+                    clearTimeout(blurTimeoutRef.current);
+                  }
+                  blurTimeoutRef.current = window.setTimeout(() => setOpenList(false), 150);
+                }}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setOpenList(true);
+                  if (e.target.value === "") {
+                    form.setValue("clientId", "");
                     }
                   }}
                 />

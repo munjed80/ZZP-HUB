@@ -18,20 +18,22 @@ const APP_BASE_URL =
     : process.env.APP_FALLBACK_URL ?? "https://zzp-hub.nl");
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "no-reply@zzp-hub.nl";
-const ALLOWED_LOGO_HOSTS = (process.env.ALLOWED_LOGO_HOSTS ?? "")
+const ALLOWED_LOGO_HOSTS = (process.env.ALLOWED_LOGO_HOSTS ?? "zzp-hub.nl")
   .split(",")
-  .map((host) => host.trim())
+  .map((host) => host.trim().toLowerCase())
   .filter(Boolean);
 
 async function ensureUser(userId: string) {
+  const demoEmail = process.env.DEMO_USER_EMAIL ?? "demo@zzp-hub.nl";
+  const demoName = process.env.DEMO_USER_NAME ?? "Demo gebruiker";
   await prisma.user.upsert({
     where: { id: userId },
     update: {},
     create: {
       id: userId,
-      email: "demo@zzp-hub.nl",
+      email: demoEmail,
       passwordHash: "demo-placeholder-hash",
-      naam: "Demo gebruiker",
+      naam: demoName,
     },
   });
 }
@@ -211,7 +213,7 @@ export async function convertQuotationToInvoice(quotationId: string) {
       data: {
         userId,
         clientId: quotation.clientId,
-        invoiceNum: `INV-${quotation.quoteNum}`,
+        invoiceNum: `INV-${quotation.quoteNum.replace(/^off[-]?/i, "")}`,
         date: new Date(),
         dueDate: quotation.validUntil,
       },
@@ -272,7 +274,8 @@ export async function sendQuotationEmail(quotationId: string) {
       try {
         const parsed = new URL(logoUrl);
         if (parsed.protocol !== "https:") return undefined;
-        if (ALLOWED_LOGO_HOSTS.length > 0 && !ALLOWED_LOGO_HOSTS.includes(parsed.hostname)) return undefined;
+        const hostname = parsed.hostname.toLowerCase();
+        if (!ALLOWED_LOGO_HOSTS.includes(hostname)) return undefined;
         return parsed.toString();
       } catch {
         return undefined;
