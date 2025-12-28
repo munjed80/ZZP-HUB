@@ -26,21 +26,40 @@ export async function getDashboardStats() {
 
   const monthlyChartData = MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
 
-  const [invoices, expenses] = await Promise.all([
-    prisma.invoice.findMany({
-      where: {
-        userId,
-        date: { gte: startOfYear, lt: endOfYear },
-        NOT: { emailStatus: InvoiceEmailStatus.CONCEPT },
-      },
-      include: { lines: true, client: true },
-      orderBy: { date: "desc" },
-    }),
-    prisma.expense.findMany({
-      where: { userId, date: { gte: startOfYear, lt: endOfYear } },
-      orderBy: { date: "desc" },
-    }),
-  ]);
+  let invoices: Awaited<ReturnType<typeof prisma.invoice.findMany>> = [];
+  let expenses: Awaited<ReturnType<typeof prisma.expense.findMany>> = [];
+
+  try {
+    [invoices, expenses] = await Promise.all([
+      prisma.invoice.findMany({
+        where: {
+          userId,
+          date: { gte: startOfYear, lt: endOfYear },
+          NOT: { emailStatus: InvoiceEmailStatus.CONCEPT },
+        },
+        include: { lines: true, client: true },
+        orderBy: { date: "desc" },
+      }),
+      prisma.expense.findMany({
+        where: { userId, date: { gte: startOfYear, lt: endOfYear } },
+        orderBy: { date: "desc" },
+      }),
+    ]);
+  } catch (error) {
+    console.error("Kon dashboardstatistieken niet ophalen", { error, userId });
+    return {
+      yearlyRevenue: 0,
+      yearlyExpenses: 0,
+      netProfit: 0,
+      totalVatCollected: 0,
+      totalVatPaid: 0,
+      vatToPay: 0,
+      incomeTaxReservation: 0,
+      monthlyChartData,
+      recentInvoices: [],
+      recentExpenses: [],
+    };
+  }
 
   let yearlyRevenue = 0;
   let totalVatCollected = 0;
