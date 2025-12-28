@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const navigatie = [
-  { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
+  { href: "/", label: "Overzicht", icon: LayoutDashboard },
   { href: "/relaties", label: "Relaties", icon: Users },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/offertes", label: "Offertes", icon: FileSignature },
