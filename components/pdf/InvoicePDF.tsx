@@ -230,7 +230,9 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
 
           <View style={styles.companyBlock}>
             {companyProfile?.logoUrl ? (
-              <Image src={companyProfile.logoUrl} style={styles.logo} alt="Bedrijfslogo" />
+              // alt prop is not supported in react-pdf
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={companyProfile.logoUrl} style={styles.logo} />
             ) : (
               <Text style={styles.companyNameFallback}>
                 {companyProfile?.companyName ?? "Bedrijfsnaam"}
