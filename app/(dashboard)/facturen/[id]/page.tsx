@@ -173,8 +173,8 @@ export default async function FactuurDetailPagina({ params }: PageProps) {
                   <p className="text-sm text-slate-700">
                     {pdfInvoice.companyProfile.postalCode} {pdfInvoice.companyProfile.city}
                   </p>
-                  <p className="text-sm text-slate-700">KVK: {pdfInvoice.companyProfile.kvkNumber}</p>
-                  <p className="text-sm text-slate-700">IBAN: {pdfInvoice.companyProfile.iban}</p>
+                  <p className="text-sm text-slate-700">KVK: {pdfInvoice.companyProfile.kvkNumber ?? "—"}</p>
+                  <p className="text-sm text-slate-700">IBAN: {pdfInvoice.companyProfile.iban ?? "—"}</p>
                 </>
               ) : (
                 <p className="text-sm text-slate-700">Geen bedrijfsprofiel gevonden.</p>

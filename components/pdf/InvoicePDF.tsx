@@ -236,7 +236,7 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
                 {companyProfile?.companyName ?? "Bedrijfsnaam"}
               </Text>
             )}
-            <Text style={styles.text}>{companyProfile?.companyName ?? "—"}</Text>
+            {!companyProfile?.logoUrl && <Text style={styles.text}>{companyProfile?.companyName ?? "—"}</Text>}
             <Text style={styles.text}>{companyProfile?.address ?? "Adres niet ingesteld"}</Text>
             <Text style={styles.text}>
               {companyProfile?.postalCode ?? ""} {companyProfile?.city ?? ""}
@@ -275,7 +275,10 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
             const amount = line.quantity * line.price;
             const isLast = index === lines.length - 1;
             return (
-              <View key={`${line.description}-${index}`} style={[styles.row, isLast && styles.lastRow]}>
+              <View
+                key={`${line.description}-${line.unit}-${line.price}-${line.vatRate}-${index}`}
+                style={[styles.row, isLast && styles.lastRow]}
+              >
                 <Text style={[styles.text, styles.description]}>{line.description}</Text>
                 <Text style={[styles.text, styles.qty]}>{line.quantity}</Text>
                 <Text style={[styles.text, styles.unit]}>{line.unit}</Text>
