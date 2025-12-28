@@ -6,30 +6,25 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
   const sessie = getDemoSessie();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-transparent">
       <div className="flex min-h-screen">
         <Sidebar />
         <div className="flex flex-1 flex-col">
-          <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+          <header className="flex items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-4 backdrop-blur">
             <div>
               <p className="text-xs font-semibold uppercase text-slate-500 tracking-wide">
                 ZZP HUB
               </p>
               <p className="text-sm text-slate-600">
-                Sessiebeveiliging actief als placeholder – koppel later je
-                identiteit of SSO-provider.
+                Sessiebeveiliging actief als placeholder – koppel later je identiteit of SSO-provider.
               </p>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-medium text-slate-900">
-                  {sessie.gebruiker}
-                </p>
-                <p className="text-xs text-slate-500">
-                  Abonnement: {sessie.abonnement}
-                </p>
+                <p className="text-sm font-medium text-slate-900">{sessie.gebruiker}</p>
+                <p className="text-xs text-slate-500">Abonnement: {sessie.abonnement}</p>
               </div>
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 text-sm font-semibold text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-800 text-sm font-semibold text-white">
                 ZZ
               </div>
             </div>

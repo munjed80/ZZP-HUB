@@ -26,7 +26,7 @@ export default function BtwPagina() {
           </CardHeader>
           <CardContent>
             <ol className="space-y-2 text-sm text-slate-700">
-              <li>1. Verzamel omzetfacturen en gekoppelde BTW-tarieven (21% / 9%).</li>
+              <li>1. Verzamel omzetfacturen en gekoppelde BTW-tarieven (21% / 9% / 0% / verlegd).</li>
               <li>2. Trek aftrekbare voorbelasting van uitgaven af.</li>
               <li>3. Controleer intracommunautaire prestaties en correcties.</li>
               <li>4. Zet reservering klaar voor automatische betaling via maandelijkse incasso.</li>

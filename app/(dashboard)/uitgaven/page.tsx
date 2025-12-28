@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBedrag } from "@/lib/utils";
 
 const uitgaven = [
-  { categorie: "Software & tools", bedrag: 320, beschrijving: "SaaS licenties (maandelijks)" },
-  { categorie: "Reiskosten", bedrag: 145, beschrijving: "Kilometervergoeding klantbezoek" },
-  { categorie: "Hardware", bedrag: 980, beschrijving: "Laptop upgrade" },
+  { categorie: "Software & tools", bedrag: 320, beschrijving: "SaaS licenties (21% BTW)" },
+  { categorie: "Reiskosten", bedrag: 145, beschrijving: "Kilometervergoeding klantbezoek (0% BTW)" },
+  { categorie: "Hardware", bedrag: 980, beschrijving: "Laptop upgrade (21% BTW)" },
 ];
 
 export default function UitgavenPagina() {
@@ -14,12 +14,12 @@ export default function UitgavenPagina() {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold text-slate-900">Uitgaven</h1>
         <p className="text-sm text-slate-600">
-          Log zakelijke kosten en houd reserveringen bij voor BTW en inkomstenbelasting.
+          Log zakelijke kosten, bewaar bonnen en bepaal aftrekbare voorbelasting (21%, 9%, 0% of verlegd).
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-2 bg-white">
           <CardHeader>
             <CardTitle>Laatste boekingen</CardTitle>
             <Badge variant="info">Klaar voor export</Badge>
@@ -39,7 +39,7 @@ export default function UitgavenPagina() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle>Logging</CardTitle>
             <Badge variant="success">Beveiligd</Badge>
