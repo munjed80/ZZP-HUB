@@ -1,12 +1,15 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Plus, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { clientSchema, type ClientFormValues } from "./schema";
 import { createClient, deleteClient, type getClients } from "./actions";
 
@@ -37,8 +40,10 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
         form.reset();
         setOpen(false);
         router.refresh();
+        toast.success("Relatie succesvol opgeslagen!");
       } catch (error) {
         console.error("Relatie opslaan mislukt", error);
+        toast.error("Relatie opslaan mislukt. Probeer het opnieuw.");
       }
     });
   });
@@ -48,8 +53,10 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
       try {
         await deleteClient(id);
         router.refresh();
+        toast.success("Relatie verwijderd.");
       } catch (error) {
         console.error("Relatie verwijderen mislukt", error);
+        toast.error("Relatie verwijderen mislukt. Probeer het opnieuw.");
       }
     });
   };
@@ -69,19 +76,15 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="success">{sortedClients.length} relaties</Badge>
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
-              className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800"
-            >
+            <Button type="button" onClick={() => setOpen(true)} className="px-3 py-1.5">
               <Plus className="h-4 w-4" aria-hidden />
               Nieuwe relatie
-            </button>
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
           {sortedClients.length === 0 ? (
-            <p className="text-sm text-slate-600">Nog geen relaties toegevoegd.</p>
+            <EmptyState />
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
@@ -107,15 +110,16 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                       <td className="px-3 py-3 text-slate-700">—</td>
                       <td className="px-3 py-3 text-slate-700">{client.city}</td>
                       <td className="px-3 py-3 text-right">
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
                           onClick={() => handleDelete(client.id)}
                           disabled={isPending}
-                          className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed"
+                          className="px-2 py-1 text-xs"
                           aria-label={`Verwijder ${client.name}`}
                         >
                           <Trash2 className="h-4 w-4" aria-hidden />
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -134,13 +138,9 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                 <h2 className="text-lg font-semibold text-slate-900">Nieuwe relatie</h2>
                 <p className="text-sm text-slate-600">Vul de klantgegevens in. Naam en e-mail zijn verplicht.</p>
               </div>
-              <button
-                type="button"
-                className="text-sm font-semibold text-slate-600 hover:text-slate-900"
-                onClick={() => setOpen(false)}
-              >
+              <Button type="button" variant="ghost" className="px-3 py-2" onClick={() => setOpen(false)}>
                 Sluiten
-              </button>
+              </Button>
             </div>
 
             <form onSubmit={onSubmit} className="mt-4 grid gap-4 md:grid-cols-2">
@@ -223,20 +223,12 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
               </div>
 
               <div className="flex justify-end gap-2 md:col-span-2">
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
-                >
+                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                   Annuleren
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed"
-                >
+                </Button>
+                <Button type="submit" disabled={isPending}>
                   {isPending ? "Opslaan..." : "Relatie opslaan"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

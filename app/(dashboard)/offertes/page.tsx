@@ -2,13 +2,16 @@ import Link from "next/link";
 import { FileSignature, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { getQuotations } from "./actions";
 
 function statusVariant(status: string) {
   if (status === "GEACCEPTEERD") return "success" as const;
-  if (status === "AFGEWEZEN") return "warning" as const;
-  return "warning" as const;
+  if (status === "AFGEWEZEN") return "destructive" as const;
+  if (status === "VERZONDEN" || status === "OPEN") return "info" as const;
+  return "muted" as const;
 }
 
 function statusLabel(status: string) {
@@ -31,10 +34,7 @@ export default async function OffertesPagina() {
               Maak offertes, verstuur per mail en zet geaccepteerde offertes om naar facturen.
             </p>
           </div>
-          <Link
-            href="/offertes/nieuw"
-            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-          >
+          <Link href="/offertes/nieuw" className={buttonVariants("primary")}>
             <Plus className="h-4 w-4" aria-hidden />
             Nieuwe offerte
           </Link>
@@ -50,36 +50,37 @@ export default async function OffertesPagina() {
           <Badge variant="warning">Converteren naar factuur</Badge>
         </CardHeader>
         <CardContent className="divide-y divide-slate-200">
-          {offertes.length === 0 && (
-            <p className="py-4 text-sm text-slate-600">Nog geen offertes. Start met een nieuwe offerte.</p>
+          {offertes.length === 0 ? (
+            <EmptyState />
+          ) : (
+            offertes.map((offerte) => (
+              <div
+                key={offerte.id}
+                className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between"
+              >
+                <div>
+                  <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-slate-900 hover:underline">
+                    {offerte.quoteNum}
+                  </Link>
+                  <p className="text-sm text-slate-600">{offerte.client?.name}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={statusVariant(offerte.status)}>{statusLabel(offerte.status)}</Badge>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {formatBedrag(
+                      offerte.lines.reduce((sum, line) => sum + Number(line.amount ?? 0), 0),
+                    )}
+                  </p>
+                  <Link
+                    href={`/offertes/${offerte.id}`}
+                    className={buttonVariants("secondary", "px-3 py-1 text-xs")}
+                  >
+                    Bekijk
+                  </Link>
+                </div>
+              </div>
+            ))
           )}
-          {offertes.map((offerte) => (
-            <div
-              key={offerte.id}
-              className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between"
-            >
-              <div>
-                <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-slate-900 hover:underline">
-                  {offerte.quoteNum}
-                </Link>
-                <p className="text-sm text-slate-600">{offerte.client?.name}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={statusVariant(offerte.status)}>{statusLabel(offerte.status)}</Badge>
-                <p className="text-sm font-semibold text-slate-900">
-                  {formatBedrag(
-                    offerte.lines.reduce((sum, line) => sum + Number(line.amount ?? 0), 0),
-                  )}
-                </p>
-                <Link
-                  href={`/offertes/${offerte.id}`}
-                  className="rounded-lg bg-amber-600 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-500"
-                >
-                  Bekijk
-                </Link>
-              </div>
-            </div>
-          ))}
         </CardContent>
       </Card>
     </div>

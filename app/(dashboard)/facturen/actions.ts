@@ -78,3 +78,44 @@ export async function createInvoice(values: InvoiceFormValues) {
   revalidatePath("/facturen/nieuw");
   return invoice;
 }
+
+export async function updateInvoice(invoiceId: string, values: InvoiceFormValues) {
+  "use server";
+
+  const userId = getCurrentUserId();
+  const data = invoiceSchema.parse(values);
+
+  await ensureUser(userId);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.invoice.updateMany({
+      where: { id: invoiceId, userId },
+      data: {
+        clientId: data.clientId,
+        invoiceNum: data.invoiceNum,
+        date: new Date(data.date),
+        dueDate: new Date(data.dueDate),
+      },
+    });
+
+    await tx.invoiceLine.deleteMany({ where: { invoiceId } });
+
+    await tx.invoiceLine.createMany({
+      data: data.lines.map((line) => ({
+        invoiceId,
+        description: line.description,
+        quantity: new Prisma.Decimal(line.quantity),
+        price: new Prisma.Decimal(line.price),
+        amount: new Prisma.Decimal(line.quantity * line.price),
+        vatRate: mapVatRate(line.vat),
+        unit: mapUnit(line.unit),
+      })),
+    });
+  });
+
+  revalidatePath("/facturen");
+  revalidatePath(`/facturen/${invoiceId}`);
+  revalidatePath(`/facturen/${invoiceId}/edit`);
+
+  return { success: true };
+}

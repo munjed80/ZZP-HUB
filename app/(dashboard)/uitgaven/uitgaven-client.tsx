@@ -5,12 +5,15 @@ import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatBedrag } from "@/lib/utils";
 import { createExpense } from "./actions";
 import { categories, expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { type BtwTarief } from "@prisma/client";
 import { CalendarClock, Euro, Loader2, PieChart, Plus, ReceiptText, UploadCloud } from "lucide-react";
+import { toast } from "sonner";
 
 type UitgavenClientProps = {
   expenses: ExpenseClientShape[];
@@ -148,9 +151,11 @@ export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) 
         setSelectedFile(null);
         setOpen(false);
         router.refresh();
+        toast.success("Uitgave succesvol opgeslagen!");
       } catch (error) {
         console.error("Uitgave opslaan mislukt", error);
         setFormError("Opslaan van uitgave is mislukt. Probeer het later opnieuw.");
+        toast.error("Opslaan van uitgave is mislukt.");
       }
     });
   });
@@ -165,14 +170,10 @@ export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) 
               Registreer kosten, bereken BTW automatisch en bewaar een link naar je bonnetjes.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
-          >
+          <Button type="button" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4" aria-hidden />
             Nieuwe uitgave
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -236,7 +237,7 @@ export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) 
         </CardHeader>
         <CardContent>
           {expenses.length === 0 ? (
-            <p className="text-sm text-slate-600">Nog geen uitgaven geregistreerd.</p>
+            <EmptyState />
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
@@ -309,13 +310,9 @@ export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) 
                   Vul de kosten in. Je kunt een bedrag incl. of excl. BTW invoeren, de ander wordt berekend.
                 </p>
               </div>
-              <button
-                type="button"
-                className="text-sm font-semibold text-slate-600 hover:text-slate-900"
-                onClick={() => setOpen(false)}
-              >
+              <Button type="button" variant="ghost" className="px-3 py-2" onClick={() => setOpen(false)}>
                 Sluiten
-              </button>
+              </Button>
             </div>
 
             <form onSubmit={onSubmit} className="mt-4 grid gap-4 md:grid-cols-2">
@@ -441,18 +438,10 @@ export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) 
               {formError && <p className="text-xs text-amber-700 md:col-span-2">{formError}</p>}
 
               <div className="flex items-center gap-3 md:col-span-2">
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
-                >
+                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
                   Annuleren
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed"
-                >
+                </Button>
+                <Button type="submit" disabled={isPending}>
                   {isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
@@ -464,7 +453,7 @@ export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) 
                       Uitgave opslaan
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

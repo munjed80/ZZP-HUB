@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { convertQuotationToInvoice } from "../actions";
 
 type Props = {
@@ -18,7 +19,7 @@ export function ConvertQuotationButton({ quotationId }: Props) {
       const result = await convertQuotationToInvoice(quotationId);
       if (result?.success && result.invoiceId) {
         toast.success("Offerte omgezet naar factuur.");
-        router.push(`/facturen/${result.invoiceId}`);
+        router.push(`/facturen/${result.invoiceId}/edit`);
       } else {
         toast.error(result?.message ?? "Omzetten mislukt.");
       }
@@ -26,13 +27,8 @@ export function ConvertQuotationButton({ quotationId }: Props) {
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleConvert}
-      disabled={isPending}
-      className="inline-flex items-center justify-center rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white ring-1 ring-amber-600 hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-70"
-    >
+    <Button type="button" onClick={handleConvert} disabled={isPending}>
       {isPending ? "Omzetten..." : "Omzetten naar Factuur"}
-    </button>
+    </Button>
   );
 }

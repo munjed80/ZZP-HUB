@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BtwTarief } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
@@ -131,11 +132,36 @@ export default async function FactuurDetailPagina({ params }: PageProps) {
 
   const totals = calculateInvoiceTotals(pdfInvoice.lines);
   const statusValue = invoice?.emailStatus ?? "CONCEPT";
-  const statusLabel = statusValue.charAt(0) + statusValue.slice(1).toLowerCase();
-  const statusVariant = statusValue === "BETAALD" ? "success" : statusValue === "HERINNERING" ? "warning" : "info";
+  const statusLabel =
+    statusValue === "BETAALD"
+      ? "Betaald"
+      : statusValue === "HERINNERING"
+        ? "Herinnering"
+        : statusValue === "VERZONDEN"
+          ? "Verzonden"
+          : "Concept";
+  const statusVariant =
+    statusValue === "BETAALD"
+      ? "success"
+      : statusValue === "HERINNERING"
+        ? "destructive"
+        : statusValue === "VERZONDEN"
+          ? "info"
+          : "muted";
 
   return (
     <div className="space-y-6">
+      <nav className="flex items-center gap-2 text-sm text-slate-600">
+        <Link href="/" className="hover:text-slate-900">
+          Home
+        </Link>
+        <span aria-hidden>/</span>
+        <Link href="/facturen" className="hover:text-slate-900">
+          Facturen
+        </Link>
+        <span aria-hidden>/</span>
+        <span className="font-semibold text-slate-900">Factuur {pdfInvoice.invoiceNum}</span>
+      </nav>
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Factuur {pdfInvoice.invoiceNum}</h1>
