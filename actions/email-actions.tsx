@@ -85,9 +85,15 @@ export async function sendInvoiceEmail(invoiceId: string) {
   }
 
   try {
+    const sanitizedInvoiceId = invoiceId.trim();
+
+    if (!/^[a-zA-Z0-9-]+$/.test(sanitizedInvoiceId)) {
+      return { success: false, message: "Ongeldig factuurnummer." };
+    }
+
     const userId = getCurrentUserId();
     const invoice = await prisma.invoice.findFirst({
-      where: { id: invoiceId, userId },
+      where: { id: sanitizedInvoiceId, userId },
       include: { client: true, lines: true, user: { include: { companyProfile: true } } },
     });
 
@@ -100,6 +106,8 @@ export async function sendInvoiceEmail(invoiceId: string) {
     const pdfBuffer = await renderToBuffer(<InvoicePDF invoice={pdfInvoice} />);
     const viewUrl = buildInvoiceUrl(invoice.id);
     const companyDetails = buildCompanyDetails(invoice.user.companyProfile);
+    const logoUrl = pdfInvoice.companyProfile?.logoUrl;
+    const trustedLogoUrl = logoUrl?.startsWith("http") ? logoUrl : undefined;
 
     const { error } = await resend.emails.send({
       from: `${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"} <no-reply@zzp-hub.nl>`,
@@ -112,7 +120,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
           viewUrl={viewUrl}
           companyName={pdfInvoice.companyProfile?.companyName}
           companyDetails={companyDetails}
-          logoUrl={pdfInvoice.companyProfile?.logoUrl}
+          logoUrl={trustedLogoUrl}
         />
       ),
       attachments: [
