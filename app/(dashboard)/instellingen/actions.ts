@@ -7,9 +7,14 @@ import { companySettingsSchema, type CompanySettingsInput } from "./schema";
 
 export async function fetchCompanyProfile() {
   const userId = getCurrentUserId();
-  return prisma.companyProfile.findUnique({
-    where: { userId },
-  });
+  try {
+    return await prisma.companyProfile.findUnique({
+      where: { userId },
+    });
+  } catch (error) {
+    console.error("Kon bedrijfsprofiel niet ophalen", error);
+    return null;
+  }
 }
 
 export async function updateCompanySettings(values: CompanySettingsInput) {
