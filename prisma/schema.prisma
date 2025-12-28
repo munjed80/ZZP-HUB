@@ -34,6 +34,7 @@ enum Eenheid {
   PROJECT
   LICENTIE
   SERVICE
+  KM
 }
 
 model User {
