@@ -1,11 +1,15 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 
 const schema = z.object({
-  naam: z.string().min(2, "Naam is verplicht"),
+  bedrijfsnaam: z.string().min(2, "Bedrijfsnaam is verplicht"),
   email: z.string().email("Voer een geldig e-mailadres in"),
   wachtwoord: z.string().min(6, "Minimaal 6 tekens"),
 });
@@ -13,71 +17,87 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function RegisterPagina() {
+  const router = useRouter();
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { naam: "", email: "", wachtwoord: "" },
+    defaultValues: { bedrijfsnaam: "", email: "", wachtwoord: "" },
   });
 
+  const onSubmit = (data: FormData) => {
+    console.log("Registratie", data);
+    router.push("/dashboard");
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="space-y-1 text-center">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          ZZP HUB
-        </p>
-        <h1 className="text-2xl font-bold text-slate-900">Registreren</h1>
-        <p className="text-sm text-slate-600">
-          Maak een account aan. Authenticatie wordt gekoppeld aan sessies met SSO of NextAuth.
-        </p>
-      </div>
+    <Card className="overflow-hidden border-slate-100 bg-white/95 shadow-xl">
+      <CardHeader className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">ZZP-HUB</p>
+        <CardTitle className="text-2xl text-slate-900">Start gratis proefperiode</CardTitle>
+        <p className="text-sm text-slate-600">Geen creditcard nodig.</p>
+      </CardHeader>
+      <CardContent>
+        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-800" htmlFor="bedrijfsnaam">
+              Bedrijfsnaam
+            </label>
+            <input
+              id="bedrijfsnaam"
+              required
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              {...form.register("bedrijfsnaam")}
+              aria-invalid={!!form.formState.errors.bedrijfsnaam}
+            />
+            {form.formState.errors.bedrijfsnaam && (
+              <p className="text-xs text-amber-700">{form.formState.errors.bedrijfsnaam.message}</p>
+            )}
+          </div>
 
-      <form className="space-y-4">
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-slate-800">Naam</label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-            {...form.register("naam")}
-          />
-          {form.formState.errors.naam && (
-            <p className="text-xs text-amber-700">{form.formState.errors.naam.message}</p>
-          )}
-        </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-800" htmlFor="email">
+              E-mailadres
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              {...form.register("email")}
+              aria-invalid={!!form.formState.errors.email}
+            />
+            {form.formState.errors.email && (
+              <p className="text-xs text-amber-700">{form.formState.errors.email.message}</p>
+            )}
+          </div>
 
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-slate-800">E-mailadres</label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-            type="email"
-            {...form.register("email")}
-          />
-          {form.formState.errors.email && (
-            <p className="text-xs text-amber-700">{form.formState.errors.email.message}</p>
-          )}
-        </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-800" htmlFor="wachtwoord">
+              Wachtwoord
+            </label>
+            <input
+              id="wachtwoord"
+              type="password"
+              required
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              {...form.register("wachtwoord")}
+              aria-invalid={!!form.formState.errors.wachtwoord}
+            />
+            {form.formState.errors.wachtwoord && (
+              <p className="text-xs text-amber-700">{form.formState.errors.wachtwoord.message}</p>
+            )}
+          </div>
 
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-slate-800">Wachtwoord</label>
-          <input
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-            type="password"
-            {...form.register("wachtwoord")}
-          />
-          {form.formState.errors.wachtwoord && (
-            <p className="text-xs text-amber-700">{form.formState.errors.wachtwoord.message}</p>
-          )}
-        </div>
-
-        <button
-          type="button"
-          onClick={form.handleSubmit((data) => console.log("Registratie", data))}
-          className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-        >
-          Registreer
-        </button>
-      </form>
-
-      <p className="text-center text-xs text-slate-500">
-        Door te registreren ga je akkoord met de voorwaarden en privacyverklaring.
-      </p>
-    </div>
+          <button type="submit" className={buttonVariants("primary", "w-full justify-center text-base py-2.5")}>
+            Account aanmaken
+          </button>
+        </form>
+      </CardContent>
+      <CardFooter className="flex flex-col items-center gap-2 text-sm text-slate-600">
+        <Link href="/login" className="text-blue-700 hover:text-blue-800">
+          Al een account? Log in
+        </Link>
+        <p className="text-xs text-slate-500">Demo-omgeving: redirect na registratie naar dashboard.</p>
+      </CardFooter>
+    </Card>
   );
 }

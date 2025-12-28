@@ -6,6 +6,11 @@ type CardProps = {
   className?: string;
 };
 
+type CardSectionProps = {
+  children: ReactNode;
+  className?: string;
+};
+
 export function Card({ children, className }: CardProps) {
   return (
     <div className={cn("rounded-xl border border-slate-200 bg-white p-4 shadow-sm", className)}>
@@ -14,14 +19,18 @@ export function Card({ children, className }: CardProps) {
   );
 }
 
-export function CardHeader({ children }: { children: ReactNode }) {
-  return <div className="flex items-start justify-between gap-2 pb-3">{children}</div>;
+export function CardHeader({ children, className }: CardSectionProps) {
+  return <div className={cn("flex items-start justify-between gap-2 pb-3", className)}>{children}</div>;
 }
 
-export function CardTitle({ children }: { children: ReactNode }) {
-  return <h3 className="text-base font-semibold text-slate-900">{children}</h3>;
+export function CardTitle({ children, className }: CardSectionProps) {
+  return <h3 className={cn("text-base font-semibold text-slate-900", className)}>{children}</h3>;
 }
 
-export function CardContent({ children }: { children: ReactNode }) {
-  return <div className="text-sm text-slate-700">{children}</div>;
+export function CardContent({ children, className }: CardSectionProps) {
+  return <div className={cn("text-sm text-slate-700", className)}>{children}</div>;
+}
+
+export function CardFooter({ children, className }: CardSectionProps) {
+  return <div className={cn("pt-3", className)}>{children}</div>;
 }
