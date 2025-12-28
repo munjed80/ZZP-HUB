@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { sendQuotationEmail } from "../actions";
 
 type Props = {
@@ -27,13 +28,8 @@ export function SendQuotationEmailButton({ quotationId, recipientEmail }: Props)
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleSend}
-      disabled={isPending}
-      className="inline-flex items-center justify-center rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white ring-1 ring-amber-600 hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-70"
-    >
+    <Button type="button" onClick={handleSend} disabled={isPending}>
       {isPending ? "Versturen..." : "Verstuur via Email"}
-    </button>
+    </Button>
   );
 }

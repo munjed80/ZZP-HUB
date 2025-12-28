@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Sidebar } from "@/components/layout/sidebar";
+import { MobileSidebar, Sidebar } from "@/components/layout/sidebar";
 import { getDemoSessie } from "@/lib/auth";
 
 export default function DashboardShell({ children }: { children: ReactNode }) {
@@ -11,13 +11,16 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
         <Sidebar />
         <div className="flex flex-1 flex-col">
           <header className="flex items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-4 backdrop-blur">
-            <div>
-              <p className="text-xs font-semibold uppercase text-slate-500 tracking-wide">
-                ZZP HUB
-              </p>
-              <p className="text-sm text-slate-600">
-                Sessiebeveiliging actief als placeholder – koppel later je identiteit of SSO-provider.
-              </p>
+            <div className="flex items-start gap-3">
+              <MobileSidebar />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  ZZP HUB
+                </p>
+                <p className="text-sm text-slate-600">
+                  Sessiebeveiliging actief als placeholder – koppel later je identiteit of SSO-provider.
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">

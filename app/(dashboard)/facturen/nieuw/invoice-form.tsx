@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBedrag } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +9,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
-import { createInvoice } from "../actions";
+import { toast } from "sonner";
+import { createInvoice, updateInvoice } from "../actions";
 import { invoiceSchema, type InvoiceFormValues } from "../schema";
 
 type Client = {
@@ -22,6 +24,14 @@ type Client = {
   btwId: string | null;
 };
 
+type InvoiceFormProps = {
+  clients: Client[];
+  initialInvoice?: InvoiceFormValues;
+  initialClientName?: string;
+  mode?: "create" | "edit";
+  invoiceId?: string;
+};
+
 function formatDateInput(date: Date) {
   return date.toISOString().slice(0, 10);
 }
@@ -32,12 +42,15 @@ function generateInvoiceNumber() {
   return `draft-${year}-${suffix}`;
 }
 
-export function InvoiceForm({ clients }: { clients: Client[] }) {
+export function InvoiceForm({
+  clients,
+  initialInvoice,
+  initialClientName,
+  mode = "create",
+  invoiceId,
+}: InvoiceFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [searchTerm, setSearchTerm] = useState(() => clients[0]?.name ?? "");
-  const [openList, setOpenList] = useState(false);
-
   const today = useMemo(() => new Date(), []);
   const defaultDueDate = useMemo(() => {
     const d = new Date();
@@ -45,23 +58,34 @@ export function InvoiceForm({ clients }: { clients: Client[] }) {
     return d;
   }, []);
 
+  const defaultFormValues: InvoiceFormValues = useMemo(
+    () =>
+      initialInvoice ?? {
+        clientId: clients[0]?.id ?? "",
+        invoiceNum: generateInvoiceNumber(),
+        date: formatDateInput(today),
+        dueDate: formatDateInput(defaultDueDate),
+        lines: [
+          {
+            description: "",
+            quantity: 1,
+            unit: "UUR",
+            price: 0,
+            vat: "21",
+          },
+        ],
+      },
+    [clients, defaultDueDate, initialInvoice, today],
+  );
+
+  const [searchTerm, setSearchTerm] = useState(
+    () => initialClientName ?? clients.find((client) => client.id === defaultFormValues.clientId)?.name ?? "",
+  );
+  const [openList, setOpenList] = useState(false);
+
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
-    defaultValues: {
-      clientId: clients[0]?.id ?? "",
-      invoiceNum: generateInvoiceNumber(),
-      date: formatDateInput(today),
-      dueDate: formatDateInput(defaultDueDate),
-      lines: [
-        {
-          description: "",
-          quantity: 1,
-          unit: "UUR",
-          price: 0,
-          vat: "21",
-        },
-      ],
-    },
+    defaultValues: defaultFormValues,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -118,10 +142,18 @@ export function InvoiceForm({ clients }: { clients: Client[] }) {
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
       try {
-        await createInvoice(values);
-        router.push("/facturen");
+        if (mode === "edit" && invoiceId) {
+          await updateInvoice(invoiceId, values);
+          toast.success("Factuur succesvol bijgewerkt!");
+          router.push(`/facturen/${invoiceId}`);
+        } else {
+          const invoice = await createInvoice(values);
+          toast.success("Factuur succesvol aangemaakt!");
+          router.push(`/facturen/${invoice.id}/edit`);
+        }
       } catch (error) {
         console.error("Factuur opslaan mislukt", error);
+        toast.error("Factuur opslaan mislukt. Probeer het opnieuw.");
       }
     });
   });
@@ -129,7 +161,9 @@ export function InvoiceForm({ clients }: { clients: Client[] }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">Nieuwe factuur</h1>
+        <h1 className="text-2xl font-bold text-slate-900">
+          {mode === "edit" ? "Factuur bewerken" : "Nieuwe factuur"}
+        </h1>
         <p className="text-sm text-slate-600">
           Koppel een relatie, vul factuurregels in en bewaar als concept. Klantadres en BTW-gegevens worden direct ingevuld.
         </p>
@@ -371,8 +405,9 @@ export function InvoiceForm({ clients }: { clients: Client[] }) {
           </div>
 
           <div className="flex justify-between">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={() =>
                 append({
                   description: "",
@@ -382,11 +417,11 @@ export function InvoiceForm({ clients }: { clients: Client[] }) {
                   vat: "21",
                 })
               }
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-800 ring-1 ring-slate-200 hover:ring-slate-300"
+              className="px-3"
             >
               <Plus className="h-4 w-4" aria-hidden />
               Regel toevoegen
-            </button>
+            </Button>
           </div>
 
           <div className="grid gap-3 rounded-lg bg-slate-50 p-4 text-sm text-slate-800 md:grid-cols-3">
@@ -405,20 +440,12 @@ export function InvoiceForm({ clients }: { clients: Client[] }) {
           </div>
 
           <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => router.push("/facturen")}
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:ring-slate-300"
-            >
+            <Button type="button" variant="secondary" onClick={() => router.push("/facturen")}>
               Annuleren
-            </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed"
-            >
-              {isPending ? "Opslaan..." : "Factuur opslaan"}
-            </button>
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Opslaan..." : mode === "edit" ? "Factuur bijwerken" : "Factuur opslaan"}
+            </Button>
           </div>
           </form>
         </CardContent>
