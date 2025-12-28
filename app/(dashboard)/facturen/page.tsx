@@ -19,7 +19,7 @@ export default function FacturenPagina() {
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/facturen/create"
+            href="/facturen/nieuw"
             className="inline-flex w-fit items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
           >
             Nieuwe factuur (concept)
