@@ -7,6 +7,7 @@ import { calculateInvoiceTotals, type InvoicePdfData } from "@/components/pdf/In
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatBedrag } from "@/lib/utils";
+import { SendInvoiceEmailButton } from "./send-invoice-email-button";
 
 type PageProps = {
   params: Promise<{
@@ -143,7 +144,12 @@ export default async function FactuurDetailPagina({ params }: PageProps) {
           </p>
           <p className="text-sm text-slate-600">Klant: {pdfInvoice.client.name}</p>
         </div>
-        <InvoicePdfDownloadButton invoice={pdfInvoice} />
+        <div className="flex flex-col gap-2 sm:flex-row">
+          {invoice ? (
+            <SendInvoiceEmailButton invoiceId={invoice.id} recipientEmail={invoice.client.email} />
+          ) : null}
+          <InvoicePdfDownloadButton invoice={pdfInvoice} />
+        </div>
       </div>
 
       <Card className="bg-white">
