@@ -88,6 +88,7 @@ function getDemoPdfInvoice(id: string): InvoicePdfData {
 export default async function FactuurDetailPagina({ params }: PageProps) {
   const { id } = await params;
   const invoice = await getInvoiceWithRelations(id);
+  const isDemoInvoice = process.env.NODE_ENV !== "production" && id.startsWith("demo");
 
   const pdfInvoice: InvoicePdfData | null = invoice
     ? {
@@ -119,7 +120,7 @@ export default async function FactuurDetailPagina({ params }: PageProps) {
           vatRate: mapVatRate(line.vatRate),
         })),
       }
-    : process.env.NODE_ENV !== "production"
+    : isDemoInvoice
       ? getDemoPdfInvoice(id)
       : null;
 

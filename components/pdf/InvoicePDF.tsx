@@ -207,6 +207,11 @@ const styles = StyleSheet.create({
 export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
   const { companyProfile, lines } = invoice;
   const totals = calculateInvoiceTotals(lines);
+  const paymentText = `Gelieve te betalen voor ${invoice.dueDate} op rekening ${
+    companyProfile?.iban ?? "—"
+  } t.n.v. ${companyProfile?.companyName ?? "uw bedrijfsnaam"}.`;
+  const logoUrl = companyProfile?.logoUrl;
+  const isTrustedLogo = logoUrl?.startsWith("http");
 
   return (
     <Document>
@@ -222,8 +227,8 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
           </View>
 
           <View style={styles.companyBlock}>
-            {companyProfile?.logoUrl ? (
-              <Image src={companyProfile.logoUrl} style={styles.logo} alt="Bedrijfslogo" />
+            {isTrustedLogo ? (
+              <Image src={logoUrl} style={styles.logo} alt="Bedrijfslogo" />
             ) : (
               <Text style={styles.companyNameFallback}>
                 {companyProfile?.companyName ?? "Bedrijfsnaam"}
@@ -298,11 +303,7 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
           </View>
         </View>
 
-        <Text style={styles.legal}>
-          {`Gelieve te betalen voor ${invoice.dueDate} op rekening ${
-            companyProfile?.iban ?? "—"
-          } t.n.v. ${companyProfile?.companyName ?? "uw bedrijfsnaam"}.`}
-        </Text>
+        <Text style={styles.legal}>{paymentText}</Text>
       </Page>
     </Document>
   );
