@@ -80,6 +80,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 700,
   },
+  documentType: {
+    fontSize: 10,
+    fontWeight: 700,
+    color: "#1d4ed8",
+    marginBottom: 6,
+    textTransform: "uppercase",
+  },
   logo: {
     width: 120,
     height: 40,
@@ -204,7 +211,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
+type DocumentType = "FACTUUR" | "OFFERTE";
+
+export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: InvoicePdfData; documentType?: DocumentType }) {
   const { companyProfile, lines } = invoice;
   const totals = calculateInvoiceTotals(lines);
   const paymentText = `Gelieve te betalen voor ${invoice.dueDate} op rekening ${
@@ -227,6 +236,7 @@ export function InvoicePDF({ invoice }: { invoice: InvoicePdfData }) {
           </View>
 
           <View style={styles.companyBlock}>
+            <Text style={styles.documentType}>{documentType}</Text>
             {isTrustedLogo ? (
               <Image src={logoUrl} style={styles.logo} alt="Bedrijfslogo" />
             ) : (

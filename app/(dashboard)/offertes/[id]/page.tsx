@@ -7,7 +7,8 @@ import { calculateInvoiceTotals, type InvoicePdfData } from "@/components/pdf/In
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatBedrag } from "@/lib/utils";
-import { SendInvoiceEmailButton } from "./send-invoice-email-button";
+import { ConvertQuotationButton } from "./convert-quotation-button";
+import { SendQuotationEmailButton } from "./send-quotation-email-button";
 
 type PageProps = {
   params: Promise<{
@@ -25,11 +26,11 @@ function formatDate(date: Date) {
   return new Date(date).toLocaleDateString("nl-NL");
 }
 
-async function getInvoiceWithRelations(id: string) {
+async function getQuotationWithRelations(id: string) {
   const userId = getCurrentUserId();
 
   try {
-    return await prisma.invoice.findFirst({
+    return await prisma.quotation.findFirst({
       where: { id, userId },
       include: {
         client: true,
@@ -38,125 +39,87 @@ async function getInvoiceWithRelations(id: string) {
       },
     });
   } catch (error) {
-    console.error("Kon factuur niet ophalen", error);
+    console.error("Kon offerte niet ophalen", error);
     return null;
   }
 }
 
-function getDemoPdfInvoice(id: string): InvoicePdfData {
-  const today = new Date();
-  const dueDate = new Date();
-  dueDate.setDate(today.getDate() + 14);
-
-  return {
-    invoiceNum: id.startsWith("demo") ? id : `demo-${id}`,
-    date: formatDate(today),
-    dueDate: formatDate(dueDate),
-    client: {
-      name: "Demo Klant BV",
-      address: "Keizersgracht 1",
-      postalCode: "1015 AB",
-      city: "Amsterdam",
-    },
-    companyProfile: {
-      companyName: "ZZP HUB Demo",
-      address: "Prinsengracht 100",
-      postalCode: "1015 EA",
-      city: "Amsterdam",
-      kvkNumber: "81234567",
-      iban: "NL00BANK0123456789",
-      logoUrl: null,
-    },
-    lines: [
-      {
-        description: "Consultancy uren",
-        quantity: 8,
-        unit: "UUR",
-        price: 95,
-        vatRate: "21",
-      },
-      {
-        description: "Onderhoudscontract",
-        quantity: 1,
-        unit: "PROJECT",
-        price: 350,
-        vatRate: "9",
-      },
-    ],
-  };
-}
-
-export default async function FactuurDetailPagina({ params }: PageProps) {
+export default async function OfferteDetailPagina({ params }: PageProps) {
   const { id } = await params;
-  const invoice = await getInvoiceWithRelations(id);
-  const isDemoInvoice = process.env.NODE_ENV !== "production" && id.startsWith("demo");
+  const quotation = await getQuotationWithRelations(id);
 
-  const pdfInvoice: InvoicePdfData | null = invoice
-    ? {
-        invoiceNum: invoice.invoiceNum,
-        date: formatDate(invoice.date),
-        dueDate: formatDate(invoice.dueDate),
-        client: {
-          name: invoice.client.name,
-          address: invoice.client.address,
-          postalCode: invoice.client.postalCode,
-          city: invoice.client.city,
-        },
-        companyProfile: invoice.user.companyProfile
-          ? {
-              companyName: invoice.user.companyProfile.companyName,
-              address: invoice.user.companyProfile.address,
-              postalCode: invoice.user.companyProfile.postalCode,
-              city: invoice.user.companyProfile.city,
-              kvkNumber: invoice.user.companyProfile.kvkNumber,
-              iban: invoice.user.companyProfile.iban,
-              logoUrl: invoice.user.companyProfile.logoUrl,
-            }
-          : null,
-        lines: invoice.lines.map((line) => ({
-          description: line.description,
-          quantity: Number(line.quantity),
-          unit: line.unit,
-          price: Number(line.price),
-          vatRate: mapVatRate(line.vatRate),
-        })),
-      }
-    : isDemoInvoice
-      ? getDemoPdfInvoice(id)
-      : null;
-
-  if (!pdfInvoice) {
+  if (!quotation) {
     notFound();
   }
 
-  const totals = calculateInvoiceTotals(pdfInvoice.lines);
-  const statusValue = invoice?.emailStatus ?? "CONCEPT";
-  const statusLabel = statusValue.charAt(0) + statusValue.slice(1).toLowerCase();
-  const statusVariant = statusValue === "BETAALD" ? "success" : statusValue === "HERINNERING" ? "warning" : "info";
+  const pdfQuotation: InvoicePdfData = {
+    invoiceNum: quotation.quoteNum,
+    date: formatDate(quotation.date),
+    dueDate: formatDate(quotation.validUntil),
+    client: {
+      name: quotation.client.name,
+      address: quotation.client.address,
+      postalCode: quotation.client.postalCode,
+      city: quotation.client.city,
+    },
+    companyProfile: quotation.user.companyProfile
+      ? {
+          companyName: quotation.user.companyProfile.companyName,
+          address: quotation.user.companyProfile.address,
+          postalCode: quotation.user.companyProfile.postalCode,
+          city: quotation.user.companyProfile.city,
+          kvkNumber: quotation.user.companyProfile.kvkNumber,
+          iban: quotation.user.companyProfile.iban,
+          logoUrl: quotation.user.companyProfile.logoUrl,
+        }
+      : null,
+    lines: quotation.lines.map((line) => ({
+      description: line.description,
+      quantity: Number(line.quantity),
+      unit: line.unit,
+      price: Number(line.price),
+      vatRate: mapVatRate(line.vatRate),
+    })),
+  };
+
+  const totals = calculateInvoiceTotals(pdfQuotation.lines);
+  const statusValue = quotation.status;
+  const statusLabel =
+    statusValue === "GEACCEPTEERD"
+      ? "Geaccepteerd"
+      : statusValue === "AFGEWEZEN"
+        ? "Geweigerd"
+        : statusValue === "VERZONDEN"
+          ? "Open"
+          : "Concept";
+  const statusVariant = statusValue === "GEACCEPTEERD" ? "success" : "warning";
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Factuur {pdfInvoice.invoiceNum}</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Offerte {pdfQuotation.invoiceNum}</h1>
           <p className="text-sm text-slate-600">
-            Datum: {pdfInvoice.date} · Vervaldatum: {pdfInvoice.dueDate}
+            Datum: {pdfQuotation.date} · Geldig tot: {pdfQuotation.dueDate}
           </p>
-          <p className="text-sm text-slate-600">Klant: {pdfInvoice.client.name}</p>
+          <p className="text-sm text-slate-600">Klant: {pdfQuotation.client.name}</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          {invoice ? (
-            <SendInvoiceEmailButton invoiceId={invoice.id} recipientEmail={invoice.client.email} />
-          ) : null}
-          <InvoicePdfDownloadButton invoice={pdfInvoice} />
+          <SendQuotationEmailButton quotationId={quotation.id} recipientEmail={quotation.client.email} />
+          <ConvertQuotationButton quotationId={quotation.id} />
+          <InvoicePdfDownloadButton
+            invoice={pdfQuotation}
+            documentType="OFFERTE"
+            fileName={`offerte-${pdfQuotation.invoiceNum}.pdf`}
+          />
         </div>
       </div>
 
       <Card className="bg-white">
         <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
-            <CardTitle>Factuurdetails</CardTitle>
-            <p className="text-sm text-slate-600">Bekijk factuurregels en bedrijfsgegevens.</p>
+            <CardTitle>Offertedetails</CardTitle>
+            <p className="text-sm text-slate-600">Bekijk offerteregels en bedrijfsgegevens.</p>
           </div>
           <Badge variant={statusVariant}>{statusLabel}</Badge>
         </CardHeader>
@@ -165,23 +128,23 @@ export default async function FactuurDetailPagina({ params }: PageProps) {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-lg border border-slate-200 p-4">
               <p className="text-sm font-semibold text-slate-900">Klant</p>
-              <p className="text-sm text-slate-700">{pdfInvoice.client.name}</p>
-              <p className="text-sm text-slate-700">{pdfInvoice.client.address}</p>
+              <p className="text-sm text-slate-700">{pdfQuotation.client.name}</p>
+              <p className="text-sm text-slate-700">{pdfQuotation.client.address}</p>
               <p className="text-sm text-slate-700">
-                {pdfInvoice.client.postalCode} {pdfInvoice.client.city}
+                {pdfQuotation.client.postalCode} {pdfQuotation.client.city}
               </p>
             </div>
             <div className="rounded-lg border border-slate-200 p-4">
               <p className="text-sm font-semibold text-slate-900">Bedrijf</p>
-              {pdfInvoice.companyProfile ? (
+              {pdfQuotation.companyProfile ? (
                 <>
-                  <p className="text-sm text-slate-700">{pdfInvoice.companyProfile.companyName}</p>
-                  <p className="text-sm text-slate-700">{pdfInvoice.companyProfile.address}</p>
+                  <p className="text-sm text-slate-700">{pdfQuotation.companyProfile.companyName}</p>
+                  <p className="text-sm text-slate-700">{pdfQuotation.companyProfile.address}</p>
                   <p className="text-sm text-slate-700">
-                    {pdfInvoice.companyProfile.postalCode} {pdfInvoice.companyProfile.city}
+                    {pdfQuotation.companyProfile.postalCode} {pdfQuotation.companyProfile.city}
                   </p>
-                  <p className="text-sm text-slate-700">KVK: {pdfInvoice.companyProfile.kvkNumber ?? "—"}</p>
-                  <p className="text-sm text-slate-700">IBAN: {pdfInvoice.companyProfile.iban ?? "—"}</p>
+                  <p className="text-sm text-slate-700">KVK: {pdfQuotation.companyProfile.kvkNumber ?? "—"}</p>
+                  <p className="text-sm text-slate-700">IBAN: {pdfQuotation.companyProfile.iban ?? "—"}</p>
                 </>
               ) : (
                 <p className="text-sm text-slate-700">Geen bedrijfsprofiel gevonden.</p>
@@ -199,7 +162,7 @@ export default async function FactuurDetailPagina({ params }: PageProps) {
               <span className="text-right">Bedrag</span>
             </div>
             <div className="divide-y divide-slate-200">
-              {pdfInvoice.lines.map((line, index) => {
+              {pdfQuotation.lines.map((line, index) => {
                 const lineTotal = line.quantity * line.price;
                 return (
                   <div key={index} className="grid grid-cols-6 px-4 py-3 text-sm text-slate-800">
@@ -229,12 +192,11 @@ export default async function FactuurDetailPagina({ params }: PageProps) {
               <span className="font-semibold">{formatBedrag(totals.vatLow)}</span>
             </div>
             <div className="flex w-full max-w-md items-center justify-between text-base font-bold">
-              <span>Totaal te betalen</span>
+              <span>Totaal</span>
               <span>{formatBedrag(totals.total)}</span>
             </div>
             <p className="mt-2 text-xs text-slate-600">
-              Gelieve te betalen voor {pdfInvoice.dueDate} op rekening {pdfInvoice.companyProfile?.iban ?? "—"} t.n.v.{" "}
-              {pdfInvoice.companyProfile?.companyName ?? "uw bedrijfsnaam"}.
+              Geldig tot {pdfQuotation.dueDate}. Bij akkoord kunnen we direct een factuur opmaken.
             </p>
           </div>
         </CardContent>
