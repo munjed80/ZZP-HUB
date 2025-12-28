@@ -1,21 +1,44 @@
-import { FileSignature } from "lucide-react";
+import Link from "next/link";
+import { FileSignature, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBedrag } from "@/lib/utils";
+import { getQuotations } from "./actions";
 
-const offertes = [
-  { nummer: "OFF-2025-004", klant: "Studio Delta", bedrag: 4200, status: "Verzonden" },
-  { nummer: "OFF-2025-003", klant: "Bright BV", bedrag: 1850, status: "Geaccepteerd" },
-];
+function statusVariant(status: string) {
+  if (status === "GEACCEPTEERD") return "success" as const;
+  if (status === "AFGEWEZEN") return "warning" as const;
+  return "warning" as const;
+}
 
-export default function OffertesPagina() {
+function statusLabel(status: string) {
+  if (status === "GEACCEPTEERD") return "Geaccepteerd";
+  if (status === "AFGEWEZEN") return "Geweigerd";
+  if (status === "VERZONDEN") return "Open";
+  return "Concept";
+}
+
+export default async function OffertesPagina() {
+  const offertes = await getQuotations();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">Offertes</h1>
-        <p className="text-sm text-slate-600">
-          Stel offertes op met BTW 21%, 9%, 0% of verlegd. Converteer geaccepteerde offertes naar facturen met één klik.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Offertes</h1>
+            <p className="text-sm text-slate-600">
+              Maak offertes, verstuur per mail en zet geaccepteerde offertes om naar facturen.
+            </p>
+          </div>
+          <Link
+            href="/offertes/nieuw"
+            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+          >
+            <Plus className="h-4 w-4" aria-hidden />
+            Nieuwe offerte
+          </Link>
+        </div>
       </div>
 
       <Card className="bg-white">
@@ -24,23 +47,36 @@ export default function OffertesPagina() {
             <FileSignature className="h-4 w-4 text-slate-500" aria-hidden />
             <CardTitle>Laatste offertes</CardTitle>
           </div>
-          <Badge variant="info">Converteren naar factuur</Badge>
+          <Badge variant="warning">Converteren naar factuur</Badge>
         </CardHeader>
         <CardContent className="divide-y divide-slate-200">
+          {offertes.length === 0 && (
+            <p className="py-4 text-sm text-slate-600">Nog geen offertes. Start met een nieuwe offerte.</p>
+          )}
           {offertes.map((offerte) => (
-            <div key={offerte.nummer} className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between">
+            <div
+              key={offerte.id}
+              className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between"
+            >
               <div>
-                <p className="text-sm font-semibold text-slate-900">{offerte.nummer}</p>
-                <p className="text-sm text-slate-600">{offerte.klant}</p>
+                <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-slate-900 hover:underline">
+                  {offerte.quoteNum}
+                </Link>
+                <p className="text-sm text-slate-600">{offerte.client?.name}</p>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant={offerte.status === "Geaccepteerd" ? "success" : "info"}>
-                  {offerte.status}
-                </Badge>
-                <p className="text-sm font-semibold text-slate-900">{formatBedrag(offerte.bedrag)}</p>
-                <button className="rounded-lg bg-slate-900 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-800">
-                  Converteer naar factuur
-                </button>
+                <Badge variant={statusVariant(offerte.status)}>{statusLabel(offerte.status)}</Badge>
+                <p className="text-sm font-semibold text-slate-900">
+                  {formatBedrag(
+                    offerte.lines.reduce((sum, line) => sum + Number(line.amount ?? 0), 0),
+                  )}
+                </p>
+                <Link
+                  href={`/offertes/${offerte.id}`}
+                  className="rounded-lg bg-amber-600 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-500"
+                >
+                  Bekijk
+                </Link>
               </div>
             </div>
           ))}
