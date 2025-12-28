@@ -7,10 +7,11 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
 
 const DEMO_USER = {
-  email: "demo@zzp-hub.nl",
-  passwordHash: "demo-placeholder-hash",
-  naam: "Demo gebruiker",
+  email: process.env.DEMO_USER_EMAIL ?? "demo@zzp-hub.local",
+  passwordHash: process.env.DEMO_USER_PASSWORD_HASH ?? "demo-placeholder-hash",
+  naam: process.env.DEMO_USER_NAME ?? "Demo gebruiker",
 };
+const allowDemoUserBootstrap = process.env.ALLOW_DEMO_USER === "true" || process.env.NODE_ENV === "development";
 
 const timeEntrySchema = z.object({
   date: z.string().min(1, "Datum is verplicht"),
@@ -35,10 +36,15 @@ function getYearRange() {
 }
 
 async function ensureUser(userId: string) {
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: {},
-    create: {
+  const existing = await prisma.user.findUnique({ where: { id: userId } });
+  if (existing) return;
+
+  if (!allowDemoUserBootstrap) {
+    throw new Error("Gebruiker niet gevonden. Stel ALLOW_DEMO_USER op 'true' of koppel een echte authenticatie provider.");
+  }
+
+  await prisma.user.create({
+    data: {
       id: userId,
       ...DEMO_USER,
     },
@@ -64,7 +70,7 @@ export async function logTimeEntry(values: TimeEntryInput) {
     revalidatePath("/uren");
   } catch (error) {
     console.error("Urenregistratie opslaan mislukt", { error, userId });
-    throw new Error("Kon de tijdsregistratie niet opslaan. Probeer het later opnieuw.");
+    throw new Error("Tijdsregistratie kon niet worden opgeslagen. Controleer de invoer en probeer het opnieuw.");
   }
 }
 
@@ -94,9 +100,13 @@ export async function deleteTimeEntry(id: string) {
   const userId = getCurrentUserId();
 
   try {
-    await prisma.timeEntry.deleteMany({
-      where: { id, userId },
-    });
+    const entry = await prisma.timeEntry.findUnique({ where: { id } });
+
+    if (!entry || entry.userId !== userId) {
+      throw new Error("Tijdregistratie niet gevonden voor deze gebruiker.");
+    }
+
+    await prisma.timeEntry.delete({ where: { id } });
     revalidatePath("/uren");
   } catch (error) {
     console.error("Tijdregistratie verwijderen mislukt", { error, id, userId });

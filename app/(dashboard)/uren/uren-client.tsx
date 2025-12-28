@@ -38,6 +38,7 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
 
   const progress = useMemo(() => Math.min((totalHours / HOURS_GOAL) * 100, 100), [totalHours]);
   const goalReached = totalHours >= HOURS_GOAL;
+  const badgeVariant = goalReached ? "success" : "info";
   const progressColor = goalReached ? "bg-emerald-500" : progress >= 75 ? "bg-amber-500" : "bg-sky-500";
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -102,11 +103,11 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
       <Card className="bg-white">
         <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
-            <Timer className="h-4 w-4 text-slate-500" aria-hidden />
+            <Timer className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <CardTitle>1225-criterium</CardTitle>
           </div>
-          <Badge variant={goalReached ? "success" : "info"}>
-            {goalReached ? "Doel gehaald!" : "Gewerkte uren: " + totalHours.toFixed(2) + " / 1225"}
+          <Badge variant={badgeVariant}>
+            {goalReached ? "Doel gehaald!" : `Gewerkte uren: ${totalHours.toFixed(2)} / 1225`}
           </Badge>
         </CardHeader>
         <CardContent>
@@ -128,12 +129,12 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
             <div className="flex items-center gap-2 text-xs text-slate-600">
               {goalReached ? (
                 <>
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden="true" />
                   Geweldig! Je hebt het urencriterium gehaald.
                 </>
               ) : (
                 <>
-                  <Clock3 className="h-4 w-4 text-sky-600" aria-hidden />
+                  <Clock3 className="h-4 w-4 text-sky-600" aria-hidden="true" />
                   Nog {Math.max(HOURS_GOAL - totalHours, 0).toFixed(2)} uur te gaan tot het criterium.
                 </>
               )}
@@ -145,7 +146,7 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
       <Card className="bg-white">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-slate-500" aria-hidden />
+            <CalendarDays className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <CardTitle>Snel uren schrijven</CardTitle>
           </div>
         </CardHeader>
@@ -191,12 +192,12 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
             >
               {isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                   Bezig...
                 </>
               ) : (
                 <>
-                  <Plus className="h-4 w-4" aria-hidden />
+                  <Plus className="h-4 w-4" aria-hidden="true" />
                   Uren schrijven
                 </>
               )}
@@ -209,7 +210,7 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
       <Card className="bg-white">
         <CardHeader className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-slate-500" aria-hidden />
+            <CalendarDays className="h-4 w-4 text-slate-500" aria-hidden="true" />
             <CardTitle>Historie (dit jaar)</CardTitle>
           </div>
           <Badge variant="info">{entries.length} registraties</Badge>
@@ -234,7 +235,6 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
                       <td className="px-3 py-3 text-slate-700">{formatDate(entry.date)}</td>
                       <td className="px-3 py-3">
                         <div className="font-medium text-slate-900">{entry.description}</div>
-                        <p className="text-xs text-slate-500">{entry.date}</p>
                       </td>
                       <td className="px-3 py-3 text-right tabular-nums font-semibold text-slate-900">
                         {entry.hours.toFixed(2)} uur
@@ -247,7 +247,7 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
                           disabled={isPending}
                           aria-label="Verwijder registratie"
                         >
-                          <Trash2 className="h-4 w-4" aria-hidden />
+                          <Trash2 className="h-4 w-4" aria-hidden="true" />
                           Verwijder
                         </button>
                       </td>
