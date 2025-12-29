@@ -26,12 +26,13 @@ export function CookieBanner() {
 
   return (
     <div
-      role="banner"
-      aria-label="Cookie consent banner"
+      role="alertdialog"
+      aria-label="Cookie consent"
+      aria-describedby="cookie-banner-description"
       className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 p-4 shadow-lg"
     >
       <div className="container mx-auto flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <p className="text-sm text-slate-100">
+        <p id="cookie-banner-description" className="text-sm text-slate-100">
           Wij gebruiken cookies om de website te verbeteren. Deze cookies zijn noodzakelijk voor de werking van de website.
         </p>
         <div className="flex gap-2">
