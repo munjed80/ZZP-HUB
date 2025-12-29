@@ -15,6 +15,7 @@ export const companySettingsSchema = z.object({
     .url("Voer een geldige URL in")
     .optional()
     .or(z.literal("")),
+  korEnabled: z.boolean().default(false),
 });
 
 export type CompanySettingsInput = z.infer<typeof companySettingsSchema>;

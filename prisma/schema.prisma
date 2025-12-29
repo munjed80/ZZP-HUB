@@ -66,6 +66,7 @@ model CompanyProfile {
   bankName     String
   paymentTerms String
   logoUrl      String?
+  korEnabled   Boolean  @default(false)
   user         User     @relation(fields: [userId], references: [id])
 }
 
