@@ -1,0 +1,17 @@
+{
+  "name": "ZZP-HUB",
+  "short_name": "ZZP-HUB",
+  "description": "De alles-in-één administratie tool voor Nederlandse ZZP'ers. Facturen, uren en BTW-aangifte.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

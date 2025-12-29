@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { MobileSidebar, Sidebar } from "@/components/layout/sidebar";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import { getDemoSessie } from "@/lib/auth";
 
 export default function DashboardShell({ children }: { children: ReactNode }) {
@@ -32,9 +33,10 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
               </div>
             </div>
           </header>
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 p-6 pb-20 md:pb-6">{children}</main>
         </div>
       </div>
+      <MobileNav />
     </div>
   );
 }

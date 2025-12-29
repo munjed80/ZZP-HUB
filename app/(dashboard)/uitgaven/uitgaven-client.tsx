@@ -239,63 +239,115 @@ export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) 
           {expenses.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
-                  <tr>
-                    <th className="px-3 py-2">Datum</th>
-                    <th className="px-3 py-2">Omschrijving</th>
-                    <th className="px-3 py-2">Categorie</th>
-                    <th className="px-3 py-2 text-right">Bedrag (excl.)</th>
-                    <th className="px-3 py-2 text-right">BTW</th>
-                    <th className="px-3 py-2 text-right">Totaal</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {expenses.map((expense) => {
-                    const { vatAmount, total } = calculateExpenseAmounts(expense);
-                    return (
-                      <tr key={expense.id} className="hover:bg-slate-50">
-                        <td className="px-3 py-3 text-slate-700">{formatDate(expense.date)}</td>
-                        <td className="px-3 py-3">
-                          <div className="font-medium text-slate-900">{expense.description}</div>
-                          {expense.receiptUrl && (
-                            <a
-                              href={expense.receiptUrl}
-                              className="text-xs text-sky-600 underline"
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              Bonnetje
-                            </a>
-                          )}
-                        </td>
-                        <td className="px-3 py-3 text-slate-700">{expense.category}</td>
-                        <td className="px-3 py-3 text-right tabular-nums text-slate-900">
-                          {formatBedrag(expense.amountExcl)}
-                        </td>
-                        <td className="px-3 py-3 text-right tabular-nums text-slate-700">
-                          {vatLabels[expense.vatRate]} ({formatBedrag(vatAmount)})
-                        </td>
-                        <td className="px-3 py-3 text-right tabular-nums font-semibold text-slate-900">
-                          {formatBedrag(total)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot className="bg-slate-50">
-                  <tr>
-                    <td className="px-3 py-3 text-sm font-semibold text-slate-700" colSpan={5}>
-                      Totaal huidige lijst
-                    </td>
-                    <td className="px-3 py-3 text-right text-sm font-semibold text-slate-900">
-                      {formatBedrag(totals.pageTotal)}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-200 text-sm">
+                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                    <tr>
+                      <th className="px-3 py-2">Datum</th>
+                      <th className="px-3 py-2">Omschrijving</th>
+                      <th className="px-3 py-2">Categorie</th>
+                      <th className="px-3 py-2 text-right">Bedrag (excl.)</th>
+                      <th className="px-3 py-2 text-right">BTW</th>
+                      <th className="px-3 py-2 text-right">Totaal</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {expenses.map((expense) => {
+                      const { vatAmount, total } = calculateExpenseAmounts(expense);
+                      return (
+                        <tr key={expense.id} className="hover:bg-slate-50">
+                          <td className="px-3 py-3 text-slate-700">{formatDate(expense.date)}</td>
+                          <td className="px-3 py-3">
+                            <div className="font-medium text-slate-900">{expense.description}</div>
+                            {expense.receiptUrl && (
+                              <a
+                                href={expense.receiptUrl}
+                                className="text-xs text-sky-600 underline"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Bonnetje
+                              </a>
+                            )}
+                          </td>
+                          <td className="px-3 py-3 text-slate-700">{expense.category}</td>
+                          <td className="px-3 py-3 text-right tabular-nums text-slate-900">
+                            {formatBedrag(expense.amountExcl)}
+                          </td>
+                          <td className="px-3 py-3 text-right tabular-nums text-slate-700">
+                            {vatLabels[expense.vatRate]} ({formatBedrag(vatAmount)})
+                          </td>
+                          <td className="px-3 py-3 text-right tabular-nums font-semibold text-slate-900">
+                            {formatBedrag(total)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot className="bg-slate-50">
+                    <tr>
+                      <td className="px-3 py-3 text-sm font-semibold text-slate-700" colSpan={5}>
+                        Totaal huidige lijst
+                      </td>
+                      <td className="px-3 py-3 text-right text-sm font-semibold text-slate-900">
+                        {formatBedrag(totals.pageTotal)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-3">
+                {expenses.map((expense) => {
+                  const { vatAmount, total } = calculateExpenseAmounts(expense);
+                  return (
+                    <div
+                      key={expense.id}
+                      className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-slate-900">{expense.description}</p>
+                          <p className="text-xs text-slate-500 mt-1">{formatDate(expense.date)}</p>
+                        </div>
+                        <Badge variant="muted" className="ml-2">{expense.category}</Badge>
+                      </div>
+                      {expense.receiptUrl && (
+                        <a
+                          href={expense.receiptUrl}
+                          className="text-xs text-sky-600 underline inline-block mb-2"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Bonnetje bekijken
+                        </a>
+                      )}
+                      <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200 text-xs">
+                        <div>
+                          <span className="text-slate-600">Excl. BTW:</span>
+                          <p className="font-semibold text-slate-900">{formatBedrag(expense.amountExcl)}</p>
+                        </div>
+                        <div>
+                          <span className="text-slate-600">BTW ({vatLabels[expense.vatRate]}):</span>
+                          <p className="font-semibold text-slate-900">{formatBedrag(vatAmount)}</p>
+                        </div>
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
+                        <span className="text-sm font-medium text-slate-600">Totaal:</span>
+                        <span className="text-lg font-bold text-slate-900">{formatBedrag(total)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div className="rounded-lg bg-slate-100 p-3 flex items-center justify-between border border-slate-200">
+                  <span className="text-sm font-semibold text-slate-700">Totaal lijst:</span>
+                  <span className="text-lg font-bold text-slate-900">{formatBedrag(totals.pageTotal)}</span>
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

@@ -45,26 +45,53 @@ export default function FacturenPagina() {
           {facturen.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="divide-y divide-slate-200">
-              {facturen.map((factuur) => (
-                <div
-                  key={factuur.nummer}
-                  className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between"
-                >
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">{factuur.nummer}</p>
-                    <p className="text-sm text-slate-600">{factuur.klant}</p>
-                    <p className="text-xs text-slate-500">BTW tarief: {factuur.tarief}</p>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block divide-y divide-slate-200">
+                {facturen.map((factuur) => (
+                  <div
+                    key={factuur.nummer}
+                    className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{factuur.nummer}</p>
+                      <p className="text-sm text-slate-600">{factuur.klant}</p>
+                      <p className="text-xs text-slate-500">BTW tarief: {factuur.tarief}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge variant={statusVariant(factuur.status)}>{factuur.status}</Badge>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {formatBedrag(factuur.bedrag)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant={statusVariant(factuur.status)}>{factuur.status}</Badge>
-                    <p className="text-sm font-semibold text-slate-900">
-                      {formatBedrag(factuur.bedrag)}
-                    </p>
+                ))}
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-3">
+                {facturen.map((factuur) => (
+                  <div
+                    key={factuur.nummer}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-slate-900">{factuur.nummer}</p>
+                        <p className="text-sm text-slate-600 mt-1">{factuur.klant}</p>
+                      </div>
+                      <Badge variant={statusVariant(factuur.status)}>{factuur.status}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200">
+                      <p className="text-xs text-slate-500">BTW: {factuur.tarief}</p>
+                      <p className="text-lg font-bold text-slate-900">
+                        {formatBedrag(factuur.bedrag)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
