@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SonnerToaster } from "@/components/providers/sonner-provider";
+import { CookieBanner } from "@/components/ui/cookie-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,9 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZZP HUB | Administratie voor freelancers",
+  title: "ZZP-HUB | Eenvoudige Boekhouding voor Freelancers",
   description:
-    "Moderne SaaS omgeving voor Nederlandse ZZP’ers met facturen, uitgaven en btw-overzichten.",
+    "De alles-in-één administratie tool voor Nederlandse ZZP'ers. Facturen, uren en BTW-aangifte.",
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -31,6 +35,7 @@ export default function RootLayout({
       >
         {children}
         <SonnerToaster />
+        <CookieBanner />
       </body>
     </html>
   );
