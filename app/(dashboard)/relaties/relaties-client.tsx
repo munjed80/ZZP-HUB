@@ -124,46 +124,86 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
-                  <tr>
-                    <th className="px-3 py-2">Bedrijfsnaam</th>
-                    <th className="px-3 py-2">Contactpersoon</th>
-                    <th className="px-3 py-2">Email</th>
-                    <th className="px-3 py-2">Telefoon</th>
-                    <th className="px-3 py-2">Stad</th>
-                    <th className="px-3 py-2 text-right">Acties</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {filteredClients.map((client) => (
-                    <tr key={client.id} className="hover:bg-slate-50">
-                      <td className="px-3 py-3">
-                        <div className="font-semibold text-slate-900">{client.name}</div>
-                        <div className="text-xs text-slate-500">{client.address}</div>
-                      </td>
-                      <td className="px-3 py-3 text-slate-700">—</td>
-                      <td className="px-3 py-3 text-slate-700">{client.email}</td>
-                      <td className="px-3 py-3 text-slate-700">—</td>
-                      <td className="px-3 py-3 text-slate-700">{client.city}</td>
-                      <td className="px-3 py-3 text-right">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => handleDelete(client.id)}
-                          disabled={isPending}
-                          className="px-2 py-1 text-xs"
-                          aria-label={`Verwijder ${client.name}`}
-                        >
-                          <Trash2 className="h-4 w-4" aria-hidden />
-                        </Button>
-                      </td>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="min-w-full divide-y divide-slate-200 text-sm">
+                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                    <tr>
+                      <th className="px-3 py-2">Bedrijfsnaam</th>
+                      <th className="px-3 py-2">Contactpersoon</th>
+                      <th className="px-3 py-2">Email</th>
+                      <th className="px-3 py-2">Telefoon</th>
+                      <th className="px-3 py-2">Stad</th>
+                      <th className="px-3 py-2 text-right">Acties</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {filteredClients.map((client) => (
+                      <tr key={client.id} className="hover:bg-slate-50">
+                        <td className="px-3 py-3">
+                          <div className="font-semibold text-slate-900">{client.name}</div>
+                          <div className="text-xs text-slate-500">{client.address}</div>
+                        </td>
+                        <td className="px-3 py-3 text-slate-700">—</td>
+                        <td className="px-3 py-3 text-slate-700">{client.email}</td>
+                        <td className="px-3 py-3 text-slate-700">—</td>
+                        <td className="px-3 py-3 text-slate-700">{client.city}</td>
+                        <td className="px-3 py-3 text-right">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => handleDelete(client.id)}
+                            disabled={isPending}
+                            className="px-2 py-1 text-xs"
+                            aria-label={`Verwijder ${client.name}`}
+                          >
+                            <Trash2 className="h-4 w-4" aria-hidden />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-3">
+                {filteredClients.map((client) => (
+                  <div
+                    key={client.id}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-slate-900">{client.name}</p>
+                        <p className="text-xs text-slate-500 mt-1">{client.address}</p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => handleDelete(client.id)}
+                        disabled={isPending}
+                        className="px-2 py-1 text-xs -mt-1"
+                        aria-label={`Verwijder ${client.name}`}
+                      >
+                        <Trash2 className="h-4 w-4" aria-hidden />
+                      </Button>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-slate-600">Email:</span>
+                        <span className="text-xs text-slate-900">{client.email}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-slate-600">Stad:</span>
+                        <span className="text-xs text-slate-900">{client.city}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
