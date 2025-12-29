@@ -30,6 +30,7 @@ type InvoiceFormProps = {
   initialClientName?: string;
   mode?: "create" | "edit";
   invoiceId?: string;
+  korEnabled?: boolean;
 };
 
 function formatDateInput(date: Date) {
@@ -48,6 +49,7 @@ export function InvoiceForm({
   initialClientName,
   mode = "create",
   invoiceId,
+  korEnabled = false,
 }: InvoiceFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -71,11 +73,11 @@ export function InvoiceForm({
             quantity: 1,
             unit: "UUR",
             price: 0,
-            vat: "21",
+            vat: korEnabled ? "0" : "21",
           },
         ],
       },
-    [clients, defaultDueDate, initialInvoice, today],
+    [clients, defaultDueDate, initialInvoice, korEnabled, today],
   );
 
   const [searchTerm, setSearchTerm] = useState(
@@ -408,15 +410,15 @@ export function InvoiceForm({
             <Button
               type="button"
               variant="secondary"
-              onClick={() =>
-                append({
-                  description: "",
-                  quantity: 1,
-                  unit: "UUR",
-                  price: 0,
-                  vat: "21",
-                })
-              }
+          onClick={() =>
+            append({
+              description: "",
+              quantity: 1,
+              unit: "UUR",
+              price: 0,
+              vat: korEnabled ? "0" : "21",
+            })
+          }
               className="px-3"
             >
               <Plus className="h-4 w-4" aria-hidden />

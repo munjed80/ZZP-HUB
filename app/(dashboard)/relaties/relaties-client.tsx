@@ -3,8 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Plus, Trash2, Users } from "lucide-react";
+import { Plus, Search, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -18,6 +17,7 @@ type ClientList = Awaited<ReturnType<typeof getClients>>;
 export function RelatiesClient({ clients }: { clients: ClientList }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<ClientFormValues>({
@@ -66,25 +66,63 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
     [clients],
   );
 
+  const filteredClients = useMemo(() => {
+    if (!searchTerm.trim()) return sortedClients;
+    const term = searchTerm.toLowerCase();
+    return sortedClients.filter(
+      (client) =>
+        client.name.toLowerCase().includes(term) ||
+        client.city.toLowerCase().includes(term)
+    );
+  }, [searchTerm, sortedClients]);
+
   return (
     <>
       <Card className="bg-white">
-        <CardHeader className="flex items-center justify-between">
+        <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-slate-500" aria-hidden />
             <CardTitle>Klanten</CardTitle>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col items-stretch gap-2 md:flex-row md:items-center">
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" aria-hidden />
+              <input
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pl-9 text-sm"
+                placeholder="Zoek op naam of stad"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
             <Badge variant="success">{sortedClients.length} relaties</Badge>
-            <Button type="button" onClick={() => setOpen(true)} className="px-3 py-1.5">
+            <Button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="px-3 py-1.5"
+              aria-expanded={open}
+              aria-controls="nieuwe-relatie-dialog"
+            >
               <Plus className="h-4 w-4" aria-hidden />
               Nieuwe relatie
             </Button>
           </div>
         </CardHeader>
         <CardContent>
-          {sortedClients.length === 0 ? (
-            <EmptyState />
+          {filteredClients.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
+              <p className="text-lg font-semibold text-slate-900">
+                {sortedClients.length === 0 ? "Nog geen relaties" : "Geen resultaten gevonden"}
+              </p>
+              <p className="text-sm text-slate-600">
+                {sortedClients.length === 0
+                  ? "Voeg je eerste relatie toe om sneller facturen en offertes op te stellen."
+                  : "Pas je zoekopdracht aan op naam of stad."}
+              </p>
+              <Button type="button" onClick={() => setOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" aria-hidden />
+                Nieuwe relatie
+              </Button>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
@@ -99,7 +137,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {sortedClients.map((client) => (
+                  {filteredClients.map((client) => (
                     <tr key={client.id} className="hover:bg-slate-50">
                       <td className="px-3 py-3">
                         <div className="font-semibold text-slate-900">{client.name}</div>
@@ -131,7 +169,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
       </Card>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div id="nieuwe-relatie-dialog" className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-xl rounded-xl bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between">
               <div>

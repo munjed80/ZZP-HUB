@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getCurrentUserId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getClients } from "../../../relaties/actions";
+import { fetchCompanyProfile } from "../../../instellingen/actions";
 import { InvoiceForm } from "../../nieuw/invoice-form";
 import type { InvoiceFormValues } from "../../schema";
 
@@ -22,7 +23,7 @@ async function getInvoice(id: string) {
 
 export default async function FactuurBewerkenPagina({ params }: PageProps) {
   const { id } = await params;
-  const [invoice, clients] = await Promise.all([getInvoice(id), getClients()]);
+  const [invoice, clients, profile] = await Promise.all([getInvoice(id), getClients(), fetchCompanyProfile()]);
 
   if (!invoice) {
     notFound();
@@ -49,6 +50,7 @@ export default async function FactuurBewerkenPagina({ params }: PageProps) {
       invoiceId={invoice.id}
       initialInvoice={initialInvoice}
       initialClientName={invoice.client.name}
+      korEnabled={profile?.korEnabled ?? false}
     />
   );
 }
