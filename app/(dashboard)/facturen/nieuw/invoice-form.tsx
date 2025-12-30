@@ -348,6 +348,7 @@ export function InvoiceForm({
                           <option value="UUR">Uur</option>
                           <option value="STUK">Stuk</option>
                           <option value="PROJECT">Project</option>
+                          <option value="LICENTIE">Licentie</option>
                           <option value="KM">Km</option>
                         </select>
                         {form.formState.errors.lines?.[index]?.unit && (

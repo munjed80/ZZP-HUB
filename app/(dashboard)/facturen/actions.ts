@@ -34,6 +34,7 @@ function mapUnit(unit: InvoiceLineValues["unit"]) {
     UUR: Eenheid.UUR,
     STUK: Eenheid.STUK,
     PROJECT: Eenheid.PROJECT,
+    LICENTIE: Eenheid.LICENTIE,
     KM: Eenheid.KM,
   };
 

@@ -29,6 +29,9 @@ export default async function FactuurBewerkenPagina({ params }: PageProps) {
     notFound();
   }
 
+  type InvoiceUnit = InvoiceFormValues["lines"][number]["unit"];
+  const allowedUnits: InvoiceUnit[] = ["UUR", "STUK", "PROJECT", "KM", "LICENTIE"];
+
   const initialInvoice: InvoiceFormValues = {
     clientId: invoice.clientId,
     invoiceNum: invoice.invoiceNum,
@@ -37,7 +40,7 @@ export default async function FactuurBewerkenPagina({ params }: PageProps) {
     lines: invoice.lines.map((line) => ({
       description: line.description,
       quantity: Number(line.quantity),
-      unit: line.unit,
+      unit: allowedUnits.includes(line.unit as InvoiceUnit) ? (line.unit as InvoiceUnit) : "UUR",
       price: Number(line.price),
       vat: line.vatRate === "HOOG_21" ? "21" : line.vatRate === "LAAG_9" ? "9" : "0",
     })),
