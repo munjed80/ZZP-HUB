@@ -12,6 +12,7 @@ const VAT_PERCENTAGES: Record<BtwTarief, number> = {
   [BtwTarief.VRIJGESTELD]: 0,
   [BtwTarief.VERLEGD]: 0,
 };
+type InvoiceWithRelations = Prisma.InvoiceGetPayload<{ include: { lines: true; client: true } }>;
 
 function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; quantity: Prisma.Decimal | number; price: Prisma.Decimal | number }) {
   if (line.amount !== null && line.amount !== undefined) return Number(line.amount);
@@ -26,7 +27,7 @@ export async function getDashboardStats() {
 
   const monthlyChartData = MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
 
-  let invoices: Awaited<ReturnType<typeof prisma.invoice.findMany>> = [];
+  let invoices: InvoiceWithRelations[] = [];
   let expenses: Awaited<ReturnType<typeof prisma.expense.findMany>> = [];
 
   try {
