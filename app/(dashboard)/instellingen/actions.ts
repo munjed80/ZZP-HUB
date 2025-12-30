@@ -130,8 +130,7 @@ export async function downloadBackup() {
       ...expense,
       amountExcl: Number(expense.amountExcl),
       date: expense.date.toISOString(),
-      createdAt: expense.createdAt?.toISOString?.() ?? undefined,
-      updatedAt: expense.updatedAt?.toISOString?.() ?? undefined,
+      createdAt: expense.createdAt.toISOString(),
     })),
   };
 }
