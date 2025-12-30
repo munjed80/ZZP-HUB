@@ -11,7 +11,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { createInvoice, updateInvoice } from "../actions";
-import { invoiceSchema, type InvoiceFormValues } from "../schema";
+import { INVOICE_LINE_UNITS, invoiceSchema, type InvoiceFormValues } from "../schema";
 
 type Client = {
   id: string;
@@ -31,6 +31,14 @@ type InvoiceFormProps = {
   mode?: "create" | "edit";
   invoiceId?: string;
   korEnabled?: boolean;
+};
+
+const unitLabels: Record<(typeof INVOICE_LINE_UNITS)[number], string> = {
+  UUR: "Uur",
+  STUK: "Stuk",
+  PROJECT: "Project",
+  KM: "Km",
+  LICENTIE: "Licentie",
 };
 
 function formatDateInput(date: Date) {
@@ -340,17 +348,17 @@ export function InvoiceForm({
                         )}
                       </td>
                       <td className="px-3 py-2">
-                        <select
-                          className="w-28 rounded-lg border border-slate-200 px-2 py-2 text-sm"
-                          {...form.register(`lines.${index}.unit` as const)}
-                          defaultValue={field.unit}
-                        >
-                          <option value="UUR">Uur</option>
-                          <option value="STUK">Stuk</option>
-                          <option value="PROJECT">Project</option>
-                          <option value="LICENTIE">Licentie</option>
-                          <option value="KM">Km</option>
-                        </select>
+                         <select
+                           className="w-28 rounded-lg border border-slate-200 px-2 py-2 text-sm"
+                           {...form.register(`lines.${index}.unit` as const)}
+                           defaultValue={field.unit}
+                         >
+                          {INVOICE_LINE_UNITS.map((unit) => (
+                            <option key={unit} value={unit}>
+                              {unitLabels[unit]}
+                            </option>
+                          ))}
+                         </select>
                         {form.formState.errors.lines?.[index]?.unit && (
                           <p className="text-xs text-amber-700">
                             {form.formState.errors.lines[index]?.unit?.message}
