@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getClients } from "../../../relaties/actions";
 import { fetchCompanyProfile } from "../../../instellingen/actions";
 import { InvoiceForm } from "../../nieuw/invoice-form";
-import type { InvoiceFormValues } from "../../schema";
+import { INVOICE_LINE_UNITS, type InvoiceFormValues } from "../../schema";
 
 type PageProps = {
   params: Promise<{
@@ -29,6 +29,11 @@ export default async function FactuurBewerkenPagina({ params }: PageProps) {
     notFound();
   }
 
+  const normalizeUnit = (unit: string): InvoiceFormValues["lines"][number]["unit"] =>
+    INVOICE_LINE_UNITS.includes(unit as (typeof INVOICE_LINE_UNITS)[number])
+      ? (unit as InvoiceFormValues["lines"][number]["unit"])
+      : "UUR";
+
   const initialInvoice: InvoiceFormValues = {
     clientId: invoice.clientId,
     invoiceNum: invoice.invoiceNum,
@@ -37,7 +42,7 @@ export default async function FactuurBewerkenPagina({ params }: PageProps) {
     lines: invoice.lines.map((line) => ({
       description: line.description,
       quantity: Number(line.quantity),
-      unit: line.unit,
+      unit: normalizeUnit(line.unit),
       price: Number(line.price),
       vat: line.vatRate === "HOOG_21" ? "21" : line.vatRate === "LAAG_9" ? "9" : "0",
     })),
