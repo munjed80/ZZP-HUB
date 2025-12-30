@@ -36,7 +36,7 @@ export async function getExpenses(): Promise<ExpenseClientShape[]> {
     return expenses.map((expense) => ({
       id: expense.id,
       description: expense.description,
-      category: expense.category,
+      category: expense.category as ExpenseClientShape["category"],
       amountExcl: Number(expense.amountExcl),
       vatRate: expense.vatRate,
       date: expense.date.toISOString().split("T")[0],
