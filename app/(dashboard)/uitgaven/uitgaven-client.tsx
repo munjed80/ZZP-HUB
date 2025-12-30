@@ -313,7 +313,9 @@ export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) 
                           <p className="text-sm font-bold text-slate-900">{expense.description}</p>
                           <p className="text-xs text-slate-500 mt-1">{formatDate(expense.date)}</p>
                         </div>
-                        <Badge variant="muted" className="ml-2">{expense.category}</Badge>
+                        <span className="ml-2">
+                          <Badge variant="muted">{expense.category}</Badge>
+                        </span>
                       </div>
                       {expense.receiptUrl && (
                         <a
