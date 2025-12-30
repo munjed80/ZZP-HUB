@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
-import { BtwTarief, InvoiceEmailStatus } from "@prisma/client";
+import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 
 export type VatReport = {
   year: number;
@@ -24,6 +24,7 @@ const VAT_PERCENTAGES: Record<BtwTarief, number> = {
   [BtwTarief.VRIJGESTELD]: 0,
   [BtwTarief.VERLEGD]: 0,
 };
+type InvoiceWithLines = Prisma.InvoiceGetPayload<{ include: { lines: true } }>;
 
 function quarterRange(year: number, quarter: number) {
   const startMonth = (quarter - 1) * 3;
@@ -32,7 +33,7 @@ function quarterRange(year: number, quarter: number) {
   return { start, end };
 }
 
-function calculateLineAmount(line: { amount: unknown; quantity: unknown; price: unknown }) {
+function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; quantity: Prisma.Decimal | number; price: Prisma.Decimal | number }) {
   const amount = line.amount;
   if (amount !== null && amount !== undefined) {
     return Number(amount);
@@ -59,7 +60,7 @@ export async function getVatReport(year: number, quarter: number): Promise<VatRe
   }
   const { start, end } = quarterRange(year, quarter);
 
-  let invoices: Awaited<ReturnType<typeof prisma.invoice.findMany>> = [];
+  let invoices: InvoiceWithLines[] = [];
   let expenses: Awaited<ReturnType<typeof prisma.expense.findMany>> = [];
 
   try {
