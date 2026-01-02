@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { UserRole } from "@prisma/client";
 import {
   LayoutDashboard,
@@ -16,6 +17,7 @@ import {
   Settings,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +29,7 @@ type NavigatieItem = {
 };
 
 export const navigatie: NavigatieItem[] = [
-  { href: "/", label: "Overzicht", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
   { href: "/relaties", label: "Relaties", icon: Users },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/offertes", label: "Offertes", icon: FileSignature },
@@ -42,12 +44,12 @@ export function Sidebar({ userRole }: { userRole?: UserRole }) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-68 shrink-0 border-r border-slate-200 bg-gradient-to-b from-slate-900 to-slate-800 px-4 py-6 text-slate-100 shadow-lg md:block">
+    <aside className="hidden w-68 shrink-0 border-r border-slate-200 bg-gradient-to-b from-slate-900 to-slate-800 px-4 py-6 text-slate-100 shadow-lg md:flex md:flex-col">
       <div className="mb-6 px-2">
         <p className="text-lg font-semibold text-white">ZZP HUB</p>
         <p className="text-sm text-slate-200">Financiën & abonnement</p>
       </div>
-      <nav className="space-y-1">
+      <nav className="flex-1 space-y-1">
         {navigatie.map((item) => {
           if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
             return null;
@@ -73,12 +75,21 @@ export function Sidebar({ userRole }: { userRole?: UserRole }) {
           );
         })}
       </nav>
-      <div className="mt-8 rounded-lg bg-white/10 p-3 text-sm text-slate-100 ring-1 ring-white/10">
-        <p className="font-semibold">Beveiliging</p>
-        <p className="text-slate-200">
-          Sessies worden beveiligd via NextAuth met rolgebaseerde toegang. MFA
-          en webhooks volgen.
-        </p>
+      <div className="mt-4 space-y-3">
+        <div className="rounded-lg bg-white/10 p-3 text-sm text-slate-100 ring-1 ring-white/10">
+          <p className="font-semibold">Beveiliging</p>
+          <p className="text-slate-200">
+            Sessies worden beveiligd via NextAuth met rolgebaseerde toegang. MFA
+            en webhooks volgen.
+          </p>
+        </div>
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-700/60"
+        >
+          <LogOut className="h-4 w-4" aria-hidden />
+          Sign Out
+        </button>
       </div>
     </aside>
   );
@@ -121,7 +132,7 @@ export function MobileSidebar({ userRole }: { userRole?: UserRole }) {
                 <X className="h-5 w-5" aria-hidden />
               </button>
             </div>
-            <nav className="space-y-1">
+            <nav className="flex-1 space-y-1">
               {navigatie.map((item) => {
                 if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
                   return null;
@@ -146,6 +157,16 @@ export function MobileSidebar({ userRole }: { userRole?: UserRole }) {
                 );
               })}
             </nav>
+            <button
+              onClick={() => {
+                setOpen(false);
+                signOut({ callbackUrl: "/" });
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-700/60"
+            >
+              <LogOut className="h-4 w-4" aria-hidden />
+              Sign Out
+            </button>
           </div>
         </div>
       )}
