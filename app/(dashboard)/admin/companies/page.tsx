@@ -10,7 +10,7 @@ export default async function CompaniesPage() {
     redirect("/login");
   }
   if (session.user.role !== UserRole.SUPERADMIN) {
-    redirect("/dashboard");
+    redirect("/");
   }
 
   const companies = await listCompanies();

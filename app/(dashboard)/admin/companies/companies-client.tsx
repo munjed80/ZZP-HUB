@@ -150,6 +150,8 @@ export function CompaniesClient({ companies }: { companies: Company[] }) {
     });
   };
 
+  const submitLabel = isPending ? "Opslaan..." : mode === "create" ? "Aanmaken" : "Opslaan";
+
   return (
     <>
       <Card className="bg-white">
@@ -362,7 +364,7 @@ export function CompaniesClient({ companies }: { companies: Company[] }) {
                   Annuleren
                 </Button>
                 <Button type="submit" disabled={isPending}>
-                  {isPending ? "Opslaan..." : mode === "create" ? "Aanmaken" : "Opslaan"}
+                  {submitLabel}
                 </Button>
               </div>
             </form>

@@ -18,6 +18,17 @@ interface AuthorizeResult {
   isSuspended: boolean;
 }
 
+function isAuthorizeResult(user: unknown): user is AuthorizeResult {
+  if (!user || typeof user !== "object") return false;
+  const candidate = user as Partial<AuthorizeResult>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.email === "string" &&
+    typeof candidate.role === "string" &&
+    typeof candidate.isSuspended === "boolean"
+  );
+}
+
 /**
  * Authorize function for credentials-based authentication.
  * 
@@ -124,11 +135,10 @@ export const authOptions: NextAuthOptions = {
    ],
    callbacks: {
      async jwt({ token, user }) {
-       if (user) {
-        const authorizedUser = user as AuthorizeResult;
-        token.id = authorizedUser.id;
-        token.role = authorizedUser.role;
-        token.isSuspended = authorizedUser.isSuspended;
+       if (user && isAuthorizeResult(user)) {
+        token.id = user.id;
+        token.role = user.role;
+        token.isSuspended = user.isSuspended;
        }
        return token;
      },

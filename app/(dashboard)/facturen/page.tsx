@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { UserRole } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 
 function statusVariant(status: string) {
   if (status === "Betaald" || status === "Geaccepteerd") return "success" as const;
@@ -22,7 +22,9 @@ function invoiceStatus(status: string) {
   return "Concept";
 }
 
-function invoiceAmount(lines: { amount: unknown; quantity: unknown; price: unknown }[]) {
+function invoiceAmount(
+  lines: { amount: Prisma.Decimal | number | null; quantity: Prisma.Decimal | number; price: Prisma.Decimal | number }[],
+) {
   return lines.reduce((total, line) => {
     if (line.amount !== null && line.amount !== undefined) {
       return total + Number(line.amount);

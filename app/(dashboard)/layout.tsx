@@ -27,11 +27,11 @@ export default async function DashboardShell({ children }: { children: ReactNode
   return (
     <div className="min-h-screen bg-transparent">
       <div className="flex min-h-screen">
-        <Sidebar />
+        <Sidebar userRole={sessie.user.role} />
         <div className="flex flex-1 flex-col">
           <header className="flex items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-4 backdrop-blur">
             <div className="flex items-start gap-3">
-              <MobileSidebar />
+              <MobileSidebar userRole={sessie.user.role} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   ZZP HUB

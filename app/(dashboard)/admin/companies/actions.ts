@@ -22,6 +22,8 @@ const companySchema = z.object({
   paymentTerms: z.string().min(1, "Betalingstermijn is verplicht"),
 });
 
+const updateCompanySchema = companySchema.partial({ password: true });
+
 async function assertSuperAdmin() {
   const sessionUser = await requireUser();
   if (sessionUser.role !== UserRole.SUPERADMIN) {
@@ -81,7 +83,15 @@ export async function createCompany(data: unknown) {
 
 export async function updateCompany(userId: string, data: unknown) {
   await assertSuperAdmin();
-  const parsed = companySchema.partial({ password: true }).parse(data);
+  const parsed = updateCompanySchema.parse(data);
+
+  const target = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+  if (!target) {
+    return { success: false, message: "Gebruiker niet gevonden." };
+  }
+  if (target.role === UserRole.SUPERADMIN) {
+    return { success: false, message: "SuperAdmin accounts kunnen hier niet worden gewijzigd." };
+  }
 
   const updates: Record<string, unknown> = {
     email: parsed.email,
@@ -151,17 +161,17 @@ export async function deleteCompany(userId: string) {
     return { success: false, message: "SuperAdmin accounts kunnen niet verwijderd worden." };
   }
 
-  await prisma.$transaction([
-    prisma.invoiceLine.deleteMany({ where: { invoice: { userId } } }),
-    prisma.quotationLine.deleteMany({ where: { quotation: { userId } } }),
-    prisma.invoice.deleteMany({ where: { userId } }),
-    prisma.quotation.deleteMany({ where: { userId } }),
-    prisma.expense.deleteMany({ where: { userId } }),
-    prisma.timeEntry.deleteMany({ where: { userId } }),
-    prisma.client.deleteMany({ where: { userId } }),
-    prisma.companyProfile.deleteMany({ where: { userId } }),
-    prisma.user.delete({ where: { id: userId } }),
-  ]);
+  await prisma.$transaction(async (tx) => {
+    await tx.invoiceLine.deleteMany({ where: { invoice: { userId } } });
+    await tx.quotationLine.deleteMany({ where: { quotation: { userId } } });
+    await tx.invoice.deleteMany({ where: { userId } });
+    await tx.quotation.deleteMany({ where: { userId } });
+    await tx.expense.deleteMany({ where: { userId } });
+    await tx.timeEntry.deleteMany({ where: { userId } });
+    await tx.client.deleteMany({ where: { userId } });
+    await tx.companyProfile.deleteMany({ where: { userId } });
+    await tx.user.delete({ where: { id: userId } });
+  });
 
   revalidatePath("/admin/companies");
   return { success: true };

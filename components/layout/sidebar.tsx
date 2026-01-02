@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { UserRole } from "@prisma/client";
 import {
   LayoutDashboard,
   Building2,
@@ -18,7 +19,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const navigatie = [
+type NavigatieItem = {
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  superAdminOnly?: boolean;
+};
+
+export const navigatie: NavigatieItem[] = [
   { href: "/", label: "Overzicht", icon: LayoutDashboard },
   { href: "/relaties", label: "Relaties", icon: Users },
   { href: "/facturen", label: "Facturen", icon: Receipt },
@@ -27,10 +35,10 @@ export const navigatie = [
   { href: "/uren", label: "Uren", icon: Clock3 },
   { href: "/btw-aangifte", label: "BTW-aangifte", icon: FileText },
   { href: "/instellingen", label: "Instellingen", icon: Settings },
-  { href: "/admin/companies", label: "Companies", icon: Building2 },
+  { href: "/admin/companies", label: "Companies", icon: Building2, superAdminOnly: true },
 ];
 
-export function Sidebar() {
+export function Sidebar({ userRole }: { userRole?: UserRole }) {
   const pathname = usePathname();
 
   return (
@@ -41,6 +49,9 @@ export function Sidebar() {
       </div>
       <nav className="space-y-1">
         {navigatie.map((item) => {
+          if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
+            return null;
+          }
           const actief =
             pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -65,15 +76,15 @@ export function Sidebar() {
       <div className="mt-8 rounded-lg bg-white/10 p-3 text-sm text-slate-100 ring-1 ring-white/10">
         <p className="font-semibold">Beveiliging</p>
         <p className="text-slate-200">
-          Klaar voor koppeling met NextAuth, Clerk of SSO. Sessies worden
-          afgeschermd; MFA en webhooks volgen.
+          Sessies worden beveiligd via NextAuth met rolgebaseerde toegang. MFA
+          en webhooks volgen.
         </p>
       </div>
     </aside>
   );
 }
 
-export function MobileSidebar() {
+export function MobileSidebar({ userRole }: { userRole?: UserRole }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -112,6 +123,9 @@ export function MobileSidebar() {
             </div>
             <nav className="space-y-1">
               {navigatie.map((item) => {
+                if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
+                  return null;
+                }
                 const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
                 const Icon = item.icon;
                 return (
