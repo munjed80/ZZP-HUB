@@ -121,7 +121,10 @@ function mapQuotationToPdfData(
 }
 
 export async function getQuotations() {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   try {
     return await prisma.quotation.findMany({
@@ -138,7 +141,10 @@ export async function getQuotations() {
 export async function createQuotation(values: QuotationFormValues) {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const data = quotationSchema.parse(values);
 
   await ensureUser(userId);
@@ -178,7 +184,10 @@ export async function createQuotation(values: QuotationFormValues) {
 export async function updateQuotationStatus(quotationId: string, status: "OPEN" | "GEACCEPTEERD" | "GEWEIGERD") {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const statusMap: Record<typeof status, QuotationStatus> = {
     OPEN: QuotationStatus.VERZONDEN,
     GEACCEPTEERD: QuotationStatus.GEACCEPTEERD,
@@ -197,7 +206,10 @@ export async function updateQuotationStatus(quotationId: string, status: "OPEN" 
 export async function convertQuotationToInvoice(quotationId: string) {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   const quotation = await prisma.quotation.findFirst({
     where: { id: quotationId, userId },
@@ -254,7 +266,10 @@ export async function sendQuotationEmail(quotationId: string) {
   }
 
   try {
-    const userId = getCurrentUserId();
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+    }
     const quotation = await prisma.quotation.findFirst({
       where: { id: quotationId, userId },
       include: { client: true, lines: true, user: { include: { companyProfile: true } } },

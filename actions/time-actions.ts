@@ -52,7 +52,10 @@ async function ensureUser(userId: string) {
 }
 
 export async function logTimeEntry(values: TimeEntryInput) {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const data = timeEntrySchema.parse(values);
 
   try {
@@ -75,7 +78,10 @@ export async function logTimeEntry(values: TimeEntryInput) {
 }
 
 export async function getTimeEntries(): Promise<TimeEntryDto[]> {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const { startOfYear, endOfYear } = getYearRange();
 
   try {
@@ -97,7 +103,10 @@ export async function getTimeEntries(): Promise<TimeEntryDto[]> {
 }
 
 export async function deleteTimeEntry(id: string) {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   try {
     const entry = await prisma.timeEntry.findUnique({ where: { id } });
@@ -115,7 +124,10 @@ export async function deleteTimeEntry(id: string) {
 }
 
 export async function getYearlyHours() {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const { startOfYear, endOfYear } = getYearRange();
 
   try {

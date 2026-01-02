@@ -104,7 +104,11 @@ export async function sendInvoiceEmail(invoiceId: string) {
     let userId: string;
 
     try {
-      userId = getCurrentUserId();
+      const id = await getCurrentUserId();
+      if (!id) {
+        throw new Error("Niet geauthenticeerd");
+      }
+      userId = id;
     } catch (error) {
       console.error("Kon gebruiker niet bepalen voor e-mailverzending", error);
       return { success: false, message: "Gebruiker niet gevonden." };

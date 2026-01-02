@@ -3,8 +3,11 @@ import { MobileSidebar, Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { getDemoSessie } from "@/lib/auth";
 
-export default function DashboardShell({ children }: { children: ReactNode }) {
-  const sessie = getDemoSessie();
+export default async function DashboardShell({ children }: { children: ReactNode }) {
+  const sessie = await getDemoSessie();
+  
+  const userName = sessie?.user?.name || sessie?.user?.email || "Gebruiker";
+  const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || "ZZ";
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -19,17 +22,17 @@ export default function DashboardShell({ children }: { children: ReactNode }) {
                   ZZP HUB
                 </p>
                 <p className="text-sm text-slate-600">
-                  Sessiebeveiliging actief als placeholder – koppel later je identiteit of SSO-provider.
+                  Ingelogd via NextAuth
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-medium text-slate-900">{sessie.gebruiker}</p>
-                <p className="text-xs text-slate-500">Abonnement: {sessie.abonnement}</p>
+                <p className="text-sm font-medium text-slate-900">{userName}</p>
+                <p className="text-xs text-slate-500">Abonnement: Standaard</p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-800 text-sm font-semibold text-white">
-                ZZ
+                {userInitials}
               </div>
             </div>
           </header>

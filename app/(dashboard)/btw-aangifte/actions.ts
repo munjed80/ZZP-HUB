@@ -42,21 +42,9 @@ function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; qua
 }
 
 export async function getVatReport(year: number, quarter: number): Promise<VatReport> {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
   if (!userId) {
-    console.error("Geen gebruiker gevonden voor BTW-rapport", { year, quarter, userId });
-    return {
-      year,
-      quarter,
-      rubriek1a: { base: 0, vat: 0 },
-      rubriek1b: { base: 0, vat: 0 },
-      rubriek1e: { base: 0 },
-      deductibleVat: 0,
-      totalSalesVat: 0,
-      totalDue: 0,
-      revenueTotal: 0,
-      expenseTotal: 0,
-    };
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
   }
   const { start, end } = quarterRange(year, quarter);
 
