@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
-import type { Sessie } from "./utils";
 import type { UserRole } from "@prisma/client";
 
 interface Credentials {
@@ -17,8 +16,16 @@ interface AuthorizeResult {
 
 /**
  * Authorize function for credentials-based authentication.
- * Fetches user from Prisma database and verifies password with bcrypt.
- * Returns user with their role from the database.
+ * 
+ * This function:
+ * - Uses prisma.user.findUnique to find the user by the provided email
+ * - Compares the password with the stored hash using bcrypt.compare
+ * - Returns the user's role and id from the database
+ * 
+ * The returned user data is designed to be used with NextAuth session and jwt callbacks
+ * to include the user's role and id from the database in the session.
+ * 
+ * Demo session logic has been removed - only real database users can log in.
  */
 export async function authorize(
   credentials: Credentials
@@ -28,7 +35,7 @@ export async function authorize(
   }
 
   try {
-    // Fetch user from database
+    // Use Prisma to find the user by email
     const user = await prisma.user.findUnique({
       where: {
         email: credentials.email,
@@ -46,7 +53,7 @@ export async function authorize(
       return null;
     }
 
-    // Verify password with bcrypt
+    // Compare password with stored hash using bcrypt
     const isPasswordValid = await bcrypt.compare(
       credentials.password,
       user.passwordHash
@@ -56,7 +63,8 @@ export async function authorize(
       return null;
     }
 
-    // Return user with role from database
+    // Return user with role and id from database
+    // This data should be included in NextAuth session and jwt callbacks
     return {
       id: user.id,
       email: user.email,
@@ -67,22 +75,4 @@ export async function authorize(
     console.error("Error during authorization:", error);
     return null;
   }
-}
-
-// Legacy functions - TODO: Replace with proper session management
-export function getDemoSessie(): Sessie {
-  return {
-    gebruiker: "Demo gebruiker",
-    abonnement: "Maandelijks - proefperiode actief",
-  };
-}
-
-export function isIngelogd(): boolean {
-  // TODO: Replace with real session validation
-  return true;
-}
-
-export function getCurrentUserId(): string {
-  // TODO: Replace with authenticated user from session
-  return "00000000-0000-0000-0000-000000000001";
 }
