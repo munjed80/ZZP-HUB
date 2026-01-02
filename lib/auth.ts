@@ -76,8 +76,8 @@ export async function authorize(
     if (process.env.NODE_ENV !== "production") {
       console.debug("Authorize debug: comparing password", {
         user: {
-          id: user.id,
-          email: user.email,
+          idSuffix: user.id.slice(-6),
+          emailMasked: user.email.replace(/(.).+(@.*)/, "$1***$2"),
           role: user.role,
           isSuspended: user.isSuspended,
         },
