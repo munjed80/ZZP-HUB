@@ -46,7 +46,7 @@ enum UserRole {
 model User {
   id             String           @id @default(uuid())
   email          String           @unique
-  passwordHash   String
+  password       String
   naam           String?
   role           UserRole         @default(COMPANY_ADMIN)
   isSuspended    Boolean          @default(false)

@@ -7,17 +7,17 @@ async function main() {
   const email = "media.pro80@hotmail.com";
   const rawPassword = "M22022012h";
 
-  const passwordHash = await bcrypt.hash(rawPassword, 10);
+  const password = await bcrypt.hash(rawPassword, 10);
 
   await prisma.user.upsert({
     where: { email },
     update: {
-      passwordHash,
+      password,
       role: UserRole.SUPERADMIN,
     },
     create: {
       email,
-      passwordHash,
+      password,
       role: UserRole.SUPERADMIN,
     },
   });

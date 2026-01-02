@@ -84,15 +84,15 @@ export async function changePassword({
     throw new Error("Gebruiker niet gevonden.");
   }
 
-  const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+  const isValid = await bcrypt.compare(currentPassword, user.password);
   if (!isValid) {
     throw new Error("Huidig wachtwoord is onjuist.");
   }
 
-  const passwordHash = await bcrypt.hash(newPassword, 12);
+  const password = await bcrypt.hash(newPassword, 10);
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash },
+    data: { password },
   });
 
   return { success: true };

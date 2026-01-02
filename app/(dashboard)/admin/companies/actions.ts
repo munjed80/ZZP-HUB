@@ -52,13 +52,13 @@ export async function createCompany(data: unknown) {
     return { success: false, message: "E-mailadres is al in gebruik." };
   }
 
-  const passwordHash = await bcrypt.hash(parsed.password, 12);
+  const password = await bcrypt.hash(parsed.password, 10);
 
   await prisma.user.create({
     data: {
       email: parsed.email,
       naam: parsed.naam,
-      passwordHash,
+      password,
       role: UserRole.COMPANY_ADMIN,
       companyProfile: {
         create: {
@@ -99,7 +99,7 @@ export async function updateCompany(userId: string, data: unknown) {
   };
 
   if (parsed.password) {
-    updates.passwordHash = await bcrypt.hash(parsed.password, 12);
+    updates.password = await bcrypt.hash(parsed.password, 10);
   }
 
   await prisma.user.update({

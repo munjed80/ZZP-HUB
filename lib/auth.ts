@@ -50,6 +50,13 @@ export async function authorize(
   }
 
   try {
+    const maskedEmail = credentials.email.replace(/(.).+(@.*)/, "$1***$2");
+    const shouldLogAuth =
+      process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
+    if (shouldLogAuth) {
+      console.log("Authorize attempt", { emailMasked: maskedEmail });
+    }
+
     // Use Prisma to find the user by email
     const user = await prisma.user.findUnique({
       where: {
@@ -58,7 +65,7 @@ export async function authorize(
       select: {
         id: true,
         email: true,
-        passwordHash: true,
+        password: true,
         naam: true,
         role: true,
         isSuspended: true,
@@ -66,21 +73,45 @@ export async function authorize(
     });
 
     if (!user) {
+      if (shouldLogAuth) {
+        console.log("Authorize failed: user not found", { emailMasked: maskedEmail });
+      }
       return null;
     }
 
     if (user.isSuspended) {
+      if (shouldLogAuth) {
+        console.log("Authorize blocked: user suspended", { emailMasked: maskedEmail });
+      }
       return null;
+    }
+
+    if (shouldLogAuth) {
+      console.log("Authorize comparing password", {
+        user: {
+          idSuffix: user.id.slice(-6),
+          emailMasked: maskedEmail,
+          role: user.role,
+          isSuspended: user.isSuspended,
+        },
+      });
     }
 
     // Compare password with stored hash using bcrypt
     const isPasswordValid = await bcrypt.compare(
       credentials.password,
-      user.passwordHash
+      user.password
     );
 
     if (!isPasswordValid) {
+      if (shouldLogAuth) {
+        console.log("Authorize failed: invalid password", { emailMasked: maskedEmail });
+      }
       return null;
+    }
+
+    if (shouldLogAuth) {
+      console.log("Authorize success", { emailMasked: maskedEmail });
     }
 
     // Return user with role and id from database
@@ -134,23 +165,23 @@ export const authOptions: NextAuthOptions = {
      })
    ],
    callbacks: {
-     async jwt({ token, user }) {
-       if (user && isAuthorizeResult(user)) {
-        token.id = user.id;
-        token.role = user.role;
-        token.isSuspended = user.isSuspended;
-       }
-       return token;
-     },
-     async session({ session, token }) {
-       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
-        session.user.isSuspended = Boolean(token.isSuspended);
-       }
-       return session;
-     }
-  },
+      async jwt({ token, user }) {
+        if (user && isAuthorizeResult(user)) {
+         token.id = user.id;
+         token.role = user.role;
+         token.isSuspended = user.isSuspended;
+        }
+        return token;
+      },
+      async session({ session, token }) {
+        if (session.user) {
+         session.user.id = token.id as string;
+         session.user.role = token.role as UserRole;
+         session.user.isSuspended = Boolean(token.isSuspended);
+        }
+        return session;
+      }
+   },
   pages: {
     signIn: "/login",
   }
