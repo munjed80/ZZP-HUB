@@ -13,7 +13,10 @@ type PageProps = {
 };
 
 async function getInvoice(id: string) {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   return prisma.invoice.findFirst({
     where: { id, userId },

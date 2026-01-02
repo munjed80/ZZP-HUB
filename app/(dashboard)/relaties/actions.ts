@@ -19,7 +19,10 @@ async function ensureUser(userId: string) {
 }
 
 export async function getClients() {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   try {
     return await prisma.client.findMany({
@@ -35,7 +38,10 @@ export async function getClients() {
 export async function createClient(values: ClientFormValues) {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const data = clientSchema.parse(values);
 
   await ensureUser(userId);
@@ -60,7 +66,10 @@ export async function createClient(values: ClientFormValues) {
 export async function deleteClient(clientId: string) {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   await prisma.client.deleteMany({
     where: { id: clientId, userId },

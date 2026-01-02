@@ -28,7 +28,10 @@ function formatDate(date: Date) {
 }
 
 async function getQuotationWithRelations(id: string) {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   try {
     return await prisma.quotation.findFirst({

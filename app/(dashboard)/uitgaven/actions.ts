@@ -24,7 +24,10 @@ async function ensureUser(userId: string) {
 }
 
 export async function getExpenses(): Promise<ExpenseClientShape[]> {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   try {
     const expenses = await prisma.expense.findMany({
@@ -49,7 +52,10 @@ export async function getExpenses(): Promise<ExpenseClientShape[]> {
 }
 
 export async function createExpense(values: ExpenseFormValues) {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const data = expenseSchema.parse(values);
 
   try {

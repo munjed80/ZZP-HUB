@@ -44,7 +44,10 @@ function mapUnit(unit: InvoiceLineValues["unit"]) {
 export async function createInvoice(values: InvoiceFormValues) {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const data = invoiceSchema.parse(values);
 
   await ensureUser(userId);
@@ -83,7 +86,10 @@ export async function createInvoice(values: InvoiceFormValues) {
 export async function updateInvoice(invoiceId: string, values: InvoiceFormValues) {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const data = invoiceSchema.parse(values);
 
   await ensureUser(userId);

@@ -6,7 +6,10 @@ import { getCurrentUserId } from "@/lib/auth";
 import { companySettingsSchema, type CompanySettingsInput } from "./schema";
 
 export async function fetchCompanyProfile() {
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   try {
     return await prisma.companyProfile.findUnique({
       where: { userId },
@@ -20,7 +23,10 @@ export async function fetchCompanyProfile() {
 export async function updateCompanySettings(values: CompanySettingsInput) {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   const data = companySettingsSchema.parse(values);
 
   await prisma.user.upsert({
@@ -79,7 +85,10 @@ export async function changePassword({
   newPassword: string;
 }) {
   "use server";
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
   await prisma.user.upsert({
     where: { id: userId },
     update: {},
@@ -98,7 +107,10 @@ export async function changePassword({
 export async function downloadBackup() {
   "use server";
 
-  const userId = getCurrentUserId();
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
 
   const [clients, invoices, expenses] = await Promise.all([
     prisma.client.findMany({ where: { userId } }),
