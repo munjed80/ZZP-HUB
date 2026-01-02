@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import type { Sessie } from "./utils";
+import type { UserRole } from "@prisma/client";
 
 interface Credentials {
   email: string;
@@ -11,7 +12,7 @@ interface AuthorizeResult {
   id: string;
   email: string;
   naam: string | null;
-  role: string;
+  role: UserRole;
 }
 
 /**
