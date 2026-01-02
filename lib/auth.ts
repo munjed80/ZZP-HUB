@@ -74,7 +74,7 @@ export async function authorize(
     }
 
     if (process.env.NODE_ENV !== "production") {
-      console.log("Authorize debug: comparing password", {
+      console.debug("Authorize debug: comparing password", {
         user: {
           id: user.id,
           email: user.email,
@@ -82,7 +82,7 @@ export async function authorize(
           isSuspended: user.isSuspended,
         },
         providedPasswordLength: credentials.password.length,
-        passwordHashPreview: user.passwordHash.slice(0, 10),
+        passwordHashLength: user.passwordHash.length,
       });
     }
 
