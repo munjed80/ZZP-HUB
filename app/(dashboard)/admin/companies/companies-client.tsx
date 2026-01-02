@@ -188,7 +188,7 @@ export function CompaniesClient({ companies }: { companies: Company[] }) {
                   </td>
                   <td className="px-3 py-3 text-slate-700">{company.email}</td>
                   <td className="px-3 py-3">
-                    <Badge variant={company.role === "SUPERADMIN" ? "info" : "secondary"}>{company.role}</Badge>
+                    <Badge variant={company.role === "SUPERADMIN" ? "info" : "muted"}>{company.role}</Badge>
                   </td>
                   <td className="px-3 py-3">
                     <Badge variant={company.isSuspended ? "destructive" : "success"}>
