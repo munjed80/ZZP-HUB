@@ -1,6 +1,9 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import type { UserRole } from "@prisma/client";
+import { getServerSession } from "next-auth/next";
+import type { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 interface Credentials {
   email: string;
@@ -75,4 +78,76 @@ export async function authorize(
     console.error("Error during authorization:", error);
     return null;
   }
+}
+
+/**
+ * NextAuth configuration options
+ */
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+        
+        const result = await authorize({
+          email: credentials.email,
+          password: credentials.password
+        });
+        
+        if (!result) {
+          return null;
+        }
+        
+        return {
+          id: result.id,
+          email: result.email,
+          name: result.naam,
+          role: result.role
+        } as any;
+      }
+    })
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = (user as any).role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        (session.user as any).id = token.id;
+        (session.user as any).role = token.role;
+      }
+      return session;
+    }
+  },
+  pages: {
+    signIn: "/login",
+  }
+};
+
+/**
+ * Get the current user's ID from the session
+ * @returns The user ID or undefined if not authenticated
+ */
+export async function getCurrentUserId(): Promise<string | undefined> {
+  const session = await getServerSession(authOptions);
+  return (session?.user as any)?.id as string | undefined;
+}
+
+/**
+ * Get the current session
+ * @returns The session object or null if not authenticated
+ */
+export async function getDemoSessie() {
+  return await getServerSession(authOptions);
 }
