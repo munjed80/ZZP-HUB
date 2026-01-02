@@ -41,6 +41,7 @@ enum Eenheid {
 enum UserRole {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
 model User {
