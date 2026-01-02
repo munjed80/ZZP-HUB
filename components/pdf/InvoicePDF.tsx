@@ -282,7 +282,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
             const amount = line.quantity * line.price;
             const isLast = index === lines.length - 1;
             return (
-              <View key={index} style={[styles.row, isLast && styles.lastRow]}>
+              <View key={index} style={[styles.row, isLast ? styles.lastRow : {}]}>
                 <Text style={[styles.text, styles.description]}>{line.description}</Text>
                 <Text style={[styles.text, styles.qty]}>{line.quantity}</Text>
                 <Text style={[styles.text, styles.unit]}>{line.unit}</Text>
