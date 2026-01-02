@@ -6,23 +6,6 @@ import { getCurrentUserId } from "@/lib/auth";
 import { expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { Prisma } from "@prisma/client";
 
-const DEMO_USER = {
-  email: "demo@zzp-hub.nl",
-  passwordHash: "demo-placeholder-hash",
-  naam: "Demo gebruiker",
-};
-
-async function ensureUser(userId: string) {
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: {},
-    create: {
-      id: userId,
-      ...DEMO_USER,
-    },
-  });
-}
-
 export async function getExpenses(): Promise<ExpenseClientShape[]> {
   const userId = await getCurrentUserId();
   if (!userId) {
@@ -59,8 +42,6 @@ export async function createExpense(values: ExpenseFormValues) {
   const data = expenseSchema.parse(values);
 
   try {
-    await ensureUser(userId);
-
     const trimmedUrl = data.receiptUrl?.trim() || null;
 
     await prisma.expense.create({

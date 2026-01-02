@@ -38,7 +38,7 @@ export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) 
     startPasswordTransition(async () => {
       try {
         await changePassword({ currentPassword: passwords.current, newPassword: passwords.next });
-        toast.success("Wachtwoord gewijzigd (demo)");
+        toast.success("Wachtwoord gewijzigd.");
         setPasswords({ current: "", next: "", confirm: "" });
       } catch (error) {
         console.error(error);
@@ -100,7 +100,7 @@ export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) 
               <ShieldCheck className="h-5 w-5 text-slate-600" aria-hidden />
               <CardTitle>Beveiliging</CardTitle>
             </div>
-            <Badge variant="info">Demo-auth</Badge>
+            <Badge variant="info">Accountbeveiliging</Badge>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordChange} className="grid gap-4 md:grid-cols-3">

@@ -39,9 +39,8 @@ enum Eenheid {
 }
 
 enum UserRole {
-  USER
-  ADMIN
-  SUPER_ADMIN
+  SUPERADMIN
+  COMPANY_ADMIN
 }
 
 model User {
@@ -49,7 +48,8 @@ model User {
   email          String           @unique
   passwordHash   String
   naam           String?
-  role           UserRole         @default(USER)
+  role           UserRole         @default(COMPANY_ADMIN)
+  isSuspended    Boolean          @default(false)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   companyProfile CompanyProfile?

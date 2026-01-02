@@ -6,19 +6,6 @@ import { getCurrentUserId } from "@/lib/auth";
 import { invoiceSchema, type InvoiceFormValues, type InvoiceLineValues } from "./schema";
 import { BtwTarief, Eenheid, Prisma } from "@prisma/client";
 
-async function ensureUser(userId: string) {
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: {},
-    create: {
-      id: userId,
-      email: "demo@zzp-hub.nl",
-      passwordHash: "demo-placeholder-hash",
-      naam: "Demo gebruiker",
-    },
-  });
-}
-
 function mapVatRate(vat: InvoiceLineValues["vat"]) {
   const mapping: Record<InvoiceLineValues["vat"], BtwTarief> = {
     "21": BtwTarief.HOOG_21,
@@ -49,8 +36,6 @@ export async function createInvoice(values: InvoiceFormValues) {
     throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
   }
   const data = invoiceSchema.parse(values);
-
-  await ensureUser(userId);
 
   const invoice = await prisma.$transaction(async (tx) => {
     const createdInvoice = await tx.invoice.create({
@@ -91,8 +76,6 @@ export async function updateInvoice(invoiceId: string, values: InvoiceFormValues
     throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
   }
   const data = invoiceSchema.parse(values);
-
-  await ensureUser(userId);
 
   await prisma.$transaction(async (tx) => {
     await tx.invoice.updateMany({

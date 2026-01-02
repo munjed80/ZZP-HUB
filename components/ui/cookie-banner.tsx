@@ -1,25 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
+
+function subscribe(listener: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const handler = () => listener();
+  window.addEventListener("storage", handler);
+  window.addEventListener("cookie-consent-change", handler);
+  return () => {
+    window.removeEventListener("storage", handler);
+    window.removeEventListener("cookie-consent-change", handler);
+  };
+}
+
+function getSnapshot() {
+  if (typeof window === "undefined") return false;
+  return !localStorage.getItem("cookieConsent");
+}
 
 export function CookieBanner() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    // Check if user has already accepted cookies (only in browser)
-    if (typeof window !== "undefined") {
-      const hasAccepted = localStorage.getItem("cookieConsent");
-      if (!hasAccepted) {
-        setIsVisible(true);
-      }
-    }
-  }, []);
+  const isVisible = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
   const handleAccept = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem("cookieConsent", "true");
+      window.dispatchEvent(new Event("cookie-consent-change"));
     }
-    setIsVisible(false);
   };
 
   if (!isVisible) return null;

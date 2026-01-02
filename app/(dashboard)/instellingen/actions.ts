@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
 import { companySettingsSchema, type CompanySettingsInput } from "./schema";
@@ -28,17 +29,6 @@ export async function updateCompanySettings(values: CompanySettingsInput) {
     throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
   }
   const data = companySettingsSchema.parse(values);
-
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: {},
-    create: {
-      id: userId,
-      email: "demo@zzp-hub.nl",
-      passwordHash: "demo-placeholder-hash",
-      naam: "Demo gebruiker",
-    },
-  });
 
   const payload = {
     companyName: data.companyName,
@@ -89,19 +79,23 @@ export async function changePassword({
   if (!userId) {
     throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
   }
-  await prisma.user.upsert({
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw new Error("Gebruiker niet gevonden.");
+  }
+
+  const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+  if (!isValid) {
+    throw new Error("Huidig wachtwoord is onjuist.");
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+  await prisma.user.update({
     where: { id: userId },
-    update: {},
-    create: {
-      id: userId,
-      email: "demo@zzp-hub.nl",
-      passwordHash: "demo-placeholder-hash",
-      naam: "Demo gebruiker",
-    },
+    data: { passwordHash },
   });
 
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return { success: true, newPassword, currentPassword };
+  return { success: true };
 }
 
 export async function downloadBackup() {

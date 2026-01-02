@@ -3,29 +3,41 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
-
-const schema = z.object({
-  bedrijfsnaam: z.string().min(2, "Bedrijfsnaam is verplicht"),
-  email: z.string().email("Voer een geldig e-mailadres in"),
-  wachtwoord: z.string().min(6, "Minimaal 6 tekens"),
-});
-
-type FormData = z.infer<typeof schema>;
+import { registerCompany } from "./actions";
+import { registerSchema, type RegisterInput } from "./schema";
+import { useState, useTransition } from "react";
+import { signIn } from "next-auth/react";
 
 export default function RegisterPagina() {
   const router = useRouter();
-  const form = useForm<FormData>({
-    resolver: zodResolver(schema),
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const form = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
     defaultValues: { bedrijfsnaam: "", email: "", wachtwoord: "" },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Registratie", data);
-    router.push("/dashboard");
+  const onSubmit = (data: RegisterInput) => {
+    setError(null);
+    startTransition(async () => {
+      const result = await registerCompany(data);
+      if (!result.success) {
+        setError(result.message ?? "Registratie mislukt.");
+        return;
+      }
+
+      await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.wachtwoord,
+      });
+
+      router.push("/dashboard");
+      router.refresh();
+    });
   };
 
   return (
@@ -87,8 +99,14 @@ export default function RegisterPagina() {
             )}
           </div>
 
-          <button type="submit" className={buttonVariants("primary", "w-full justify-center text-base py-2.5")}>
-            Account aanmaken
+          {error ? <p className="text-xs text-amber-700">{error}</p> : null}
+
+          <button
+            type="submit"
+            className={buttonVariants("primary", "w-full justify-center text-base py-2.5")}
+            disabled={isPending}
+          >
+            {isPending ? "Bezig met aanmaken..." : "Account aanmaken"}
           </button>
         </form>
       </CardContent>
@@ -96,7 +114,7 @@ export default function RegisterPagina() {
         <Link href="/login" className="text-blue-700 hover:text-blue-800">
           Al een account? Log in
         </Link>
-        <p className="text-xs text-slate-500">Demo-omgeving: redirect na registratie naar dashboard.</p>
+        <p className="text-xs text-slate-500">Maak een account aan om te starten met ZZP-HUB.</p>
       </CardFooter>
     </Card>
   );

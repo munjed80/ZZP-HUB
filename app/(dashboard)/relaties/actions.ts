@@ -2,31 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId, requireUser } from "@/lib/auth";
+import { UserRole } from "@prisma/client";
 import { clientSchema, type ClientFormValues } from "./schema";
 
-async function ensureUser(userId: string) {
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: {},
-    create: {
-      id: userId,
-      email: "demo@zzp-hub.nl",
-      passwordHash: "demo-placeholder-hash",
-      naam: "Demo gebruiker",
-    },
-  });
-}
-
 export async function getClients() {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { id: userId, role } = await requireUser();
 
   try {
     return await prisma.client.findMany({
-      where: { userId },
+      where: role === UserRole.SUPERADMIN ? {} : { userId },
       orderBy: { name: "asc" },
     });
   } catch (error) {
@@ -43,8 +28,6 @@ export async function createClient(values: ClientFormValues) {
     throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
   }
   const data = clientSchema.parse(values);
-
-  await ensureUser(userId);
 
   await prisma.client.create({
     data: {

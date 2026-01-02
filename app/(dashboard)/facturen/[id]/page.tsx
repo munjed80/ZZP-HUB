@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BtwTarief } from "@prisma/client";
+import { BtwTarief, UserRole } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
 import { calculateInvoiceTotals, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatBedrag } from "@/lib/utils";
 import { SendInvoiceEmailButton } from "./send-invoice-email-button";
@@ -27,14 +27,11 @@ function formatDate(date: Date) {
 }
 
 async function getInvoiceWithRelations(id: string) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { id: userId, role } = await requireUser();
 
   try {
     return await prisma.invoice.findFirst({
-      where: { id, userId },
+      where: role === UserRole.SUPERADMIN ? { id } : { id, userId },
       include: {
         client: true,
         lines: true,
@@ -47,91 +44,42 @@ async function getInvoiceWithRelations(id: string) {
   }
 }
 
-function getDemoPdfInvoice(id: string): InvoicePdfData {
-  const today = new Date();
-  const dueDate = new Date();
-  dueDate.setDate(today.getDate() + 14);
-
-  return {
-    invoiceNum: id.startsWith("demo") ? id : `demo-${id}`,
-    date: formatDate(today),
-    dueDate: formatDate(dueDate),
-    client: {
-      name: "Demo Klant BV",
-      address: "Keizersgracht 1",
-      postalCode: "1015 AB",
-      city: "Amsterdam",
-    },
-    companyProfile: {
-      companyName: "ZZP HUB Demo",
-      address: "Prinsengracht 100",
-      postalCode: "1015 EA",
-      city: "Amsterdam",
-      kvkNumber: "81234567",
-      iban: "NL00BANK0123456789",
-      logoUrl: null,
-    },
-    lines: [
-      {
-        description: "Consultancy uren",
-        quantity: 8,
-        unit: "UUR",
-        price: 95,
-        vatRate: "21",
-      },
-      {
-        description: "Onderhoudscontract",
-        quantity: 1,
-        unit: "PROJECT",
-        price: 350,
-        vatRate: "9",
-      },
-    ],
-  };
-}
-
 export default async function FactuurDetailPagina({ params }: PageProps) {
   const { id } = await params;
   const invoice = await getInvoiceWithRelations(id);
-  const isDemoInvoice = process.env.NODE_ENV !== "production" && id.startsWith("demo");
-
-  const pdfInvoice: InvoicePdfData | null = invoice
-    ? {
-        invoiceNum: invoice.invoiceNum,
-        date: formatDate(invoice.date),
-        dueDate: formatDate(invoice.dueDate),
-        client: {
-          name: invoice.client.name,
-          address: invoice.client.address,
-          postalCode: invoice.client.postalCode,
-          city: invoice.client.city,
-        },
-        companyProfile: invoice.user.companyProfile
-          ? {
-              companyName: invoice.user.companyProfile.companyName,
-              address: invoice.user.companyProfile.address,
-              postalCode: invoice.user.companyProfile.postalCode,
-              city: invoice.user.companyProfile.city,
-              kvkNumber: invoice.user.companyProfile.kvkNumber,
-              iban: invoice.user.companyProfile.iban,
-              logoUrl: invoice.user.companyProfile.logoUrl,
-            }
-          : null,
-        lines: invoice.lines.map((line) => ({
-          description: line.description,
-          quantity: Number(line.quantity),
-          unit: line.unit,
-          price: Number(line.price),
-          vatRate: mapVatRate(line.vatRate),
-        })),
-      }
-    : isDemoInvoice
-      ? getDemoPdfInvoice(id)
-      : null;
-
-  if (!pdfInvoice) {
+  if (!invoice) {
     notFound();
   }
+
+  const pdfInvoice: InvoicePdfData = {
+    invoiceNum: invoice.invoiceNum,
+    date: formatDate(invoice.date),
+    dueDate: formatDate(invoice.dueDate),
+    client: {
+      name: invoice.client.name,
+      address: invoice.client.address,
+      postalCode: invoice.client.postalCode,
+      city: invoice.client.city,
+    },
+    companyProfile: invoice.user.companyProfile
+      ? {
+          companyName: invoice.user.companyProfile.companyName,
+          address: invoice.user.companyProfile.address,
+          postalCode: invoice.user.companyProfile.postalCode,
+          city: invoice.user.companyProfile.city,
+          kvkNumber: invoice.user.companyProfile.kvkNumber,
+          iban: invoice.user.companyProfile.iban,
+          logoUrl: invoice.user.companyProfile.logoUrl,
+        }
+      : null,
+    lines: invoice.lines.map((line) => ({
+      description: line.description,
+      quantity: Number(line.quantity),
+      unit: line.unit,
+      price: Number(line.price),
+      vatRate: mapVatRate(line.vatRate),
+    })),
+  };
 
   const totals = calculateInvoiceTotals(pdfInvoice.lines);
   const statusValue = invoice?.emailStatus ?? "CONCEPT";

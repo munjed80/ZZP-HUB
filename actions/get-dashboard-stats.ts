@@ -2,7 +2,8 @@
 
 import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
+import { UserRole } from "@prisma/client";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const VAT_PERCENTAGES: Record<BtwTarief, number> = {
@@ -20,13 +21,11 @@ function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; qua
 }
 
 export async function getDashboardStats() {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { id: userId, role } = await requireUser();
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+  const scope = role === UserRole.SUPERADMIN ? {} : { userId };
 
   const monthlyChartData = MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
 
@@ -37,7 +36,7 @@ export async function getDashboardStats() {
     [invoices, expenses] = await Promise.all([
       prisma.invoice.findMany({
         where: {
-          userId,
+          ...scope,
           date: { gte: startOfYear, lt: endOfYear },
           NOT: { emailStatus: InvoiceEmailStatus.CONCEPT },
         },
@@ -45,7 +44,7 @@ export async function getDashboardStats() {
         orderBy: { date: "desc" },
       }),
       prisma.expense.findMany({
-        where: { userId, date: { gte: startOfYear, lt: endOfYear } },
+        where: { ...scope, date: { gte: startOfYear, lt: endOfYear } },
         orderBy: { date: "desc" },
       }),
     ]);

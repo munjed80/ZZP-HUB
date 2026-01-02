@@ -6,13 +6,6 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
 
-const DEMO_USER = {
-  email: process.env.DEMO_USER_EMAIL ?? "demo@zzp-hub.local",
-  passwordHash: process.env.DEMO_USER_PASSWORD_HASH ?? "demo-placeholder-hash",
-  naam: process.env.DEMO_USER_NAME ?? "Demo gebruiker",
-};
-const allowDemoUserBootstrap = process.env.ALLOW_DEMO_USER === "true" || process.env.NODE_ENV === "development";
-
 const timeEntrySchema = z.object({
   date: z.string().min(1, "Datum is verplicht"),
   hours: z.number().positive("Aantal uren moet groter dan 0 zijn"),
@@ -35,22 +28,6 @@ function getYearRange() {
   return { startOfYear, endOfYear };
 }
 
-async function ensureUser(userId: string) {
-  const existing = await prisma.user.findUnique({ where: { id: userId } });
-  if (existing) return;
-
-  if (!allowDemoUserBootstrap) {
-    throw new Error("Gebruiker niet gevonden. Stel ALLOW_DEMO_USER op 'true' of koppel een echte authenticatie provider.");
-  }
-
-  await prisma.user.create({
-    data: {
-      id: userId,
-      ...DEMO_USER,
-    },
-  });
-}
-
 export async function logTimeEntry(values: TimeEntryInput) {
   const userId = await getCurrentUserId();
   if (!userId) {
@@ -59,8 +36,6 @@ export async function logTimeEntry(values: TimeEntryInput) {
   const data = timeEntrySchema.parse(values);
 
   try {
-    await ensureUser(userId);
-
     await prisma.timeEntry.create({
       data: {
         userId,

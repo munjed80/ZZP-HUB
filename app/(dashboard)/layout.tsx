@@ -1,12 +1,17 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { MobileSidebar, Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { getDemoSessie } from "@/lib/auth";
+import { getServerAuthSession } from "@/lib/auth";
+import { UserRole } from "@prisma/client";
 
 export default async function DashboardShell({ children }: { children: ReactNode }) {
-  const sessie = await getDemoSessie();
-  
-  const userName = sessie?.user?.name || sessie?.user?.email || "Gebruiker";
+  const sessie = await getServerAuthSession();
+  if (!sessie?.user) {
+    redirect("/login");
+  }
+
+  const userName = sessie.user.name || sessie.user.email || "Gebruiker";
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";
@@ -22,17 +27,17 @@ export default async function DashboardShell({ children }: { children: ReactNode
   return (
     <div className="min-h-screen bg-transparent">
       <div className="flex min-h-screen">
-        <Sidebar />
+        <Sidebar userRole={sessie.user.role} />
         <div className="flex flex-1 flex-col">
           <header className="flex items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-4 backdrop-blur">
             <div className="flex items-start gap-3">
-              <MobileSidebar />
+              <MobileSidebar userRole={sessie.user.role} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   ZZP HUB
                 </p>
                 <p className="text-sm text-slate-600">
-                  Ingelogd via NextAuth
+                  {sessie.user.role === UserRole.SUPERADMIN ? "SuperAdmin" : "Bedrijfsbeheer"}
                 </p>
               </div>
             </div>

@@ -13,12 +13,12 @@ async function main() {
     where: { email },
     update: {
       passwordHash,
-      role: UserRole.ADMIN,
+      role: UserRole.SUPERADMIN,
     },
     create: {
       email,
       passwordHash,
-      role: UserRole.ADMIN,
+      role: UserRole.SUPERADMIN,
     },
   });
 
