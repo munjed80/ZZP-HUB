@@ -106,7 +106,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
     try {
       const id = await getCurrentUserId();
       if (!id) {
-        throw new Error("Niet geauthenticeerd");
+        throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
       }
       userId = id;
     } catch (error) {

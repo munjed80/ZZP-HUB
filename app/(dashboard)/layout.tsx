@@ -7,7 +7,17 @@ export default async function DashboardShell({ children }: { children: ReactNode
   const sessie = await getDemoSessie();
   
   const userName = sessie?.user?.name || sessie?.user?.email || "Gebruiker";
-  const userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || "ZZ";
+  
+  // Generate initials: for names use first letters of words, for emails use first char + char after @
+  let userInitials = "ZZ";
+  if (userName.includes("@")) {
+    // Email address: use first char and first char after @
+    const parts = userName.split("@");
+    userInitials = (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+  } else {
+    // Name: use first letters of up to 2 words
+    userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  }
 
   return (
     <div className="min-h-screen bg-transparent">
