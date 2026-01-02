@@ -225,9 +225,9 @@ export default async function LandingPagina() {
               </h3>
             </div>
             <div className="mt-12 grid grid-cols-2 gap-8 md:grid-cols-4">
-              {trustLogos.map((logo, index) => (
+              {trustLogos.map((logo) => (
                 <div
-                  key={index}
+                  key={logo}
                   className="flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-6 py-8 text-center text-sm font-semibold text-slate-700 transition-all hover:border-indigo-300 hover:bg-indigo-50"
                 >
                   {logo}
