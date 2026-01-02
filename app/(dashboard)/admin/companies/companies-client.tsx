@@ -196,13 +196,13 @@ export function CompaniesClient({ companies }: { companies: Company[] }) {
                     </Badge>
                   </td>
                   <td className="px-3 py-3 text-right space-x-2">
-                    <Button type="button" size="sm" variant="secondary" onClick={() => openEdit(company)}>
+                    <Button type="button" variant="secondary" onClick={() => openEdit(company)}>
                       Bewerken
                     </Button>
-                    <Button type="button" size="sm" variant="ghost" onClick={() => toggleSuspended(company)}>
+                    <Button type="button" variant="ghost" onClick={() => toggleSuspended(company)}>
                       {company.isSuspended ? "Deblokkeren" : "Blokkeren"}
                     </Button>
-                    <Button type="button" size="sm" variant="destructive" onClick={() => handleDelete(company)}>
+                    <Button type="button" variant="destructive" onClick={() => handleDelete(company)}>
                       Verwijderen
                     </Button>
                   </td>
