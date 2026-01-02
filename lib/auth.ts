@@ -141,7 +141,7 @@ export const authOptions: NextAuthOptions = {
  */
 export async function getCurrentUserId(): Promise<string | undefined> {
   const session = await getServerSession(authOptions);
-  return (session?.user as any)?.id as string | undefined;
+  return session?.user?.id;
 }
 
 /**
