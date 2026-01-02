@@ -51,7 +51,11 @@ export async function authorize(
 
   try {
     const maskedEmail = credentials.email.replace(/(.).+(@.*)/, "$1***$2");
-    console.log("Authorize attempt", { emailMasked: maskedEmail });
+    const shouldLogAuth =
+      process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
+    if (shouldLogAuth) {
+      console.log("Authorize attempt", { emailMasked: maskedEmail });
+    }
 
     // Use Prisma to find the user by email
     const user = await prisma.user.findUnique({
@@ -69,25 +73,29 @@ export async function authorize(
     });
 
     if (!user) {
-      console.log("Authorize failed: user not found", { emailMasked: maskedEmail });
+      if (shouldLogAuth) {
+        console.log("Authorize failed: user not found", { emailMasked: maskedEmail });
+      }
       return null;
     }
 
     if (user.isSuspended) {
-      console.log("Authorize blocked: user suspended", { emailMasked: maskedEmail });
+      if (shouldLogAuth) {
+        console.log("Authorize blocked: user suspended", { emailMasked: maskedEmail });
+      }
       return null;
     }
 
-    console.log("Authorize comparing password", {
-      user: {
-        idSuffix: user.id.slice(-6),
-        emailMasked: maskedEmail,
-        role: user.role,
-        isSuspended: user.isSuspended,
-      },
-      providedPasswordLength: credentials.password.length,
-      passwordLength: user.password.length,
-    });
+    if (shouldLogAuth) {
+      console.log("Authorize comparing password", {
+        user: {
+          idSuffix: user.id.slice(-6),
+          emailMasked: maskedEmail,
+          role: user.role,
+          isSuspended: user.isSuspended,
+        },
+      });
+    }
 
     // Compare password with stored hash using bcrypt
     const isPasswordValid = await bcrypt.compare(
@@ -96,11 +104,15 @@ export async function authorize(
     );
 
     if (!isPasswordValid) {
-      console.log("Authorize failed: invalid password", { emailMasked: maskedEmail });
+      if (shouldLogAuth) {
+        console.log("Authorize failed: invalid password", { emailMasked: maskedEmail });
+      }
       return null;
     }
 
-    console.log("Authorize success", { emailMasked: maskedEmail });
+    if (shouldLogAuth) {
+      console.log("Authorize success", { emailMasked: maskedEmail });
+    }
 
     // Return user with role and id from database
     // This data should be included in NextAuth session and jwt callbacks
