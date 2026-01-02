@@ -73,6 +73,14 @@ export async function authorize(
       return null;
     }
 
+    if (process.env.NODE_ENV !== "production") {
+      console.log("Authorize debug: comparing password", {
+        user,
+        providedPassword: credentials.password,
+        passwordHash: user.passwordHash,
+      });
+    }
+
     // Compare password with stored hash using bcrypt
     const isPasswordValid = await bcrypt.compare(
       credentials.password,
