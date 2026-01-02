@@ -238,7 +238,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
           <View style={styles.companyBlock}>
             <Text style={styles.documentType}>{documentType}</Text>
             {isTrustedLogo && logoUrl ? (
-              <Image src={logoUrl} style={styles.logo} alt="Bedrijfslogo" />
+              <Image src={logoUrl} style={styles.logo} />
             ) : (
               <Text style={styles.companyNameFallback}>
                 {companyProfile?.companyName ?? "Bedrijfsnaam"}
