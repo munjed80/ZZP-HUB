@@ -15,6 +15,7 @@ interface AuthorizeResult {
   email: string;
   naam: string | null;
   role: UserRole;
+  isSuspended: boolean;
 }
 
 /**
@@ -49,10 +50,15 @@ export async function authorize(
         passwordHash: true,
         naam: true,
         role: true,
+        isSuspended: true,
       },
     });
 
     if (!user) {
+      return null;
+    }
+
+    if (user.isSuspended) {
       return null;
     }
 
@@ -73,6 +79,7 @@ export async function authorize(
       email: user.email,
       naam: user.naam,
       role: user.role,
+      isSuspended: user.isSuspended,
     };
   } catch (error) {
     console.error("Error during authorization:", error);
@@ -105,49 +112,59 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
         
-        return {
-          id: result.id,
-          email: result.email,
-          name: result.naam,
-          role: result.role
-        } as any;
-      }
-    })
-  ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as any).role;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
-      }
-      return session;
-    }
+         return {
+           id: result.id,
+           email: result.email,
+           name: result.naam,
+           role: result.role,
+           isSuspended: result.isSuspended,
+         };
+       }
+     })
+   ],
+   callbacks: {
+     async jwt({ token, user }) {
+       if (user) {
+        const authorizedUser = user as AuthorizeResult;
+        token.id = authorizedUser.id;
+        token.role = authorizedUser.role;
+        token.isSuspended = authorizedUser.isSuspended;
+       }
+       return token;
+     },
+     async session({ session, token }) {
+       if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as UserRole;
+        session.user.isSuspended = Boolean(token.isSuspended);
+       }
+       return session;
+     }
   },
   pages: {
     signIn: "/login",
   }
 };
 
-/**
- * Get the current user's ID from the session
- * @returns The user ID or undefined if not authenticated
- */
+export function getServerAuthSession() {
+  return getServerSession(authOptions);
+}
+
 export async function getCurrentUserId(): Promise<string | undefined> {
-  const session = await getServerSession(authOptions);
+  const session = await getServerAuthSession();
+  if (session?.user?.isSuspended) {
+    return undefined;
+  }
   return session?.user?.id;
 }
 
-/**
- * Get the current session
- * @returns The session object or null if not authenticated
- */
-export async function getDemoSessie() {
-  return await getServerSession(authOptions);
+export async function requireUser() {
+  const session = await getServerAuthSession();
+  if (!session?.user) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
+  if (session.user.isSuspended) {
+    throw new Error("Dit account is geblokkeerd. Neem contact op met support.");
+  }
+  return { id: session.user.id, role: session.user.role };
 }

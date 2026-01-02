@@ -1,19 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export function CookieBanner() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    // Check if user has already accepted cookies (only in browser)
-    if (typeof window !== "undefined") {
-      const hasAccepted = localStorage.getItem("cookieConsent");
-      if (!hasAccepted) {
-        setIsVisible(true);
-      }
-    }
-  }, []);
+  const [isVisible, setIsVisible] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const hasAccepted = localStorage.getItem("cookieConsent");
+    return !hasAccepted;
+  });
 
   const handleAccept = () => {
     if (typeof window !== "undefined") {

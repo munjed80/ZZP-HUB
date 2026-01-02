@@ -1,11 +1,11 @@
 "use server";
 
 import { Resend } from "resend";
-import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
+import { BtwTarief, InvoiceEmailStatus, Prisma, UserRole } from "@prisma/client";
 import { renderToBuffer } from "@react-pdf/renderer";
 import InvoiceEmail from "@/components/emails/InvoiceEmail";
 import { InvoicePDF, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const APP_BASE_URL =
@@ -95,27 +95,15 @@ export async function sendInvoiceEmail(invoiceId: string) {
 
     const uuidPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
     const isUuid = uuidPattern.test(sanitizedInvoiceId);
-    const isDemoId = sanitizedInvoiceId.startsWith("demo-") || sanitizedInvoiceId === "demo";
 
-    if (!isUuid && !isDemoId) {
+    if (!isUuid) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    let userId: string;
-
-    try {
-      const id = await getCurrentUserId();
-      if (!id) {
-        throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-      }
-      userId = id;
-    } catch (error) {
-      console.error("Kon gebruiker niet bepalen voor e-mailverzending", error);
-      return { success: false, message: "Gebruiker niet gevonden." };
-    }
+    const { id: userId, role } = await requireUser();
 
     const invoice = await prisma.invoice.findFirst({
-      where: { id: sanitizedInvoiceId, userId },
+      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
       include: { client: true, lines: true, user: { include: { companyProfile: true } } },
     });
 

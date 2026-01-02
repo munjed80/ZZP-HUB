@@ -1,12 +1,17 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { MobileSidebar, Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { getDemoSessie } from "@/lib/auth";
+import { getServerAuthSession } from "@/lib/auth";
+import { UserRole } from "@prisma/client";
 
 export default async function DashboardShell({ children }: { children: ReactNode }) {
-  const sessie = await getDemoSessie();
-  
-  const userName = sessie?.user?.name || sessie?.user?.email || "Gebruiker";
+  const sessie = await getServerAuthSession();
+  if (!sessie?.user) {
+    redirect("/login");
+  }
+
+  const userName = sessie.user.name || sessie.user.email || "Gebruiker";
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";
@@ -32,7 +37,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
                   ZZP HUB
                 </p>
                 <p className="text-sm text-slate-600">
-                  Ingelogd via NextAuth
+                  {sessie.user.role === UserRole.SUPERADMIN ? "SuperAdmin" : "Bedrijfsbeheer"}
                 </p>
               </div>
             </div>

@@ -23,21 +23,6 @@ const ALLOWED_LOGO_HOSTS = (process.env.ALLOWED_LOGO_HOSTS ?? "zzp-hub.nl")
   .map((host) => host.trim().toLowerCase())
   .filter(Boolean);
 
-async function ensureUser(userId: string) {
-  const demoEmail = process.env.DEMO_USER_EMAIL ?? "demo@zzp-hub.nl";
-  const demoName = process.env.DEMO_USER_NAME ?? "Demo gebruiker";
-  await prisma.user.upsert({
-    where: { id: userId },
-    update: {},
-    create: {
-      id: userId,
-      email: demoEmail,
-      passwordHash: "demo-placeholder-hash",
-      naam: demoName,
-    },
-  });
-}
-
 function mapVatRate(vat: QuotationLineValues["vat"]) {
   const mapping: Record<QuotationLineValues["vat"], BtwTarief> = {
     "21": BtwTarief.HOOG_21,
@@ -146,8 +131,6 @@ export async function createQuotation(values: QuotationFormValues) {
     throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
   }
   const data = quotationSchema.parse(values);
-
-  await ensureUser(userId);
 
   const quotation = await prisma.$transaction(async (tx) => {
     const created = await tx.quotation.create({

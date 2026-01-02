@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { signIn } from "next-auth/react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const schema = z.object({
   email: z.string().email("Voer een geldig e-mailadres in"),
@@ -18,14 +19,30 @@ type FormData = z.infer<typeof schema>;
 
 export default function LoginPagina() {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { email: "", wachtwoord: "" },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Login", data);
+  const onSubmit = async (data: FormData) => {
+    setError(null);
+    setLoading(true);
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: data.email,
+      password: data.wachtwoord,
+    });
+
+    if (result?.error) {
+      setError("Ongeldige inloggegevens.");
+      setLoading(false);
+      return;
+    }
+
     router.push("/dashboard");
+    router.refresh();
   };
 
   return (
@@ -83,23 +100,19 @@ export default function LoginPagina() {
             </Link>
           </div>
 
-          <button type="submit" className={buttonVariants("primary", "w-full justify-center text-base py-2.5")}>
-            Inloggen
-          </button>
+          {error ? <p className="text-xs text-amber-700">{error}</p> : null}
+
           <button
-            type="button"
-            className={cn(
-              buttonVariants("secondary", "w-full justify-center text-base py-2.5"),
-              "bg-white text-slate-800",
-            )}
-            onClick={() => router.push("/dashboard")}
+            type="submit"
+            className={buttonVariants("primary", "w-full justify-center text-base py-2.5")}
+            disabled={loading}
           >
-            Inloggen met Google
+            {loading ? "Bezig met inloggen..." : "Inloggen"}
           </button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col items-center gap-2 text-xs text-slate-500">
-        <p>Demo-omgeving: redirect na login naar dashboard.</p>
+        <p>Log in met je geregistreerde account.</p>
       </CardFooter>
     </Card>
   );

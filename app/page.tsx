@@ -101,11 +101,8 @@ export default function LandingPagina() {
                 <Link href="/register" className={buttonVariants("primary", "w-full sm:w-auto text-base px-6 py-3")}>
                   Start 14 dagen gratis
                 </Link>
-                <Link
-                  href="#demo"
-                  className={buttonVariants("secondary", "w-full sm:w-auto text-base px-6 py-3")}
-                >
-                  Bekijk demo
+                <Link href="/login" className={buttonVariants("secondary", "w-full sm:w-auto text-base px-6 py-3")}>
+                  Log in
                 </Link>
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-600">
@@ -122,7 +119,7 @@ export default function LandingPagina() {
               </div>
             </div>
 
-            <div id="demo" className="flex-1">
+            <div className="flex-1">
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-blue-100/50">
                 <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-3">
                   <span className="h-3 w-3 rounded-full bg-rose-400" />

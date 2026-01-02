@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Building2,
   Users,
   FileText,
   Receipt,
@@ -26,6 +27,7 @@ export const navigatie = [
   { href: "/uren", label: "Uren", icon: Clock3 },
   { href: "/btw-aangifte", label: "BTW-aangifte", icon: FileText },
   { href: "/instellingen", label: "Instellingen", icon: Settings },
+  { href: "/admin/companies", label: "Companies", icon: Building2 },
 ];
 
 export function Sidebar() {
