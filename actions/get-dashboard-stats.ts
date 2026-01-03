@@ -1,6 +1,6 @@
 "use server";
 
-import { BtwTarief, Prisma } from "@prisma/client";
+import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
@@ -29,8 +29,9 @@ export async function getDashboardStats() {
   const scope = role === UserRole.SUPERADMIN ? {} : { userId };
   const finalizedInvoiceFilter = {
     ...scope,
+    // Prisma filter requires a mutable array; cast is used to bypass readonly tuple inference.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    emailStatus: { in: ["VERZONDEN", "BETAALD"] as any },
+    emailStatus: { in: [InvoiceEmailStatus.VERZONDEN, InvoiceEmailStatus.BETAALD] as any },
   };
 
   const monthlyChartData = createMonthlyChartData();
@@ -38,6 +39,7 @@ export async function getDashboardStats() {
   let invoices: InvoiceWithRelations[] = [];
   let recentInvoices: InvoiceWithRelations[] = [];
   let expenses: Awaited<ReturnType<typeof prisma.expense.findMany>> = [];
+  const sliceRecentExpenses = (list: typeof expenses) => (list ?? []).slice(0, 5);
 
   try {
     const [invoicesForYear, latestInvoices, expensesForYear] = await Promise.all([
@@ -120,7 +122,7 @@ export async function getDashboardStats() {
       incomeTaxReservation,
       monthlyChartData,
       recentInvoices,
-      recentExpenses: expenses.slice(0, 5),
+      recentExpenses: sliceRecentExpenses(expenses),
     };
   } catch (error) {
     console.error("Kon dashboardstatistieken niet berekenen", { error, userId });
@@ -134,7 +136,7 @@ export async function getDashboardStats() {
       incomeTaxReservation: 0,
       monthlyChartData: createMonthlyChartData(),
       recentInvoices,
-      recentExpenses: expenses.slice(0, 5),
+      recentExpenses: sliceRecentExpenses(expenses),
     };
   }
 }
