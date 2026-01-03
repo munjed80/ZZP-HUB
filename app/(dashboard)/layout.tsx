@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { MobileSidebar, Sidebar } from "@/components/layout/sidebar";
+import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { UserAvatarMenu } from "@/components/layout/user-avatar-menu";
 import { getServerAuthSession } from "@/lib/auth";
