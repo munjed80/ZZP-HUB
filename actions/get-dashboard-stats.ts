@@ -29,7 +29,7 @@ export async function getDashboardStats() {
   const scope = role === UserRole.SUPERADMIN ? {} : { userId };
   const finalizedInvoiceFilter = {
     ...scope,
-    emailStatus: { in: FINALIZED_INVOICE_STATUSES },
+    emailStatus: { in: ["VERZONDEN", "BETAALD"] as any },
   };
 
   const monthlyChartData = MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
