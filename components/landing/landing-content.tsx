@@ -47,6 +47,42 @@ const elitePerks = [
 
 const trustLogos = ["Delta Studio", "Noord Agency", "Kracht Consulting", "Studio Blink", "Peak Devs", "Atelier 6"];
 
+const glassStats = [
+  {
+    label: "Maand-omzet",
+    value: "€12.480",
+    chip: "+18% vs vorige maand",
+    icon: LineChart,
+    accent: "from-indigo-500 to-purple-500",
+  },
+  {
+    label: "Openstaand",
+    value: "€2.130",
+    chip: "3 facturen",
+    icon: FileText,
+    accent: "from-amber-400 to-orange-400",
+  },
+  {
+    label: "Focus sprint",
+    value: "06:24:18",
+    chip: "Timer live",
+    icon: Timer,
+    accent: "from-emerald-400 to-teal-500",
+  },
+];
+
+const glassPayments = [
+  { klant: "Peak Devs", bedrag: "€1.420", status: "Betaald" },
+  { klant: "Studio Blink", bedrag: "€980", status: "In review" },
+  { klant: "Noord Agency", bedrag: "€760", status: "Betaald" },
+];
+
+const glassFlow = [
+  { label: "BTW-sync klaar", icon: ShieldCheck, tone: "text-emerald-100 bg-emerald-500/10 ring-emerald-300/20" },
+  { label: "Rapportage live", icon: Sparkles, tone: "text-indigo-50 bg-indigo-500/10 ring-indigo-300/30" },
+  { label: "Automatische incasso", icon: Calculator, tone: "text-amber-50 bg-amber-500/10 ring-amber-300/30" },
+];
+
 const fadeUp = {
   initial: { opacity: 0, y: 18 },
   whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -78,15 +114,8 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <Sparkles className="h-5 w-5 text-slate-700" aria-hidden />
               </div>
               <motion.span
-                className="text-xl font-semibold tracking-tight"
-                style={{
-                  backgroundImage: "linear-gradient(120deg,#e5e7eb,#ffffff,#0f172a)",
-                  backgroundSize: "220% 220%",
-                  WebkitBackgroundClip: "text",
-                  color: "transparent",
-                }}
-                animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                transition={{ duration: 6, ease: "linear", repeat: Infinity }}
+                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(79,70,229,0.25)]"
+                transition={{ duration: 0.6 }}
               >
                 ZZP-HUB
               </motion.span>
@@ -210,114 +239,142 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 </motion.div>
               </div>
 
-              <div className="relative h-[520px]">
-                <div className="absolute -inset-10 rounded-[36px] bg-gradient-to-br from-indigo-200/50 via-white/40 to-indigo-300/40 blur-[90px]" />
-                <div className="absolute inset-0 rounded-[32px] border border-white/40 bg-white/40 shadow-[0_35px_120px_-60px_rgba(79,70,229,0.45)] backdrop-blur-3xl" />
-
+              <div className="relative h-[540px]">
+                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-indigo-300/35 via-white/30 to-purple-300/40 blur-[110px]" />
                 <motion.div
-                  className="absolute left-3 right-10 top-10 rounded-3xl border border-white/60 bg-white/70 p-5 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.45)] backdrop-blur-xl"
+                  className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-white/35 p-6 shadow-[0_35px_120px_-60px_rgba(79,70,229,0.55)] backdrop-blur-3xl"
                   {...tiltEffect}
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Factuur NL-1043</p>
-                      <p className="text-lg font-semibold text-slate-900">Delta Studio</p>
+                  <div className="flex items-center justify-between border-b border-white/40 pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-500 to-sky-400 text-white shadow-lg shadow-indigo-500/30 ring-1 ring-white/50">
+                        <Sparkles className="h-5 w-5" aria-hidden />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Glass preview</p>
+                        <p className="text-base font-semibold text-slate-900">Elite Dashboard</p>
+                      </div>
                     </div>
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">Betaald</span>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    {[
-                      { item: "UX Design Sprint", amount: "€1.120" },
-                      { item: "Urenregistratie", amount: "€380" },
-                      { item: "BTW (21%)", amount: "€314" },
-                    ].map((line) => (
-                      <div
-                        key={line.item}
-                        className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/70 px-3 py-2 text-sm shadow-sm"
-                      >
-                        <span className="text-slate-700">{line.item}</span>
-                        <span className="font-semibold text-slate-900">{line.amount}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 flex items-center justify-between rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-4 py-3 text-white shadow-lg shadow-indigo-900/30">
-                    <div className="text-sm text-white/80">Totaal</div>
-                    <div className="text-2xl font-semibold">€1.814</div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  className="absolute right-0 top-2 w-[58%] rounded-3xl border border-white/50 bg-white/80 p-4 shadow-[0_25px_90px_-60px_rgba(79,70,229,0.55)] backdrop-blur-xl"
-                  {...tiltEffect}
-                  transition={{ ...tiltEffect.transition, delay: 0.05 }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live rapportage</p>
-                      <p className="text-sm font-semibold text-slate-800">Cashflow</p>
+                    <div className="flex items-center gap-2 rounded-full border border-white/50 bg-white/30 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
+                      <ShieldCheck className="h-4 w-4 text-emerald-500" aria-hidden />
+                      Indigo beveiliging
                     </div>
-                    <span className="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold text-indigo-600">Live</span>
                   </div>
-                  <div className="mt-4 grid grid-cols-8 items-end gap-2">
-                    {[35, 55, 68, 62, 82, 72, 96, 88].map((height, idx) => (
-                      <div key={idx} className="space-y-2">
-                        <div
-                          className="rounded-xl bg-gradient-to-t from-indigo-500 to-indigo-400 shadow-[0_12px_30px_-18px_rgba(79,70,229,0.7)]"
-                          style={{ height: `${height}px` }}
-                        />
-                        <div
-                          className="rounded-xl bg-gradient-to-t from-amber-400 to-orange-300 shadow-[0_12px_30px_-18px_rgba(251,191,36,0.6)]"
-                          style={{ height: `${Math.max(26, height - 28)}px` }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-                    <span>Omzet</span>
-                    <span>Kosten</span>
-                    <span>Prognose</span>
-                  </div>
-                </motion.div>
 
-                <motion.div
-                  className="absolute left-6 bottom-4 w-[52%] rounded-3xl border border-white/50 bg-white/75 p-4 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.35)] backdrop-blur-xl"
-                  {...tiltEffect}
-                  transition={{ ...tiltEffect.transition, delay: 0.08 }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Timer</p>
-                      <p className="text-lg font-semibold text-slate-900">UX Sprint • 06:24:18</p>
+                  <div className="mt-5 grid gap-4">
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      {glassStats.map((stat) => {
+                        const Icon = stat.icon;
+                        return (
+                          <div
+                            key={stat.label}
+                            className="rounded-2xl border border-white/50 bg-white/45 p-4 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.35)] backdrop-blur-xl"
+                          >
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{stat.label}</p>
+                              <span
+                                className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${stat.accent} text-white shadow-md shadow-indigo-500/30 ring-1 ring-white/40`}
+                              >
+                                <Icon className="h-4 w-4" aria-hidden />
+                              </span>
+                            </div>
+                            <div className="mt-3 text-2xl font-semibold text-slate-900">{stat.value}</div>
+                            <p className="mt-1 text-xs font-semibold text-indigo-700">{stat.chip}</p>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-600">Live</span>
-                  </div>
-                  <div className="mt-4 grid grid-cols-4 gap-2 text-center text-sm font-semibold text-slate-800">
-                    {["Focus", "Pauze", "Opslaan", "Export"].map((label, idx) => (
-                      <div
-                        key={label}
-                        className={`rounded-2xl border border-white/60 px-3 py-2 shadow-sm ${idx === 0 ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-indigo-900/30" : "bg-white/80"}`}
-                      >
-                        {label}
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
 
-                <motion.div
-                  className="absolute right-4 bottom-0 w-[42%] rounded-2xl border border-white/50 bg-white/75 p-3 shadow-[0_20px_70px_-45px_rgba(79,70,229,0.35)] backdrop-blur-xl"
-                  {...tiltEffect}
-                  transition={{ ...tiltEffect.transition, delay: 0.12 }}
-                >
-                  <div className="flex items-center justify-between text-sm text-slate-700">
-                    <span>Recente betalingen</span>
-                    <ArrowRight className="h-4 w-4 text-slate-400" aria-hidden />
-                  </div>
-                  <div className="mt-3 space-y-2 text-sm">
-                    {["Peak Devs • €1.420", "Studio Blink • €980", "Noord Agency • €760"].map((invoice) => (
-                      <div key={invoice} className="rounded-xl border border-white/60 bg-white/80 px-3 py-2 shadow-sm">
-                        <p className="font-semibold text-slate-800">{invoice}</p>
+                    <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                      <div className="relative overflow-hidden rounded-2xl border border-white/45 bg-white/45 p-5 shadow-[0_22px_80px_-55px_rgba(79,70,229,0.55)]">
+                        <div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-indigo-400/30 blur-3xl" />
+                        <div className="absolute right-0 -bottom-10 h-32 w-40 rounded-full bg-purple-400/20 blur-3xl" />
+                        <div className="relative flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Realtime rapportage</p>
+                            <p className="text-lg font-semibold text-slate-900">Cashflow & uptime</p>
+                          </div>
+                          <span className="rounded-full bg-indigo-600/10 px-3 py-1 text-[11px] font-semibold text-indigo-700 ring-1 ring-indigo-200/50">
+                            Live sync
+                          </span>
+                        </div>
+                        <div className="relative mt-6 grid grid-cols-12 items-end gap-2">
+                          {[36, 62, 78, 68, 92, 74, 108, 98, 86, 94, 120, 104].map((height, idx) => (
+                            <div key={idx} className="space-y-2">
+                              <div
+                                className="rounded-xl bg-gradient-to-t from-indigo-600 to-sky-400 shadow-[0_14px_36px_-18px_rgba(79,70,229,0.65)]"
+                                style={{ height: `${height}px` }}
+                              />
+                              <div
+                                className="rounded-xl bg-gradient-to-t from-amber-400 to-orange-300 shadow-[0_12px_28px_-18px_rgba(251,191,36,0.6)]"
+                                style={{ height: `${Math.max(22, height - 34)}px` }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 flex items-center justify-between text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                          <span>Omzet</span>
+                          <span>Kosten</span>
+                          <span>Prognose</span>
+                        </div>
                       </div>
-                    ))}
+
+                      <div className="space-y-3">
+                        <div className="rounded-2xl border border-white/45 bg-white/45 p-4 shadow-[0_18px_60px_-50px_rgba(79,70,229,0.45)]">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold text-slate-900">Recente betalingen</p>
+                            <ArrowRight className="h-4 w-4 text-slate-500" aria-hidden />
+                          </div>
+                          <div className="mt-3 space-y-2 text-sm">
+                            {glassPayments.map((invoice) => (
+                              <div
+                                key={invoice.klant}
+                                className="flex items-center justify-between rounded-xl border border-white/50 bg-white/70 px-3 py-2 shadow-sm backdrop-blur"
+                              >
+                                <div>
+                                  <p className="font-semibold text-slate-900">{invoice.klant}</p>
+                                  <p className="text-xs text-slate-500">Elite factuur</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-sm font-semibold text-slate-900">{invoice.bedrag}</p>
+                                  <span className="text-[11px] font-semibold text-emerald-600">{invoice.status}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-white/45 bg-white/40 p-4 shadow-[0_18px_60px_-55px_rgba(15,23,42,0.35)]">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold text-slate-900">Flow</p>
+                            <span className="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-semibold text-white">
+                              14 dagen gratis
+                            </span>
+                          </div>
+                          <div className="mt-3 space-y-2">
+                            {glassFlow.map((item) => {
+                              const Icon = item.icon;
+                              return (
+                                <div
+                                  key={item.label}
+                                  className="flex items-center justify-between rounded-xl border border-white/40 bg-white/60 px-3 py-2 shadow-sm backdrop-blur"
+                                >
+                                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                                    <span
+                                      className={`flex h-8 w-8 items-center justify-center rounded-lg ring-1 ${item.tone}`}
+                                    >
+                                      <Icon className="h-4 w-4" aria-hidden />
+                                    </span>
+                                    {item.label}
+                                  </div>
+                                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Sync</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               </div>
@@ -402,18 +459,18 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               </motion.div>
               <motion.h2
                 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl"
-                  {...fadeUp}
-                  transition={{ ...fadeUp.whileInView.transition, delay: 0.05 }}
+                {...fadeUp}
+                transition={{ ...fadeUp.whileInView.transition, delay: 0.05 }}
               >
-                Eén majestueuze prijs
+                €4,99/mnd · All-in-one Elite
               </motion.h2>
               <motion.p
                 className="mx-auto mt-4 max-w-2xl text-lg text-slate-300"
                   {...fadeUp}
                   transition={{ ...fadeUp.whileInView.transition, delay: 0.1 }}
               >
-                Geen keuzestress. Alles wat je nodig hebt voor €4,99 per maand. Inclusief indigo glow beveiliging, audit
-                trails en premium support.
+                Eén plan met alles erin. Inclusief indigo glow beveiliging, audit trails, premium support én 14 dagen gratis
+                proberen.
               </motion.p>
             </div>
 
@@ -445,6 +502,9 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     </div>
                   ))}
                 </div>
+                <p className="mt-6 text-sm font-semibold text-slate-200">
+                  14 dagen gratis proberen. Daarna €4,99 per maand. Geen kleine lettertjes.
+                </p>
                 <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/register"}
@@ -497,7 +557,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Sparkles className="h-4 w-4" aria-hidden />
               Signature edition
             </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Powered by MHM IT</p>
+            <p className="text-sm font-semibold tracking-tight text-slate-200">Powered by MHM IT</p>
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
               <Link href="/privacy" className="transition-colors duration-200 hover:text-white">
                 Privacy
