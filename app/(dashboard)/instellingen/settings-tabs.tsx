@@ -26,9 +26,10 @@ type SettingsTabsProps = {
 export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) {
   const searchParams = useSearchParams();
   const tabParam = searchParams?.get("tab");
-  const activeTab = tabParam && VALID_TABS.includes(tabParam as typeof VALID_TABS[number]) 
+  const initialTab = tabParam && VALID_TABS.includes(tabParam as (typeof VALID_TABS)[number]) 
     ? tabParam 
     : DEFAULT_TAB;
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [isPasswordPending, startPasswordTransition] = useTransition();
   const [isBackupPending, startBackupTransition] = useTransition();
   const [isEmailPending, startEmailTransition] = useTransition();
@@ -98,7 +99,7 @@ export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) 
   };
 
   return (
-    <Tabs value={activeTab} className="space-y-6">
+    <Tabs defaultValue="profiel" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
       <TabsList>
         <TabsTrigger value="profiel">Bedrijfsprofiel</TabsTrigger>
         <TabsTrigger value="beveiliging">Beveiliging</TabsTrigger>
