@@ -36,7 +36,7 @@ export function DropdownMenu({ trigger, children, align = "right" }: DropdownMen
       {open && (
         <div
           className={cn(
-            "absolute top-full mt-2 z-50 min-w-[200px] rounded-lg border border-slate-200/70 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200",
+            "absolute top-full mt-2 z-50 min-w-[200px] rounded-lg border border-slate-200/70 bg-white shadow-lg transition-all duration-200 ease-out opacity-100 scale-100",
             align === "right" ? "right-0" : "left-0"
           )}
         >

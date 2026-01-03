@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { User, HelpCircle, LogOut } from "lucide-react";
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -10,6 +11,8 @@ type UserAvatarMenuProps = {
 };
 
 export function UserAvatarMenu({ userName, userInitials }: UserAvatarMenuProps) {
+  const router = useRouter();
+
   return (
     <DropdownMenu
       trigger={
@@ -23,11 +26,11 @@ export function UserAvatarMenu({ userName, userInitials }: UserAvatarMenuProps) 
         <p className="text-sm font-semibold text-slate-900">{userName}</p>
         <p className="text-xs text-slate-500">Beheer je account</p>
       </div>
-      <DropdownMenuItem onClick={() => window.location.href = "/instellingen"}>
+      <DropdownMenuItem onClick={() => router.push("/instellingen")}>
         <User className="h-4 w-4" aria-hidden />
         Mijn Profiel
       </DropdownMenuItem>
-      <DropdownMenuItem onClick={() => window.location.href = "/support"}>
+      <DropdownMenuItem onClick={() => router.push("/support")}>
         <HelpCircle className="h-4 w-4" aria-hidden />
         Hulp & Support
       </DropdownMenuItem>

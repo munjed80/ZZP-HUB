@@ -70,7 +70,7 @@ export function MobileNav() {
           
           {/* FAB Menu */}
           {fabMenuOpen && (
-            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 min-w-[180px] rounded-xl border border-slate-200/70 bg-white shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-200">
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 min-w-[180px] rounded-xl border border-slate-200/70 bg-white shadow-xl transition-all duration-200 ease-out opacity-100 scale-100">
               <div className="py-2">
                 <Link
                   href="/facturen/nieuw"
