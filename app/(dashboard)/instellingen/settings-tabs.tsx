@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { changePassword, downloadBackup } from "./actions";
+import { changePassword, downloadBackup, updateEmailSettings } from "./actions";
 import { SettingsForm, type CompanyProfileData } from "./settings-form";
 
 type SettingsTabsProps = {
@@ -22,10 +22,15 @@ type SettingsTabsProps = {
 export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) {
   const [isPasswordPending, startPasswordTransition] = useTransition();
   const [isBackupPending, startBackupTransition] = useTransition();
+  const [isEmailPending, startEmailTransition] = useTransition();
   const [passwords, setPasswords] = useState({
     current: "",
     next: "",
     confirm: "",
+  });
+  const [emailSettings, setEmailSettings] = useState({
+    emailSenderName: initialProfile?.emailSenderName ?? initialProfile?.companyName ?? "",
+    emailReplyTo: initialProfile?.emailReplyTo ?? "",
   });
 
   const handlePasswordChange = (event: FormEvent<HTMLFormElement>) => {
@@ -66,11 +71,29 @@ export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) 
     });
   };
 
+  const handleEmailSettingsSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    startEmailTransition(async () => {
+      try {
+        const saved = await updateEmailSettings(emailSettings);
+        setEmailSettings({
+          emailSenderName: saved?.emailSenderName ?? emailSettings.emailSenderName,
+          emailReplyTo: saved?.emailReplyTo ?? emailSettings.emailReplyTo,
+        });
+        toast.success("E-mailinstellingen opgeslagen.");
+      } catch (error) {
+        console.error(error);
+        toast.error("Kon e-mailinstellingen niet opslaan.");
+      }
+    });
+  };
+
   return (
     <Tabs defaultValue="profiel" className="space-y-6">
       <TabsList>
         <TabsTrigger value="profiel">Bedrijfsprofiel</TabsTrigger>
         <TabsTrigger value="beveiliging">Beveiliging</TabsTrigger>
+        <TabsTrigger value="email">E-mail</TabsTrigger>
         <TabsTrigger value="backup">Data & Backup</TabsTrigger>
       </TabsList>
 
@@ -141,6 +164,54 @@ export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) 
                 <Button type="submit" disabled={isPasswordPending}>
                   <Lock className="mr-2 h-4 w-4" aria-hidden />
                   {isPasswordPending ? "Wijzigen..." : "Wachtwoord wijzigen"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="email">
+        <Card className="bg-white">
+          <CardHeader className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-slate-600" aria-hidden />
+              <CardTitle>E-mailinstellingen</CardTitle>
+            </div>
+            <Badge variant="info">Versturen</Badge>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleEmailSettingsSubmit} className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-800">Afzendernaam</label>
+                <input
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  placeholder="Naam die ontvangers zien"
+                  value={emailSettings.emailSenderName}
+                  onChange={(event) =>
+                    setEmailSettings((prev) => ({ ...prev, emailSenderName: event.target.value }))
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-800">Reply-to</label>
+                <input
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  placeholder="antwoord@example.com"
+                  value={emailSettings.emailReplyTo}
+                  onChange={(event) =>
+                    setEmailSettings((prev) => ({ ...prev, emailReplyTo: event.target.value }))
+                  }
+                  type="email"
+                />
+                <p className="text-xs text-slate-500">
+                  Antwoorden op factuur-e-mails worden naar dit adres gestuurd.
+                </p>
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                <Button type="submit" disabled={isEmailPending}>
+                  {isEmailPending ? "Opslaan..." : "Opslaan"}
                 </Button>
               </div>
             </form>

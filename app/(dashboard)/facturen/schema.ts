@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const INVOICE_LINE_UNITS = ["UUR", "STUK", "PROJECT", "KM", "LICENTIE"] as const;
+export const INVOICE_LINE_UNITS = ["UUR", "STUK", "PROJECT", "KM", "LICENTIE", "STOP"] as const;
 
 export const invoiceLineSchema = z.object({
   description: z.string().min(1, "Omschrijving is verplicht"),

@@ -19,3 +19,14 @@ export const companySettingsSchema = z.object({
 });
 
 export type CompanySettingsInput = z.infer<typeof companySettingsSchema>;
+
+export const emailSettingsSchema = z.object({
+  emailSenderName: z.string().min(2, "Afzendernaam is verplicht"),
+  emailReplyTo: z
+    .string()
+    .email("Voer een geldig reply-to e-mailadres in")
+    .optional()
+    .or(z.literal("")),
+});
+
+export type EmailSettingsInput = z.infer<typeof emailSettingsSchema>;

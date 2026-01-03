@@ -39,6 +39,7 @@ const unitLabels: Record<(typeof INVOICE_LINE_UNITS)[number], string> = {
   PROJECT: "Project",
   KM: "Km",
   LICENTIE: "Licentie",
+  STOP: "Stop",
 };
 
 function formatDateInput(date: Date) {

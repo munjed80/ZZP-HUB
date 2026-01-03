@@ -141,6 +141,11 @@ export default async function FacturenPagina() {
                           {formatBedrag(invoiceAmount(factuur.lines))}
                         </p>
                       </div>
+                      {factuur.emailStatus === "CONCEPT" ? (
+                        <Link href={`/facturen/${factuur.id}/edit`} className={buttonVariants("secondary", "px-3 py-2")}>
+                          Bewerken
+                        </Link>
+                      ) : null}
                       <InvoiceActionsMenu
                         pdfInvoice={pdfInvoice}
                         invoiceId={factuur.id}
@@ -176,6 +181,11 @@ export default async function FacturenPagina() {
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 pt-3">
+                      {factuur.emailStatus === "CONCEPT" ? (
+                        <Link href={`/facturen/${factuur.id}/edit`} className={buttonVariants("secondary", "px-3 py-2")}>
+                          Bewerken
+                        </Link>
+                      ) : null}
                       <InvoiceActionsMenu
                         pdfInvoice={pdfInvoice}
                         invoiceId={factuur.id}

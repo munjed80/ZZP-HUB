@@ -4,7 +4,12 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId, requireUser } from "@/lib/auth";
-import { companySettingsSchema, type CompanySettingsInput } from "./schema";
+import {
+  companySettingsSchema,
+  emailSettingsSchema,
+  type CompanySettingsInput,
+  type EmailSettingsInput,
+} from "./schema";
 
 export async function fetchCompanyProfile() {
   const userId = await getCurrentUserId();
@@ -27,17 +32,18 @@ export async function updateCompanySettings(values: CompanySettingsInput) {
   const { id: userId } = await requireUser();
   const data = companySettingsSchema.parse(values);
   const logoUrl = data.logoUrl?.trim();
+  const paymentTerms = `${data.paymentTerms}`.trim();
 
   const payload = {
-    companyName: data.companyName,
-    address: data.address,
-    postalCode: data.postalCode,
-    city: data.city,
-    kvkNumber: data.kvkNumber,
-    btwNumber: data.btwNumber,
-    iban: data.iban,
-    bankName: data.bankName,
-    paymentTerms: `${data.paymentTerms}`,
+    companyName: data.companyName.trim(),
+    address: data.address.trim(),
+    postalCode: data.postalCode.trim(),
+    city: data.city.trim(),
+    kvkNumber: data.kvkNumber.trim(),
+    btwNumber: data.btwNumber.trim(),
+    iban: data.iban.trim(),
+    bankName: data.bankName.trim(),
+    paymentTerms,
     logoUrl: logoUrl || null,
     korEnabled: data.korEnabled ?? false,
     userId,
@@ -68,6 +74,29 @@ export async function updateCompanySettings(values: CompanySettingsInput) {
     console.error("Settings Save Error:", error);
     throw error;
   }
+}
+
+export async function updateEmailSettings(values: EmailSettingsInput) {
+  "use server";
+
+  const { id: userId } = await requireUser();
+  const data = emailSettingsSchema.parse(values);
+  const replyTo = data.emailReplyTo?.trim();
+
+  const updateResult = await prisma.companyProfile.updateMany({
+    where: { userId },
+    data: {
+      emailSenderName: data.emailSenderName.trim(),
+      emailReplyTo: replyTo ? replyTo.toLowerCase() : null,
+    },
+  });
+
+  if (updateResult.count === 0) {
+    throw new Error("Maak eerst een bedrijfsprofiel aan voordat je e-mailinstellingen opslaat.");
+  }
+
+  revalidatePath("/instellingen");
+  return prisma.companyProfile.findUnique({ where: { userId } });
 }
 
 export async function changePassword({

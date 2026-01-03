@@ -36,6 +36,7 @@ enum Eenheid {
   LICENTIE
   SERVICE
   KM
+  STOP
 }
 
 enum UserRole {
@@ -74,6 +75,8 @@ model CompanyProfile {
   paymentTerms String
   logoUrl      String?
   korEnabled   Boolean  @default(false)
+  emailSenderName String?
+  emailReplyTo    String?
   user         User     @relation(fields: [userId], references: [id])
 }
 

@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
     fontSize: 11,
-    padding: 32,
+    padding: 36,
     lineHeight: 1.5,
     backgroundColor: "#ffffff",
     color: "#0f172a",
@@ -64,54 +64,67 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 18,
+    marginBottom: 20,
+    alignItems: "flex-start",
     borderBottomWidth: 1,
     borderBottomColor: "#e2e8f0",
-    paddingBottom: 12,
+    paddingBottom: 16,
   },
   clientBlock: {
-    width: "55%",
-  },
-  companyBlock: {
-    width: "45%",
+    width: "48%",
     alignItems: "flex-end",
   },
-  companyNameFallback: {
-    fontSize: 18,
+  companyBlock: {
+    width: "48%",
+    alignItems: "flex-start",
+  },
+  companyName: {
+    fontSize: 16,
     fontWeight: 700,
+    marginTop: 6,
+    marginBottom: 2,
+  },
+  clientName: {
+    fontSize: 14,
+    fontWeight: 700,
+    marginBottom: 4,
   },
   documentType: {
     fontSize: 10,
     fontWeight: 700,
     color: "#1d4ed8",
-    marginBottom: 6,
+    marginBottom: 8,
     textTransform: "uppercase",
   },
   logo: {
-    width: 120,
-    height: 40,
-    marginBottom: 6,
+    width: 140,
+    height: 48,
+    marginBottom: 8,
   },
   label: {
     fontSize: 10,
     textTransform: "uppercase",
     color: "#475569",
     letterSpacing: 0.6,
+    marginBottom: 2,
   },
   text: {
     fontSize: 11,
   },
   meta: {
-    marginBottom: 16,
+    marginBottom: 18,
     flexDirection: "row",
+    gap: 10,
+    flexWrap: "wrap",
   },
   metaItem: {
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: "#e2e8f0",
     borderRadius: 6,
-    minWidth: 150,
-    marginRight: 12,
+    minWidth: 140,
+    backgroundColor: "#f8fafc",
   },
   metaLabel: {
     fontSize: 9,
@@ -129,6 +142,7 @@ const styles = StyleSheet.create({
     borderColor: "#e2e8f0",
     borderRadius: 6,
     overflow: "hidden",
+    backgroundColor: "#fff",
   },
   tableHeader: {
     flexDirection: "row",
@@ -179,14 +193,19 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   totals: {
-    marginTop: 14,
+    marginTop: 16,
     alignSelf: "flex-end",
     width: "60%",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: "#f8fafc",
   },
   totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 4,
+    marginBottom: 6,
   },
   totalLabel: {
     fontSize: 11,
@@ -199,10 +218,10 @@ const styles = StyleSheet.create({
   grandTotal: {
     fontSize: 13,
     fontWeight: 700,
-    marginTop: 4,
+    marginTop: 6,
     borderTopWidth: 1,
     borderTopColor: "#e2e8f0",
-    paddingTop: 6,
+    paddingTop: 8,
   },
   legal: {
     marginTop: 18,
@@ -226,31 +245,32 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <View style={styles.clientBlock}>
-            <Text style={styles.label}>Klant</Text>
-            <Text style={styles.text}>{invoice.client.name}</Text>
-            <Text style={styles.text}>{invoice.client.address}</Text>
-            <Text style={styles.text}>
-              {invoice.client.postalCode} {invoice.client.city}
-            </Text>
-          </View>
-
           <View style={styles.companyBlock}>
-            <Text style={styles.documentType}>{documentType}</Text>
             {isTrustedLogo && logoUrl ? (
               /* eslint-disable-next-line jsx-a11y/alt-text */
               <Image src={logoUrl} style={styles.logo} />
             ) : (
-              <Text style={styles.companyNameFallback}>
-                {companyProfile?.companyName ?? "Bedrijfsnaam"}
-              </Text>
+              <Text style={styles.companyName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
             )}
+            <Text style={styles.documentType}>{documentType}</Text>
+            {isTrustedLogo && logoUrl ? (
+              <Text style={styles.companyName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
+            ) : null}
             <Text style={styles.text}>{companyProfile?.address ?? "Adres niet ingesteld"}</Text>
             <Text style={styles.text}>
               {companyProfile?.postalCode ?? ""} {companyProfile?.city ?? ""}
             </Text>
             {companyProfile?.kvkNumber ? <Text style={styles.text}>KVK: {companyProfile.kvkNumber}</Text> : null}
             {companyProfile?.iban ? <Text style={styles.text}>IBAN: {companyProfile.iban}</Text> : null}
+          </View>
+
+          <View style={styles.clientBlock}>
+            <Text style={styles.label}>Klant</Text>
+            <Text style={styles.clientName}>{invoice.client.name}</Text>
+            <Text style={styles.text}>{invoice.client.address}</Text>
+            <Text style={styles.text}>
+              {invoice.client.postalCode} {invoice.client.city}
+            </Text>
           </View>
         </View>
 

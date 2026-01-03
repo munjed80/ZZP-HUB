@@ -61,3 +61,29 @@ export async function deleteClient(clientId: string) {
   revalidatePath("/relaties");
   revalidatePath("/facturen/nieuw");
 }
+
+export async function updateClient(clientId: string, values: ClientFormValues) {
+  "use server";
+
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
+  const data = clientSchema.parse(values);
+
+  await prisma.client.updateMany({
+    where: { id: clientId, userId },
+    data: {
+      name: data.name,
+      email: data.email,
+      address: data.address,
+      postalCode: data.postalCode,
+      city: data.city,
+      kvkNumber: data.kvkNumber || null,
+      btwId: data.btwId || null,
+    },
+  });
+
+  revalidatePath("/relaties");
+  revalidatePath("/facturen/nieuw");
+}

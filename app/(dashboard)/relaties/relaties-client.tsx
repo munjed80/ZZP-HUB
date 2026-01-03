@@ -3,14 +3,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Search, Trash2, Users } from "lucide-react";
+import { Pencil, Plus, Search, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { clientSchema, type ClientFormValues } from "./schema";
-import { createClient, deleteClient, type getClients } from "./actions";
+import { createClient, deleteClient, updateClient, type getClients } from "./actions";
 
 type ClientList = Awaited<ReturnType<typeof getClients>>;
 
@@ -19,6 +19,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [editingClient, setEditingClient] = useState<ClientList[number] | null>(null);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
@@ -33,14 +34,46 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
     },
   });
 
+  useEffect(() => {
+    if (editingClient) {
+      form.reset({
+        name: editingClient.name,
+        email: editingClient.email,
+        address: editingClient.address,
+        postalCode: editingClient.postalCode,
+        city: editingClient.city,
+        kvkNumber: editingClient.kvkNumber ?? "",
+        btwId: editingClient.btwId ?? "",
+      });
+    }
+  }, [editingClient, form]);
+
+  const resetForm = () => {
+    form.reset({
+      name: "",
+      email: "",
+      address: "",
+      postalCode: "",
+      city: "",
+      kvkNumber: "",
+      btwId: "",
+    });
+    setEditingClient(null);
+  };
+
   const onSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
       try {
-        await createClient(values);
-        form.reset();
+        if (editingClient) {
+          await updateClient(editingClient.id, values);
+          toast.success("Relatie bijgewerkt!");
+        } else {
+          await createClient(values);
+          toast.success("Relatie succesvol opgeslagen!");
+        }
+        resetForm();
         setOpen(false);
         router.refresh();
-        toast.success("Relatie succesvol opgeslagen!");
       } catch (error) {
         console.error("Relatie opslaan mislukt", error);
         toast.error("Relatie opslaan mislukt. Probeer het opnieuw.");
@@ -97,7 +130,11 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
             <Badge variant="success">{sortedClients.length} relaties</Badge>
             <Button
               type="button"
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                resetForm();
+                setEditingClient(null);
+                setOpen(true);
+              }}
               className="px-3 py-1.5"
               aria-expanded={open}
               aria-controls="nieuwe-relatie-dialog"
@@ -118,7 +155,14 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                   ? "Voeg je eerste relatie toe om sneller facturen en offertes op te stellen."
                   : "Pas je zoekopdracht aan op naam of stad."}
               </p>
-              <Button type="button" onClick={() => setOpen(true)}>
+              <Button
+                type="button"
+                onClick={() => {
+                  resetForm();
+                  setEditingClient(null);
+                  setOpen(true);
+                }}
+              >
                 <Plus className="mr-2 h-4 w-4" aria-hidden />
                 Nieuwe relatie
               </Button>
@@ -150,6 +194,19 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                         <td className="px-3 py-3 text-slate-700">—</td>
                         <td className="px-3 py-3 text-slate-700">{client.city}</td>
                         <td className="px-3 py-3 text-right">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditingClient(client);
+                            setOpen(true);
+                          }}
+                          disabled={isPending}
+                          className="px-2 py-1 text-xs"
+                          aria-label={`Bewerk ${client.name}`}
+                        >
+                          <Pencil className="h-4 w-4" aria-hidden />
+                          </Button>
                           <Button
                             type="button"
                             variant="ghost"
@@ -179,16 +236,31 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                         <p className="text-sm font-bold text-slate-900">{client.name}</p>
                         <p className="text-xs text-slate-500 mt-1">{client.address}</p>
                       </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => handleDelete(client.id)}
-                        disabled={isPending}
-                        className="px-2 py-1 text-xs -mt-1"
-                        aria-label={`Verwijder ${client.name}`}
-                      >
-                        <Trash2 className="h-4 w-4" aria-hidden />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => {
+                            setEditingClient(client);
+                            setOpen(true);
+                          }}
+                          disabled={isPending}
+                          className="px-2 py-1 text-xs -mt-1"
+                          aria-label={`Bewerk ${client.name}`}
+                        >
+                          <Pencil className="h-4 w-4" aria-hidden />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => handleDelete(client.id)}
+                          disabled={isPending}
+                          className="px-2 py-1 text-xs -mt-1"
+                          aria-label={`Verwijder ${client.name}`}
+                        >
+                          <Trash2 className="h-4 w-4" aria-hidden />
+                        </Button>
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -213,10 +285,20 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
           <div className="w-full max-w-xl rounded-xl bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Nieuwe relatie</h2>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  {editingClient ? "Relatie bewerken" : "Nieuwe relatie"}
+                </h2>
                 <p className="text-sm text-slate-600">Vul de klantgegevens in. Naam en e-mail zijn verplicht.</p>
               </div>
-              <Button type="button" variant="ghost" className="px-3 py-2" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="ghost"
+                className="px-3 py-2"
+                onClick={() => {
+                  setOpen(false);
+                  resetForm();
+                }}
+              >
                 Sluiten
               </Button>
             </div>
@@ -301,7 +383,14 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
               </div>
 
               <div className="flex justify-end gap-2 md:col-span-2">
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setOpen(false);
+                    resetForm();
+                  }}
+                >
                   Annuleren
                 </Button>
                 <Button type="submit" disabled={isPending}>

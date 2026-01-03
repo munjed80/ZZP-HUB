@@ -320,6 +320,7 @@ export function QuotationForm({ clients }: { clients: Client[] }) {
                             <option value="STUK">Stuk</option>
                             <option value="PROJECT">Project</option>
                             <option value="KM">Km</option>
+                            <option value="STOP">Stop</option>
                           </select>
                           {form.formState.errors.lines?.[index]?.unit && (
                             <p className="text-xs text-amber-700">

@@ -22,6 +22,8 @@ export type CompanyProfileData = {
   paymentTerms: string;
   logoUrl: string | null;
   korEnabled: boolean;
+  emailSenderName?: string | null;
+  emailReplyTo?: string | null;
 } | null;
 
 const paymentOptions = [14, 30];
