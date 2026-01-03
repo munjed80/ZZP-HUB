@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, type MotionProps } from "framer-motion";
+import { motion, type MotionProps, type TargetAndTransition, type Transition } from "framer-motion";
 import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, Sparkles, ShieldCheck, LineChart, Infinity } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,11 +83,20 @@ const glassFlow = [
   { label: "Automatische incasso", icon: Calculator, tone: "text-amber-50 bg-amber-500/10 ring-amber-300/30" },
 ];
 
-const fadeUp: MotionProps = {
+type FadeUpProps = MotionProps & {
+  whileInView: TargetAndTransition & { transition: Transition };
+};
+
+const fadeUp: FadeUpProps = {
   initial: { opacity: 0, y: 18 },
   whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
   viewport: { once: true, amount: 0.3 },
 };
+
+const fadeUpTransition = (delay: number): Transition => ({
+  ...fadeUp.whileInView.transition,
+  delay,
+});
 
 const staggeredCard = (delay: number): MotionProps => ({
   initial: { opacity: 0, y: 16 },
@@ -186,7 +195,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <motion.h1
                   className="text-4xl font-semibold leading-[1.02] tracking-[-0.05em] text-slate-900 sm:text-6xl lg:text-7xl"
                   {...fadeUp}
-                  transition={{ ...fadeUp.whileInView.transition, delay: 0.05 }}
+                  transition={fadeUpTransition(0.05)}
                   style={{
                     backgroundImage: "linear-gradient(110deg,#e5e7eb,#94a3b8,#0f172a)",
                     backgroundSize: "140% 140%",
@@ -199,7 +208,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <motion.p
                   className="max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl"
                   {...fadeUp}
-                  transition={{ ...fadeUp.whileInView.transition, delay: 0.1 }}
+                  transition={fadeUpTransition(0.1)}
                 >
                   Een gelaagde, glasheldere ervaring met live dashboards, zwevende glaslagen en een magnetic flow. Luxe
                   genoeg voor Apple, snel genoeg voor Stripe, en helder als Linear.
@@ -207,7 +216,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <motion.div
                   className="flex flex-col items-start gap-3 sm:flex-row sm:items-center"
                   {...fadeUp}
-                  transition={{ ...fadeUp.whileInView.transition, delay: 0.15 }}
+                  transition={fadeUpTransition(0.15)}
                 >
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/register"}
@@ -232,7 +241,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <motion.div
                   className="flex items-center gap-3 text-sm text-slate-600"
                   {...fadeUp}
-                  transition={{ ...fadeUp.whileInView.transition, delay: 0.2 }}
+                  transition={fadeUpTransition(0.2)}
                 >
                   <CheckCircle2 className="h-5 w-5 text-emerald-500" aria-hidden />
                   <span>14 dagen gratis • Geen creditcard • Magnetic UI</span>
@@ -460,14 +469,14 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               <motion.h2
                 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl"
                 {...fadeUp}
-                transition={{ ...fadeUp.whileInView.transition, delay: 0.05 }}
+                transition={fadeUpTransition(0.05)}
               >
                 €4,99/mnd · All-in-one Elite
               </motion.h2>
               <motion.p
                 className="mx-auto mt-4 max-w-2xl text-lg text-slate-300"
-                  {...fadeUp}
-                  transition={{ ...fadeUp.whileInView.transition, delay: 0.1 }}
+                {...fadeUp}
+                transition={fadeUpTransition(0.1)}
               >
                 Eén plan met alles erin. Inclusief indigo glow beveiliging, audit trails, premium support én 14 dagen gratis
                 proberen.
@@ -479,7 +488,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               <motion.div
                 className="relative overflow-hidden rounded-[32px] border border-white/15 bg-white/5 p-8 shadow-[0_35px_120px_-70px_rgba(99,102,241,0.8)] backdrop-blur-2xl"
                 {...fadeUp}
-                transition={{ ...fadeUp.whileInView.transition, delay: 0.15 }}
+                transition={fadeUpTransition(0.15)}
               >
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-100">
