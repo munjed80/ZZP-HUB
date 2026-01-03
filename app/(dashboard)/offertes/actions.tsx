@@ -96,7 +96,11 @@ function mapQuotationToPdfData(
           iban: quotation.user.companyProfile.iban,
           bankName: quotation.user.companyProfile.bankName,
           logoUrl: quotation.user.companyProfile.logoUrl,
-          email: quotation.user.email,
+          email:
+            quotation.user.companyProfile.emailReplyTo ??
+            quotation.user.companyProfile.emailSenderName ??
+            quotation.user.email,
+          website: process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? undefined,
         }
       : null,
     lines: quotation.lines.map((line) => ({
