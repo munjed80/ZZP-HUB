@@ -184,37 +184,37 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-              <div className="space-y-6">
+              <div className="space-y-6 text-center lg:text-left">
                 <motion.div
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-indigo-700 shadow-sm backdrop-blur"
+                  className="mx-auto inline-flex items-center gap-2 rounded-full border border-[#bdc3c7] bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-indigo-700 shadow-sm backdrop-blur sm:mx-0"
                   {...fadeUp}
                 >
                   <Sparkles className="h-4 w-4" aria-hidden />
                   <span>Super Premium SaaS</span>
                 </motion.div>
                 <motion.h1
-                  className="text-4xl font-semibold leading-[1.02] tracking-[-0.05em] text-slate-900 sm:text-6xl lg:text-7xl"
+                  className="text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-slate-900 drop-shadow-[0_10px_28px_rgba(15,23,42,0.24)] sm:text-5xl lg:text-6xl"
                   {...fadeUp}
                   transition={fadeUpTransition(0.05)}
                   style={{
-                    backgroundImage: "linear-gradient(110deg,#e5e7eb,#94a3b8,#0f172a)",
-                    backgroundSize: "140% 140%",
+                    backgroundImage: "linear-gradient(120deg,#1f2937,#0f172a,#334155)",
+                    backgroundSize: "160% 160%",
                     WebkitBackgroundClip: "text",
                     color: "transparent",
                   }}
                 >
-                  De nieuwe standaard voor Nederlandse ZZP&apos;ers.
+                  De Slimste Boekhouding voor Logistieke ZZP&apos;ers
                 </motion.h1>
                 <motion.p
-                  className="max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl"
+                  className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-700 sm:text-xl lg:mx-0"
                   {...fadeUp}
                   transition={fadeUpTransition(0.1)}
                 >
-                  Een gelaagde, glasheldere ervaring met live dashboards, zwevende glaslagen en een magnetic flow. Luxe
-                  genoeg voor Apple, snel genoeg voor Stripe, en helder als Linear.
+                  Factureer stops, ritten en uren in seconden. Speciaal ontworpen voor koeriers en transportondernemers die
+                  snelheid eisen.
                 </motion.p>
                 <motion.div
-                  className="flex flex-col items-start gap-3 sm:flex-row sm:items-center"
+                  className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start"
                   {...fadeUp}
                   transition={fadeUpTransition(0.15)}
                 >
@@ -225,7 +225,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                       "text-base px-8 py-3 shadow-xl shadow-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/40"
                     )}
                   >
-                    {primaryCta}
+                    Start Nu Gratis
                     <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
                   </Link>
                   <Link
@@ -235,11 +235,11 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                       "text-base px-8 py-3 border border-slate-200/80 bg-white/80 shadow-sm hover:-translate-y-0.5"
                     )}
                   >
-                    Bekijk prijs
+                    Bekijk Demo
                   </Link>
                 </motion.div>
                 <motion.div
-                  className="flex items-center gap-3 text-sm text-slate-600"
+                  className="flex items-center justify-center gap-3 text-sm text-slate-600 lg:justify-start"
                   {...fadeUp}
                   transition={fadeUpTransition(0.2)}
                 >
@@ -251,7 +251,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               <div className="relative h-[540px]">
                 <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-indigo-300/35 via-white/30 to-purple-300/40 blur-[110px]" />
                 <motion.div
-                  className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-white/35 p-6 shadow-[0_35px_120px_-60px_rgba(79,70,229,0.55)] backdrop-blur-3xl"
+                  className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-[linear-gradient(135deg,#f5f7fa_0%,#c3cfe2_100%)] bg-[length:200%_200%] p-6 shadow-[0_35px_120px_-60px_rgba(79,70,229,0.55)] backdrop-blur-[12px] animate-[metal-shine_8s_linear_infinite]"
                   {...tiltEffect}
                 >
                   <div className="flex items-center justify-between border-b border-white/40 pb-4">
