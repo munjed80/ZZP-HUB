@@ -12,7 +12,7 @@ import { useState } from "react";
 
 const schema = z.object({
   email: z.string().email("Voer een geldig e-mailadres in"),
-  wachtwoord: z.string().min(6, "Minimaal 6 tekens"),
+  password: z.string().min(6, "Minimaal 6 tekens"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -23,7 +23,7 @@ export default function LoginPagina() {
   const [loading, setLoading] = useState(false);
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "", wachtwoord: "" },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -32,7 +32,7 @@ export default function LoginPagina() {
     const result = await signIn("credentials", {
       redirect: false,
       email: data.email,
-      password: data.wachtwoord,
+      password: data.password,
     });
 
     if (result?.error) {
@@ -74,20 +74,20 @@ export default function LoginPagina() {
         </div>
 
         <div className="space-y-2">
-          <label className="flex items-center gap-2 text-sm font-semibold text-slate-800" htmlFor="wachtwoord">
+          <label className="flex items-center gap-2 text-sm font-semibold text-slate-800" htmlFor="password">
             <Lock className="h-4 w-4 text-slate-400" aria-hidden />
             Wachtwoord
           </label>
           <input
-            id="wachtwoord"
+            id="password"
             type="password"
             required
             className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-indigo-500 focus:outline-none focus:ring-0"
-            {...form.register("wachtwoord")}
-            aria-invalid={!!form.formState.errors.wachtwoord}
+            {...form.register("password")}
+            aria-invalid={!!form.formState.errors.password}
           />
-          {form.formState.errors.wachtwoord && (
-            <p className="text-xs text-amber-700">{form.formState.errors.wachtwoord.message}</p>
+          {form.formState.errors.password && (
+            <p className="text-xs text-amber-700">{form.formState.errors.password.message}</p>
           )}
         </div>
 
