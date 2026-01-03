@@ -85,7 +85,15 @@ async function fetchInvoices(): Promise<InvoiceWithRelations[]> {
 }
 
 export default async function FacturenPagina() {
-  const facturen = await fetchInvoices();
+  let facturen: InvoiceWithRelations[] = [];
+  let fetchError = false;
+
+  try {
+    facturen = await fetchInvoices();
+  } catch (error) {
+    console.error("Kon facturen niet ophalen", error);
+    fetchError = true;
+  }
   const mappedInvoices = facturen.map((factuur) => ({
     factuur,
     pdfInvoice: mapInvoiceToPdfData(factuur),
@@ -115,7 +123,11 @@ export default async function FacturenPagina() {
         </CardHeader>
         <CardContent>
           {facturen.length === 0 ? (
-            <EmptyState />
+            fetchError ? (
+              <EmptyState title="Geen facturen gevonden" description="We konden de facturen niet ophalen. Probeer het later opnieuw." />
+            ) : (
+              <EmptyState title="Geen facturen gevonden" />
+            )
           ) : (
             <>
               {/* Desktop Table View */}

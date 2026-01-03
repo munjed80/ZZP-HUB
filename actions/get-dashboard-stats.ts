@@ -1,11 +1,12 @@
 "use server";
 
-import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
+import { BtwTarief, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
+const createMonthlyChartData = () => MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
 const VAT_PERCENTAGES: Record<BtwTarief, number> = {
   [BtwTarief.HOOG_21]: 0.21,
   [BtwTarief.LAAG_9]: 0.09,
@@ -13,7 +14,6 @@ const VAT_PERCENTAGES: Record<BtwTarief, number> = {
   [BtwTarief.VRIJGESTELD]: 0,
   [BtwTarief.VERLEGD]: 0,
 };
-const FINALIZED_INVOICE_STATUSES = [InvoiceEmailStatus.VERZONDEN, InvoiceEmailStatus.BETAALD] as const;
 type InvoiceWithRelations = Prisma.InvoiceGetPayload<{ include: { lines: true; client: true } }>;
 
 function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; quantity: Prisma.Decimal | number; price: Prisma.Decimal | number }) {
@@ -29,10 +29,11 @@ export async function getDashboardStats() {
   const scope = role === UserRole.SUPERADMIN ? {} : { userId };
   const finalizedInvoiceFilter = {
     ...scope,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     emailStatus: { in: ["VERZONDEN", "BETAALD"] as any },
   };
 
-  const monthlyChartData = MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
+  const monthlyChartData = createMonthlyChartData();
 
   let invoices: InvoiceWithRelations[] = [];
   let recentInvoices: InvoiceWithRelations[] = [];
@@ -78,46 +79,62 @@ export async function getDashboardStats() {
     };
   }
 
-  let yearlyRevenue = 0;
-  let totalVatCollected = 0;
+  try {
+    let yearlyRevenue = 0;
+    let totalVatCollected = 0;
 
-  for (const invoice of invoices) {
-    let invoiceBase = 0;
-    for (const line of invoice.lines) {
-      const base = calculateLineAmount(line);
-      const vatRate = VAT_PERCENTAGES[line.vatRate] ?? 0;
-      invoiceBase += base;
-      totalVatCollected += base * vatRate;
+    for (const invoice of invoices) {
+      let invoiceBase = 0;
+      for (const line of invoice.lines) {
+        const base = calculateLineAmount(line);
+        const vatRate = VAT_PERCENTAGES[line.vatRate] ?? 0;
+        invoiceBase += base;
+        totalVatCollected += base * vatRate;
+      }
+      yearlyRevenue += invoiceBase;
+      monthlyChartData[invoice.date.getMonth()].revenue += invoiceBase;
     }
-    yearlyRevenue += invoiceBase;
-    monthlyChartData[invoice.date.getMonth()].revenue += invoiceBase;
+
+    let yearlyExpenses = 0;
+    let totalVatPaid = 0;
+
+    for (const expense of expenses) {
+      const base = Number(expense.amountExcl);
+      const vatRate = VAT_PERCENTAGES[expense.vatRate] ?? 0;
+      yearlyExpenses += base;
+      totalVatPaid += base * vatRate;
+      monthlyChartData[expense.date.getMonth()].expenses += base;
+    }
+
+    const netProfit = yearlyRevenue - yearlyExpenses;
+    const vatToPay = totalVatCollected - totalVatPaid;
+    const incomeTaxReservation = Math.max(0, netProfit * 0.35);
+
+    return {
+      yearlyRevenue,
+      yearlyExpenses,
+      netProfit,
+      totalVatCollected,
+      totalVatPaid,
+      vatToPay,
+      incomeTaxReservation,
+      monthlyChartData,
+      recentInvoices,
+      recentExpenses: expenses.slice(0, 5),
+    };
+  } catch (error) {
+    console.error("Kon dashboardstatistieken niet berekenen", { error, userId });
+    return {
+      yearlyRevenue: 0,
+      yearlyExpenses: 0,
+      netProfit: 0,
+      totalVatCollected: 0,
+      totalVatPaid: 0,
+      vatToPay: 0,
+      incomeTaxReservation: 0,
+      monthlyChartData: createMonthlyChartData(),
+      recentInvoices,
+      recentExpenses: expenses.slice(0, 5),
+    };
   }
-
-  let yearlyExpenses = 0;
-  let totalVatPaid = 0;
-
-  for (const expense of expenses) {
-    const base = Number(expense.amountExcl);
-    const vatRate = VAT_PERCENTAGES[expense.vatRate] ?? 0;
-    yearlyExpenses += base;
-    totalVatPaid += base * vatRate;
-    monthlyChartData[expense.date.getMonth()].expenses += base;
-  }
-
-  const netProfit = yearlyRevenue - yearlyExpenses;
-  const vatToPay = totalVatCollected - totalVatPaid;
-  const incomeTaxReservation = Math.max(0, netProfit * 0.35);
-
-  return {
-    yearlyRevenue,
-    yearlyExpenses,
-    netProfit,
-    totalVatCollected,
-    totalVatPaid,
-    vatToPay,
-    incomeTaxReservation,
-    monthlyChartData,
-    recentInvoices,
-    recentExpenses: expenses.slice(0, 5),
-  };
 }
