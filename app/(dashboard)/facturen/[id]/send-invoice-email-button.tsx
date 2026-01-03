@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { sendInvoiceEmail } from "@/actions/email-actions";
+import { sendInvoiceEmail } from "@/app/actions/send-invoice";
 
 type Props = {
   invoiceId: string;
