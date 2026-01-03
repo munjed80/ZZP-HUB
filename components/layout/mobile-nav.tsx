@@ -6,7 +6,7 @@ import { LayoutDashboard, Receipt, Wallet, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
 ];

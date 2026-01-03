@@ -29,3 +29,23 @@ textarea,
 select {
   font: inherit;
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.shimmer-text {
+  background-image: linear-gradient(120deg, #ffffff, #c7d2fe, #7c3aed, #312e81);
+  background-size: 280% 280%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shimmer 3.8s ease-in-out infinite;
+}
