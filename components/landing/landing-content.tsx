@@ -106,7 +106,7 @@ const staggeredCard = (delay: number): MotionProps => ({
 
 const tiltEffect = {
   whileHover: { rotateX: -6, rotateY: 6, translateY: -10, scale: 1.01 },
-  transition: { type: "spring", stiffness: 140, damping: 16 },
+  transition: { type: "spring" as const, stiffness: 140, damping: 16 },
   style: { transformStyle: "preserve-3d" as const },
 };
 
