@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { User, LogOut } from "lucide-react";
+import { User, Settings, LogOut } from "lucide-react";
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 type UserAvatarMenuProps = {
@@ -27,7 +27,7 @@ export function UserAvatarMenu({ userName, userInitials }: UserAvatarMenuProps) 
         <p className="text-xs text-slate-500">Beheer je account</p>
       </div>
       <DropdownMenuItem onClick={() => router.push("/instellingen")}>
-        <User className="h-4 w-4" aria-hidden />
+        <Settings className="h-4 w-4" aria-hidden />
         Instellingen
       </DropdownMenuItem>
       <DropdownMenuItem onClick={() => router.push("/instellingen?tab=beveiliging")}>

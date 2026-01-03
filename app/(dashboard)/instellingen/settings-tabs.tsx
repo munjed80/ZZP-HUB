@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { changePassword, downloadBackup, updateEmailSettings } from "./actions";
 import { SettingsForm, type CompanyProfileData } from "./settings-form";
 
+const DEFAULT_TAB = "profiel";
+
 type SettingsTabsProps = {
   initialProfile: CompanyProfileData;
   abonnement: {
@@ -23,7 +25,7 @@ type SettingsTabsProps = {
 export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) {
   const searchParams = useSearchParams();
   const tabParam = searchParams?.get("tab");
-  const activeTab = tabParam || "profiel";
+  const activeTab = tabParam || DEFAULT_TAB;
   const [isPasswordPending, startPasswordTransition] = useTransition();
   const [isBackupPending, startBackupTransition] = useTransition();
   const [isEmailPending, startEmailTransition] = useTransition();
