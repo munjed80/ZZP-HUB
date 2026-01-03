@@ -9,6 +9,7 @@ export async function registerCompany(values: RegisterInput) {
   const data = registerSchema.parse(values);
 
   try {
+    console.log("Register Attempt:", data.email);
     console.log("Register attempt", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
 
     const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
@@ -16,7 +17,7 @@ export async function registerCompany(values: RegisterInput) {
       return { success: false, message: "E-mailadres is al in gebruik." };
     }
 
-    const password = await bcrypt.hash(data.wachtwoord, 10);
+    const password = await bcrypt.hash(data.password, 10);
 
     await prisma.user.create({
       data: {

@@ -17,7 +17,7 @@ export default function RegisterPagina() {
   const [isPending, startTransition] = useTransition();
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { bedrijfsnaam: "", email: "", wachtwoord: "" },
+    defaultValues: { bedrijfsnaam: "", email: "", password: "" },
   });
 
   const onSubmit = (data: RegisterInput) => {
@@ -32,7 +32,7 @@ export default function RegisterPagina() {
       await signIn("credentials", {
         redirect: false,
         email: data.email,
-        password: data.wachtwoord,
+        password: data.password,
       });
 
       router.push("/dashboard");
@@ -86,20 +86,20 @@ export default function RegisterPagina() {
         </div>
 
         <div className="space-y-2">
-          <label className="flex items-center gap-2 text-sm font-semibold text-slate-800" htmlFor="wachtwoord">
+          <label className="flex items-center gap-2 text-sm font-semibold text-slate-800" htmlFor="password">
             <Lock className="h-4 w-4 text-slate-400" aria-hidden />
             Wachtwoord
           </label>
           <input
-            id="wachtwoord"
+            id="password"
             type="password"
             required
             className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-indigo-500 focus:outline-none focus:ring-0"
-            {...form.register("wachtwoord")}
-            aria-invalid={!!form.formState.errors.wachtwoord}
+            {...form.register("password")}
+            aria-invalid={!!form.formState.errors.password}
           />
-          {form.formState.errors.wachtwoord && (
-            <p className="text-xs text-amber-700">{form.formState.errors.wachtwoord.message}</p>
+          {form.formState.errors.password && (
+            <p className="text-xs text-amber-700">{form.formState.errors.password.message}</p>
           )}
         </div>
 
