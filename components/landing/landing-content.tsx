@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, type MotionProps } from "framer-motion";
 import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, Sparkles, ShieldCheck, LineChart, Infinity } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,15 +83,15 @@ const glassFlow = [
   { label: "Automatische incasso", icon: Calculator, tone: "text-amber-50 bg-amber-500/10 ring-amber-300/30" },
 ];
 
-const fadeUp = {
+const fadeUp: MotionProps = {
   initial: { opacity: 0, y: 18 },
-  whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
   viewport: { once: true, amount: 0.3 },
 };
 
-const staggeredCard = (delay: number) => ({
+const staggeredCard = (delay: number): MotionProps => ({
   initial: { opacity: 0, y: 16 },
-  whileInView: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut", delay } },
+  whileInView: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1], delay } },
   viewport: { once: true, amount: 0.2 },
 });
 
