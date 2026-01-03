@@ -13,7 +13,7 @@ type CardSectionProps = {
 
 export function Card({ children, className }: CardProps) {
   return (
-    <div className={cn("rounded-xl border border-slate-200 bg-white p-4 shadow-sm", className)}>
+    <div className={cn("rounded-xl border border-slate-200 bg-white p-4 md:p-5 shadow-sm", className)}>
       {children}
     </div>
   );
