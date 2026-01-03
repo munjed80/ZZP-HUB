@@ -57,7 +57,7 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
     startTransition(async () => {
       try {
         const saved = await updateCompanySettings(values);
-        toast.success("Instellingen opgeslagen");
+        toast.success("Instellingen succesvol opgeslagen");
         form.reset({
           ...values,
           paymentTerms: saved.paymentTerms ? Number(saved.paymentTerms) : values.paymentTerms,
