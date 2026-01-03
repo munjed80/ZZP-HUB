@@ -15,8 +15,12 @@ export type InvoicePdfCompany = {
   postalCode: string;
   city: string;
   kvkNumber?: string;
+  btwNumber?: string;
   iban?: string;
+  bankName?: string | null;
   logoUrl?: string | null;
+  email?: string | null;
+  website?: string | null;
 };
 
 export type InvoicePdfClient = {
@@ -52,36 +56,60 @@ export function calculateInvoiceTotals(lines: InvoicePdfLine[]) {
   };
 }
 
+const primaryColor = "#4f46e5";
+
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
     fontSize: 11,
-    padding: 36,
+    padding: 40,
     lineHeight: 1.5,
     backgroundColor: "#ffffff",
     color: "#0f172a",
   },
   header: {
+    marginBottom: 28,
+    paddingBottom: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    gap: 14,
+  },
+  headerTop: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
     alignItems: "flex-start",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
-    paddingBottom: 16,
   },
-  clientBlock: {
-    width: "48%",
-    alignItems: "flex-end",
+  title: {
+    fontSize: 24,
+    fontWeight: 800,
+    letterSpacing: 0.5,
+  },
+  invoiceNumber: {
+    color: primaryColor,
+    fontWeight: 700,
+  },
+  parties: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 12,
   },
   companyBlock: {
-    width: "48%",
+    flex: 1,
     alignItems: "flex-start",
+    gap: 2,
+  },
+  divider: {
+    width: 1,
+    backgroundColor: "#e5e7eb",
+  },
+  clientBlock: {
+    flex: 1,
+    alignItems: "flex-start",
+    gap: 2,
   },
   companyName: {
     fontSize: 16,
     fontWeight: 700,
-    marginTop: 6,
     marginBottom: 2,
   },
   clientName: {
@@ -90,23 +118,23 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   documentType: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: 700,
-    color: "#1d4ed8",
-    marginBottom: 8,
+    color: "#334155",
+    marginTop: 6,
     textTransform: "uppercase",
+    letterSpacing: 0.6,
   },
   logo: {
     width: 140,
-    height: 48,
-    marginBottom: 8,
+    height: 50,
   },
   label: {
     fontSize: 10,
     textTransform: "uppercase",
     color: "#475569",
     letterSpacing: 0.6,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   text: {
     fontSize: 11,
@@ -122,7 +150,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: "#e2e8f0",
-    borderRadius: 6,
+    borderRadius: 8,
     minWidth: 140,
     backgroundColor: "#f8fafc",
   },
@@ -131,6 +159,7 @@ const styles = StyleSheet.create({
     color: "#64748b",
     marginBottom: 4,
     textTransform: "uppercase",
+    letterSpacing: 0.4,
   },
   metaValue: {
     fontSize: 12,
@@ -138,32 +167,31 @@ const styles = StyleSheet.create({
     color: "#0f172a",
   },
   table: {
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    borderRadius: 6,
-    overflow: "hidden",
+    marginTop: 6,
     backgroundColor: "#fff",
+    borderRadius: 8,
+    overflow: "hidden",
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#f8fafc",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
-    paddingVertical: 8,
-    paddingHorizontal: 8,
+    backgroundColor: "#f3f4f6",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e5e7eb",
+    paddingVertical: 9,
+    paddingHorizontal: 10,
   },
   headerCell: {
     fontSize: 10,
     fontWeight: 700,
-    color: "#0f172a",
+    color: primaryColor,
     textTransform: "uppercase",
   },
   row: {
     flexDirection: "row",
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e5e7eb",
   },
   lastRow: {
     borderBottomWidth: 0,
@@ -193,19 +221,19 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   totals: {
-    marginTop: 16,
+    marginTop: 18,
     alignSelf: "flex-end",
-    width: "60%",
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    borderRadius: 8,
-    padding: 12,
-    backgroundColor: "#f8fafc",
+    width: "55%",
+    borderWidth: 0.5,
+    borderColor: "#e5e7eb",
+    borderRadius: 10,
+    padding: 14,
+    backgroundColor: "#f9fafb",
   },
   totalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 6,
+    marginBottom: 8,
   },
   totalLabel: {
     fontSize: 11,
@@ -216,17 +244,42 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   grandTotal: {
-    fontSize: 13,
-    fontWeight: 700,
-    marginTop: 6,
-    borderTopWidth: 1,
-    borderTopColor: "#e2e8f0",
-    paddingTop: 8,
+    fontSize: 15,
+    fontWeight: 800,
+    marginTop: 8,
+    borderTopWidth: 0.5,
+    borderTopColor: "#e5e7eb",
+    paddingTop: 10,
+    color: primaryColor,
   },
   legal: {
     marginTop: 18,
     fontSize: 10,
     color: "#475569",
+  },
+  footer: {
+    marginTop: 30,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+    paddingTop: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  footerColumn: {
+    flex: 1,
+    gap: 2,
+  },
+  footerLabel: {
+    fontSize: 9,
+    color: "#64748b",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  footerValue: {
+    fontSize: 11,
+    fontWeight: 600,
+    color: "#0f172a",
   },
 });
 
@@ -245,39 +298,49 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <View style={styles.companyBlock}>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.title}>{documentType}</Text>
+              <Text style={[styles.metaLabel, { marginTop: 6 }]}>Factuurnummer</Text>
+              <Text style={[styles.metaValue, styles.invoiceNumber]}>{invoice.invoiceNum}</Text>
+            </View>
             {isTrustedLogo && logoUrl ? (
               /* eslint-disable-next-line jsx-a11y/alt-text */
               <Image src={logoUrl} style={styles.logo} />
             ) : (
               <Text style={styles.companyName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
             )}
-            <Text style={styles.documentType}>{documentType}</Text>
-            {isTrustedLogo && logoUrl ? (
-              <Text style={styles.companyName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
-            ) : null}
-            <Text style={styles.text}>{companyProfile?.address ?? "Adres niet ingesteld"}</Text>
-            <Text style={styles.text}>
-              {companyProfile?.postalCode ?? ""} {companyProfile?.city ?? ""}
-            </Text>
-            {companyProfile?.kvkNumber ? <Text style={styles.text}>KVK: {companyProfile.kvkNumber}</Text> : null}
-            {companyProfile?.iban ? <Text style={styles.text}>IBAN: {companyProfile.iban}</Text> : null}
           </View>
 
-          <View style={styles.clientBlock}>
-            <Text style={styles.label}>Klant</Text>
-            <Text style={styles.clientName}>{invoice.client.name}</Text>
-            <Text style={styles.text}>{invoice.client.address}</Text>
-            <Text style={styles.text}>
-              {invoice.client.postalCode} {invoice.client.city}
-            </Text>
+          <View style={styles.parties}>
+            <View style={styles.companyBlock}>
+              <Text style={styles.label}>Verzender</Text>
+              <Text style={styles.companyName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
+              <Text style={styles.text}>{companyProfile?.address ?? "Adres niet ingesteld"}</Text>
+              <Text style={styles.text}>
+                {companyProfile?.postalCode ?? ""} {companyProfile?.city ?? ""}
+              </Text>
+              {companyProfile?.kvkNumber ? <Text style={styles.text}>KVK: {companyProfile.kvkNumber}</Text> : null}
+              {companyProfile?.iban ? <Text style={styles.text}>IBAN: {companyProfile.iban}</Text> : null}
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.clientBlock}>
+              <Text style={styles.label}>Ontvanger</Text>
+              <Text style={styles.clientName}>{invoice.client.name}</Text>
+              <Text style={styles.text}>{invoice.client.address}</Text>
+              <Text style={styles.text}>
+                {invoice.client.postalCode} {invoice.client.city}
+              </Text>
+            </View>
           </View>
         </View>
 
         <View style={styles.meta}>
           <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>Factuurnummer</Text>
-            <Text style={styles.metaValue}>{invoice.invoiceNum}</Text>
+            <Text style={[styles.metaValue, styles.invoiceNumber]}>{invoice.invoiceNum}</Text>
           </View>
           <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>Datum</Text>
@@ -335,6 +398,27 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
         </View>
 
         <Text style={styles.legal}>{paymentText}</Text>
+
+        <View style={styles.footer}>
+          <View style={styles.footerColumn}>
+            <Text style={styles.footerLabel}>IBAN</Text>
+            <Text style={styles.footerValue}>{companyProfile?.iban ?? "—"}</Text>
+            <Text style={styles.footerLabel}>BIC</Text>
+            <Text style={styles.footerValue}>{companyProfile?.bankName ?? "—"}</Text>
+          </View>
+          <View style={styles.footerColumn}>
+            <Text style={styles.footerLabel}>KVK</Text>
+            <Text style={styles.footerValue}>{companyProfile?.kvkNumber ?? "—"}</Text>
+            <Text style={styles.footerLabel}>BTW</Text>
+            <Text style={styles.footerValue}>{companyProfile?.btwNumber ?? "—"}</Text>
+          </View>
+          <View style={styles.footerColumn}>
+            <Text style={styles.footerLabel}>Website</Text>
+            <Text style={styles.footerValue}>{companyProfile?.website ?? "—"}</Text>
+            <Text style={styles.footerLabel}>Email</Text>
+            <Text style={styles.footerValue}>{companyProfile?.email ?? "—"}</Text>
+          </View>
+        </View>
       </Page>
     </Document>
   );

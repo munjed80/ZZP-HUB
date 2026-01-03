@@ -92,8 +92,12 @@ function mapQuotationToPdfData(
           postalCode: quotation.user.companyProfile.postalCode,
           city: quotation.user.companyProfile.city,
           kvkNumber: quotation.user.companyProfile.kvkNumber,
+          btwNumber: quotation.user.companyProfile.btwNumber,
           iban: quotation.user.companyProfile.iban,
+          bankName: quotation.user.companyProfile.bankName,
           logoUrl: quotation.user.companyProfile.logoUrl,
+          email: quotation.user.email,
+          website: null,
         }
       : null,
     lines: quotation.lines.map((line) => ({
