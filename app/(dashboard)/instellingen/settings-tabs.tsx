@@ -99,7 +99,7 @@ export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) 
   };
 
   return (
-    <Tabs defaultValue="profiel" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+    <Tabs defaultValue={DEFAULT_TAB} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
       <TabsList>
         <TabsTrigger value="profiel">Bedrijfsprofiel</TabsTrigger>
         <TabsTrigger value="beveiliging">Beveiliging</TabsTrigger>
