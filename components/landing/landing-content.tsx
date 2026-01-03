@@ -212,7 +212,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
 
             <div className="mt-16 sm:mt-20">
               <motion.div
-                className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-[0_30px_100px_-40px_rgba(79,70,229,0.5)] backdrop-blur-2xl ring-1 ring-indigo-100/60"
+                className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-[0_30px_100px_-40px_rgba(79,70,229,0.5)] backdrop-blur-3xl ring-1 ring-indigo-100/60"
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
@@ -224,7 +224,11 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <div className="h-3 w-3 rounded-full bg-emerald-400" />
                   <span className="ml-3 text-xs font-medium text-slate-500">Dashboard Preview</span>
                 </div>
-                <div className="relative bg-gradient-to-b from-white/90 to-indigo-50/60 p-4">
+                <motion.div
+                  className="relative bg-gradient-to-b from-white/90 to-indigo-50/60 p-4"
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                >
                   <div className="absolute -left-6 -top-8 h-24 w-24 rounded-full bg-indigo-200/50 blur-3xl" aria-hidden />
                   <Image
                     src="/window.svg"
@@ -234,7 +238,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     className="relative h-auto w-full rounded-2xl border border-white/80 shadow-2xl shadow-indigo-900/10"
                     priority
                   />
-                </div>
+                </motion.div>
               </motion.div>
             </div>
           </div>
