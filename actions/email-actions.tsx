@@ -1,3 +1,3 @@
 "use server";
 
-export { sendInvoiceEmail } from "@/app/actions/send-invoice";
+export { sendInvoiceEmail } from "@/app/actions/invoice-actions";

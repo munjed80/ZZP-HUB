@@ -1,6 +1,6 @@
 import { renderToBuffer } from "@react-pdf/renderer";
 import { BtwTarief, Prisma } from "@prisma/client";
-import { InvoicePDF, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
+import { InvoiceTemplate as InvoicePDF, type InvoiceTemplateData } from "@/lib/invoice-template";
 
 export type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
   include: { client: true; lines: true; user: { include: { companyProfile: true } } };
@@ -16,7 +16,7 @@ function formatDate(date: Date) {
   return new Date(date).toLocaleDateString("nl-NL");
 }
 
-export function mapInvoiceToPdfData(invoice: InvoiceWithRelations): InvoicePdfData {
+export function mapInvoiceToPdfData(invoice: InvoiceWithRelations): InvoiceTemplateData {
   return {
     invoiceNum: invoice.invoiceNum,
     date: formatDate(invoice.date),
@@ -48,6 +48,6 @@ export function mapInvoiceToPdfData(invoice: InvoiceWithRelations): InvoicePdfDa
   };
 }
 
-export async function generateInvoicePdf(invoice: InvoicePdfData) {
+export async function generateInvoicePdf(invoice: InvoiceTemplateData) {
   return renderToBuffer(<InvoicePDF invoice={invoice} />);
 }

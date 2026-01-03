@@ -11,6 +11,43 @@ import { formatBedrag } from "@/lib/utils";
 import { SendInvoiceEmailButton } from "./[id]/send-invoice-email-button";
 import { Prisma, UserRole } from "@prisma/client";
 
+function InvoiceActionsMenu({
+  pdfInvoice,
+  invoiceId,
+  recipientEmail,
+}: {
+  pdfInvoice: ReturnType<typeof mapInvoiceToPdfData>;
+  invoiceId: string;
+  recipientEmail: string;
+}) {
+  return (
+    <details className="relative inline-block">
+      <summary
+        className={buttonVariants("secondary", "cursor-pointer list-none px-3 py-2")}
+        role="button"
+        aria-label="Acties"
+        style={{ listStyle: "none" }}
+      >
+        Acties
+      </summary>
+      <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg border border-slate-200 bg-white shadow-lg">
+        <div className="flex flex-col gap-2 p-2">
+          <InvoicePdfDownloadButton
+            invoice={pdfInvoice}
+            label="Download PDF"
+            className="w-full justify-center bg-slate-900 text-white hover:bg-slate-800"
+          />
+          <SendInvoiceEmailButton
+            invoiceId={invoiceId}
+            recipientEmail={recipientEmail}
+            className="w-full justify-center"
+          />
+        </div>
+      </div>
+    </details>
+  );
+}
+
 function statusVariant(status: string) {
   if (status === "Betaald" || status === "Geaccepteerd") return "success" as const;
   if (status === "Open" || status === "Verzonden") return "info" as const;
@@ -104,14 +141,11 @@ export default async function FacturenPagina() {
                           {formatBedrag(invoiceAmount(factuur.lines))}
                         </p>
                       </div>
-                      <div className="flex flex-wrap justify-end gap-2">
-                        <InvoicePdfDownloadButton
-                          invoice={pdfInvoice}
-                          label="Bekijk PDF"
-                          className={buttonVariants("secondary")}
-                        />
-                        <SendInvoiceEmailButton invoiceId={factuur.id} recipientEmail={factuur.client.email} />
-                      </div>
+                      <InvoiceActionsMenu
+                        pdfInvoice={pdfInvoice}
+                        invoiceId={factuur.id}
+                        recipientEmail={factuur.client.email}
+                      />
                     </div>
                   </div>
                 ))}
@@ -142,12 +176,11 @@ export default async function FacturenPagina() {
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 pt-3">
-                      <InvoicePdfDownloadButton
-                        invoice={pdfInvoice}
-                        label="Bekijk PDF"
-                        className={buttonVariants("secondary")}
+                      <InvoiceActionsMenu
+                        pdfInvoice={pdfInvoice}
+                        invoiceId={factuur.id}
+                        recipientEmail={factuur.client.email}
                       />
-                      <SendInvoiceEmailButton invoiceId={factuur.id} recipientEmail={factuur.client.email} />
                     </div>
                   </div>
                 ))}

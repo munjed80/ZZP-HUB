@@ -4,14 +4,15 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { sendInvoiceEmail } from "@/app/actions/send-invoice";
+import { sendInvoiceEmail } from "@/app/actions/invoice-actions";
 
 type Props = {
   invoiceId: string;
   recipientEmail: string;
+  className?: string;
 };
 
-export function SendInvoiceEmailButton({ invoiceId, recipientEmail }: Props) {
+export function SendInvoiceEmailButton({ invoiceId, recipientEmail, className }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -28,7 +29,7 @@ export function SendInvoiceEmailButton({ invoiceId, recipientEmail }: Props) {
   };
 
   return (
-    <Button type="button" onClick={handleClick} disabled={isPending}>
+    <Button type="button" onClick={handleClick} disabled={isPending} className={className}>
       {isPending ? "Versturen..." : "Verstuur via Email"}
     </Button>
   );
