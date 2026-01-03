@@ -48,25 +48,25 @@ export default async function DashboardPagina() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-        <p className="text-sm text-slate-600">
+        <h1 className="text-xl md:text-2xl font-bold text-slate-900">Dashboard</h1>
+        <p className="text-xs md:text-sm text-slate-600">
           Overzicht van je financiële gezondheid in {now.getFullYear()}. Alle bedragen zijn exclusief BTW.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => {
           const Icon = item.icon;
           return (
             <Card key={item.label} className="bg-white shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600">{item.label}</CardTitle>
+                <CardTitle className="text-xs md:text-sm font-medium text-slate-600">{item.label}</CardTitle>
                 <span className={`rounded-full p-2 ${item.bg}`}>
                   <Icon className={`h-4 w-4 ${item.color}`} aria-hidden />
                 </span>
               </CardHeader>
               <CardContent>
-                <p className="text-2xl font-semibold text-slate-900">{formatBedrag(item.value)}</p>
+                <p className="text-xl md:text-2xl font-semibold text-slate-900">{formatBedrag(item.value)}</p>
               </CardContent>
             </Card>
           );
@@ -76,7 +76,7 @@ export default async function DashboardPagina() {
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Card className="bg-white shadow-sm">
           <CardHeader>
-            <CardTitle>Omzet vs kosten per maand</CardTitle>
+            <CardTitle className="text-sm md:text-base">Omzet vs kosten per maand</CardTitle>
           </CardHeader>
           <CardContent>
             <RevenueExpensesChart data={chartData} />
@@ -89,13 +89,13 @@ export default async function DashboardPagina() {
               <PiggyBank className="h-5 w-5 text-blue-600" aria-hidden />
             </div>
             <div>
-              <CardTitle>Inkomstenbelasting reservering</CardTitle>
-              <p className="text-sm text-slate-600">Zet dit opzij voor de belastingdienst (35% buffer).</p>
+              <CardTitle className="text-sm md:text-base">Inkomstenbelasting reservering</CardTitle>
+              <p className="text-xs md:text-sm text-slate-600">Zet dit opzij voor de belastingdienst (35% buffer).</p>
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold text-slate-900">{formatBedrag(stats.incomeTaxReservation)}</p>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="text-2xl md:text-3xl font-semibold text-slate-900">{formatBedrag(stats.incomeTaxReservation)}</p>
+            <p className="mt-2 text-xs md:text-sm text-slate-600">
               Gebaseerd op je huidige winst: {formatBedrag(stats.netProfit)}.
             </p>
           </CardContent>
@@ -105,11 +105,11 @@ export default async function DashboardPagina() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="bg-white shadow-sm">
           <CardHeader>
-            <CardTitle>Recente facturen</CardTitle>
-            <p className="text-sm text-slate-600">Laatste 5 definitieve facturen</p>
+            <CardTitle className="text-sm md:text-base">Recente facturen</CardTitle>
+            <p className="text-xs md:text-sm text-slate-600">Laatste 5 definitieve facturen</p>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
+            <table className="w-full border-collapse text-xs md:text-sm">
               <thead>
                 <tr className="text-left text-slate-600">
                   <th className="border-b border-slate-100 px-2 py-2">Nummer</th>
@@ -144,11 +144,11 @@ export default async function DashboardPagina() {
 
         <Card className="bg-white shadow-sm">
           <CardHeader>
-            <CardTitle>Recente uitgaven</CardTitle>
-            <p className="text-sm text-slate-600">Laatste 5 geregistreerde uitgaven</p>
+            <CardTitle className="text-sm md:text-base">Recente uitgaven</CardTitle>
+            <p className="text-xs md:text-sm text-slate-600">Laatste 5 geregistreerde uitgaven</p>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
+            <table className="w-full border-collapse text-xs md:text-sm">
               <thead>
                 <tr className="text-left text-slate-600">
                   <th className="border-b border-slate-100 px-2 py-2">Omschrijving</th>
