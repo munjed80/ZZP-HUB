@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { Download, Lock, ShieldCheck, Database } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,9 @@ type SettingsTabsProps = {
 };
 
 export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get("tab");
+  const activeTab = tabParam || "profiel";
   const [isPasswordPending, startPasswordTransition] = useTransition();
   const [isBackupPending, startBackupTransition] = useTransition();
   const [isEmailPending, startEmailTransition] = useTransition();
@@ -89,7 +93,7 @@ export function SettingsTabs({ initialProfile, abonnement }: SettingsTabsProps) 
   };
 
   return (
-    <Tabs defaultValue="profiel" className="space-y-6">
+    <Tabs value={activeTab} className="space-y-6">
       <TabsList>
         <TabsTrigger value="profiel">Bedrijfsprofiel</TabsTrigger>
         <TabsTrigger value="beveiliging">Beveiliging</TabsTrigger>

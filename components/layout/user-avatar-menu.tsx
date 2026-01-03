@@ -30,7 +30,7 @@ export function UserAvatarMenu({ userName, userInitials }: UserAvatarMenuProps) 
         <User className="h-4 w-4" aria-hidden />
         Instellingen
       </DropdownMenuItem>
-      <DropdownMenuItem onClick={() => router.push("/instellingen")}>
+      <DropdownMenuItem onClick={() => router.push("/instellingen?tab=beveiliging")}>
         <User className="h-4 w-4" aria-hidden />
         Profiel
       </DropdownMenuItem>
