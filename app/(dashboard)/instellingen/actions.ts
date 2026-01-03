@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId, requireUser } from "@/lib/auth";
 import { companySettingsSchema, type CompanySettingsInput } from "./schema";
 
 export async function fetchCompanyProfile() {
@@ -24,11 +24,9 @@ export async function fetchCompanyProfile() {
 export async function updateCompanySettings(values: CompanySettingsInput) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { id: userId } = await requireUser();
   const data = companySettingsSchema.parse(values);
+  const logoUrl = data.logoUrl?.trim();
 
   const payload = {
     companyName: data.companyName,
@@ -40,31 +38,36 @@ export async function updateCompanySettings(values: CompanySettingsInput) {
     iban: data.iban,
     bankName: data.bankName,
     paymentTerms: `${data.paymentTerms}`,
-    logoUrl: data.logoUrl || null,
+    logoUrl: logoUrl || null,
     korEnabled: data.korEnabled ?? false,
     userId,
   };
 
-  const profile = await prisma.companyProfile.upsert({
-    where: { userId },
-    create: payload,
-    update: {
-      companyName: payload.companyName,
-      address: payload.address,
-      postalCode: payload.postalCode,
-      city: payload.city,
-      kvkNumber: payload.kvkNumber,
-      btwNumber: payload.btwNumber,
-      iban: payload.iban,
-      bankName: payload.bankName,
-      paymentTerms: payload.paymentTerms,
-      logoUrl: payload.logoUrl,
-      korEnabled: payload.korEnabled,
-    },
-  });
+  try {
+    const profile = await prisma.companyProfile.upsert({
+      where: { userId },
+      create: payload,
+      update: {
+        companyName: payload.companyName,
+        address: payload.address,
+        postalCode: payload.postalCode,
+        city: payload.city,
+        kvkNumber: payload.kvkNumber,
+        btwNumber: payload.btwNumber,
+        iban: payload.iban,
+        bankName: payload.bankName,
+        paymentTerms: payload.paymentTerms,
+        logoUrl: payload.logoUrl,
+        korEnabled: payload.korEnabled,
+      },
+    });
 
-  revalidatePath("/instellingen");
-  return profile;
+    revalidatePath("/instellingen");
+    return profile;
+  } catch (error) {
+    console.error("Settings Save Error:", error);
+    throw error;
+  }
 }
 
 export async function changePassword({
