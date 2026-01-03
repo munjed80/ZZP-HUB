@@ -85,7 +85,15 @@ async function fetchInvoices(): Promise<InvoiceWithRelations[]> {
 }
 
 export default async function FacturenPagina() {
-  const facturen = await fetchInvoices();
+  let facturen: InvoiceWithRelations[] = [];
+  let fetchError = false;
+
+  try {
+    facturen = await fetchInvoices();
+  } catch (error) {
+    console.error("Kon facturen niet ophalen", error);
+    fetchError = true;
+  }
   const mappedInvoices = facturen.map((factuur) => ({
     factuur,
     pdfInvoice: mapInvoiceToPdfData(factuur),
@@ -115,7 +123,14 @@ export default async function FacturenPagina() {
         </CardHeader>
         <CardContent>
           {facturen.length === 0 ? (
-            <EmptyState />
+            fetchError ? (
+              <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center">
+                <p className="text-lg font-semibold text-slate-900">Facturen konden niet worden geladen</p>
+                <p className="text-sm text-slate-600">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
+              </div>
+            ) : (
+              <EmptyState />
+            )
           ) : (
             <>
               {/* Desktop Table View */}
