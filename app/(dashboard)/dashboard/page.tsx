@@ -54,7 +54,7 @@ export default async function DashboardPagina() {
         </p>
       </div>
 
-      <div className="grid gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => {
           const Icon = item.icon;
           return (
