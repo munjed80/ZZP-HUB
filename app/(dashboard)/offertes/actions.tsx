@@ -97,7 +97,6 @@ function mapQuotationToPdfData(
           bankName: quotation.user.companyProfile.bankName,
           logoUrl: quotation.user.companyProfile.logoUrl,
           email: quotation.user.email,
-          website: null,
         }
       : null,
     lines: quotation.lines.map((line) => ({

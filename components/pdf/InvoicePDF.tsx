@@ -339,10 +339,6 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
 
         <View style={styles.meta}>
           <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Factuurnummer</Text>
-            <Text style={[styles.metaValue, styles.invoiceNumber]}>{invoice.invoiceNum}</Text>
-          </View>
-          <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>Datum</Text>
             <Text style={styles.metaValue}>{invoice.date}</Text>
           </View>

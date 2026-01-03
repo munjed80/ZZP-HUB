@@ -39,7 +39,6 @@ export function mapInvoiceToPdfData(invoice: InvoiceWithRelations): InvoiceTempl
           bankName: invoice.user.companyProfile.bankName,
           logoUrl: invoice.user.companyProfile.logoUrl,
           email: invoice.user.email,
-          website: null,
         }
       : null,
     lines: invoice.lines.map((line) => ({
