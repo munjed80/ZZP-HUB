@@ -64,6 +64,8 @@ export async function sendInvoiceEmail(invoiceId: string) {
     const pdfBuffer = await generateInvoicePdf(pdfInvoice);
     const viewUrl = buildInvoiceUrl(invoice.id);
     const companyDetails = buildCompanyDetails(invoice.user.companyProfile);
+    const senderName = invoice.user.companyProfile?.emailSenderName?.trim() ?? pdfInvoice.companyProfile?.companyName ?? "ZZP HUB";
+    const replyToAddress = invoice.user.companyProfile?.emailReplyTo?.trim();
     const trustedLogoUrl = (() => {
       const logoUrl = pdfInvoice.companyProfile?.logoUrl;
       if (!logoUrl) return undefined;
@@ -82,7 +84,8 @@ export async function sendInvoiceEmail(invoiceId: string) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
-      from: `${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"} <${FROM_EMAIL}>`,
+      from: `${senderName} <${FROM_EMAIL}>`,
+      reply_to: replyToAddress || undefined,
       to: invoice.client.email,
       subject: `Factuur ${pdfInvoice.invoiceNum} van ${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"}`,
       react: (

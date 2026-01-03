@@ -26,28 +26,41 @@ export async function getDashboardStats() {
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
   const scope = role === UserRole.SUPERADMIN ? {} : { userId };
+  const finalizedInvoiceFilter = {
+    ...scope,
+    emailStatus: { in: [InvoiceEmailStatus.VERZONDEN, InvoiceEmailStatus.BETAALD] },
+  } as const;
 
   const monthlyChartData = MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
 
   let invoices: InvoiceWithRelations[] = [];
+  let recentInvoices: InvoiceWithRelations[] = [];
   let expenses: Awaited<ReturnType<typeof prisma.expense.findMany>> = [];
 
   try {
-    [invoices, expenses] = await Promise.all([
+    const [invoicesForYear, latestInvoices, expensesForYear] = await Promise.all([
       prisma.invoice.findMany({
         where: {
-          ...scope,
+          ...finalizedInvoiceFilter,
           date: { gte: startOfYear, lt: endOfYear },
-          NOT: { emailStatus: InvoiceEmailStatus.CONCEPT },
         },
         include: { lines: true, client: true },
         orderBy: { date: "desc" },
+      }),
+      prisma.invoice.findMany({
+        where: finalizedInvoiceFilter,
+        include: { lines: true, client: true },
+        orderBy: { date: "desc" },
+        take: 5,
       }),
       prisma.expense.findMany({
         where: { ...scope, date: { gte: startOfYear, lt: endOfYear } },
         orderBy: { date: "desc" },
       }),
     ]);
+    invoices = invoicesForYear;
+    recentInvoices = latestInvoices;
+    expenses = expensesForYear;
   } catch (error) {
     console.error("Kon dashboardstatistieken niet ophalen", { error, userId });
     return {
@@ -103,7 +116,7 @@ export async function getDashboardStats() {
     vatToPay,
     incomeTaxReservation,
     monthlyChartData,
-    recentInvoices: invoices.slice(0, 5),
+    recentInvoices,
     recentExpenses: expenses.slice(0, 5),
   };
 }

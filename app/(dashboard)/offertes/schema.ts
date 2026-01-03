@@ -3,7 +3,7 @@ import { z } from "zod";
 export const quotationLineSchema = z.object({
   description: z.string().min(1, "Omschrijving is verplicht"),
   quantity: z.coerce.number().positive("Aantal moet groter dan 0 zijn"),
-  unit: z.enum(["UUR", "STUK", "PROJECT", "KM"], {
+  unit: z.enum(["UUR", "STUK", "PROJECT", "KM", "STOP"], {
     required_error: "Eenheid is verplicht",
   }),
   price: z.coerce.number().nonnegative("Prijs moet 0 of hoger zijn"),

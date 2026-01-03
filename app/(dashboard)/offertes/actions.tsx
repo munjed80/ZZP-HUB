@@ -39,6 +39,7 @@ function mapUnit(unit: QuotationLineValues["unit"]) {
     STUK: Eenheid.STUK,
     PROJECT: Eenheid.PROJECT,
     KM: Eenheid.KM,
+    STOP: Eenheid.STOP,
   };
 
   return mapping[unit];
