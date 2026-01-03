@@ -71,7 +71,8 @@ export async function updateCompanySettings(values: CompanySettingsInput) {
     revalidatePath("/instellingen");
     return profile;
   } catch (error) {
-    console.error("Settings Save Error:", error);
+    console.error("Database Save Error:", error);
+    console.error("Failed payload:", JSON.stringify(payload, null, 2));
     throw error;
   }
 }
