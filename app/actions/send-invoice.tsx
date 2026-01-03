@@ -85,7 +85,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
       from: `${senderName} <${FROM_EMAIL}>`,
-      reply_to: replyToAddress || undefined,
+      replyTo: replyToAddress || undefined,
       to: invoice.client.email,
       subject: `Factuur ${pdfInvoice.invoiceNum} van ${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"}`,
       react: (

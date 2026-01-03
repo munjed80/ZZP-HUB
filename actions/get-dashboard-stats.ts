@@ -13,6 +13,7 @@ const VAT_PERCENTAGES: Record<BtwTarief, number> = {
   [BtwTarief.VRIJGESTELD]: 0,
   [BtwTarief.VERLEGD]: 0,
 };
+const FINALIZED_INVOICE_STATUSES = [InvoiceEmailStatus.VERZONDEN, InvoiceEmailStatus.BETAALD] as const;
 type InvoiceWithRelations = Prisma.InvoiceGetPayload<{ include: { lines: true; client: true } }>;
 
 function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; quantity: Prisma.Decimal | number; price: Prisma.Decimal | number }) {
@@ -28,7 +29,7 @@ export async function getDashboardStats() {
   const scope = role === UserRole.SUPERADMIN ? {} : { userId };
   const finalizedInvoiceFilter = {
     ...scope,
-    emailStatus: { in: [InvoiceEmailStatus.VERZONDEN, InvoiceEmailStatus.BETAALD] },
+    emailStatus: { in: FINALIZED_INVOICE_STATUSES },
   };
 
   const monthlyChartData = MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
