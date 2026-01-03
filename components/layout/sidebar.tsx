@@ -45,12 +45,12 @@ export function Sidebar({ userRole }: { userRole?: UserRole }) {
 
   return (
     <aside className="hidden w-68 shrink-0 border-r border-slate-200/70 bg-white/90 px-4 py-6 text-slate-800 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.45)] backdrop-blur-xl md:flex md:flex-col">
-      <div className="mb-6 flex items-center justify-between px-2">
-        <div>
+      <div className="mb-6 flex items-center justify-between rounded-xl border border-slate-200/70 bg-white/80 px-3 py-3 shadow-sm">
+        <div className="space-y-0.5">
           <p className="text-lg font-semibold tracking-tight text-slate-900">ZZP HUB</p>
           <p className="text-sm text-slate-500">Financiën & abonnement</p>
         </div>
-        <span className="rounded-full border border-slate-200/70 bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm">
+        <span className="rounded-full border border-slate-200/70 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 shadow-sm">
           Pro
         </span>
       </div>
@@ -81,7 +81,7 @@ export function Sidebar({ userRole }: { userRole?: UserRole }) {
         })}
       </nav>
       <div className="mt-auto space-y-3 border-t border-slate-200/70 pt-4">
-        <div className="rounded-xl border border-slate-200/70 bg-white p-3 text-sm text-slate-700 shadow-sm">
+        <div className="rounded-xl border border-slate-200/70 bg-white/80 p-3 text-sm text-slate-700 shadow-sm backdrop-blur">
           <p className="font-semibold text-slate-900">Beveiliging</p>
           <p className="text-slate-600">
             Sessies beveiligd via NextAuth met rolgebaseerde toegang. MFA en webhooks volgen.
@@ -89,7 +89,7 @@ export function Sidebar({ userRole }: { userRole?: UserRole }) {
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-100"
+          className="flex w-full items-center gap-2 rounded-lg border border-slate-200/70 bg-white/80 px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:bg-slate-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200"
         >
           <LogOut className="h-4 w-4" aria-hidden />
           Sign Out
@@ -166,7 +166,7 @@ export function MobileSidebar({ userRole }: { userRole?: UserRole }) {
                 setOpen(false);
                 signOut({ callbackUrl: "/" });
               }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-100"
+              className="flex w-full items-center gap-2 rounded-lg border border-slate-200/70 bg-white/80 px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:bg-slate-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200"
             >
               <LogOut className="h-4 w-4" aria-hidden />
               Sign Out

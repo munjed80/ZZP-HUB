@@ -69,7 +69,7 @@ export default function LoginPagina() {
                 id="email"
                 type="email"
                 required
-                className="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 pl-10 text-sm shadow-[0_10px_40px_-28px_rgba(15,23,42,0.45)] transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200/70"
+                className="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2.5 pl-10 text-sm text-slate-900 shadow-[0_10px_40px_-28px_rgba(15,23,42,0.45)] transition-all duration-200 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300/70 focus:shadow-[0_18px_50px_-34px_rgba(79,70,229,0.55)]"
                 {...form.register("email")}
                 aria-invalid={!!form.formState.errors.email}
               />
@@ -89,7 +89,7 @@ export default function LoginPagina() {
                 id="wachtwoord"
                 type="password"
                 required
-                className="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 pl-10 text-sm shadow-[0_10px_40px_-28px_rgba(15,23,42,0.45)] transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200/70"
+                className="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2.5 pl-10 text-sm text-slate-900 shadow-[0_10px_40px_-28px_rgba(15,23,42,0.45)] transition-all duration-200 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300/70 focus:shadow-[0_18px_50px_-34px_rgba(79,70,229,0.55)]"
                 {...form.register("wachtwoord")}
                 aria-invalid={!!form.formState.errors.wachtwoord}
               />
@@ -117,7 +117,7 @@ export default function LoginPagina() {
             type="submit"
             className={buttonVariants(
               "primary",
-              "w-full justify-center text-base py-2.5 shadow-indigo-500/20 shadow-lg hover:-translate-y-0.5 transition-transform"
+              "w-full justify-center text-base py-2.5 shadow-indigo-500/20 shadow-lg hover:-translate-y-0.5 hover:shadow-indigo-500/35 transition-all"
             )}
             disabled={loading}
           >
