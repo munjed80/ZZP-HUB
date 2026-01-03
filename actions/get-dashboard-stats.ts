@@ -29,7 +29,7 @@ export async function getDashboardStats() {
   const finalizedInvoiceFilter = {
     ...scope,
     emailStatus: { in: [InvoiceEmailStatus.VERZONDEN, InvoiceEmailStatus.BETAALD] },
-  } as const;
+  };
 
   const monthlyChartData = MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
 
