@@ -26,14 +26,14 @@ export default async function DashboardShell({ children }: { children: ReactNode
   }
 
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-slate-50">
       <div className="flex min-h-screen">
         <Sidebar userRole={sessie.user.role} />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200/70 bg-white/80 px-4 py-3 backdrop-blur-xl shadow-sm md:px-6 md:py-4">
+          <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-sm md:px-6 md:py-4">
             <div className="flex items-start gap-3">
               <div className="hidden md:block">
-                <p className="shimmer-text text-sm font-bold tracking-wide md:text-xs md:font-semibold md:uppercase md:tracking-wide">
+                <p className="text-sm font-bold tracking-wide text-slate-900 md:text-xs md:font-semibold md:uppercase md:tracking-wide">
                   ZZP-HUB
                 </p>
                 <p className="hidden text-sm text-slate-600 md:block">
@@ -41,7 +41,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
                 </p>
               </div>
               <div className="md:hidden">
-                <p className="shimmer-text text-sm font-bold tracking-wide">
+                <p className="text-sm font-bold tracking-wide text-slate-900">
                   ZZP-HUB
                 </p>
               </div>

@@ -43,26 +43,25 @@ export function MobileNav() {
   }, [fabMenuOpen]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#d5dae0] bg-white/95 shadow-[0_-4px_16px_rgba(13,148,136,0.06)] backdrop-blur-xl md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-sm md:hidden">
       <div className="relative flex items-center justify-around px-2 py-2">
         {navItems.slice(0, 2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
-          const iconClasses = cn("h-5 w-5 transition-transform duration-200", actief && "scale-110 text-teal-700");
           
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition-all duration-200 will-change-transform",
+                "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors",
                 actief
-                  ? "text-teal-700 bg-teal-50 shadow-[0_12px_30px_-18px_rgba(13,148,136,0.30)] scale-[1.02]"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:scale-[1.02]"
+                  ? "text-teal-700 bg-teal-50"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               )}
               aria-current={actief ? "page" : undefined}
             >
-              <Icon className={cn(iconClasses, actief && "stroke-[2.5]")} aria-hidden={true} />
+              <Icon className={cn("h-5 w-5", actief && "stroke-[2.5]")} aria-hidden={true} />
               <span className="text-[10px] font-semibold leading-tight">{item.label}</span>
             </Link>
           );
@@ -72,7 +71,7 @@ export function MobileNav() {
         <div className="relative flex-1 flex justify-center" ref={fabMenuRef}>
           <button
             onClick={() => setFabMenuOpen(!fabMenuOpen)}
-            className="absolute -top-8 flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,#ffffff,#dfe3e8,#c5ccd5)] text-teal-700 shadow-lg shadow-[0_18px_36px_-18px_rgba(13,148,136,0.30)] ring-1 ring-[#cfd5dd] hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
+            className="absolute -top-8 flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-white shadow-md border border-teal-700 hover:bg-teal-700 transition-colors"
             aria-label="Toevoegen"
           >
             <Plus className={cn("h-6 w-6 transition-transform duration-200", fabMenuOpen && "rotate-45")} aria-hidden />
@@ -80,8 +79,8 @@ export function MobileNav() {
           
           {/* FAB Menu */}
             {fabMenuOpen && (
-              <div className="absolute bottom-20 left-1/2 min-w-[220px] -translate-x-1/2 rounded-xl border border-[#d5dae0] bg-white/95 shadow-[0_18px_45px_-24px_rgba(13,148,136,0.28)] ring-1 ring-white/60 backdrop-blur transition-all duration-200 ease-out">
-                <div className="flex flex-col divide-y divide-slate-100/80 py-1.5">
+              <div className="absolute bottom-20 left-1/2 min-w-[220px] -translate-x-1/2 rounded-lg border border-slate-200 bg-white shadow-lg">
+                <div className="flex flex-col divide-y divide-slate-100 py-1.5">
                   {fabActions.map((action) => {
                     const Icon = action.icon;
                     return (
@@ -89,9 +88,9 @@ export function MobileNav() {
                         key={action.label}
                         href={action.href}
                         onClick={() => setFabMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3.5 text-sm font-semibold text-slate-800 transition-all duration-200 hover:bg-gradient-to-r hover:from-teal-50 hover:via-white hover:to-teal-50 hover:text-teal-700 active:scale-[0.99]"
+                        className="flex items-center gap-3 px-4 py-3.5 text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 hover:text-teal-700"
                       >
-                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700 ring-1 ring-slate-200/80 shadow-inner shadow-white/30">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700 border border-slate-200">
                           <Icon className="h-5 w-5" aria-hidden />
                       </span>
                       <span className="flex-1">{action.label}</span>
@@ -106,21 +105,20 @@ export function MobileNav() {
         {navItems.slice(2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
-          const iconClasses = cn("h-5 w-5 transition-transform duration-200", actief && "scale-110 text-teal-700");
           
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition-all duration-200 will-change-transform",
+                "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors",
                 actief
-                  ? "text-teal-700 bg-teal-50 shadow-[0_12px_30px_-18px_rgba(13,148,136,0.30)] scale-[1.02]"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:scale-[1.02]"
+                  ? "text-teal-700 bg-teal-50"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               )}
               aria-current={actief ? "page" : undefined}
             >
-              <Icon className={cn(iconClasses, actief && "stroke-[2.5]")} aria-hidden={true} />
+              <Icon className={cn("h-5 w-5", actief && "stroke-[2.5]")} aria-hidden={true} />
               <span className="text-[10px] font-semibold leading-tight">{item.label}</span>
             </Link>
           );
