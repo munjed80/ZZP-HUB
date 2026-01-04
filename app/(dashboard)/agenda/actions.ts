@@ -54,15 +54,19 @@ export async function createEvent(values: EventFormValues) {
         userId,
         title: data.title,
         description: data.description,
-        start: startDate,
-        end: endDate,
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
       },
     });
 
     revalidatePath("/agenda");
     return { success: true, event: created };
   } catch (error) {
-    console.error("Opslaan van afspraak mislukt", { error, userId });
+    console.error("AGENDA_SAVE_ERROR:", {
+      error,
+      userId,
+      payload: { title: data.title, start: data.start, end: data.end },
+    });
     return { success: false, message: "Opslaan van de afspraak is mislukt." };
   }
 }
