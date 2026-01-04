@@ -13,7 +13,7 @@ export function Badge({ children, variant = "info" }: BadgeProps) {
     warning: "bg-amber-50 text-amber-700 ring-amber-200",
     muted: "bg-slate-50 text-slate-600 ring-slate-200",
     destructive: "bg-rose-50 text-rose-700 ring-rose-200",
-    primary: "bg-slate-900 text-white ring-slate-900",
+    primary: "bg-teal-600 text-white ring-teal-600",
   };
 
   return (
