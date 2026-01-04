@@ -62,3 +62,55 @@ export async function createExpense(values: ExpenseFormValues) {
     throw new Error("Uitgave opslaan mislukt. Controleer je invoer en probeer het later opnieuw.");
   }
 }
+
+export async function deleteExpense(expenseId: string) {
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
+
+  try {
+    const deleted = await prisma.expense.deleteMany({
+      where: { id: expenseId, userId },
+    });
+    if (deleted.count === 0) {
+      return { success: false, message: "Uitgave niet gevonden." };
+    }
+    revalidatePath("/uitgaven");
+    return { success: true };
+  } catch (error) {
+    console.error("DELETE_EXPENSE_FAILED", { error, expenseId, userId });
+    return { success: false, message: "Verwijderen mislukt." };
+  }
+}
+
+export async function duplicateExpense(expenseId: string) {
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
+
+  const expense = await prisma.expense.findFirst({ where: { id: expenseId, userId } });
+  if (!expense) {
+    return { success: false, message: "Uitgave niet gevonden." };
+  }
+
+  try {
+    await prisma.expense.create({
+      data: {
+        userId,
+        description: `${expense.description} (kopie)`,
+        category: expense.category,
+        amountExcl: expense.amountExcl,
+        vatRate: expense.vatRate,
+        date: expense.date,
+        receiptUrl: expense.receiptUrl,
+      },
+    });
+    revalidatePath("/uitgaven");
+    return { success: true };
+  } catch (error) {
+    console.error("DUPLICATE_EXPENSE_FAILED", { error, expenseId, userId });
+    return { success: false, message: "Dupliceren mislukt." };
+  }
+}

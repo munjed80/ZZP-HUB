@@ -21,9 +21,9 @@ export const metadata: Metadata = {
   description:
     "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
   openGraph: {
     title: "Elite Business Hub | Slimmer Ondernemen voor ZZP'ers",
@@ -54,7 +54,7 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background-secondary)] text-[var(--foreground)]`}

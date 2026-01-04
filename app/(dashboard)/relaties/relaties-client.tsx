@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pencil, Plus, Search, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { clientSchema, type ClientFormValues } from "./schema";
 import { createClient, deleteClient, updateClient, type getClients } from "./actions";
+import { EntityActionsMenu } from "@/components/ui/entity-actions-menu";
 
 type ClientList = Awaited<ReturnType<typeof getClients>>;
 
@@ -194,29 +196,48 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                         <td className="px-3 py-3 text-slate-700">—</td>
                         <td className="px-3 py-3 text-slate-700">{client.city}</td>
                         <td className="px-3 py-3 text-right">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => {
-                            setEditingClient(client);
-                            setOpen(true);
-                          }}
-                          disabled={isPending}
-                          className="px-2 py-1 text-xs"
-                          aria-label={`Bewerk ${client.name}`}
-                        >
-                          <Pencil className="h-4 w-4" aria-hidden />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => handleDelete(client.id)}
-                            disabled={isPending}
-                            className="px-2 py-1 text-xs"
-                            aria-label={`Verwijder ${client.name}`}
+                          <EntityActionsMenu
+                            title="Relatie acties"
+                            description={client.name}
+                            triggerClassName="px-2 py-1 text-xs"
                           >
-                            <Trash2 className="h-4 w-4" aria-hidden />
-                          </Button>
+                            <div className="space-y-2 p-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                className="w-full justify-start gap-2"
+                                onClick={() => {
+                                  setEditingClient(client);
+                                  setOpen(true);
+                                }}
+                              >
+                                <Pencil className="h-4 w-4" aria-hidden />
+                                Bewerk relatie
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                className="w-full justify-start gap-2"
+                                onClick={() => handleDelete(client.id)}
+                                disabled={isPending}
+                              >
+                                <Trash2 className="h-4 w-4" aria-hidden />
+                                Verwijder
+                              </Button>
+                              <Link
+                                href={`/facturen/nieuw?clientId=${client.id}`}
+                                className={buttonVariants("ghost", "w-full justify-start gap-2")}
+                              >
+                                Nieuwe factuur
+                              </Link>
+                              <Link
+                                href={`/offertes/nieuw?clientId=${client.id}`}
+                                className={buttonVariants("ghost", "w-full justify-start gap-2")}
+                              >
+                                Nieuwe offerte
+                              </Link>
+                            </div>
+                          </EntityActionsMenu>
                         </td>
                       </tr>
                     ))}
@@ -237,29 +258,48 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                         <p className="text-xs text-slate-500 mt-1">{client.address}</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => {
-                            setEditingClient(client);
-                            setOpen(true);
-                          }}
-                          disabled={isPending}
-                          className="px-2 py-1 text-xs -mt-1"
-                          aria-label={`Bewerk ${client.name}`}
+                        <EntityActionsMenu
+                          title="Relatie acties"
+                          description={client.name}
+                          triggerClassName="px-2 py-1 text-xs"
                         >
-                          <Pencil className="h-4 w-4" aria-hidden />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => handleDelete(client.id)}
-                          disabled={isPending}
-                          className="px-2 py-1 text-xs -mt-1"
-                          aria-label={`Verwijder ${client.name}`}
-                        >
-                          <Trash2 className="h-4 w-4" aria-hidden />
-                        </Button>
+                          <div className="space-y-2 p-2">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="w-full justify-start gap-2"
+                              onClick={() => {
+                                setEditingClient(client);
+                                setOpen(true);
+                              }}
+                            >
+                              <Pencil className="h-4 w-4" aria-hidden />
+                              Bewerk relatie
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="w-full justify-start gap-2"
+                              onClick={() => handleDelete(client.id)}
+                              disabled={isPending}
+                            >
+                              <Trash2 className="h-4 w-4" aria-hidden />
+                              Verwijder
+                            </Button>
+                            <Link
+                              href={`/facturen/nieuw?clientId=${client.id}`}
+                              className={buttonVariants("ghost", "w-full justify-start gap-2")}
+                            >
+                              Nieuwe factuur
+                            </Link>
+                            <Link
+                              href={`/offertes/nieuw?clientId=${client.id}`}
+                              className={buttonVariants("ghost", "w-full justify-start gap-2")}
+                            >
+                              Nieuwe offerte
+                            </Link>
+                          </div>
+                        </EntityActionsMenu>
                       </div>
                     </div>
                     <div className="space-y-2">
