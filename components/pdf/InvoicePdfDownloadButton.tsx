@@ -4,6 +4,8 @@ import { useState } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { InvoicePDF, type InvoicePdfData } from "./InvoicePDF";
 
+const DOWNLOAD_CLEANUP_DELAY_MS = 100;
+
 type Props = {
   invoice: InvoicePdfData;
   documentType?: "FACTUUR" | "OFFERTE";
@@ -28,10 +30,13 @@ export function InvoicePdfDownloadButton({ invoice, documentType = "FACTUUR", fi
       const anchor = document.createElement("a");
       anchor.href = url;
       anchor.download = downloadName;
+      anchor.rel = "noopener";
       document.body.appendChild(anchor);
       anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
+      setTimeout(() => {
+        anchor.remove();
+        URL.revokeObjectURL(url);
+      }, DOWNLOAD_CLEANUP_DELAY_MS);
     } catch (error) {
       console.error("PDF download failed", error);
     } finally {
