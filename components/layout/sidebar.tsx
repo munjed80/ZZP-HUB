@@ -69,15 +69,18 @@ export function Sidebar({ userRole }: { userRole?: UserRole }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-200",
                 actief
-                  ? "bg-[#e7eef4] text-[#0a2e50] shadow-sm ring-1 ring-[#c7d4de]"
-                  : "text-slate-700 hover:-translate-y-0.5 hover:bg-slate-100"
+                  ? "bg-[#e7eef4] text-[#0a2e50] font-semibold shadow-sm ring-1 ring-[#b9c7d6]"
+                  : "text-slate-700 font-medium hover:-translate-y-0.5 hover:bg-slate-100"
               )}
               aria-current={actief ? "page" : undefined}
             >
-              <Icon className="h-4 w-4" aria-hidden />
-              {item.label}
+              <Icon
+                className={cn("h-4 w-4 transition-colors", actief ? "text-[#0a2e50]" : "text-slate-500")}
+                aria-hidden
+              />
+              <span className={cn("transition-colors", actief && "text-[#0a2e50]")}>{item.label}</span>
             </Link>
           );
         })}
@@ -162,8 +165,11 @@ export function MobileSidebar({ userRole }: { userRole?: UserRole }) {
                         : "text-slate-700 hover:bg-slate-100"
                     )}
                   >
-                    <Icon className="h-5 w-5" aria-hidden />
-                    {item.label}
+                    <Icon
+                      className={cn("h-5 w-5 transition-colors", actief ? "text-[#0a2e50]" : "text-slate-500")}
+                      aria-hidden
+                    />
+                    <span className={cn("transition-colors", actief && "text-[#0a2e50]")}>{item.label}</span>
                   </Link>
                 );
               })}
