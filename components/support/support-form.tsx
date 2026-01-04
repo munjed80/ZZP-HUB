@@ -71,7 +71,7 @@ export function SupportForm({ context, minimal, className }: SupportFormProps) {
         </p>
         <button
           type="button"
-          className={buttonVariants("secondary", "mt-2 w-fit")}
+          className={cn(buttonVariants("secondary"), "mt-2 w-fit")}
           onClick={() => setStatus("idle")}
         >
           Nieuw bericht sturen
@@ -162,8 +162,8 @@ export function SupportForm({ context, minimal, className }: SupportFormProps) {
         <p className="text-xs text-slate-500">We antwoorden meestal binnen één werkdag.</p>
         <button
           type="submit"
-          className={buttonVariants(
-            "primary",
+          className={cn(
+            buttonVariants("primary"),
             "inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm shadow-sm shadow-teal-200",
           )}
           disabled={status === "loading"}

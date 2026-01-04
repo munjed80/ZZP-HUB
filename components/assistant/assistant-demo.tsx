@@ -97,7 +97,10 @@ export function AssistantDemo({ className }: { className?: string }) {
         <p className="text-xs text-slate-600">Voor andere vragen kun je contact opnemen met support.</p>
         <a
           href="#support"
-          className={buttonVariants("secondary", "w-fit rounded-lg bg-white text-sm font-semibold text-teal-800 shadow-sm")}
+          className={cn(
+            buttonVariants("secondary"),
+            "w-fit rounded-lg bg-white text-sm font-semibold text-teal-800 shadow-sm",
+          )}
         >
           Naar support
         </a>

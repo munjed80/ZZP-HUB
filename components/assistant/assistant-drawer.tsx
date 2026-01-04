@@ -54,8 +54,8 @@ export function AssistantDrawer() {
         type="button"
         onClick={() => setOpen(true)}
         className={cn(
-          buttonVariants("primary", "fixed bottom-24 right-4 z-40 shadow-lg shadow-teal-200/60 px-4 py-2 text-sm"),
-          "md:right-6 md:bottom-6",
+          buttonVariants("primary"),
+          "fixed bottom-24 right-4 z-40 shadow-lg shadow-teal-200/60 px-4 py-2 text-sm md:right-6 md:bottom-6",
         )}
       >
         <MessageCircle className="h-4 w-4" aria-hidden />
@@ -119,15 +119,15 @@ export function AssistantDrawer() {
                     placeholder="Bijvoorbeeld: Hoe maak ik mijn eerste factuur?"
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-inner shadow-slate-100 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
                   />
-                  <button
-                    type="button"
-                    onClick={() => askAssistant(question)}
-                    className={buttonVariants(
-                      "primary",
-                      "inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm shadow-sm shadow-teal-200",
-                    )}
-                    disabled={loading}
-                  >
+                <button
+                  type="button"
+                  onClick={() => askAssistant(question)}
+                  className={cn(
+                    buttonVariants("primary"),
+                    "inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm shadow-sm shadow-teal-200",
+                  )}
+                  disabled={loading}
+                >
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <ArrowRight className="h-4 w-4" aria-hidden />}
                     Vraag beantwoording
                   </button>
