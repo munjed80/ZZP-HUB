@@ -48,7 +48,7 @@ export default function LoginPagina() {
   return (
     <div className="space-y-8 rounded-[32px] bg-white/70 p-8 shadow-[0_24px_80px_-60px_rgba(15,23,42,0.45)] backdrop-blur-xl ring-1 ring-slate-100">
       <div className="space-y-2">
-        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-indigo-700">
+        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#0a2e50]">
           <Sparkles className="h-4 w-4" aria-hidden />
           ZZP-HUB • Invisible UI
         </p>
@@ -66,7 +66,7 @@ export default function LoginPagina() {
             id="email"
             type="email"
             required
-            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-indigo-500 focus:outline-none focus:ring-0"
+            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-[#1b4965] focus:outline-none focus:ring-0"
             {...form.register("email")}
             aria-invalid={!!form.formState.errors.email}
           />
@@ -82,7 +82,7 @@ export default function LoginPagina() {
             id="password"
             type="password"
             required
-            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-indigo-500 focus:outline-none focus:ring-0"
+            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-[#1b4965] focus:outline-none focus:ring-0"
             {...form.register("password")}
             aria-invalid={!!form.formState.errors.password}
           />
@@ -94,12 +94,12 @@ export default function LoginPagina() {
         <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="mailto:support@zzp-hub.nl?subject=Wachtwoord%20vergeten"
-            className="text-indigo-700 underline-offset-4 hover:underline"
+            className="text-[#0a2e50] underline-offset-4 hover:underline"
           >
             Wachtwoord vergeten?
           </Link>
           <Link href="/register" className="text-slate-600 hover:text-slate-800">
-            Nog geen account? <span className="text-indigo-700">Meld je aan</span>
+            Nog geen account? <span className="text-[#0a2e50]">Meld je aan</span>
           </Link>
         </div>
 
@@ -109,7 +109,7 @@ export default function LoginPagina() {
           type="submit"
           className={buttonVariants(
             "primary",
-            "w-full justify-center text-base py-3 shadow-indigo-500/20 shadow-lg hover:shadow-indigo-500/35"
+            "w-full justify-center text-base py-3 shadow-[0_18px_48px_-30px_rgba(10,46,80,0.36)] hover:shadow-[0_22px_54px_-32px_rgba(27,73,101,0.32)]"
           )}
           disabled={loading}
         >

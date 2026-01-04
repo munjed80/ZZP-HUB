@@ -38,7 +38,7 @@ const features = [
 
 const elitePerks = [
   "Layered dashboards met realtime data",
-  "Indigo Glow beveiliging en 2FA",
+  "Midnight Shield beveiliging en 2FA",
   "Premium support in het Nederlands",
   "Automatische BTW en export-ready PDF's",
   "Project timers & smart reminders",
@@ -53,7 +53,7 @@ const glassStats = [
     value: "€12.480",
     chip: "+18% vs vorige maand",
     icon: LineChart,
-    accent: "from-indigo-500 to-purple-500",
+    accent: "from-[#0a2e50] to-[#1b4965]",
   },
   {
     label: "Openstaand",
@@ -79,7 +79,7 @@ const glassPayments = [
 
 const glassFlow = [
   { label: "BTW-sync klaar", icon: ShieldCheck, tone: "text-emerald-100 bg-emerald-500/10 ring-emerald-300/20" },
-  { label: "Rapportage live", icon: Sparkles, tone: "text-indigo-50 bg-indigo-500/10 ring-indigo-300/30" },
+  { label: "Rapportage live", icon: Sparkles, tone: "text-[#0a2e50] bg-[#e7eef4] ring-[#c7d4de]" },
   { label: "Automatische incasso", icon: Calculator, tone: "text-amber-50 bg-amber-500/10 ring-amber-300/30" },
 ];
 
@@ -114,10 +114,10 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
   const primaryCta = isLoggedIn ? "Naar Dashboard" : "Gratis starten";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f5f6fb] via-white to-[#eef0ff] text-slate-900">
+    <div className="min-h-screen bg-gradient-to-b from-[#f8f9fa] via-white to-[#eef3f6] text-slate-900">
       <header className="sticky top-4 z-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between rounded-full border border-white/20 bg-white/70 px-4 py-3 shadow-2xl backdrop-blur-md">
+          <div className="flex items-center justify-between rounded-full border border-white/30 bg-white/80 px-4 py-3 shadow-2xl backdrop-blur-md">
             <Link href="/" className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-200 via-white to-slate-500 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] ring-1 ring-white/60">
                 <Sparkles className="h-5 w-5 text-slate-700" aria-hidden />
@@ -130,28 +130,28 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               </motion.span>
             </Link>
             <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
-              <Link href="#features" className="transition-colors duration-200 hover:text-indigo-600">
+              <Link href="#features" className="transition-colors duration-200 hover:text-[#0a2e50]">
                 Features
               </Link>
-              <Link href="#pricing" className="transition-colors duration-200 hover:text-indigo-600">
+              <Link href="#pricing" className="transition-colors duration-200 hover:text-[#0a2e50]">
                 Prijzen
               </Link>
-              <Link href="#preview" className="transition-colors duration-200 hover:text-indigo-600">
+              <Link href="#preview" className="transition-colors duration-200 hover:text-[#0a2e50]">
                 Preview
               </Link>
             </nav>
             <div className="flex items-center gap-3">
               {isLoggedIn ? (
-                <Link
-                  href="/dashboard"
-                  className={buttonVariants(
-                    "primary",
-                    "shadow-lg shadow-indigo-500/25 px-5 py-2.5 text-sm tracking-tight"
-                  )}
-                >
-                  Naar Dashboard
-                </Link>
-              ) : (
+                  <Link
+                    href="/dashboard"
+                    className={buttonVariants(
+                      "primary",
+                      "shadow-lg shadow-[0_18px_48px_-30px_rgba(10,46,80,0.36)] px-5 py-2.5 text-sm tracking-tight"
+                    )}
+                  >
+                    Naar Dashboard
+                  </Link>
+                ) : (
                 <>
                   <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-slate-700")}>
                     Inloggen
@@ -160,7 +160,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href="/register"
                     className={buttonVariants(
                       "primary",
-                      "shadow-lg shadow-indigo-500/25 px-5 py-2.5 text-sm tracking-tight"
+                      "shadow-lg shadow-[0_18px_48px_-30px_rgba(10,46,80,0.36)] px-5 py-2.5 text-sm tracking-tight"
                     )}
                   >
                     Gratis starten
@@ -173,20 +173,17 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
       </header>
 
       <main className="pt-16 sm:pt-20">
-        <section
-          id="preview"
-          className="relative overflow-hidden pb-24 pt-20 sm:pt-24 lg:pt-28"
-        >
+        <section id="preview" className="relative overflow-hidden pb-24 pt-20 sm:pt-24 lg:pt-28">
           <div className="absolute inset-0">
-            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-indigo-200/35 blur-3xl" />
-            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl" />
-            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#eef0ff]" />
+            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-[#d7e1ea] blur-3xl" />
+            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-[#c7d4de]/70 blur-3xl" />
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#eef3f6]" />
           </div>
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
               <div className="space-y-6 text-center lg:text-left">
                 <motion.div
-                className="mx-auto inline-flex items-center gap-2 rounded-full border border-[#bdc3c7] bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-indigo-700 shadow-sm backdrop-blur sm:mx-0"
+                className="mx-auto inline-flex items-center gap-2 rounded-full border border-[#c7d4de] bg-white/85 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#0a2e50] shadow-sm backdrop-blur sm:mx-0"
                 {...fadeUp}
               >
                 <Sparkles className="h-4 w-4" aria-hidden />
@@ -203,15 +200,14 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   color: "transparent",
                 }}
               >
-                  Slimmer Ondernemen، Sneller Factureren.
+                  Elite Business Management for Professionals.
               </motion.h1>
               <motion.p
                 className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-700 sm:text-xl lg:mx-0"
                 {...fadeUp}
                 transition={fadeUpTransition(0.1)}
               >
-                  Hét all-in-one platform voor de moderne ZZP&apos;er. Beheer je ritten, stops, offertes en boekhouding met de
-                  snelheid van licht.
+                  The all-in-one platform for modern professionals. Manage trips, stops, quotes and bookkeeping in a premium financial workflow.
               </motion.p>
                 <motion.div
                   className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start"
@@ -222,7 +218,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href={isLoggedIn ? "/dashboard" : "/register"}
                     className={buttonVariants(
                       "primary",
-                      "text-base px-8 py-3 shadow-xl shadow-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-500/40"
+                      "text-base px-8 py-3 shadow-xl shadow-[0_22px_64px_-36px_rgba(10,46,80,0.4)] transition-all hover:shadow-2xl hover:shadow-[0_26px_72px_-34px_rgba(27,73,101,0.38)]"
                     )}
                   >
                     Start Nu Gratis
@@ -232,7 +228,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href="#pricing"
                     className={buttonVariants(
                       "secondary",
-                      "text-base px-8 py-3 border border-slate-200/80 bg-white/80 shadow-sm hover:-translate-y-0.5"
+                      "text-base px-8 py-3 border border-slate-200/80 bg-white/85 shadow-sm hover:-translate-y-0.5"
                     )}
                   >
                     Bekijk Demo
@@ -249,14 +245,14 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               </div>
 
               <div className="relative h-[540px]">
-                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-indigo-300/35 via-white/30 to-purple-300/40 blur-[110px]" />
+                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-[#d7e1ea]/70 via-white/35 to-[#c7d4de]/60 blur-[110px]" />
                 <motion.div
                   className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-[linear-gradient(145deg,#e6e9f0_0%,#bdc3c7_100%)] bg-[length:200%_200%] p-6 shadow-[0_40px_120px_-70px_rgba(15,23,42,0.6)] ring-1 ring-white/50 backdrop-blur-[12px] animate-[metal-shine_8s_linear_infinite]"
                   {...tiltEffect}
                 >
                   <div className="flex items-center justify-between border-b border-white/40 pb-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-500 to-sky-400 text-white shadow-lg shadow-indigo-500/30 ring-1 ring-white/50">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a2e50] via-[#1b4965] to-[#4f6f86] text-white shadow-lg shadow-[0_12px_32px_-18px_rgba(10,46,80,0.6)] ring-1 ring-white/50">
                         <Sparkles className="h-5 w-5" aria-hidden />
                       </div>
                       <div>
@@ -266,7 +262,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     </div>
                     <div className="flex items-center gap-2 rounded-full border border-white/50 bg-white/30 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
                       <ShieldCheck className="h-4 w-4 text-emerald-500" aria-hidden />
-                      Indigo beveiliging
+                      Midnight beveiliging
                     </div>
                   </div>
 
@@ -282,28 +278,28 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                             <div className="flex items-center justify-between">
                               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{stat.label}</p>
                               <span
-                                className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${stat.accent} text-white shadow-md shadow-indigo-500/30 ring-1 ring-white/40`}
+                                className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${stat.accent} text-white shadow-md shadow-[0_12px_32px_-18px_rgba(10,46,80,0.45)] ring-1 ring-white/40`}
                               >
                                 <Icon className="h-4 w-4" aria-hidden />
                               </span>
                             </div>
                             <div className="mt-3 text-2xl font-semibold text-slate-900">{stat.value}</div>
-                            <p className="mt-1 text-xs font-semibold text-indigo-700">{stat.chip}</p>
+                            <p className="mt-1 text-xs font-semibold text-[#0a2e50]">{stat.chip}</p>
                           </div>
                         );
                       })}
                     </div>
 
                     <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                      <div className="relative overflow-hidden rounded-2xl border border-white/45 bg-white/45 p-5 shadow-[0_22px_80px_-55px_rgba(79,70,229,0.55)]">
-                        <div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-indigo-400/30 blur-3xl" />
-                        <div className="absolute right-0 -bottom-10 h-32 w-40 rounded-full bg-purple-400/20 blur-3xl" />
+                      <div className="relative overflow-hidden rounded-2xl border border-white/45 bg-white/45 p-5 shadow-[0_22px_80px_-55px_rgba(10,46,80,0.45)]">
+                        <div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[#c7d4de]/80 blur-3xl" />
+                        <div className="absolute right-0 -bottom-10 h-32 w-40 rounded-full bg-[#e0e7ee] blur-3xl" />
                         <div className="relative flex items-center justify-between">
                           <div>
                             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Realtime rapportage</p>
                             <p className="text-lg font-semibold text-slate-900">Cashflow & uptime</p>
                           </div>
-                          <span className="rounded-full bg-indigo-600/10 px-3 py-1 text-[11px] font-semibold text-indigo-700 ring-1 ring-indigo-200/50">
+                          <span className="rounded-full bg-[#e7eef4] px-3 py-1 text-[11px] font-semibold text-[#0a2e50] ring-1 ring-[#c7d4de]">
                             Live sync
                           </span>
                         </div>
@@ -311,7 +307,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                           {[36, 62, 78, 68, 92, 74, 108, 98, 86, 94, 120, 104].map((height, idx) => (
                             <div key={idx} className="space-y-2">
                               <div
-                                className="rounded-xl bg-gradient-to-t from-indigo-600 to-sky-400 shadow-[0_14px_36px_-18px_rgba(79,70,229,0.65)]"
+                                className="rounded-xl bg-gradient-to-t from-[#0a2e50] to-[#1b4965] shadow-[0_14px_36px_-18px_rgba(10,46,80,0.55)]"
                                 style={{ height: `${height}px` }}
                               />
                               <div
@@ -329,7 +325,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                       </div>
 
                       <div className="space-y-3">
-                        <div className="rounded-2xl border border-white/45 bg-white/45 p-4 shadow-[0_18px_60px_-50px_rgba(79,70,229,0.45)]">
+                        <div className="rounded-2xl border border-white/45 bg-white/45 p-4 shadow-[0_18px_60px_-50px_rgba(10,46,80,0.38)]">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-semibold text-slate-900">Recente betalingen</p>
                             <ArrowRight className="h-4 w-4 text-slate-500" aria-hidden />
@@ -356,7 +352,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                         <div className="rounded-2xl border border-white/45 bg-white/40 p-4 shadow-[0_18px_60px_-55px_rgba(15,23,42,0.35)]">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-semibold text-slate-900">Flow</p>
-                            <span className="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] font-semibold text-white">
+                            <span className="rounded-full bg-[#0a2e50] px-3 py-1 text-[11px] font-semibold text-white shadow-sm shadow-[0_10px_26px_-18px_rgba(10,46,80,0.6)]">
                               14 dagen gratis
                             </span>
                           </div>
@@ -391,7 +387,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section className="bg-[#f7f7fb] py-16 sm:py-20">
+        <section className="bg-[#f4f6f8] py-16 sm:py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
               <div>
@@ -400,8 +396,8 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   Creatives, developers & consultants werken soepeler met ZZP-HUB.
                 </h3>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/80 px-3 py-2 text-sm text-slate-600 shadow-sm">
-                <Sparkles className="h-4 w-4 text-indigo-500" aria-hidden />
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/85 px-3 py-2 text-sm text-slate-600 shadow-sm">
+                <Sparkles className="h-4 w-4 text-[#1b4965]" aria-hidden />
                 <span>Glasheldere premium workflow</span>
               </div>
             </div>
@@ -409,7 +405,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               {trustLogos.map((logo, idx) => (
                 <motion.div
                   key={logo}
-                  className="flex items-center justify-center rounded-xl border border-slate-200/70 bg-white/70 px-4 py-3 text-center text-sm font-semibold text-slate-700 shadow-[0_10px_35px_-24px_rgba(15,23,42,0.25)] transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-100"
+                  className="flex items-center justify-center rounded-xl border border-slate-200/70 bg-white/80 px-4 py-3 text-center text-sm font-semibold text-slate-700 shadow-[0_10px_35px_-24px_rgba(10,46,80,0.22)] transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-[0_18px_40px_-28px_rgba(27,73,101,0.16)]"
                   {...staggeredCard(0.04 * idx)}
                 >
                   <span className="w-full truncate text-slate-500 mix-blend-multiply filter grayscale">{logo}</span>
@@ -422,7 +418,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
         <section id="features" className="bg-white py-24 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Features</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#1b4965]">Features</p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Alles wat je nodig hebt</h2>
               <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
                 Staggered reveals, glasheldere flows en invisible inputs voor je klanten.
@@ -434,9 +430,9 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 const Icon = feature.icon;
                 return (
                   <motion.div key={feature.title} className="h-full" {...staggeredCard(0.05 * index)}>
-                    <Card className="h-full border-slate-200/70 bg-white/90 shadow-[0_18px_80px_-45px_rgba(15,23,42,0.35)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-100">
+                    <Card className="h-full border-slate-200/70 bg-white/90 shadow-[0_18px_80px_-45px_rgba(10,46,80,0.32)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[0_24px_90px_-48px_rgba(27,73,101,0.24)]">
                       <CardHeader className="space-y-4">
-                        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-400 text-white shadow-lg shadow-indigo-500/30 ring-1 ring-white/30">
+                        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a2e50] to-[#1b4965] text-white shadow-lg shadow-[0_16px_40px_-24px_rgba(10,46,80,0.5)] ring-1 ring-white/40">
                           <Icon className="h-7 w-7" aria-hidden />
                         </div>
                         <CardTitle className="text-xl font-semibold tracking-tight text-slate-900">{feature.title}</CardTitle>
@@ -452,10 +448,10 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section id="pricing" className="relative overflow-hidden bg-[#0b0c10] py-24 sm:py-28 text-slate-100">
+        <section id="pricing" className="relative overflow-hidden bg-gradient-to-br from-[#0a2e50] via-[#0c3d66] to-[#0a2e50] py-24 sm:py-28 text-slate-100">
           <div className="absolute inset-0">
-            <div className="absolute left-10 top-8 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
-            <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-purple-500/20 blur-[140px]" />
+            <div className="absolute left-10 top-8 h-72 w-72 rounded-full bg-[#1b4965]/40 blur-3xl" />
+            <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-[#0a2e50]/35 blur-[140px]" />
           </div>
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
@@ -478,20 +474,20 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 {...fadeUp}
                 transition={fadeUpTransition(0.1)}
               >
-                Eén plan met alles erin. Inclusief indigo glow beveiliging, audit trails, premium support én 14 dagen gratis
+                Eén plan met alles erin. Inclusief Midnight Shield beveiliging, audit trails, premium support én 14 dagen gratis
                 proberen.
               </motion.p>
             </div>
 
             <div className="relative mx-auto mt-16 max-w-3xl">
-              <div className="absolute inset-6 -z-10 rounded-[36px] bg-indigo-600/30 blur-[100px]" />
+              <div className="absolute inset-6 -z-10 rounded-[36px] bg-[#1b4965]/45 blur-[100px]" />
               <motion.div
-                className="relative overflow-hidden rounded-[32px] border border-white/15 bg-white/5 p-8 shadow-[0_35px_120px_-70px_rgba(99,102,241,0.8)] backdrop-blur-2xl"
+                className="relative overflow-hidden rounded-[32px] border border-white/15 bg-white/5 p-8 shadow-[0_35px_120px_-70px_rgba(10,46,80,0.65)] backdrop-blur-2xl"
                 {...fadeUp}
                 transition={fadeUpTransition(0.15)}
               >
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-100">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#e7eef4]">
                     Elite Plan
                   </div>
                   <p className="text-sm text-slate-200">Ultieme focus, premium design, altijd opzegbaar.</p>
@@ -506,7 +502,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                       key={perk}
                       className="flex items-start gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-slate-100 shadow-[0_18px_50px_-40px_rgba(0,0,0,0.45)]"
                     >
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 text-indigo-200" aria-hidden />
+                      <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-300" aria-hidden />
                       <span>{perk}</span>
                     </div>
                   ))}
@@ -519,7 +515,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href={isLoggedIn ? "/dashboard" : "/register"}
                     className={buttonVariants(
                       "primary",
-                      "w-full justify-center bg-white text-indigo-700 px-8 py-3 text-base shadow-[0_20px_70px_-35px_rgba(255,255,255,0.8)] hover:bg-white"
+                      "w-full justify-center bg-white text-[#0a2e50] px-8 py-3 text-base shadow-[0_20px_70px_-35px_rgba(255,255,255,0.8)] hover:bg-white"
                     )}
                   >
                     {primaryCta}
@@ -535,11 +531,11 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-indigo-500 py-16 sm:py-20">
+        <section className="bg-gradient-to-r from-[#0a2e50] via-[#1b4965] to-[#0a2e50] py-16 sm:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center text-white">
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Klaar om te starten?</h2>
-              <p className="mx-auto mt-4 max-w-2xl text-lg text-indigo-100">
+              <p className="mx-auto mt-4 max-w-2xl text-lg text-[#e7eef4]">
                 Sluit je aan bij honderden ZZP&apos;ers die al besparen op administratietijd.
               </p>
               <div className="mt-10 flex items-center justify-center gap-4">
@@ -547,7 +543,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   href={isLoggedIn ? "/dashboard" : "/register"}
                   className={buttonVariants(
                     "secondary",
-                    "text-base px-8 py-3 bg-white text-indigo-700 hover:bg-indigo-50 shadow-xl shadow-indigo-900/20"
+                    "text-base px-8 py-3 bg-white text-[#0a2e50] hover:bg-[#eef2f5] shadow-xl shadow-[0_22px_64px_-40px_rgba(0,0,0,0.35)]"
                   )}
                 >
                   {primaryCta}

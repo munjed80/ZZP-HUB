@@ -22,8 +22,8 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center", className)}>
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-700">
+    <div className={cn("flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-[#d5dae0] bg-white px-6 py-10 text-center shadow-[0_12px_40px_-24px_rgba(10,46,80,0.22)]", className)}>
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#e7eef4] text-[#0a2e50] ring-1 ring-[#c7d4de]">
         {icon ?? <FileQuestion className="h-5 w-5" aria-hidden />}
       </div>
       <div className="space-y-1">
@@ -36,4 +36,3 @@ export function EmptyState({
     </div>
   );
 }
-
