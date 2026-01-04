@@ -28,7 +28,7 @@ export function ConvertQuotationButton({ quotationId }: Props) {
   };
 
   return (
-    <Button type="button" onClick={handleConvert} disabled={isPending}>
+    <Button type="button" variant="secondary" onClick={handleConvert} disabled={isPending}>
       {isPending ? (
         "Omzetten..."
       ) : (

@@ -46,32 +46,32 @@ export default async function DashboardPagina() {
       label: "Omzet (jaar)",
       value: stats.yearlyRevenue,
       icon: ArrowUpRight,
-      color: "text-[#10B981]",
-      bg: "bg-emerald-50",
+      iconColor: "text-emerald-600",
+      iconBg: "bg-emerald-50",
       trend: buildTrend(thisMonth.revenue, previousMonth.revenue),
     },
     {
       label: "Uitgaven (jaar)",
       value: stats.yearlyExpenses,
       icon: ArrowDownRight,
-      color: "text-[#4A5568]",
-      bg: "bg-slate-100",
+      iconColor: "text-slate-600",
+      iconBg: "bg-slate-50",
       trend: buildTrend(thisMonth.expenses, previousMonth.expenses, true),
     },
     {
       label: "Winst",
       value: stats.netProfit,
       icon: Euro,
-      color: "text-teal-600",
-      bg: "bg-teal-50",
+      iconColor: "text-teal-600",
+      iconBg: "bg-teal-50",
       trend: buildTrend(thisMonthProfit, previousMonthProfit),
     },
     {
       label: "Te betalen BTW",
       value: stats.vatToPay,
       icon: AlertTriangle,
-      color: "text-amber-600",
-      bg: "bg-amber-50",
+      iconColor: "text-amber-600",
+      iconBg: "bg-amber-50",
       trend: buildTrend(currentVatBalance, previousVatBalance, true),
     },
   ];
@@ -96,7 +96,9 @@ export default async function DashboardPagina() {
                   <CardTitle className="text-xs font-medium uppercase tracking-wide text-slate-600">
                     {item.label}
                   </CardTitle>
-                  <Icon className="h-4 w-4 text-slate-400" aria-hidden />
+                  <div className={cn("rounded-lg p-2", item.iconBg)}>
+                    <Icon className={cn("h-4 w-4", item.iconColor)} aria-hidden />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -124,8 +126,8 @@ export default async function DashboardPagina() {
         <Card>
           <CardHeader className="pb-4">
             <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-slate-100 p-2.5">
-                <PiggyBank className="h-5 w-5 text-slate-600" aria-hidden />
+              <div className="rounded-lg bg-teal-50 p-2.5">
+                <PiggyBank className="h-5 w-5 text-teal-600" aria-hidden />
               </div>
               <div className="flex-1">
                 <CardTitle className="text-base font-medium text-slate-900">IB reservering</CardTitle>

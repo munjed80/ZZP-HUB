@@ -29,7 +29,7 @@ export function SendInvoiceEmailButton({ invoiceId, recipientEmail, className }:
   };
 
   return (
-    <Button type="button" onClick={handleClick} disabled={isPending} className={className}>
+    <Button type="button" variant="primary" onClick={handleClick} disabled={isPending} className={className}>
       {isPending ? "Versturen..." : "Verstuur via Email"}
     </Button>
   );

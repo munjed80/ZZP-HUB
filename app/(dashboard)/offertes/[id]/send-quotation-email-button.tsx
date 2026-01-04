@@ -28,7 +28,7 @@ export function SendQuotationEmailButton({ quotationId, recipientEmail }: Props)
   };
 
   return (
-    <Button type="button" onClick={handleSend} disabled={isPending}>
+    <Button type="button" variant="primary" onClick={handleSend} disabled={isPending}>
       {isPending ? "Versturen..." : "Verstuur via Email"}
     </Button>
   );
