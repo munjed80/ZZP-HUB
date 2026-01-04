@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Check } from "lucide-react";
+import { InvoiceEmailStatus } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
@@ -15,7 +16,7 @@ type Props = {
   pdfInvoice: ReturnType<typeof mapInvoiceToPdfData>;
   invoiceId: string;
   recipientEmail: string;
-  emailStatus: string;
+  emailStatus: InvoiceEmailStatus;
 };
 
 export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emailStatus }: Props) {
@@ -58,7 +59,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
             recipientEmail={recipientEmail}
             className="w-full justify-center"
           />
-          {emailStatus !== "BETAALD" && (
+          {emailStatus !== InvoiceEmailStatus.BETAALD && (
             <Button
               type="button"
               onClick={handleMarkAsPaid}
