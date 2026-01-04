@@ -2,9 +2,24 @@
 
 import Link from "next/link";
 import { motion, type MotionProps, type TargetAndTransition, type Transition } from "framer-motion";
-import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, Sparkles, ShieldCheck, LineChart, Infinity } from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, ShieldCheck, LineChart, Infinity } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const BrandZ = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2.2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M5 5h14L5 19h14" />
+  </svg>
+);
 
 const features = [
   {
@@ -79,7 +94,7 @@ const glassPayments = [
 
 const glassFlow = [
   { label: "BTW-sync klaar", icon: ShieldCheck, tone: "text-emerald-100 bg-emerald-500/10 ring-emerald-300/20" },
-  { label: "Rapportage live", icon: Sparkles, tone: "text-[#0a2e50] bg-[#e7eef4] ring-[#c7d4de]" },
+  { label: "Rapportage live", icon: BrandZ, tone: "text-[#1e293b] bg-[#1e293b]/10 ring-[#1e293b]/20" },
   { label: "Automatische incasso", icon: Calculator, tone: "text-amber-50 bg-amber-500/10 ring-amber-300/30" },
 ];
 
@@ -114,29 +129,29 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
   const primaryCta = isLoggedIn ? "Naar Dashboard" : "Gratis starten";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f8f9fa] via-white to-[#eef3f6] text-slate-900">
+    <div className="min-h-screen bg-gradient-to-b from-[#e2e8f0] via-white to-[#e5e7eb] text-slate-900">
       <header className="sticky top-4 z-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between rounded-full border border-white/30 bg-white/80 px-4 py-3 shadow-2xl backdrop-blur-md">
+          <div className="flex items-center justify-between rounded-full border border-[#1e293b]/10 bg-white/85 px-4 py-3 shadow-2xl shadow-slate-200/40 backdrop-blur-md">
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-200 via-white to-slate-500 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] ring-1 ring-white/60">
-                <Sparkles className="h-5 w-5 text-slate-700" aria-hidden />
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1e293b] via-[#334155] to-[#1e293b] shadow-[0_10px_40px_-18px_rgba(30,41,59,0.55)] ring-1 ring-[#1e293b]/30">
+                <BrandZ className="h-5 w-5 text-white" aria-hidden />
               </div>
               <motion.span
-                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(10,46,80,0.25)]"
+                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(30,41,59,0.25)]"
                 transition={{ duration: 0.6 }}
               >
                 ZZP-HUB
               </motion.span>
             </Link>
-            <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
-              <Link href="#features" className="transition-colors duration-200 hover:text-[#0a2e50]">
+            <nav className="hidden items-center gap-8 text-sm font-medium text-slate-700 md:flex">
+              <Link href="#features" className="transition-colors duration-200 hover:text-[#1e293b]">
                 Features
               </Link>
-              <Link href="#pricing" className="transition-colors duration-200 hover:text-[#0a2e50]">
+              <Link href="#pricing" className="transition-colors duration-200 hover:text-[#1e293b]">
                 Prijzen
               </Link>
-              <Link href="#preview" className="transition-colors duration-200 hover:text-[#0a2e50]">
+              <Link href="#preview" className="transition-colors duration-200 hover:text-[#1e293b]">
                 Preview
               </Link>
             </nav>
@@ -153,7 +168,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   </Link>
                 ) : (
                 <>
-                  <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-slate-700")}>
+                  <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-[#1e293b]")}>
                     Inloggen
                   </Link>
                   <Link
@@ -175,29 +190,29 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
       <main className="pt-16 sm:pt-20">
         <section
           id="preview"
-          className="relative overflow-hidden bg-[linear-gradient(135deg,#f7f8fb,#e6e9ef,#cfd4dd)] pb-24 pt-20 sm:pt-24 lg:pt-28"
+          className="relative overflow-hidden bg-[linear-gradient(135deg,#e5e7eb,#cbd5e1,#1e293b)] pb-24 pt-20 sm:pt-24 lg:pt-28"
         >
           <div className="absolute inset-0">
-            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-[#d7e1ea] blur-3xl" />
-            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-[#c7d4de]/70 blur-3xl" />
-            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#eef3f6]" />
+            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-[#1e293b]/25 blur-3xl" />
+            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-[#334155]/30 blur-3xl" />
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#e2e8f0]" />
           </div>
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
               <div className="space-y-6 text-center lg:text-left">
                 <motion.div
-                className="mx-auto inline-flex items-center gap-2 rounded-full border border-[#c7d4de] bg-white/85 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#0a2e50] shadow-sm backdrop-blur sm:mx-0"
-                {...fadeUp}
-              >
-                <Sparkles className="h-4 w-4" aria-hidden />
-                <span>Elite Business Hub 2026</span>
-              </motion.div>
+                  className="mx-auto inline-flex items-center gap-2 rounded-full border border-[#334155] bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#0f172a] shadow-md backdrop-blur sm:mx-0"
+                  {...fadeUp}
+                >
+                  <BrandZ className="h-4 w-4 text-[#1e293b]" aria-hidden />
+                  <span>Elite Business Hub 2026</span>
+                </motion.div>
               <motion.h1
-                className="text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-slate-900 drop-shadow-[0_10px_28px_rgba(15,23,42,0.24)] sm:text-5xl lg:text-6xl"
+                className="text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-slate-900 drop-shadow-[0_10px_28px_rgba(15,23,42,0.28)] sm:text-5xl lg:text-6xl"
                 {...fadeUp}
                 transition={fadeUpTransition(0.05)}
                 style={{
-                  backgroundImage: "linear-gradient(135deg,#f5f7fa 0%,#d6dbe3 36%,#b6bec9 62%,#f8fafc 100%)",
+                  backgroundImage: "linear-gradient(135deg,#1e293b 0%,#334155 45%,#0f172a 95%)",
                   backgroundSize: "160% 160%",
                   WebkitBackgroundClip: "text",
                   color: "transparent",
@@ -205,13 +220,13 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               >
                   Slimmer ondernemen met een premium financieel hub voor ZZP&apos;ers.
               </motion.h1>
-              <motion.p
-                className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-700 sm:text-xl lg:mx-0"
-                {...fadeUp}
-                transition={fadeUpTransition(0.1)}
-              >
+                <motion.p
+                  className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-800 sm:text-xl lg:mx-0"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.1)}
+                >
                   Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.
-              </motion.p>
+                </motion.p>
                 <motion.div
                   className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start"
                   {...fadeUp}
@@ -221,7 +236,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href={isLoggedIn ? "/dashboard" : "/register"}
                     className={buttonVariants(
                       "primary",
-                      "text-base px-8 py-3 shadow-xl shadow-[0_22px_64px_-36px_rgba(10,46,80,0.4)] transition-all hover:shadow-2xl hover:shadow-[0_26px_72px_-34px_rgba(27,73,101,0.38)]"
+                      "text-base px-8 py-3 shadow-xl shadow-[0_22px_64px_-36px_rgba(30,41,59,0.45)] transition-all hover:shadow-2xl hover:shadow-[0_26px_72px_-34px_rgba(51,65,85,0.42)]"
                     )}
                   >
                     Start Nu Gratis
@@ -231,14 +246,14 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href="#pricing"
                     className={buttonVariants(
                       "secondary",
-                      "text-base px-8 py-3 border border-slate-200/80 bg-white/85 shadow-sm hover:-translate-y-0.5"
+                      "text-base px-8 py-3 border border-[#334155]/60 bg-white/90 shadow-sm hover:-translate-y-0.5 hover:bg-[#e2e8f0]"
                     )}
                   >
                     Bekijk Demo
                   </Link>
                 </motion.div>
                 <motion.div
-                  className="flex items-center justify-center gap-3 text-sm text-slate-600 lg:justify-start"
+                  className="flex items-center justify-center gap-3 text-sm text-slate-700 lg:justify-start"
                   {...fadeUp}
                   transition={fadeUpTransition(0.2)}
                 >
@@ -248,18 +263,18 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               </div>
 
               <div className="relative h-[540px]">
-                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-[#d7e1ea]/70 via-white/35 to-[#c7d4de]/60 blur-[110px]" />
+                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-[#1e293b]/20 via-[#334155]/10 to-[#0f172a]/18 blur-[110px]" />
                 <motion.div
-                  className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-[linear-gradient(145deg,#e6e9f0_0%,#bdc3c7_100%)] bg-[length:200%_200%] p-6 shadow-[0_40px_120px_-70px_rgba(15,23,42,0.6)] ring-1 ring-white/50 backdrop-blur-[12px] animate-[metal-shine_8s_linear_infinite]"
+                  className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-[linear-gradient(145deg,#dfe7f1_0%,#cbd5e1_55%,#94a3b8_100%)] bg-[length:200%_200%] p-6 shadow-[0_40px_120px_-70px_rgba(15,23,42,0.6)] ring-1 ring-[#1e293b]/20 backdrop-blur-[12px] animate-[metal-shine_8s_linear_infinite]"
                   {...tiltEffect}
                 >
                   <div className="flex items-center justify-between border-b border-white/40 pb-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a2e50] via-[#4A5568] to-[#4f6f86] text-white shadow-lg shadow-[0_12px_32px_-18px_rgba(10,46,80,0.6)] ring-1 ring-white/50">
-                        <Sparkles className="h-5 w-5" aria-hidden />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1e293b] via-[#334155] to-[#1f2937] text-white shadow-lg shadow-[0_12px_32px_-18px_rgba(30,41,59,0.6)] ring-1 ring-white/40">
+                        <BrandZ className="h-5 w-5" aria-hidden />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">Glass preview</p>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">Glass preview</p>
                         <p className="text-base font-semibold text-slate-900">Elite Dashboard</p>
                       </div>
                     </div>
@@ -279,7 +294,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                             className="rounded-2xl border border-white/50 bg-white/45 p-4 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.35)] backdrop-blur-xl"
                           >
                             <div className="flex items-center justify-between">
-                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{stat.label}</p>
+                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">{stat.label}</p>
                               <span
                                 className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${stat.accent} text-white shadow-md shadow-[0_12px_32px_-18px_rgba(10,46,80,0.45)] ring-1 ring-white/40`}
                               >
@@ -287,7 +302,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                               </span>
                             </div>
                             <div className="mt-3 text-2xl font-semibold text-slate-900">{stat.value}</div>
-                            <p className="mt-1 text-xs font-semibold text-[#0a2e50]">{stat.chip}</p>
+                            <p className="mt-1 text-xs font-semibold text-[#1e293b]">{stat.chip}</p>
                           </div>
                         );
                       })}
@@ -295,14 +310,14 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
 
                     <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
                       <div className="relative overflow-hidden rounded-2xl border border-white/45 bg-white/45 p-5 shadow-[0_22px_80px_-55px_rgba(10,46,80,0.45)]">
-                        <div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[#c7d4de]/80 blur-3xl" />
-                        <div className="absolute right-0 -bottom-10 h-32 w-40 rounded-full bg-[#e0e7ee] blur-3xl" />
+                        <div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[#1e293b]/20 blur-3xl" />
+                        <div className="absolute right-0 -bottom-10 h-32 w-40 rounded-full bg-[#334155]/18 blur-3xl" />
                         <div className="relative flex items-center justify-between">
                           <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Realtime rapportage</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Realtime rapportage</p>
                             <p className="text-lg font-semibold text-slate-900">Cashflow & uptime</p>
                           </div>
-                          <span className="rounded-full bg-[#e7eef4] px-3 py-1 text-[11px] font-semibold text-[#0a2e50] ring-1 ring-[#c7d4de]">
+                          <span className="rounded-full bg-[#e2e8f0] px-3 py-1 text-[11px] font-semibold text-[#1e293b] ring-1 ring-[#334155]/50">
                             Live sync
                           </span>
                         </div>
@@ -320,7 +335,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                             </div>
                           ))}
                         </div>
-                        <div className="mt-4 flex items-center justify-between text-[11px] uppercase tracking-[0.16em] text-slate-500">
+                        <div className="mt-4 flex items-center justify-between text-[11px] uppercase tracking-[0.16em] text-slate-700">
                           <span>Omzet</span>
                           <span>Kosten</span>
                           <span>Prognose</span>
@@ -331,7 +346,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                         <div className="rounded-2xl border border-white/45 bg-white/45 p-4 shadow-[0_18px_60px_-50px_rgba(10,46,80,0.38)]">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-semibold text-slate-900">Recente betalingen</p>
-                            <ArrowRight className="h-4 w-4 text-slate-500" aria-hidden />
+                            <ArrowRight className="h-4 w-4 text-slate-700" aria-hidden />
                           </div>
                           <div className="mt-3 space-y-2 text-sm">
                             {glassPayments.map((invoice) => (
@@ -341,7 +356,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                               >
                                 <div>
                                   <p className="font-semibold text-slate-900">{invoice.klant}</p>
-                                  <p className="text-xs text-slate-500">Elite factuur</p>
+                                  <p className="text-xs text-slate-700">Elite factuur</p>
                                 </div>
                                 <div className="text-right">
                                   <p className="text-sm font-semibold text-slate-900">{invoice.bedrag}</p>
@@ -375,7 +390,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                                     </span>
                                     {item.label}
                                   </div>
-                                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Sync</span>
+                                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">Sync</span>
                                 </div>
                               );
                             })}
@@ -394,13 +409,13 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Trusted by 500+ ZZP&apos;ers</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-700">Trusted by 500+ ZZP&apos;ers</p>
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
                   Creatives, developers & consultants werken soepeler met ZZP-HUB.
                 </h3>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/85 px-3 py-2 text-sm text-slate-600 shadow-sm">
-                <Sparkles className="h-4 w-4 text-[#4A5568]" aria-hidden />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#334155]/60 bg-white/90 px-3 py-2 text-sm text-slate-700 shadow-sm">
+                <BrandZ className="h-4 w-4 text-[#1e293b]" aria-hidden />
                 <span>Glasheldere premium workflow</span>
               </div>
             </div>
@@ -411,7 +426,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   className="flex items-center justify-center rounded-xl border border-slate-200/70 bg-white/80 px-4 py-3 text-center text-sm font-semibold text-slate-700 shadow-[0_10px_35px_-24px_rgba(10,46,80,0.22)] transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-[0_18px_40px_-28px_rgba(27,73,101,0.16)]"
                   {...staggeredCard(0.04 * idx)}
                 >
-                  <span className="w-full truncate text-slate-500 mix-blend-multiply filter grayscale">{logo}</span>
+                  <span className="w-full truncate text-slate-700 mix-blend-multiply">{logo}</span>
                 </motion.div>
               ))}
             </div>
@@ -441,7 +456,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                         <CardTitle className="text-xl font-semibold tracking-tight text-slate-900">{feature.title}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-slate-600">{feature.description}</p>
+                        <p className="text-slate-700">{feature.description}</p>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -459,11 +474,11 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <motion.div
-                className="mx-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-slate-200 via-white to-slate-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-900 shadow-[0_10px_50px_-28px_rgba(255,255,255,0.6)]"
+                className="mx-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#1e293b] via-[#334155] to-[#0f172a] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white shadow-[0_12px_40px_-18px_rgba(15,23,42,0.55)]"
                 {...fadeUp}
               >
                 14 Dagen Gratis
-                <Sparkles className="h-4 w-4" aria-hidden />
+                <BrandZ className="h-4 w-4" aria-hidden />
               </motion.div>
               <motion.h2
                 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl"
@@ -542,13 +557,13 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 Sluit je aan bij honderden ZZP&apos;ers die al besparen op administratietijd.
               </p>
               <div className="mt-10 flex items-center justify-center gap-4">
-                <Link
-                  href={isLoggedIn ? "/dashboard" : "/register"}
-                  className={buttonVariants(
-                    "secondary",
-                    "text-base px-8 py-3 bg-white text-[#0a2e50] hover:bg-[#eef2f5] shadow-xl shadow-[0_22px_64px_-40px_rgba(0,0,0,0.35)]"
-                  )}
-                >
+                  <Link
+                    href={isLoggedIn ? "/dashboard" : "/register"}
+                    className={buttonVariants(
+                      "secondary",
+                      "text-base px-8 py-3 bg-white text-[#1e293b] hover:bg-[#e2e8f0] shadow-xl shadow-[0_22px_64px_-40px_rgba(30,41,59,0.35)]"
+                    )}
+                  >
                   {primaryCta}
                   <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
                 </Link>
@@ -562,7 +577,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center gap-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-200">
-              <Sparkles className="h-4 w-4" aria-hidden />
+              <BrandZ className="h-4 w-4 text-slate-100" aria-hidden />
               Signature edition
             </div>
             <p className="text-sm font-semibold tracking-tight text-slate-200">Powered by MHM IT</p>
@@ -577,7 +592,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 Contact
               </Link>
             </div>
-            <p className="text-xs text-slate-500">© 2024 ZZP-HUB. All rights reserved.</p>
+            <p className="text-xs text-slate-300">© 2024 ZZP-HUB. All rights reserved.</p>
           </div>
         </div>
       </footer>
