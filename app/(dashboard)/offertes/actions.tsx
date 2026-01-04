@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { BtwTarief, Eenheid, Prisma, QuotationStatus } from "@prisma/client";
+import { BtwTarief, Eenheid, InvoiceEmailStatus, Prisma, QuotationStatus } from "@prisma/client";
 import { Resend } from "resend";
 import { renderToBuffer } from "@react-pdf/renderer";
 import QuotationEmail from "@/components/emails/QuotationEmail";
@@ -194,7 +194,7 @@ export async function updateQuotationStatus(quotationId: string, status: "OPEN" 
   revalidatePath(`/offertes/${quotationId}`);
 }
 
-export async function convertQuotationToInvoice(quotationId: string) {
+export async function convertToInvoice(quotationId: string) {
   "use server";
 
   const userId = await getCurrentUserId();
@@ -219,6 +219,7 @@ export async function convertQuotationToInvoice(quotationId: string) {
         invoiceNum: `INV-${quotation.quoteNum.replace(/^off[-]?/i, "")}`,
         date: new Date(),
         dueDate: quotation.validUntil,
+        emailStatus: InvoiceEmailStatus.CONCEPT,
       },
     });
 
@@ -243,7 +244,9 @@ export async function convertQuotationToInvoice(quotationId: string) {
   });
 
   revalidatePath("/offertes");
+  revalidatePath(`/offertes/${quotationId}`);
   revalidatePath("/facturen");
+  revalidatePath(`/facturen/${invoice.id}`);
 
   return { success: true, invoiceId: invoice.id };
 }

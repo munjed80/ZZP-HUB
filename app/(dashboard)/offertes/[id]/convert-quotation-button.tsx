@@ -3,8 +3,9 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { FilePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { convertQuotationToInvoice } from "../actions";
+import { convertToInvoice } from "../actions";
 
 type Props = {
   quotationId: string;
@@ -16,10 +17,10 @@ export function ConvertQuotationButton({ quotationId }: Props) {
 
   const handleConvert = () => {
     startTransition(async () => {
-      const result = await convertQuotationToInvoice(quotationId);
+      const result = await convertToInvoice(quotationId);
       if (result?.success && result.invoiceId) {
-        toast.success("Offerte omgezet naar factuur.");
-        router.push(`/facturen/${result.invoiceId}/edit`);
+        toast.success("Offerte succesvol omgezet naar factuur!");
+        router.push(`/facturen/${result.invoiceId}`);
       } else {
         toast.error(result?.message ?? "Omzetten mislukt.");
       }
@@ -28,7 +29,14 @@ export function ConvertQuotationButton({ quotationId }: Props) {
 
   return (
     <Button type="button" onClick={handleConvert} disabled={isPending}>
-      {isPending ? "Omzetten..." : "Omzetten naar Factuur"}
+      {isPending ? (
+        "Omzetten..."
+      ) : (
+        <>
+          <FilePlus className="h-4 w-4" aria-hidden />
+          Zet om naar factuur
+        </>
+      )}
     </Button>
   );
 }
