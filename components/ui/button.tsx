@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
 
 const baseClasses =
-  "group relative inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-300 ease-out will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-[1.5px] hover:scale-[1.01] after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-white/25 after:opacity-0 after:blur-xl after:transition-opacity after:duration-300 hover:after:opacity-60";
+  "group relative inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-300 ease-out will-change-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 hover:-translate-y-[1.5px] hover:scale-[1.01] shadow-[0_14px_34px_-18px_rgba(15,23,42,0.42)] hover:shadow-[0_18px_40px_-18px_rgba(79,70,229,0.45)] before:pointer-events-none before:absolute before:inset-[1.5px] before:rounded-[inherit] before:bg-white/18 before:opacity-0 before:blur-[6px] before:transition before:duration-300 hover:before:opacity-90 after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:bg-white/25 after:opacity-0 after:blur-xl after:transition-opacity after:duration-300 hover:after:opacity-60";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary: "bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:ring-indigo-500",

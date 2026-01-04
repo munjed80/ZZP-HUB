@@ -186,33 +186,33 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
             <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
               <div className="space-y-6 text-center lg:text-left">
                 <motion.div
-                  className="mx-auto inline-flex items-center gap-2 rounded-full border border-[#bdc3c7] bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-indigo-700 shadow-sm backdrop-blur sm:mx-0"
-                  {...fadeUp}
-                >
-                  <Sparkles className="h-4 w-4" aria-hidden />
-                  <span>Super Premium SaaS</span>
-                </motion.div>
-                <motion.h1
-                  className="text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-slate-900 drop-shadow-[0_10px_28px_rgba(15,23,42,0.24)] sm:text-5xl lg:text-6xl"
-                  {...fadeUp}
-                  transition={fadeUpTransition(0.05)}
-                  style={{
-                    backgroundImage: "linear-gradient(120deg,#1f2937,#0f172a,#334155)",
-                    backgroundSize: "160% 160%",
-                    WebkitBackgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  De Slimste Boekhouding voor Logistieke ZZP&apos;ers
-                </motion.h1>
-                <motion.p
-                  className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-700 sm:text-xl lg:mx-0"
-                  {...fadeUp}
-                  transition={fadeUpTransition(0.1)}
-                >
-                  Factureer stops, ritten en uren in seconden. Speciaal ontworpen voor koeriers en transportondernemers die
-                  snelheid eisen.
-                </motion.p>
+                className="mx-auto inline-flex items-center gap-2 rounded-full border border-[#bdc3c7] bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-indigo-700 shadow-sm backdrop-blur sm:mx-0"
+                {...fadeUp}
+              >
+                <Sparkles className="h-4 w-4" aria-hidden />
+                <span>Elite Business Hub 2026</span>
+              </motion.div>
+              <motion.h1
+                className="text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-slate-900 drop-shadow-[0_10px_28px_rgba(15,23,42,0.24)] sm:text-5xl lg:text-6xl"
+                {...fadeUp}
+                transition={fadeUpTransition(0.05)}
+                style={{
+                  backgroundImage: "linear-gradient(135deg,#e6e9f0 0%,#cfd5dd 32%,#9ba3b5 58%,#f4f6fb 100%)",
+                  backgroundSize: "160% 160%",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                }}
+              >
+                  Slimmer Ondernemen، Sneller Factureren.
+              </motion.h1>
+              <motion.p
+                className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-700 sm:text-xl lg:mx-0"
+                {...fadeUp}
+                transition={fadeUpTransition(0.1)}
+              >
+                  Hét all-in-one platform voor de moderne ZZP&apos;er. Beheer je ritten, stops, offertes en boekhouding met de
+                  snelheid van licht.
+              </motion.p>
                 <motion.div
                   className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start"
                   {...fadeUp}
@@ -251,7 +251,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               <div className="relative h-[540px]">
                 <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-indigo-300/35 via-white/30 to-purple-300/40 blur-[110px]" />
                 <motion.div
-                  className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-[linear-gradient(135deg,#f5f7fa_0%,#c3cfe2_100%)] bg-[length:200%_200%] p-6 shadow-[0_35px_120px_-60px_rgba(79,70,229,0.55)] backdrop-blur-[12px] animate-[metal-shine_8s_linear_infinite]"
+                  className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-[linear-gradient(145deg,#e6e9f0_0%,#bdc3c7_100%)] bg-[length:200%_200%] p-6 shadow-[0_40px_120px_-70px_rgba(15,23,42,0.6)] ring-1 ring-white/50 backdrop-blur-[12px] animate-[metal-shine_8s_linear_infinite]"
                   {...tiltEffect}
                 >
                   <div className="flex items-center justify-between border-b border-white/40 pb-4">
