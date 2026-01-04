@@ -7,8 +7,10 @@ import { getCurrentUserId, requireUser } from "@/lib/auth";
 import {
   companySettingsSchema,
   emailSettingsSchema,
+  profileBasicsSchema,
   type CompanySettingsInput,
   type EmailSettingsInput,
+  type ProfileBasicsInput,
 } from "./schema";
 
 export async function fetchCompanyProfile() {
@@ -98,6 +100,73 @@ export async function updateEmailSettings(values: EmailSettingsInput) {
 
   revalidatePath("/instellingen");
   return prisma.companyProfile.findUnique({ where: { userId } });
+}
+
+export async function fetchUserAccount() {
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return null;
+
+  return {
+    name: user.naam ?? "",
+    email: user.email,
+  };
+}
+
+export async function saveProfileBasics(values: ProfileBasicsInput) {
+  "use server";
+
+  const { id: userId } = await requireUser();
+  const data = profileBasicsSchema.parse(values);
+
+  const trimmedName = data.name.trim();
+  const trimmedCompanyName = data.companyName?.trim();
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { naam: trimmedName },
+  });
+
+  if (trimmedCompanyName) {
+    await prisma.companyProfile.updateMany({
+      where: { userId },
+      data: { companyName: trimmedCompanyName },
+    });
+  }
+
+  revalidatePath("/instellingen");
+
+  return {
+    name: trimmedName,
+    companyName: trimmedCompanyName ?? "",
+  };
+}
+
+export async function saveProfileAvatar(avatarDataUrl: string) {
+  "use server";
+
+  const { id: userId } = await requireUser();
+  const safeAvatar = avatarDataUrl.trim();
+  if (!safeAvatar) {
+    throw new Error("Geen afbeelding aangeleverd.");
+  }
+
+  const profile = await prisma.companyProfile.findUnique({ where: { userId } });
+  if (!profile) {
+    return null;
+  }
+
+  const updated = await prisma.companyProfile.update({
+    where: { userId },
+    data: { logoUrl: safeAvatar },
+  });
+
+  revalidatePath("/instellingen");
+  return updated.logoUrl ?? null;
 }
 
 export async function changePassword({
