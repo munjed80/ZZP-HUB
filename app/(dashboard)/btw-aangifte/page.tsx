@@ -120,7 +120,7 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
               </button>
             </form>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3" aria-live="polite">
             <div className="flex items-center gap-2 rounded-xl bg-[var(--background-secondary)] px-3 py-2 text-sm text-[var(--muted)] ring-1 ring-[var(--border)]">
               <Percent className="h-4 w-4 text-[#4a6fa5]" aria-hidden="true" />
               Rubriek berekening voor {quarterLabels[report.quarter]} {report.year}

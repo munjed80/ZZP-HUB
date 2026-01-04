@@ -9,17 +9,23 @@ type Props = {
   profit: number;
 };
 
-const COLORS = ["#1b6b7a", "#4a6fa5", "#2f9e7c"];
+const COLORS = {
+  revenue: "#1b6b7a",
+  expenses: "#4a6fa5",
+  profit: "#2f9e7c",
+  loss: "#e77975",
+};
 
 export function DistributionDonut({ revenue, expenses, profit }: Props) {
   const safeRevenue = Math.max(0, revenue);
   const safeExpenses = Math.max(0, expenses);
-  const safeProfit = Math.max(0, profit);
+  const profitLabel = profit >= 0 ? "Winst" : "Verlies";
+  const safeProfit = Math.abs(profit);
 
   const data = [
-    { name: "Omzet", value: safeRevenue, color: COLORS[0] },
-    { name: "Kosten", value: safeExpenses, color: COLORS[1] },
-    { name: "Winst", value: safeProfit, color: COLORS[2] },
+    { name: "Omzet", value: safeRevenue, color: COLORS.revenue },
+    { name: "Kosten", value: safeExpenses, color: COLORS.expenses },
+    { name: profitLabel, value: safeProfit, color: profit >= 0 ? COLORS.profit : COLORS.loss },
   ];
 
   const total = data.reduce((sum, item) => sum + item.value, 0) || 1;
