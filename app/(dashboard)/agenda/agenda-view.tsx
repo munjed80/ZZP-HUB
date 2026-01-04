@@ -20,7 +20,7 @@ type AgendaEventDto = {
   end: string;
 };
 
-type ParsedAgendaEvent = AgendaEventDto & { start: Date; end: Date };
+type ParsedAgendaEvent = Omit<AgendaEventDto, 'start' | 'end'> & { start: Date; end: Date };
 
 type AgendaViewProps = {
   events: AgendaEventDto[];
