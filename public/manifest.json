@@ -1,13 +1,18 @@
 {
-  "name": "ZZP-HUB",
-  "short_name": "ZZP-HUB",
-  "description": "Elite Business Management for Professionals. Alles-in-één administratie, facturen, uren en BTW-aangifte.",
+  "name": "Elite Hub",
+  "short_name": "Hub",
+  "description": "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8f9fa",
   "theme_color": "#0a2e50",
   "orientation": "portrait-primary",
   "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
     {
       "src": "/favicon.svg",
       "sizes": "any",

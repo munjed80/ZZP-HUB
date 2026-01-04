@@ -4,8 +4,8 @@
   --background: #f8f9fa;
   --foreground: #0a2e50;
   --primary: #0a2e50;
-  --primary-accent: #1b4965;
-  --accent-emerald: #28a745;
+  --primary-accent: #4a5568;
+  --accent-emerald: #10b981;
 }
 
 @theme inline {
@@ -21,7 +21,7 @@
 body {
   background:
     radial-gradient(circle at 25% 20%, rgba(10, 46, 80, 0.08), transparent 36%),
-    radial-gradient(circle at 80% 0%, rgba(27, 73, 101, 0.08), transparent 32%),
+    radial-gradient(circle at 80% 0%, rgba(74, 85, 104, 0.08), transparent 32%),
     var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;

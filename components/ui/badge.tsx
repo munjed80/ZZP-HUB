@@ -9,7 +9,7 @@ type BadgeProps = {
 export function Badge({ children, variant = "info" }: BadgeProps) {
   const styles: Record<NonNullable<BadgeProps["variant"]>, string> = {
     info: "bg-[#e7eef4] text-[#0a2e50] ring-[#c7d4de]",
-    success: "bg-[#e7f6ec] text-[#28a745] ring-[#b8e2c3]",
+    success: "bg-[#e8f7f0] text-[#10b981] ring-[#bfe9d4]",
     warning: "bg-amber-100 text-amber-800 ring-amber-200",
     muted: "bg-slate-100 text-slate-700 ring-slate-200",
     destructive: "bg-red-100 text-red-800 ring-red-200",

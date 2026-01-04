@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="grid min-h-screen lg:grid-cols-2">
         <div className="relative overflow-hidden bg-gradient-to-br from-[#0a2e50] via-[#0c3d66] to-[#0a2e50] text-white">
           <motion.div
-            className="absolute -left-10 top-4 h-64 w-64 rounded-full bg-[#1b4965]/35 blur-3xl"
+            className="absolute -left-10 top-4 h-64 w-64 rounded-full bg-[#4A5568]/35 blur-3xl"
             animate={{ y: [0, -10, 6, 0], x: [0, 6, -6, 0] }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
           />

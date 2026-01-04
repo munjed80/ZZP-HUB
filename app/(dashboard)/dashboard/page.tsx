@@ -1,6 +1,6 @@
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, BarChart3, PiggyBank } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatBedrag } from "@/lib/utils";
+import { cn, formatBedrag } from "@/lib/utils";
 import { RevenueExpensesChart } from "@/components/dashboard/revenue-expenses-chart";
 import { getDashboardStats } from "@/actions/get-dashboard-stats";
 
@@ -19,15 +19,15 @@ export default async function DashboardPagina() {
       label: "Omzet (jaar)",
       value: stats.yearlyRevenue,
       icon: ArrowUpRight,
-      color: "text-emerald-600",
+      color: "text-[#10B981]",
       bg: "bg-emerald-50",
     },
     {
-      label: "Kosten (jaar)",
+      label: "Uitgaven (jaar)",
       value: stats.yearlyExpenses,
       icon: ArrowDownRight,
-      color: "text-rose-600",
-      bg: "bg-rose-50",
+      color: "text-[#4A5568]",
+      bg: "bg-slate-100",
     },
     {
       label: "Winst",
@@ -57,16 +57,32 @@ export default async function DashboardPagina() {
       <div className="grid gap-4 md:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => {
           const Icon = item.icon;
+          const isPrimaryMetric = item.label.startsWith("Omzet") || item.label.startsWith("Uitgaven");
+
           return (
             <Card key={item.label} className="bg-white shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs md:text-sm font-medium text-slate-600">{item.label}</CardTitle>
+                <CardTitle
+                  className={cn(
+                    "text-xs md:text-sm font-medium text-slate-600",
+                    isPrimaryMetric && "text-[13px] uppercase tracking-[0.16em] text-[#4A5568]",
+                  )}
+                >
+                  {item.label}
+                </CardTitle>
                 <span className={`rounded-full p-2 ${item.bg}`}>
                   <Icon className={`h-4 w-4 ${item.color}`} aria-hidden />
                 </span>
               </CardHeader>
               <CardContent>
-                <p className="text-xl md:text-2xl font-semibold text-slate-900">{formatBedrag(item.value)}</p>
+                <p
+                  className={cn(
+                    "text-xl md:text-2xl font-semibold text-slate-900",
+                    isPrimaryMetric && "text-3xl md:text-[32px] font-bold tracking-tight text-[#0A2E50]",
+                  )}
+                >
+                  {formatBedrag(item.value)}
+                </p>
               </CardContent>
             </Card>
           );

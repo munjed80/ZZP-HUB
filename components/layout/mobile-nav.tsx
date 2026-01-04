@@ -48,20 +48,21 @@ export function MobileNav() {
         {navItems.slice(0, 2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
+          const iconClasses = cn("h-5 w-5 transition-transform duration-200", actief && "scale-110 text-[#0A2E50]");
           
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition-all duration-200",
+                "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition-all duration-200 will-change-transform",
                 actief
-                  ? "text-[#0a2e50] bg-[#e7eef4]"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  ? "text-[#0a2e50] bg-[#e7eef4] shadow-[0_12px_30px_-18px_rgba(10,46,80,0.35)] scale-[1.02]"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:scale-[1.02]"
               )}
               aria-current={actief ? "page" : undefined}
             >
-              <Icon className={cn("h-5 w-5", actief && "stroke-[2.5]")} aria-hidden={true} />
+              <Icon className={cn(iconClasses, actief && "stroke-[2.5]")} aria-hidden={true} />
               <span className="text-[10px] font-semibold leading-tight">{item.label}</span>
             </Link>
           );
@@ -105,20 +106,21 @@ export function MobileNav() {
         {navItems.slice(2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
+          const iconClasses = cn("h-5 w-5 transition-transform duration-200", actief && "scale-110 text-[#0A2E50]");
           
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition-all duration-200",
+                "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-xl transition-all duration-200 will-change-transform",
                 actief
-                  ? "text-[#0a2e50] bg-[#e7eef4]"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  ? "text-[#0a2e50] bg-[#e7eef4] shadow-[0_12px_30px_-18px_rgba(10,46,80,0.35)] scale-[1.02]"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:scale-[1.02]"
               )}
               aria-current={actief ? "page" : undefined}
             >
-              <Icon className={cn("h-5 w-5", actief && "stroke-[2.5]")} aria-hidden={true} />
+              <Icon className={cn(iconClasses, actief && "stroke-[2.5]")} aria-hidden={true} />
               <span className="text-[10px] font-semibold leading-tight">{item.label}</span>
             </Link>
           );
