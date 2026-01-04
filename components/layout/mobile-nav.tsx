@@ -3,11 +3,12 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Receipt, Plus, FileText, Users, Send, Wallet } from "lucide-react";
+import { LayoutDashboard, Receipt, Plus, FileText, Users, Send, Wallet, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
   { href: "/relaties", label: "Relaties", icon: Users },
@@ -100,7 +101,7 @@ export function MobileNav() {
           )}
         </div>
 
-        {navItems.slice(2, 4).map((item) => {
+        {navItems.slice(2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
           

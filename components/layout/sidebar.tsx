@@ -7,6 +7,7 @@ import { signOut } from "next-auth/react";
 import { UserRole } from "@prisma/client";
 import {
   LayoutDashboard,
+  CalendarDays,
   Building2,
   Users,
   FileText,
@@ -30,6 +31,7 @@ type NavigatieItem = {
 
 export const navigatie: NavigatieItem[] = [
   { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
+  { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/relaties", label: "Relaties", icon: Users },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/offertes", label: "Offertes", icon: FileSignature },
