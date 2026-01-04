@@ -60,7 +60,7 @@ export function EntityActionsMenu({
     <button
       type="button"
       onClick={() => handleOpenChange(!resolvedOpen)}
-      className={buttonVariants("secondary", cn("px-3 py-2 gap-2", triggerClassName))}
+      className={cn(buttonVariants("secondary"), "px-3 py-2 gap-2", triggerClassName)}
       aria-haspopup="menu"
       aria-expanded={resolvedOpen}
     >

@@ -200,9 +200,6 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                             title="Relatie acties"
                             description={client.name}
                             triggerClassName="px-2 py-1 text-xs"
-                            onOpenChange={(open) => {
-                              if (open) return;
-                            }}
                           >
                             <div className="space-y-2 p-2">
                               <Button
