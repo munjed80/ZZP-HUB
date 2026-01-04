@@ -129,7 +129,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
               Beschrijving
             </label>
             <div className="relative">
-              <AlignLeft className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden />
+              <AlignLeft className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
               <textarea
                 id="event-description"
                 value={form.description}
@@ -146,7 +146,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
                 Start
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden />
+                <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
                 <input
                   id="event-start"
                   type="datetime-local"
@@ -162,7 +162,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
                 Eind
               </label>
               <div className="relative">
-                <Clock3 className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden />
+                <Clock3 className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
                 <input
                   id="event-end"
                   type="datetime-local"
@@ -264,7 +264,7 @@ export function AgendaView({ events }: AgendaViewProps) {
             onClick={() => setShowAddModal(true)}
             className={cn(buttonVariants("primary", "inline-flex items-center gap-2"), "hidden md:inline-flex")}
           >
-            <Plus className="h-4 w-4" aria-hidden />
+            <Plus className="h-4 w-4" aria-hidden="true" />
             Nieuwe afspraak
           </button>
         </div>
@@ -373,7 +373,7 @@ export function AgendaView({ events }: AgendaViewProps) {
                           ) : null}
                         </div>
                         <div className="mt-3 flex items-center gap-2 rounded-lg border border-white/40 bg-white/20 px-3 py-2 text-xs font-semibold text-slate-800 backdrop-blur">
-                          <Clock3 className="h-4 w-4 text-indigo-600" aria-hidden />
+                          <Clock3 className="h-4 w-4 text-indigo-600" aria-hidden="true" />
                           {formatTijd(event.start)} - {formatTijd(event.end)}
                         </div>
                       </div>
@@ -435,7 +435,7 @@ export function AgendaView({ events }: AgendaViewProps) {
         className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-300 transition hover:scale-105 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200 md:hidden"
         aria-label="Nieuwe afspraak toevoegen"
       >
-        <Plus className="h-6 w-6" aria-hidden />
+                        <Plus className="h-6 w-6" aria-hidden="true" />
       </button>
 
       <AddEventModal
