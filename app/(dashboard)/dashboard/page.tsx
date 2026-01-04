@@ -1,12 +1,38 @@
-import { AlertTriangle, ArrowDownRight, ArrowUpRight, BarChart3, PiggyBank } from "lucide-react";
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, Euro, PiggyBank } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatBedrag } from "@/lib/utils";
 import { RevenueExpensesChart } from "@/components/dashboard/revenue-expenses-chart";
-import { getDashboardStats } from "@/actions/get-dashboard-stats";
+import { DEFAULT_VAT_RATE, getDashboardStats } from "@/actions/get-dashboard-stats";
 
 export default async function DashboardPagina() {
   const stats = await getDashboardStats();
   const now = new Date();
+  const thisMonthIndex = now.getMonth();
+  const previousMonthIndex = thisMonthIndex === 0 ? 0 : thisMonthIndex - 1;
+  const thisMonth = stats.monthlyChartData[thisMonthIndex] ?? { revenue: 0, expenses: 0 };
+  const previousMonth = stats.monthlyChartData[previousMonthIndex] ?? { revenue: 0, expenses: 0 };
+  const thisMonthProfit = thisMonth.revenue - thisMonth.expenses;
+  const previousMonthProfit = previousMonth.revenue - previousMonth.expenses;
+  const VAT_TREND_RATE = DEFAULT_VAT_RATE;
+  const currentVatBalance = (thisMonth.revenue - thisMonth.expenses) * VAT_TREND_RATE;
+  const previousVatBalance = (previousMonth.revenue - previousMonth.expenses) * VAT_TREND_RATE;
+
+  const buildTrend = (current: number, previous: number, invert = false) => {
+    const change =
+      previous === 0
+        ? current === 0
+          ? 0
+          : 100
+        : ((current - previous) / previous) * 100;
+    const label = `${change >= 0 ? "+" : ""}${Number.isFinite(change) ? change.toFixed(0) : "0"}% vs vorige maand`;
+    const positive = invert ? change <= 0 : change >= 0;
+
+    return {
+      label,
+      variant: change === 0 ? "muted" : positive ? "success" : "destructive",
+    } as const;
+  };
 
   const chartData = stats.monthlyChartData.map((item) => ({
     month: item.name,
@@ -21,6 +47,7 @@ export default async function DashboardPagina() {
       icon: ArrowUpRight,
       color: "text-[#10B981]",
       bg: "bg-emerald-50",
+      trend: buildTrend(thisMonth.revenue, previousMonth.revenue),
     },
     {
       label: "Uitgaven (jaar)",
@@ -28,13 +55,15 @@ export default async function DashboardPagina() {
       icon: ArrowDownRight,
       color: "text-[#4A5568]",
       bg: "bg-slate-100",
+      trend: buildTrend(thisMonth.expenses, previousMonth.expenses, true),
     },
     {
       label: "Winst",
       value: stats.netProfit,
-      icon: BarChart3,
+      icon: Euro,
       color: "text-blue-600",
       bg: "bg-blue-50",
+      trend: buildTrend(thisMonthProfit, previousMonthProfit),
     },
     {
       label: "Te betalen BTW",
@@ -42,6 +71,7 @@ export default async function DashboardPagina() {
       icon: AlertTriangle,
       color: "text-amber-600",
       bg: "bg-amber-50",
+      trend: buildTrend(currentVatBalance, previousVatBalance, true),
     },
   ];
 
@@ -61,20 +91,22 @@ export default async function DashboardPagina() {
 
           return (
             <Card key={item.label} className="bg-white shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle
-                  className={cn(
-                    "text-xs md:text-sm font-medium text-slate-600",
-                    isPrimaryMetric && "text-[13px] uppercase tracking-[0.16em] text-[#4A5568]",
-                  )}
-                >
-                  {item.label}
-                </CardTitle>
-                <span className={`rounded-full p-2 ${item.bg}`}>
-                  <Icon className={`h-4 w-4 ${item.color}`} aria-hidden />
-                </span>
+              <CardHeader className="space-y-1.5 pb-2">
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-full p-2 ${item.bg}`}>
+                    <Icon className={`h-4 w-4 ${item.color}`} aria-hidden />
+                  </span>
+                  <CardTitle
+                    className={cn(
+                      "text-xs md:text-sm font-semibold text-slate-700",
+                      isPrimaryMetric && "text-[13px] uppercase tracking-[0.16em] text-[#0A2E50]",
+                    )}
+                  >
+                    {item.label}
+                  </CardTitle>
+                </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
                 <p
                   className={cn(
                     "text-xl md:text-2xl font-semibold text-slate-900",
@@ -83,6 +115,7 @@ export default async function DashboardPagina() {
                 >
                   {formatBedrag(item.value)}
                 </p>
+                <Badge variant={item.trend.variant}>{item.trend.label}</Badge>
               </CardContent>
             </Card>
           );
@@ -126,7 +159,7 @@ export default async function DashboardPagina() {
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <table className="w-full border-collapse text-xs md:text-sm">
-              <thead>
+              <thead className="bg-slate-50/80">
                 <tr className="text-left text-slate-600">
                   <th className="border-b border-slate-100 px-2 py-2">Nummer</th>
                   <th className="border-b border-slate-100 px-2 py-2">Klant</th>
@@ -165,7 +198,7 @@ export default async function DashboardPagina() {
           </CardHeader>
           <CardContent className="overflow-x-auto">
             <table className="w-full border-collapse text-xs md:text-sm">
-              <thead>
+              <thead className="bg-slate-50/80">
                 <tr className="text-left text-slate-600">
                   <th className="border-b border-slate-100 px-2 py-2">Omschrijving</th>
                   <th className="border-b border-slate-100 px-2 py-2">Categorie</th>
