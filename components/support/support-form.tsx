@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { toast } from "sonner";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, Loader2, Mail, MessageCircle } from "lucide-react";
+import { CheckCircle2, Loader2, Link as LinkIcon, Mail, MessageCircle } from "lucide-react";
 
 type SupportFormProps = {
   context?: string;
@@ -17,6 +18,7 @@ export function SupportForm({ context, minimal, className }: SupportFormProps) {
     email: "",
     subject: "",
     message: "",
+    screenshotUrl: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -45,16 +47,20 @@ export function SupportForm({ context, minimal, className }: SupportFormProps) {
 
       if (!response.ok) {
         setStatus("error");
-        setError(data?.error ?? "Verzenden mislukt.");
+        const message = data?.error ?? "Verzenden mislukt.";
+        setError(message);
+        toast.error(message);
         return;
       }
 
       setStatus("success");
-      setFormState({ name: "", email: "", subject: "", message: "" });
+      setFormState({ name: "", email: "", subject: "", message: "", screenshotUrl: "" });
+      toast.success("Supportverzoek verzonden");
     } catch (err) {
       console.error("Support formulier fout", err);
       setStatus("error");
       setError("Er ging iets mis. Probeer het later opnieuw.");
+      toast.error("Verzenden mislukt. Probeer het opnieuw.");
     }
   }
 
@@ -154,6 +160,25 @@ export function SupportForm({ context, minimal, className }: SupportFormProps) {
           onChange={handleChange("message")}
           className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-inner shadow-slate-100 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
         />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700" htmlFor="screenshotUrl">
+          Screenshot URL (optioneel)
+        </label>
+        <div className="relative">
+          <LinkIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden />
+          <input
+            id="screenshotUrl"
+            name="screenshotUrl"
+            type="url"
+            value={formState.screenshotUrl}
+            onChange={handleChange("screenshotUrl")}
+            placeholder="https://"
+            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pl-9 text-sm text-slate-900 shadow-inner shadow-slate-100 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+          />
+        </div>
+        <p className="text-xs text-slate-500">Voeg een link naar een screenshot toe voor snellere opvolging (optioneel).</p>
       </div>
 
       {error ? <p className="text-sm text-amber-700">{error}</p> : null}

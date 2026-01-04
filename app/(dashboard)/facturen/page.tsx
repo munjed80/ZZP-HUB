@@ -8,19 +8,13 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { formatBedrag } from "@/lib/utils";
 import { InvoiceActionsMenu } from "./_components/invoice-actions-menu";
-import { Prisma, UserRole } from "@prisma/client";
+import { InvoiceEmailStatus, Prisma, UserRole } from "@prisma/client";
 
-function statusVariant(status: string) {
-  if (status === "Betaald") return "success" as const;
-  if (status === "Onbetaald") return "info" as const;
-  if (status === "Concept") return "muted" as const;
-  return "warning" as const;
-}
-
-function invoiceStatus(status: string) {
-  if (status === "BETAALD") return "Betaald";
-  if (status === "CONCEPT") return "Concept";
-  return "Onbetaald";
+function statusInfo(status: InvoiceEmailStatus | string) {
+  if (status === InvoiceEmailStatus.BETAALD) return { label: "Betaald", variant: "success" as const };
+  if (status === InvoiceEmailStatus.CONCEPT) return { label: "Concept", variant: "muted" as const };
+  if (status === InvoiceEmailStatus.HERINNERING) return { label: "Herinnering", variant: "warning" as const };
+  return { label: "Onbetaald", variant: "info" as const };
 }
 
 function invoiceAmount(
@@ -117,17 +111,17 @@ export default async function FacturenPagina() {
                           Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
                         </p>
                       </div>
-                      <Badge variant={statusVariant(invoiceStatus(factuur.emailStatus))}>
-                        {invoiceStatus(factuur.emailStatus)}
-                      </Badge>
-                      <InvoiceActionsMenu
-                        pdfInvoice={pdfInvoice}
-                        invoiceId={factuur.id}
-                        recipientEmail={factuur.client.email}
-                        emailStatus={factuur.emailStatus}
-                        editHref={factuur.emailStatus === "CONCEPT" ? `/facturen/${factuur.id}/edit` : undefined}
-                        shareLink={`/facturen/${factuur.id}`}
-                      />
+                       <Badge variant={statusInfo(factuur.emailStatus).variant}>
+                         {statusInfo(factuur.emailStatus).label}
+                       </Badge>
+                       <InvoiceActionsMenu
+                         pdfInvoice={pdfInvoice}
+                         invoiceId={factuur.id}
+                         recipientEmail={factuur.client.email}
+                         emailStatus={factuur.emailStatus}
+                         editHref={`/facturen/${factuur.id}/edit`}
+                         shareLink={`/facturen/${factuur.id}`}
+                       />
                     </div>
                   </div>
                 ))}
@@ -145,25 +139,25 @@ export default async function FacturenPagina() {
                         <p className="text-sm font-medium text-slate-900">{factuur.invoiceNum}</p>
                         <p className="text-sm text-slate-600 mt-0.5">{factuur.client.name}</p>
                       </div>
-                      <Badge variant={statusVariant(invoiceStatus(factuur.emailStatus))}>
-                        {invoiceStatus(factuur.emailStatus)}
-                      </Badge>
+                       <Badge variant={statusInfo(factuur.emailStatus).variant}>
+                         {statusInfo(factuur.emailStatus).label}
+                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-slate-500">
-                        Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
-                      </p>
-                      <p className="text-base font-semibold tabular-nums text-slate-900">
-                        {formatBedrag(invoiceAmount(factuur.lines))}
-                      </p>
-                    </div>
-                     <div className="flex items-center gap-2 mt-3">
+                     <div className="flex items-center justify-between">
+                       <p className="text-xs text-slate-500">
+                         Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
+                       </p>
+                       <p className="text-base font-semibold tabular-nums text-slate-900">
+                         {formatBedrag(invoiceAmount(factuur.lines))}
+                       </p>
+                     </div>
+                     <div className="mt-3 flex items-center justify-end gap-2">
                        <InvoiceActionsMenu
                          pdfInvoice={pdfInvoice}
                          invoiceId={factuur.id}
                          recipientEmail={factuur.client.email}
                          emailStatus={factuur.emailStatus}
-                         editHref={factuur.emailStatus === "CONCEPT" ? `/facturen/${factuur.id}/edit` : undefined}
+                         editHref={`/facturen/${factuur.id}/edit`}
                          shareLink={`/facturen/${factuur.id}`}
                        />
                      </div>

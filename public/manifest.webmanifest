@@ -1,0 +1,23 @@
+{
+  "name": "ZZP HUB",
+  "short_name": "ZZP HUB",
+  "description": "Premium financieel dashboard voor zzp'ers: facturen, offertes, BTW, uren en planning.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ecf2f4",
+  "theme_color": "#0f4c5c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/window.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

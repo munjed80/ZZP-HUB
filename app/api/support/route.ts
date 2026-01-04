@@ -7,6 +7,7 @@ const supportSchema = z.object({
   email: z.string().email().max(160),
   subject: z.string().min(3).max(160).trim(),
   message: z.string().min(10).max(2000).trim(),
+  screenshotUrl: z.string().url().max(500).optional().or(z.literal("").transform(() => undefined)),
   context: z.string().max(120).optional(),
 });
 
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "E-mailservice is niet geconfigureerd." }, { status: 500 });
   }
 
-  const { name, email, subject, message, context } = parsed.data;
+  const { name, email, subject, message, context, screenshotUrl } = parsed.data;
   const resend = new Resend(process.env.RESEND_API_KEY);
   const fromEmail = process.env.RESEND_FROM_EMAIL ?? "support@zzp-hub.nl";
   const toEmail = process.env.SUPPORT_EMAIL ?? fromEmail;
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
       `Naam: ${name}`,
       `E-mail: ${email}`,
       context ? `Context: ${context}` : null,
+      screenshotUrl ? `Screenshot: ${screenshotUrl}` : null,
       "",
       message,
     ]

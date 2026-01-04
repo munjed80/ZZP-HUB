@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { answerFromGuide, assistantGuide } from "@/lib/assistant/knowledge";
+import { assistantGuide } from "@/lib/assistant/guide";
+import { answerFromKnowledge } from "@/lib/assistant/knowledge";
 
 const scopeMessage =
   "Deze assistent antwoordt uitsluitend vanuit de interne productgids over: product, starten, facturen/offertes, BTW, uren (1225), prijzen/abonnement en support.";
@@ -12,13 +13,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Geen vraag ontvangen." }, { status: 400 });
   }
 
-  const { answer, topic, followUps } = answerFromGuide(rawQuestion);
+  try {
+    const { answer, topic, followUps, source } = await answerFromKnowledge(rawQuestion);
 
-  return NextResponse.json({
-    answer,
-    topic,
-    followUps,
-    guide: assistantGuide,
-    scope: scopeMessage,
-  });
+    return NextResponse.json({
+      answer,
+      topic,
+      followUps,
+      knowledge: source,
+      guide: assistantGuide,
+      scope: scopeMessage,
+    });
+  } catch (error) {
+    console.error("AI assistent kennisbank fout", error);
+    return NextResponse.json({ error: "Assistent niet beschikbaar." }, { status: 500 });
+  }
 }

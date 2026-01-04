@@ -16,11 +16,12 @@ import {
    Clock3,
    Settings,
    LifeBuoy,
-   Sparkles,
+  Sparkles,
   X,
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SidebarBrand } from "@/components/sidebar/sidebar-brand";
 
 type NavigatieItem = {
   href: string;
@@ -45,20 +46,21 @@ export const navigatie: NavigatieItem[] = [
   { href: "/admin/companies", label: "Companies", icon: Building2, superAdminOnly: true },
 ];
 
-export function Sidebar({ userRole, onAssistantClick }: { userRole?: UserRole; onAssistantClick?: () => void }) {
+export function Sidebar({
+  userRole,
+  onAssistantClick,
+  collapsed = false,
+}: { userRole?: UserRole; onAssistantClick?: () => void; collapsed?: boolean }) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-68 shrink-0 border-r border-slate-200 bg-white px-4 py-6 text-slate-800 md:flex md:flex-col">
-      <div className="mb-6 flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-3 shadow-sm">
-        <div className="space-y-0.5">
-          <p className="text-lg font-semibold tracking-tight text-slate-900">ZZP HUB</p>
-          <p className="text-sm text-slate-500">Financiën & abonnement</p>
-        </div>
-        <span className="rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
-          Pro
-        </span>
-      </div>
+    <aside
+      className={cn(
+        "hidden shrink-0 border-r border-slate-200 bg-white px-4 py-6 text-slate-800 md:flex md:flex-col",
+        collapsed ? "w-24" : "w-68",
+      )}
+    >
+      <SidebarBrand collapsed={collapsed} className="mb-6" />
       <nav className="flex-1 space-y-1">
         {navigatie.map((item) => {
           if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
@@ -164,14 +166,11 @@ export function MobileSidebar({
         />
         <div className="absolute left-0 top-0 flex h-full w-80 max-w-[85%] flex-col gap-6 border-r border-slate-200 bg-white px-5 py-6 text-slate-800 shadow-lg animate-in slide-in-from-left duration-300">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xl font-bold tracking-tight text-slate-900">ZZP-HUB</p>
-              <p className="text-sm text-slate-500">Navigatie</p>
-            </div>
+            <SidebarBrand className="flex-1" />
             <button
               type="button"
               onClick={() => onOpenChange?.(false)}
-              className="rounded-lg p-2 text-slate-700 hover:bg-slate-100"
+              className="ml-3 rounded-lg p-2 text-slate-700 hover:bg-slate-100"
               aria-label="Sluit menu"
             >
               <X className="h-5 w-5" aria-hidden />

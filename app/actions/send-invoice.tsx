@@ -66,6 +66,10 @@ export async function sendInvoiceEmail(invoiceId: string) {
     const companyDetails = buildCompanyDetails(invoice.user.companyProfile);
     const senderName = invoice.user.companyProfile?.emailSenderName?.trim() ?? pdfInvoice.companyProfile?.companyName ?? "ZZP HUB";
     const replyToAddress = invoice.user.companyProfile?.emailReplyTo?.trim();
+    const recipientEmail = invoice.client.email?.trim();
+    if (!recipientEmail) {
+      return { success: false, message: "Geen ontvanger ingesteld voor deze factuur." };
+    }
     const trustedLogoUrl = (() => {
       const logoUrl = pdfInvoice.companyProfile?.logoUrl;
       if (!logoUrl) return undefined;
@@ -86,7 +90,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
     const { error } = await resend.emails.send({
       from: `${senderName} <${FROM_EMAIL}>`,
       replyTo: replyToAddress || undefined,
-      to: invoice.client.email,
+      to: recipientEmail,
       subject: `Factuur ${pdfInvoice.invoiceNum} van ${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"}`,
       react: (
         <InvoiceEmail
@@ -117,7 +121,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
       data: { emailStatus: InvoiceEmailStatus.VERZONDEN },
     });
 
-    return { success: true, recipient: invoice.client.email };
+    return { success: true, recipient: recipientEmail };
   } catch (error) {
     console.error("Versturen van factuur e-mail is mislukt", { error, invoiceId });
     return { success: false, message: "Het verzenden van de factuur is mislukt." };

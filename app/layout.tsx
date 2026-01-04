@@ -1,23 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SonnerToaster } from "@/components/providers/sonner-provider";
 import { CookieBanner } from "@/components/ui/cookie-banner";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  preload: false,
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  preload: false,
-});
+import { ServiceWorkerRegister } from "@/components/providers/service-worker-register";
 
 export const metadata: Metadata = {
   title: "Elite Business Hub | Slimmer Ondernemen voor ZZP'ers",
+  applicationName: "ZZP HUB",
   description:
     "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
   icons: {
@@ -41,7 +30,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   themeColor: "#0A2E50",
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({
@@ -57,11 +46,12 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/favicon.svg" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background-secondary)] text-[var(--foreground)]`}
+        className="antialiased bg-[var(--background-secondary)] text-[var(--foreground)]"
       >
         {children}
         <SonnerToaster />
         <CookieBanner />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
