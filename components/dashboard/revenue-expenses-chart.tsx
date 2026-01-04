@@ -50,11 +50,11 @@ export function RevenueExpensesChart({ data }: { data: ChartPoint[] }) {
           />
           <Tooltip
             formatter={(value) => formatBedrag(Number(value))}
-            labelStyle={{ color: "#0f2f3a", fontWeight: 600 }}
+            labelStyle={{ color: "var(--foreground)", fontWeight: 600 }}
             contentStyle={{
               borderRadius: 12,
-              border: "1px solid #d6e1e7",
-              boxShadow: "0 16px 50px -30px rgba(15, 47, 58, 0.35)",
+              border: "1px solid var(--border)",
+              boxShadow: "0 16px 50px -30px var(--shadow-muted, rgba(15, 47, 58, 0.35))",
               background: "#ffffff",
             }}
           />
