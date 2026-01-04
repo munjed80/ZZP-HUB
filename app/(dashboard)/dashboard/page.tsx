@@ -9,11 +9,12 @@ export default async function DashboardPagina() {
   const stats = await getDashboardStats();
   const now = new Date();
   const thisMonthIndex = Math.max(0, now.getMonth());
-  const previousMonthIndex = Math.max(0, thisMonthIndex - 1);
+  const previousMonthIndex = thisMonthIndex === 0 ? 11 : thisMonthIndex - 1;
   const thisMonth = stats.monthlyChartData[thisMonthIndex] ?? { revenue: 0, expenses: 0 };
   const previousMonth = stats.monthlyChartData[previousMonthIndex] ?? { revenue: 0, expenses: 0 };
   const thisMonthProfit = thisMonth.revenue - thisMonth.expenses;
   const previousMonthProfit = previousMonth.revenue - previousMonth.expenses;
+  const VAT_TREND_RATE = 0.21;
 
   const buildTrend = (current: number, previous: number, invert = false) => {
     const change =
@@ -69,8 +70,8 @@ export default async function DashboardPagina() {
       color: "text-amber-600",
       bg: "bg-amber-50",
       trend: buildTrend(
-        thisMonth.revenue * 0.21 - thisMonth.expenses * 0.21,
-        previousMonth.revenue * 0.21 - previousMonth.expenses * 0.21,
+        thisMonth.revenue * VAT_TREND_RATE - thisMonth.expenses * VAT_TREND_RATE,
+        previousMonth.revenue * VAT_TREND_RATE - previousMonth.expenses * VAT_TREND_RATE,
         true,
       ),
     },
