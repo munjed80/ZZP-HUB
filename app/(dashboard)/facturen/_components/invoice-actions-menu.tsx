@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { InvoiceEmailStatus } from "@prisma/client";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Popover } from "@/components/ui/popover";
+import { Sheet } from "@/components/ui/sheet";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
 import { SendInvoiceEmailButton } from "../[id]/send-invoice-email-button";
 import { deleteInvoice, markAsPaid, markAsUnpaid } from "@/app/actions/invoice-actions";
@@ -38,6 +40,29 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile viewport with debouncing
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    const debouncedCheckMobile = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 100);
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", debouncedCheckMobile);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", debouncedCheckMobile);
+    };
+  }, []);
 
   const handleMarkAsPaid = () => {
     startTransition(async () => {
@@ -122,106 +147,143 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
     }
   };
 
-  return (
-    <details className="relative inline-block" open={isOpen} onToggle={(e) => setIsOpen(e.currentTarget.open)}>
-      <summary
-        className={buttonVariants("secondary", "cursor-pointer list-none px-3 py-2")}
-        role="button"
-        aria-label="Open deelopties"
-        style={{ listStyle: "none" }}
-      >
-        <MoreVertical className="h-4 w-4" aria-hidden />
-        Acties
-      </summary>
-      <div className="absolute right-0 z-10 mt-2 w-72 rounded-xl border border-[var(--border)] bg-white shadow-xl shadow-slate-200/70 backdrop-blur">
-        <div className="flex flex-col gap-2 p-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Document</p>
-          <InvoicePdfDownloadButton
-            invoice={pdfInvoice}
-            label="Download PDF"
-            className="w-full justify-start"
-            variant="secondary"
-            icon={<FileDown className="h-4 w-4" aria-hidden />}
-          />
-          <SendInvoiceEmailButton
-            invoiceId={invoiceId}
-            recipientEmail={recipientEmail}
-            className="w-full justify-start"
-            variant="secondary"
-            label="Verstuur via e-mail"
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleShareEmail}
-            className="w-full justify-start gap-2"
-          >
-            <Mail className="h-4 w-4" aria-hidden />
-            Deel via e-mail
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleShareWhatsApp}
-            className="w-full justify-start gap-2"
-          >
-            <MessageCircle className="h-4 w-4" aria-hidden />
-            Deel via WhatsApp
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleCopyLink}
-            className="w-full justify-start gap-2"
-          >
-            <Copy className="h-4 w-4" aria-hidden />
-            Kopieer link
-          </Button>
-        </div>
-        <div className="border-t border-[var(--border)] p-3 space-y-2">
-          <div className="flex flex-wrap gap-2">
-            {editHref ? (
-              <Link href={editHref} className={buttonVariants("ghost", "w-full justify-start gap-2")}>
-                <Edit3 className="h-4 w-4" aria-hidden />
-                Bewerk factuur
-              </Link>
-            ) : null}
-            <Button
-              type="button"
-              onClick={handleDelete}
-              disabled={isPending}
-              className="w-full justify-start gap-2"
-              variant="ghost"
-            >
-              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-              {isPending ? "Verwijderen..." : "Verwijder"}
-            </Button>
-          </div>
-          {emailStatus === InvoiceEmailStatus.BETAALD ? (
-            <Button
-              type="button"
-              onClick={handleMarkAsUnpaid}
-              disabled={isPending}
-              className="w-full justify-center gap-2"
-              variant="secondary"
-            >
-              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Undo2 className="h-4 w-4" />}
-              {isPending ? "Bezig..." : "Markeer als onbetaald"}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              onClick={handleMarkAsPaid}
-              disabled={isPending}
-              className="w-full justify-center gap-2"
-              variant="primary"
-            >
-              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-              {isPending ? "Markeren..." : "Markeer als betaald"}
-            </Button>
-          )}
-        </div>
+  const menuContent = (
+    <div className="flex flex-col">
+      <div className="flex flex-col gap-2 p-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Document</p>
+        <InvoicePdfDownloadButton
+          invoice={pdfInvoice}
+          label="Download PDF"
+          className="w-full justify-start"
+          variant="secondary"
+          icon={<FileDown className="h-4 w-4" aria-hidden />}
+        />
+        <SendInvoiceEmailButton
+          invoiceId={invoiceId}
+          recipientEmail={recipientEmail}
+          className="w-full justify-start"
+          variant="secondary"
+          label="Verstuur via e-mail"
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleShareEmail}
+          className="w-full justify-start gap-2"
+        >
+          <Mail className="h-4 w-4" aria-hidden />
+          Deel via e-mail
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleShareWhatsApp}
+          className="w-full justify-start gap-2"
+        >
+          <MessageCircle className="h-4 w-4" aria-hidden />
+          Deel via WhatsApp
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleCopyLink}
+          className="w-full justify-start gap-2"
+        >
+          <Copy className="h-4 w-4" aria-hidden />
+          Kopieer link
+        </Button>
       </div>
-    </details>
+      <div className="border-t border-[var(--border)] p-3 space-y-2">
+        <div className="flex flex-wrap gap-2">
+          {editHref ? (
+            <Link href={editHref} className={buttonVariants("ghost", "w-full justify-start gap-2")}>
+              <Edit3 className="h-4 w-4" aria-hidden />
+              Bewerk factuur
+            </Link>
+          ) : null}
+          <Button
+            type="button"
+            onClick={handleDelete}
+            disabled={isPending}
+            className="w-full justify-start gap-2"
+            variant="ghost"
+          >
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            {isPending ? "Verwijderen..." : "Verwijder"}
+          </Button>
+        </div>
+        {emailStatus === InvoiceEmailStatus.BETAALD ? (
+          <Button
+            type="button"
+            onClick={handleMarkAsUnpaid}
+            disabled={isPending}
+            className="w-full justify-center gap-2"
+            variant="secondary"
+          >
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Undo2 className="h-4 w-4" />}
+            {isPending ? "Bezig..." : "Markeer als onbetaald"}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            onClick={handleMarkAsPaid}
+            disabled={isPending}
+            className="w-full justify-center gap-2"
+            variant="primary"
+          >
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+            {isPending ? "Markeren..." : "Markeer als betaald"}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
+  const trigger = (
+    <span className={buttonVariants("secondary", "px-3 py-2 gap-2")}>
+      <MoreVertical className="h-4 w-4" aria-hidden />
+      Acties
+    </span>
+  );
+
+  // Mobile: use Sheet (bottom drawer)
+  if (isMobile) {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className={buttonVariants("secondary", "px-3 py-2 gap-2")}
+          aria-label="Open acties"
+        >
+          <MoreVertical className="h-4 w-4" aria-hidden />
+          Acties
+        </button>
+        <Sheet
+          open={isOpen}
+          onOpenChange={setIsOpen}
+          title="Factuur acties"
+          description={`Factuur ${pdfInvoice.invoiceNum}`}
+        >
+          {menuContent}
+        </Sheet>
+      </>
+    );
+  }
+
+  // Desktop/Tablet: use Popover with collision detection
+  return (
+    <Popover
+      trigger={trigger}
+      align="end"
+      side="bottom"
+      collisionPadding={16}
+      open={isOpen}
+      onOpenChange={setIsOpen}
+    >
+      <div className="w-72">
+        {menuContent}
+      </div>
+    </Popover>
   );
 }
