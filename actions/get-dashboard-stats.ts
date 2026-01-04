@@ -29,9 +29,7 @@ export async function getDashboardStats() {
   const scope = role === UserRole.SUPERADMIN ? {} : { userId };
   const finalizedInvoiceFilter = {
     ...scope,
-    // Prisma filter requires a mutable array; cast is used to bypass readonly tuple inference.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    emailStatus: { in: [InvoiceEmailStatus.VERZONDEN, InvoiceEmailStatus.BETAALD] as any },
+    emailStatus: InvoiceEmailStatus.BETAALD,
   };
 
   const monthlyChartData = createMonthlyChartData();

@@ -3,50 +3,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
-import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
 import { mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { formatBedrag } from "@/lib/utils";
-import { SendInvoiceEmailButton } from "./[id]/send-invoice-email-button";
+import { InvoiceActionsMenu } from "./_components/invoice-actions-menu";
 import { Prisma, UserRole } from "@prisma/client";
-
-function InvoiceActionsMenu({
-  pdfInvoice,
-  invoiceId,
-  recipientEmail,
-}: {
-  pdfInvoice: ReturnType<typeof mapInvoiceToPdfData>;
-  invoiceId: string;
-  recipientEmail: string;
-}) {
-  return (
-    <details className="relative inline-block">
-      <summary
-        className={buttonVariants("secondary", "cursor-pointer list-none px-3 py-2")}
-        role="button"
-        aria-label="Acties"
-        style={{ listStyle: "none" }}
-      >
-        Acties
-      </summary>
-      <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg border border-slate-200 bg-white shadow-lg">
-        <div className="flex flex-col gap-2 p-2">
-          <InvoicePdfDownloadButton
-            invoice={pdfInvoice}
-            label="Download PDF"
-            className="w-full justify-center bg-slate-900 text-white hover:bg-slate-800"
-          />
-          <SendInvoiceEmailButton
-            invoiceId={invoiceId}
-            recipientEmail={recipientEmail}
-            className="w-full justify-center"
-          />
-        </div>
-      </div>
-    </details>
-  );
-}
 
 function statusVariant(status: string) {
   if (status === "Betaald" || status === "Geaccepteerd") return "success" as const;
@@ -165,6 +127,7 @@ export default async function FacturenPagina() {
                         pdfInvoice={pdfInvoice}
                         invoiceId={factuur.id}
                         recipientEmail={factuur.client.email}
+                        emailStatus={factuur.emailStatus}
                       />
                     </div>
                   </div>
@@ -205,6 +168,7 @@ export default async function FacturenPagina() {
                         pdfInvoice={pdfInvoice}
                         invoiceId={factuur.id}
                         recipientEmail={factuur.client.email}
+                        emailStatus={factuur.emailStatus}
                       />
                     </div>
                   </div>
