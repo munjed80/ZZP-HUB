@@ -18,6 +18,7 @@ import { toast } from "sonner";
 type UitgavenClientProps = {
   expenses: ExpenseClientShape[];
   errorMessage?: string;
+  forceOpen?: boolean;
 };
 
 const vatPercentages: Record<BtwTarief, number> = {
@@ -73,9 +74,9 @@ function getLargestCategory(categoryTotals: Record<string, number>) {
   return Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Nog niets";
 }
 
-export function UitgavenClient({ expenses, errorMessage }: UitgavenClientProps) {
+export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenClientProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(Boolean(forceOpen));
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);

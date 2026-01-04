@@ -16,7 +16,7 @@ const navItems = [
 const fabActions = [
   { href: "/facturen/nieuw", label: "Nieuwe Factuur", icon: FileText },
   { href: "/offertes/nieuw", label: "Nieuwe Offerte", icon: Send },
-  { href: "/uitgaven", label: "Nieuwe Uitgave", icon: Receipt },
+  { href: "/uitgaven?action=new", label: "Nieuwe Uitgave", icon: Receipt },
   { href: "/relaties?action=new", label: "Nieuwe Relatie", icon: Users },
 ];
 

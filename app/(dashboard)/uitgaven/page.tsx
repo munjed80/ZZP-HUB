@@ -2,7 +2,11 @@ import { getExpenses } from "./actions";
 import { UitgavenClient } from "./uitgaven-client";
 import type { ExpenseClientShape } from "./schema";
 
-export default async function UitgavenPagina() {
+type UitgavenPaginaProps = {
+  searchParams?: Record<string, string | string[] | undefined>;
+};
+
+export default async function UitgavenPagina({ searchParams }: UitgavenPaginaProps) {
   let expenses: ExpenseClientShape[] = [];
   let errorMessage: string | undefined;
 
@@ -12,5 +16,7 @@ export default async function UitgavenPagina() {
     errorMessage = error instanceof Error ? error.message : "Uitgaven konden niet worden geladen.";
   }
 
-  return <UitgavenClient expenses={expenses} errorMessage={errorMessage} />;
+  const forceOpen = searchParams?.action === "new";
+
+  return <UitgavenClient expenses={expenses} errorMessage={errorMessage} forceOpen={forceOpen} />;
 }
