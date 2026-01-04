@@ -3,14 +3,21 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Receipt, Settings, Plus, FileText, Users } from "lucide-react";
+import { LayoutDashboard, Receipt, Plus, FileText, Users, Send, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/facturen", label: "Facturen", icon: Receipt },
+  { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
   { href: "/relaties", label: "Relaties", icon: Users },
-  { href: "/instellingen", label: "Instellingen", icon: Settings },
+];
+
+const fabActions = [
+  { href: "/facturen/nieuw", label: "Nieuwe Factuur", icon: FileText },
+  { href: "/offertes/nieuw", label: "Nieuwe Offerte", icon: Send },
+  { href: "/uitgaven?action=new", label: "Nieuwe Uitgave", icon: Receipt },
+  { href: "/relaties?action=new", label: "Nieuwe Relatie", icon: Users },
 ];
 
 export function MobileNav() {
@@ -70,24 +77,24 @@ export function MobileNav() {
           
           {/* FAB Menu */}
           {fabMenuOpen && (
-            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 min-w-[180px] rounded-xl border border-slate-200/70 bg-white shadow-xl transition-all duration-200 ease-out opacity-100 scale-100">
-              <div className="py-2">
-                <Link
-                  href="/facturen/nieuw"
-                  onClick={() => setFabMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                >
-                  <FileText className="h-5 w-5" aria-hidden />
-                  Nieuwe Factuur
-                </Link>
-                <Link
-                  href="/relaties?action=new"
-                  onClick={() => setFabMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                >
-                  <Users className="h-5 w-5" aria-hidden />
-                  Nieuwe Relatie
-                </Link>
+            <div className="absolute bottom-20 left-1/2 min-w-[220px] -translate-x-1/2 rounded-xl border border-slate-200/80 bg-white/95 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.4)] ring-1 ring-white/60 backdrop-blur transition-all duration-200 ease-out">
+              <div className="flex flex-col divide-y divide-slate-100/80 py-1.5">
+                {fabActions.map((action) => {
+                  const Icon = action.icon;
+                  return (
+                    <Link
+                      key={action.label}
+                      href={action.href}
+                      onClick={() => setFabMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3.5 text-sm font-semibold text-slate-800 transition-all duration-200 hover:bg-gradient-to-r hover:from-indigo-50 hover:via-white hover:to-indigo-50 hover:text-indigo-700 active:scale-[0.99]"
+                    >
+                      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700 ring-1 ring-slate-200/80 shadow-inner shadow-white/30">
+                        <Icon className="h-5 w-5" aria-hidden />
+                      </span>
+                      <span className="flex-1">{action.label}</span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}
