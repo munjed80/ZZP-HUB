@@ -91,8 +91,8 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
+    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-slate-900/40 px-4 py-6">
+      <div className="w-full max-w-lg rounded-lg bg-white shadow-lg border border-slate-200">
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">Nieuwe afspraak</p>
@@ -344,7 +344,7 @@ export function AgendaView({ events }: AgendaViewProps) {
                 })}
               </div>
 
-              <div className="md:hidden" aria-label="Afspraken lijstweergave">
+                  <div className="md:hidden" aria-label="Afspraken lijstweergave">
                 <div className="mb-2 flex items-center justify-between">
                   <p className="text-sm font-semibold text-slate-800">Verticale tijdlijn</p>
                   <Badge variant="primary">Mobiel</Badge>
@@ -352,15 +352,15 @@ export function AgendaView({ events }: AgendaViewProps) {
                 {upcomingEvents.length === 0 ? (
                   <p className="text-sm text-slate-600">Nog geen afspraken gepland.</p>
                 ) : (
-                  <div className="relative space-y-4 pl-5 before:absolute before:left-[6px] before:top-0 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-teal-600/70 before:via-teal-200/40 before:to-transparent">
+                  <div className="relative space-y-4 pl-5 before:absolute before:left-[6px] before:top-0 before:h-full before:w-[2px] before:bg-teal-200">
                     {upcomingEvents.map((event) => (
                       <div
                         key={event.id}
-                        className="relative overflow-hidden rounded-2xl border border-white/50 bg-white/30 p-4 backdrop-blur-xl shadow-lg shadow-[0_16px_44px_-28px_rgba(13,148,136,0.30)] ring-1 ring-white/60"
+                        className="relative overflow-hidden rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
                       >
                         <span
                           aria-hidden="true"
-                          className="absolute -left-[14px] top-4 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white/70 bg-teal-600 shadow-sm shadow-[0_10px_26px_-18px_rgba(13,148,136,0.40)]"
+                          className="absolute -left-[14px] top-4 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white bg-teal-600 shadow-sm"
                         />
                         <div className="space-y-1">
                           <p className="text-xs uppercase tracking-wide text-slate-500">
@@ -375,8 +375,8 @@ export function AgendaView({ events }: AgendaViewProps) {
                             <p className="text-xs text-slate-700">{event.description}</p>
                           ) : null}
                         </div>
-                        <div className="mt-3 flex items-center gap-2 rounded-lg border border-white/40 bg-white/20 px-3 py-2 text-xs font-semibold text-slate-800 backdrop-blur">
-                          <Clock3 className="h-4 w-4 text-[#4A5568]" aria-hidden="true" />
+                        <div className="mt-3 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800">
+                          <Clock3 className="h-4 w-4 text-slate-600" aria-hidden="true" />
                           {formatTijd(event.start)} - {formatTijd(event.end)}
                         </div>
                       </div>
@@ -435,7 +435,7 @@ export function AgendaView({ events }: AgendaViewProps) {
       <button
         type="button"
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-[0_18px_42px_-22px_rgba(13,148,136,0.30)] transition hover:scale-105 hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-200 md:hidden"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-white border border-teal-700 shadow-lg transition hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-200 md:hidden"
         aria-label="Nieuwe afspraak toevoegen"
       >
         <Plus className="h-6 w-6" aria-hidden="true" />
