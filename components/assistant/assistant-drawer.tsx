@@ -4,7 +4,7 @@ import { useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Loader2, MessageCircle, ShieldCheck, Sparkles, X } from "lucide-react";
-import { assistantGuide } from "@/lib/assistant/knowledge";
+import { assistantGuide } from "@/lib/assistant/guide";
 
 const exampleQuestions = [
   "Wat doet ZZP HUB voor mijn facturen?",

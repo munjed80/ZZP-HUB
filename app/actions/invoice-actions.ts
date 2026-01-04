@@ -91,7 +91,7 @@ export async function markAsUnpaid(invoiceId: string) {
 
     await prisma.invoice.update({
       where: { id: invoice.id },
-      data: { emailStatus: InvoiceEmailStatus.CONCEPT },
+      data: { emailStatus: InvoiceEmailStatus.VERZONDEN },
     });
 
     revalidatePath("/facturen");

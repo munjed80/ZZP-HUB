@@ -26,9 +26,10 @@ type Props = {
   quotationId: string;
   recipientEmail: string;
   shareLink: string;
+  className?: string;
 };
 
-export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail, shareLink }: Props) {
+export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail, shareLink, className }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
@@ -97,6 +98,7 @@ export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail
       onOpenChange={setIsOpen}
       title="Offerte acties"
       description={`Offerte ${pdfQuotation.invoiceNum}`}
+      triggerClassName={className}
     >
       <div className="flex flex-col gap-2 p-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Document</p>

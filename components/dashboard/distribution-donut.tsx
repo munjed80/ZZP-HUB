@@ -1,6 +1,7 @@
 "use client";
 
 import { Pie, PieChart, ResponsiveContainer, Tooltip, Cell } from "recharts";
+import type { Formatter, NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 import { formatBedrag } from "@/lib/utils";
 
 type Props = {
@@ -38,34 +39,38 @@ export function DistributionDonut({ revenue, expenses, profit }: Props) {
     );
   }
 
+  const tooltipFormatter: Formatter<ValueType, NameType> = (value, name): [string, string] => {
+    const toFiniteNumber = (input: ValueType | undefined) => {
+      if (input === undefined) return undefined;
+      if (Array.isArray(input)) return undefined;
+      if (typeof input === "number" && Number.isFinite(input)) {
+        return input;
+      }
+      if (typeof input === "string") {
+        const parsed = Number(input);
+        if (Number.isFinite(parsed)) {
+          return parsed;
+        }
+      }
+      return undefined;
+    };
+
+    const numericValue = toFiniteNumber(value);
+    const safeName = typeof name === "string" ? name : "Onbekend";
+
+    if (numericValue === undefined) {
+      return ["-", safeName];
+    }
+
+    return [`${formatBedrag(numericValue)} (${((numericValue / total) * 100).toFixed(0)}%)`, safeName];
+  };
+
   return (
     <div className="w-full">
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>
           <Tooltip
-            formatter={(value: number | string | undefined, name: string | undefined): [string, string] => {
-              const toFiniteNumber = (input: number | string | undefined) => {
-                if (typeof input === "number" && Number.isFinite(input)) {
-                  return input;
-                }
-                if (typeof input === "string") {
-                  const parsed = Number(input);
-                  if (Number.isFinite(parsed)) {
-                    return parsed;
-                  }
-                }
-                return undefined;
-              };
-
-              const numericValue = toFiniteNumber(value);
-              const safeName = name ?? "Onbekend";
-
-              if (numericValue === undefined) {
-                return ["-", safeName];
-              }
-
-              return [`${formatBedrag(numericValue)} (${((numericValue / total) * 100).toFixed(0)}%)`, safeName];
-            }}
+            formatter={tooltipFormatter}
             contentStyle={{
               borderRadius: 12,
               border: "1px solid var(--border)",

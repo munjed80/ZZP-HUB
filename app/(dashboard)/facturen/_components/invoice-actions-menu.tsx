@@ -38,6 +38,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
+  const isPaid = emailStatus === InvoiceEmailStatus.BETAALD;
 
   const handleMarkAsPaid = () => {
     startTransition(async () => {
@@ -87,9 +88,13 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
   const handleShareWhatsApp = () => {
     const totals = calculateInvoiceTotals(pdfInvoice.lines);
     const companyName = pdfInvoice.companyProfile?.companyName ?? "ZZP HUB";
+    const link =
+      shareLink && shareLink.startsWith("http")
+        ? shareLink
+        : `${window.location.origin}${shareLink ?? `/facturen/${invoiceId}`}`;
     const message = `Factuur ${pdfInvoice.invoiceNum} van ${companyName}. Totaal: ${formatBedrag(
       totals.total,
-    )}. Verstuurd via ZZP HUB.`;
+    )}. Bekijk: ${link}`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
@@ -220,6 +225,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
       onOpenChange={setIsOpen}
       title="Factuur acties"
       description={`Factuur ${pdfInvoice.invoiceNum}`}
+      triggerClassName="h-10 px-3 shadow-sm"
     >
       {menuContent}
     </EntityActionsMenu>
