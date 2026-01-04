@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f9fa;
+  --background: #ffffff;
+  --background-secondary: #f8fafc;
   --foreground: #0f172a;
   --primary: #0d9488;
   --primary-accent: #64748b;
   --accent-emerald: #10b981;
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
 }
 
 @theme inline {
@@ -19,10 +22,7 @@
 }
 
 body {
-  background:
-    radial-gradient(circle at 25% 20%, rgba(13, 148, 136, 0.06), transparent 36%),
-    radial-gradient(circle at 80% 0%, rgba(100, 116, 139, 0.06), transparent 32%),
-    var(--background);
+  background: var(--background-secondary);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
@@ -34,6 +34,7 @@ select {
   font: inherit;
 }
 
+/* Landing page specific animations - not used in dashboard */
 @keyframes shimmer {
   0% {
     background-position: 0% 50%;

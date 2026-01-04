@@ -24,11 +24,11 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 px-6 py-10 text-center shadow-[0_14px_50px_-30px_rgba(15,23,42,0.45)] backdrop-blur-sm",
+        "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center",
         className,
       )}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-900/5 text-slate-900 ring-1 ring-slate-200">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-600 border border-slate-200">
         {icon ?? <FileQuestion className="h-5 w-5" aria-hidden />}
       </div>
       <div className="space-y-1">

@@ -16,13 +16,13 @@ export function UserAvatarMenu({ userName, userInitials }: UserAvatarMenuProps) 
   return (
     <DropdownMenu
       trigger={
-        <div className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-800 text-xs md:text-sm font-semibold text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+        <div className="flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-teal-600 text-xs md:text-sm font-semibold text-white border border-teal-700 shadow-sm hover:bg-teal-700 transition-colors cursor-pointer">
           {userInitials}
         </div>
       }
       align="right"
     >
-      <div className="px-4 py-3 border-b border-slate-200/70">
+      <div className="px-4 py-3 border-b border-slate-200">
         <p className="text-sm font-semibold text-slate-900">{userName}</p>
         <p className="text-xs text-slate-500">Beheer je account</p>
       </div>

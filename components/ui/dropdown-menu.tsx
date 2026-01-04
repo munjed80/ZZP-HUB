@@ -36,7 +36,7 @@ export function DropdownMenu({ trigger, children, align = "right" }: DropdownMen
       {open && (
         <div
           className={cn(
-            "absolute top-full mt-2 z-50 min-w-[200px] rounded-lg border border-slate-200/70 bg-white shadow-lg transition-all duration-200 ease-out opacity-100 scale-100",
+            "absolute top-full mt-2 z-50 min-w-[200px] rounded-lg border border-slate-200 bg-white shadow-md",
             align === "right" ? "right-0" : "left-0"
           )}
         >
@@ -78,5 +78,5 @@ type DropdownMenuSeparatorProps = {
 };
 
 export function DropdownMenuSeparator({ className }: DropdownMenuSeparatorProps) {
-  return <div className={cn("my-1 h-px bg-slate-200/70", className)} />;
+  return <div className={cn("my-1 h-px bg-slate-200", className)} />;
 }
