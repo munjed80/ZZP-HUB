@@ -194,7 +194,7 @@ export async function updateQuotationStatus(quotationId: string, status: "OPEN" 
   revalidatePath(`/offertes/${quotationId}`);
 }
 
-export async function convertToInvoice(quotationId: string) {
+export async function convertOfferteToInvoice(offerteId: string) {
   "use server";
 
   const userId = await getCurrentUserId();
@@ -203,7 +203,7 @@ export async function convertToInvoice(quotationId: string) {
   }
 
   const quotation = await prisma.quotation.findFirst({
-    where: { id: quotationId, userId },
+    where: { id: offerteId, userId },
     include: { lines: true, client: true, user: { include: { companyProfile: true } } },
   });
 
@@ -237,18 +237,25 @@ export async function convertToInvoice(quotationId: string) {
 
     await tx.quotation.update({
       where: { id: quotation.id },
-      data: { status: QuotationStatus.GEACCEPTEERD },
+      data: { status: QuotationStatus.OMGEZET },
     });
 
     return createdInvoice;
   });
 
   revalidatePath("/offertes");
-  revalidatePath(`/offertes/${quotationId}`);
+  revalidatePath(`/offertes/${offerteId}`);
   revalidatePath("/facturen");
   revalidatePath(`/facturen/${invoice.id}`);
 
   return { success: true, invoiceId: invoice.id };
+}
+
+export async function convertToInvoice(quotationId: string) {
+  /**
+   * @deprecated Gebruik convertOfferteToInvoice voor nieuwe aanroepen.
+   */
+  return convertOfferteToInvoice(quotationId);
 }
 
 export async function sendQuotationEmail(quotationId: string) {

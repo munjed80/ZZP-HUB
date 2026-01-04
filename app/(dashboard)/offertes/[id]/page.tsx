@@ -91,6 +91,8 @@ export default async function OfferteDetailPagina({ params }: PageProps) {
   const statusLabel =
     statusValue === "GEACCEPTEERD"
       ? "Geaccepteerd"
+      : statusValue === "OMGEZET"
+        ? "Omgezet"
       : statusValue === "AFGEWEZEN"
         ? "Geweigerd"
     : statusValue === "VERZONDEN"
@@ -99,6 +101,8 @@ export default async function OfferteDetailPagina({ params }: PageProps) {
   const statusVariant =
     statusValue === "GEACCEPTEERD"
       ? "success"
+      : statusValue === "OMGEZET"
+        ? "success"
       : statusValue === "AFGEWEZEN"
         ? "destructive"
         : statusValue === "VERZONDEN"

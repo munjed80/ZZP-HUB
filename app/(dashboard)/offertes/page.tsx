@@ -6,9 +6,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { getQuotations } from "./actions";
+import { ConvertQuotationButton } from "./[id]/convert-quotation-button";
 
 function statusVariant(status: string) {
-  if (status === "GEACCEPTEERD") return "success" as const;
+  if (status === "GEACCEPTEERD" || status === "OMGEZET") return "success" as const;
   if (status === "AFGEWEZEN") return "destructive" as const;
   if (status === "VERZONDEN" || status === "OPEN") return "info" as const;
   return "muted" as const;
@@ -16,6 +17,7 @@ function statusVariant(status: string) {
 
 function statusLabel(status: string) {
   if (status === "GEACCEPTEERD") return "Geaccepteerd";
+  if (status === "OMGEZET") return "Omgezet";
   if (status === "AFGEWEZEN") return "Geweigerd";
   if (status === "VERZONDEN") return "Open";
   return "Concept";
@@ -71,6 +73,7 @@ export default async function OffertesPagina() {
                       offerte.lines.reduce((sum, line) => sum + Number(line.amount ?? 0), 0),
                     )}
                   </p>
+                  <ConvertQuotationButton quotationId={offerte.id} />
                   <Link
                     href={`/offertes/${offerte.id}`}
                     className={buttonVariants("secondary", "px-3 py-1 text-xs")}

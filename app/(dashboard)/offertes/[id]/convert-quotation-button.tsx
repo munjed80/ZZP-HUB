@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { FilePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { convertToInvoice } from "../actions";
+import { convertOfferteToInvoice } from "../actions";
 
 type Props = {
   quotationId: string;
@@ -17,7 +17,7 @@ export function ConvertQuotationButton({ quotationId }: Props) {
 
   const handleConvert = () => {
     startTransition(async () => {
-      const result = await convertToInvoice(quotationId);
+      const result = await convertOfferteToInvoice(quotationId);
       if (result?.success && result.invoiceId) {
         toast.success("Offerte succesvol omgezet naar factuur!");
         router.push(`/facturen/${result.invoiceId}`);

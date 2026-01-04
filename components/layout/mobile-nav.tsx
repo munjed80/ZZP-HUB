@@ -6,17 +6,18 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Receipt, Plus, FileText, Users, Send, Wallet, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Order aligned with mobile navigation requirement: Dashboard, Facturen, Agenda, Uitgaven.
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/facturen", label: "Facturen", icon: Receipt },
+  { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
-  { href: "/relaties", label: "Relaties", icon: Users },
 ];
 
 const fabActions = [
   { href: "/facturen/nieuw", label: "Nieuwe Factuur", icon: FileText },
   { href: "/offertes/nieuw", label: "Nieuwe Offerte", icon: Send },
+  { href: "/agenda?add=1", label: "Nieuwe Afspraak", icon: CalendarDays },
   { href: "/uitgaven?action=new", label: "Nieuwe Uitgave", icon: Receipt },
   { href: "/relaties?action=new", label: "Nieuwe Relatie", icon: Users },
 ];
