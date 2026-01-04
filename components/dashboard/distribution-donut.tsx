@@ -28,7 +28,15 @@ export function DistributionDonut({ revenue, expenses, profit }: Props) {
     { name: profitLabel, value: safeProfit, color: profit >= 0 ? COLORS.profit : COLORS.loss },
   ];
 
-  const total = data.reduce((sum, item) => sum + item.value, 0) || 1;
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+
+  if (total === 0) {
+    return (
+      <div className="rounded-xl border border-[var(--border)] bg-white/70 px-4 py-8 text-center text-sm text-[var(--muted)]">
+        Nog geen gegevens voor omzet, kosten of winst.
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
