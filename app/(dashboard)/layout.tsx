@@ -27,7 +27,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[var(--background-secondary)]">
       <div className="flex min-h-screen">
         <Sidebar userRole={sessie.user.role} />
         <div className="flex flex-1 flex-col">

@@ -50,7 +50,7 @@ export function AssistantDrawer() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-40 flex flex-col items-start gap-3 md:bottom-6 md:left-6">
+    <div className="fixed bottom-4 left-4 z-40 flex flex-col items-start gap-3 md:bottom-6 md:left-6 lg:bottom-8 lg:left-8">
       {open ? (
         <div className="w-[20rem] max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-xl shadow-teal-200/50 backdrop-blur">
           <div className="flex items-start justify-between gap-3">

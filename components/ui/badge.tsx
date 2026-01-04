@@ -8,12 +8,12 @@ type BadgeProps = {
 
 export function Badge({ children, variant = "info", className, ...props }: BadgeProps) {
   const styles: Record<NonNullable<BadgeProps["variant"]>, string> = {
-    info: "bg-slate-100 text-slate-800 border-slate-200",
-    success: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    warning: "bg-amber-50 text-amber-700 border-amber-200",
-    muted: "bg-slate-50 text-slate-600 border-slate-200",
-    destructive: "bg-rose-50 text-rose-700 border-rose-200",
-    primary: "bg-teal-600 text-white border-teal-700",
+    info: "bg-[#e8f0fa] text-[#1d4b73] border-[#d4e3f3]",
+    success: "bg-[#e7f6f0] text-[#0f5132] border-[#cce9dc]",
+    warning: "bg-[#fff4e5] text-[#8b5b0b] border-[#ffe2b8]",
+    muted: "bg-[#f3f6f8] text-[#4a6076] border-[#e0e8ed]",
+    destructive: "bg-[#fdecee] text-[#7b1c1f] border-[#f7c7ce]",
+    primary: "bg-[#0f4c5c] text-white border-[#0b3a46]",
   };
 
   return (

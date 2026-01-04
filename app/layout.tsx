@@ -57,7 +57,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/favicon.ico" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F8F9FA] text-slate-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background-secondary)] text-[var(--foreground)]`}
       >
         {children}
         <SonnerToaster />

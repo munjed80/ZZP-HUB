@@ -28,7 +28,7 @@ export function ConvertQuotationButton({ quotationId }: Props) {
   };
 
   return (
-    <Button type="button" variant="secondary" onClick={handleConvert} disabled={isPending}>
+    <Button type="button" variant="primary" className="px-3 py-2 text-xs md:text-sm" onClick={handleConvert} disabled={isPending}>
       {isPending ? (
         "Omzetten..."
       ) : (

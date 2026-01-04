@@ -11,17 +11,16 @@ import { InvoiceActionsMenu } from "./_components/invoice-actions-menu";
 import { Prisma, UserRole } from "@prisma/client";
 
 function statusVariant(status: string) {
-  if (status === "Betaald" || status === "Geaccepteerd") return "success" as const;
-  if (status === "Open" || status === "Verzonden") return "info" as const;
+  if (status === "Betaald") return "success" as const;
+  if (status === "Onbetaald") return "info" as const;
   if (status === "Concept") return "muted" as const;
-  return "destructive" as const;
+  return "warning" as const;
 }
 
 function invoiceStatus(status: string) {
   if (status === "BETAALD") return "Betaald";
-  if (status === "VERZONDEN") return "Verzonden";
-  if (status === "HERINNERING") return "Herinnering";
-  return "Concept";
+  if (status === "CONCEPT") return "Concept";
+  return "Onbetaald";
 }
 
 function invoiceAmount(
@@ -64,8 +63,8 @@ export default async function FacturenPagina() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Facturen</h1>
-        <p className="text-sm text-slate-600 mt-1">
+        <h1 className="text-2xl font-semibold text-[var(--foreground)]">Facturen</h1>
+        <p className="text-sm text-[var(--muted)] mt-1">
           Beheer facturen, verstuur herinneringen en volg betalingen
         </p>
       </div>
@@ -121,19 +120,14 @@ export default async function FacturenPagina() {
                       <Badge variant={statusVariant(invoiceStatus(factuur.emailStatus))}>
                         {invoiceStatus(factuur.emailStatus)}
                       </Badge>
-                      <div className="flex items-center gap-2">
-                        {factuur.emailStatus === "CONCEPT" && (
-                          <Link href={`/facturen/${factuur.id}/edit`} className={buttonVariants("ghost", "h-9 px-3")}>
-                            Bewerken
-                          </Link>
-                        )}
-                        <InvoiceActionsMenu
-                          pdfInvoice={pdfInvoice}
-                          invoiceId={factuur.id}
-                          recipientEmail={factuur.client.email}
-                          emailStatus={factuur.emailStatus}
-                        />
-                      </div>
+                      <InvoiceActionsMenu
+                        pdfInvoice={pdfInvoice}
+                        invoiceId={factuur.id}
+                        recipientEmail={factuur.client.email}
+                        emailStatus={factuur.emailStatus}
+                        editHref={factuur.emailStatus === "CONCEPT" ? `/facturen/${factuur.id}/edit` : undefined}
+                        shareLink={`/facturen/${factuur.id}`}
+                      />
                     </div>
                   </div>
                 ))}
@@ -163,19 +157,16 @@ export default async function FacturenPagina() {
                         {formatBedrag(invoiceAmount(factuur.lines))}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 mt-3">
-                      {factuur.emailStatus === "CONCEPT" && (
-                        <Link href={`/facturen/${factuur.id}/edit`} className={buttonVariants("ghost", "h-9 px-3")}>
-                          Bewerken
-                        </Link>
-                      )}
-                      <InvoiceActionsMenu
-                        pdfInvoice={pdfInvoice}
-                        invoiceId={factuur.id}
-                        recipientEmail={factuur.client.email}
-                        emailStatus={factuur.emailStatus}
-                      />
-                    </div>
+                     <div className="flex items-center gap-2 mt-3">
+                       <InvoiceActionsMenu
+                         pdfInvoice={pdfInvoice}
+                         invoiceId={factuur.id}
+                         recipientEmail={factuur.client.email}
+                         emailStatus={factuur.emailStatus}
+                         editHref={factuur.emailStatus === "CONCEPT" ? `/facturen/${factuur.id}/edit` : undefined}
+                         shareLink={`/facturen/${factuur.id}`}
+                       />
+                     </div>
                   </div>
                 ))}
               </div>

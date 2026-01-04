@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { Share2 } from "lucide-react";
 import { InvoicePDF, type InvoicePdfData } from "./InvoicePDF";
@@ -25,6 +25,7 @@ type Props = {
   label?: string;
   className?: string;
   variant?: ButtonVariant;
+  icon?: ReactNode;
 };
 
 export function InvoicePdfDownloadButton({
@@ -34,6 +35,7 @@ export function InvoicePdfDownloadButton({
   label,
   className,
   variant = "secondary",
+  icon,
 }: Props) {
   const [isGenerating, setIsGenerating] = useState(false);
   const downloadName = fileName ?? `${documentType === "OFFERTE" ? "offerte" : "factuur"}-${invoice.invoiceNum}.pdf`;
@@ -95,7 +97,7 @@ export function InvoicePdfDownloadButton({
         "PDF genereren..."
       ) : (
         <>
-          <Share2 className="h-4 w-4" aria-hidden="true" />
+          {icon ?? <Share2 className="h-4 w-4" aria-hidden="true" />}
           {buttonLabel}
         </>
       )}
