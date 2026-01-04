@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafa;
-  --foreground: #0f172a;
-  --primary: #4f46e5;
-  --primary-accent: #4338ca;
+  --background: #f8f9fa;
+  --foreground: #0a2e50;
+  --primary: #0a2e50;
+  --primary-accent: #1b4965;
+  --accent-emerald: #28a745;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--primary-accent);
+  --color-emerald: var(--accent-emerald);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background:
-    radial-gradient(circle at 25% 20%, rgba(79, 70, 229, 0.08), transparent 38%),
-    radial-gradient(circle at 80% 0%, rgba(79, 70, 229, 0.07), transparent 32%),
+    radial-gradient(circle at 25% 20%, rgba(10, 46, 80, 0.08), transparent 36%),
+    radial-gradient(circle at 80% 0%, rgba(27, 73, 101, 0.08), transparent 32%),
     var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
@@ -43,7 +47,7 @@ select {
 }
 
 .shimmer-text {
-  background-image: linear-gradient(120deg, #ffffff, #c7d2fe, #7c3aed, #312e81);
+  background-image: linear-gradient(120deg, #ffffff, #e3e7ee, #c2c9d3, #8a93a3);
   background-size: 280% 280%;
   -webkit-background-clip: text;
   color: transparent;

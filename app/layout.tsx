@@ -17,11 +17,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZZP-HUB | Eenvoudige Boekhouding voor Freelancers",
+  title: "ZZP-HUB | Elite Business Management for Professionals",
   description:
-    "De alles-in-één administratie tool voor Nederlandse ZZP'ers. Facturen, uren en BTW-aangifte.",
+    "Elite Business Management for Professionals. All-in-one administratie, facturen, uren en BTW-aangifte in een premium financiële uitstraling.",
   icons: {
     icon: '/favicon.svg',
+  },
+  openGraph: {
+    title: "ZZP-HUB | Elite Business Management voor Professionals",
+    description:
+      "Beheer je business met een premium financiële look: facturen, uren, BTW en rapportages in één strak dashboard.",
+    url: "https://zzp-hub.nl",
+    siteName: "ZZP-HUB",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "ZZP-HUB premium hero" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ZZP-HUB | Elite Business Management",
+    description:
+      "Premium financieel dashboard voor ZZP'ers met facturen, uren, BTW en rapportages.",
+    images: ["/og-image.png"],
   },
 };
 
@@ -36,7 +51,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#FAFAFA] text-slate-900`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F8F9FA] text-slate-900`}
       >
         {children}
         <SonnerToaster />

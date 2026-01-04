@@ -1,4 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="20" fill="#1e293b"/>
-  <text x="50" y="70" font-size="60" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold">Z</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="ZZP HUB">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A2E50"/>
+      <stop offset="100%" stop-color="#1B4965"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7f9fb"/>
+      <stop offset="40%" stop-color="#dce2e8"/>
+      <stop offset="100%" stop-color="#9fa8b8"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0a2e50" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect x="4" y="4" width="112" height="112" rx="24" fill="url(#bg)" />
+  <path d="M36 34h48a6 6 0 0 1 4.6 9.9L63 76h21a6 6 0 0 1 4.8 9.6l-4 6.4A6 6 0 0 1 79 94H33a6 6 0 0 1-5-9.2l25.4-40H36a6 6 0 0 1-6-6v-4a6 6 0 0 1 6-6Z" fill="url(#metal)" filter="url(#glow)"/>
 </svg>
