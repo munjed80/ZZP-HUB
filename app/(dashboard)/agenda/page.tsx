@@ -73,6 +73,9 @@ export default function AgendaPagina() {
   const formatTijd = (datum: Date) =>
     datum.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
 
+  const formatAfspraakLabel = (aantal: number) =>
+    `${aantal} ${aantal === 1 ? "afspraak" : "afspraken"}`;
+
   const isVandaag = (dag: number) => {
     return (
       dag === vandaag.getDate() &&
@@ -111,7 +114,6 @@ export default function AgendaPagina() {
                 <p className="text-xs text-slate-600">{maandNaam}</p>
               </div>
             </div>
-            <Badge variant="primary">List view op mobiel</Badge>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="hidden md:grid grid-cols-7 gap-2 text-xs font-semibold uppercase text-slate-500">
@@ -152,7 +154,7 @@ export default function AgendaPagina() {
                         {dag}
                       </span>
                       {dagEvents.length > 0 && (
-                        <Badge variant="primary">{dagEvents.length} afspraak</Badge>
+                        <Badge variant="primary">{formatAfspraakLabel(dagEvents.length)}</Badge>
                       )}
                     </div>
 
@@ -193,7 +195,6 @@ export default function AgendaPagina() {
                       <p className="text-sm font-semibold text-slate-900">{event.title}</p>
                       <p className="text-xs text-slate-600">{event.description}</p>
                     </div>
-                    <Badge variant="primary">Dagweergave</Badge>
                   </div>
                   <p className="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-800">
                     <Clock3 className="h-4 w-4 text-indigo-600" aria-hidden />
@@ -221,7 +222,7 @@ export default function AgendaPagina() {
                       month: "long",
                     }).format(new Date(dag))}
                   </span>
-                  <Badge variant="primary">{eventsByDag[dag].length} afspraak</Badge>
+                  <Badge variant="primary">{formatAfspraakLabel(eventsByDag[dag].length)}</Badge>
                 </div>
                 <div className="space-y-2 text-sm text-slate-700">
                   {eventsByDag[dag].map((event) => (
