@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -12,20 +12,18 @@ import {
   Loader2,
   Mail,
   MessageCircle,
-  MoreVertical,
   Trash2,
   Undo2,
 } from "lucide-react";
 import { InvoiceEmailStatus } from "@prisma/client";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Popover } from "@/components/ui/popover";
-import { Sheet } from "@/components/ui/sheet";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
 import { SendInvoiceEmailButton } from "../[id]/send-invoice-email-button";
 import { deleteInvoice, markAsPaid, markAsUnpaid } from "@/app/actions/invoice-actions";
 import { type mapInvoiceToPdfData } from "@/lib/pdf-generator";
 import { calculateInvoiceTotals } from "@/components/pdf/InvoicePDF";
 import { formatBedrag } from "@/lib/utils";
+import { EntityActionsMenu } from "@/components/ui/entity-actions-menu";
 
 type Props = {
   pdfInvoice: ReturnType<typeof mapInvoiceToPdfData>;
@@ -40,29 +38,6 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect mobile viewport with debouncing
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    const debouncedCheckMobile = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(checkMobile, 100);
-    };
-    
-    checkMobile();
-    window.addEventListener("resize", debouncedCheckMobile);
-    
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener("resize", debouncedCheckMobile);
-    };
-  }, []);
 
   const handleMarkAsPaid = () => {
     startTransition(async () => {
@@ -239,51 +214,14 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
     </div>
   );
 
-  const trigger = (
-    <span className={buttonVariants("secondary", "px-3 py-2 gap-2")}>
-      <MoreVertical className="h-4 w-4" aria-hidden />
-      Acties
-    </span>
-  );
-
-  // Mobile: use Sheet (bottom drawer)
-  if (isMobile) {
-    return (
-      <>
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className={buttonVariants("secondary", "px-3 py-2 gap-2")}
-          aria-label="Open acties"
-        >
-          <MoreVertical className="h-4 w-4" aria-hidden />
-          Acties
-        </button>
-        <Sheet
-          open={isOpen}
-          onOpenChange={setIsOpen}
-          title="Factuur acties"
-          description={`Factuur ${pdfInvoice.invoiceNum}`}
-        >
-          {menuContent}
-        </Sheet>
-      </>
-    );
-  }
-
-  // Desktop/Tablet: use Popover with collision detection
   return (
-    <Popover
-      trigger={trigger}
-      align="end"
-      side="bottom"
-      collisionPadding={16}
+    <EntityActionsMenu
       open={isOpen}
       onOpenChange={setIsOpen}
+      title="Factuur acties"
+      description={`Factuur ${pdfInvoice.invoiceNum}`}
     >
-      <div className="w-72">
-        {menuContent}
-      </div>
-    </Popover>
+      {menuContent}
+    </EntityActionsMenu>
   );
 }

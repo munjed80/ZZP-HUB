@@ -7,6 +7,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { getQuotations } from "./actions";
 import { ConvertQuotationButton } from "./[id]/convert-quotation-button";
+import { QuotationActionsMenu } from "./_components/quotation-actions-menu";
+import { type InvoicePdfData } from "@/components/pdf/InvoicePDF";
 
 function statusVariant(status: string) {
   if (status === "GEACCEPTEERD" || status === "OMGEZET") return "success" as const;
@@ -21,6 +23,28 @@ function statusLabel(status: string) {
   if (status === "AFGEWEZEN") return "Geweigerd";
   if (status === "VERZONDEN") return "Open";
   return "Concept";
+}
+
+function mapQuotationToPdfData(offerte: Awaited<ReturnType<typeof getQuotations>>[number]): InvoicePdfData {
+  return {
+    invoiceNum: offerte.quoteNum,
+    date: new Date(offerte.date).toLocaleDateString("nl-NL"),
+    dueDate: new Date(offerte.validUntil).toLocaleDateString("nl-NL"),
+    client: {
+      name: offerte.client?.name ?? "",
+      address: offerte.client?.address ?? "",
+      postalCode: offerte.client?.postalCode ?? "",
+      city: offerte.client?.city ?? "",
+    },
+    companyProfile: null,
+    lines: offerte.lines.map((line) => ({
+      description: line.description,
+      quantity: Number(line.quantity),
+      unit: line.unit,
+      price: Number(line.price),
+      vatRate: line.vatRate === "HOOG_21" ? "21" : line.vatRate === "LAAG_9" ? "9" : "0",
+    })),
+  };
 }
 
 export default async function OffertesPagina() {
@@ -55,35 +79,37 @@ export default async function OffertesPagina() {
           {offertes.length === 0 ? (
             <EmptyState />
           ) : (
-            offertes.map((offerte) => (
-              <div
-                key={offerte.id}
-                className="flex flex-col gap-3 py-3 md:flex-row md:items-center md:justify-between"
-              >
-                <div className="space-y-1">
-                  <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-[var(--foreground)] hover:underline">
-                    {offerte.quoteNum}
-                  </Link>
-                  <p className="text-sm text-[var(--muted)]">{offerte.client?.name}</p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={statusVariant(offerte.status)}>{statusLabel(offerte.status)}</Badge>
-                  <p className="text-sm font-semibold text-[var(--foreground)]">
-                    {formatBedrag(
-                      offerte.lines.reduce((sum, line) => sum + Number(line.amount ?? 0), 0),
-                    )}
-                  </p>
-                  <ConvertQuotationButton quotationId={offerte.id} />
-                  <Link
-                    href={`/offertes/${offerte.id}`}
-                    className={buttonVariants("secondary", "px-3 py-1 text-xs")}
-                  >
-                    Bekijk
-                  </Link>
-                </div>
-              </div>
-            ))
-          )}
+             offertes.map((offerte) => {
+               const pdfQuotation = mapQuotationToPdfData(offerte);
+               const totalAmount = offerte.lines.reduce((sum, line) => sum + Number(line.amount ?? 0), 0);
+
+               return (
+                 <div
+                   key={offerte.id}
+                   className="flex flex-col gap-3 py-3 md:flex-row md:items-center md:justify-between"
+                 >
+                   <div className="space-y-1">
+                     <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-[var(--foreground)] hover:underline">
+                       {offerte.quoteNum}
+                     </Link>
+                     <p className="text-sm text-[var(--muted)]">{offerte.client?.name}</p>
+                   </div>
+                   <div className="flex flex-wrap items-center gap-2">
+                     <Badge variant={statusVariant(offerte.status)}>{statusLabel(offerte.status)}</Badge>
+                     <p className="text-sm font-semibold text-[var(--foreground)]">
+                       {formatBedrag(totalAmount)}
+                     </p>
+                     <QuotationActionsMenu
+                       pdfQuotation={pdfQuotation}
+                       quotationId={offerte.id}
+                       recipientEmail={offerte.client?.email ?? ""}
+                       shareLink={`/offertes/${offerte.id}`}
+                     />
+                   </div>
+                 </div>
+               );
+             })
+           )}
         </CardContent>
       </Card>
     </div>

@@ -258,6 +258,82 @@ export async function convertToInvoice(quotationId: string) {
   return convertOfferteToInvoice(quotationId);
 }
 
+export async function deleteQuotation(quotationId: string) {
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
+
+  try {
+    await prisma.quotationLine.deleteMany({ where: { quotationId, quotation: { userId } } });
+    const deleted = await prisma.quotation.deleteMany({ where: { id: quotationId, userId } });
+
+    if (deleted.count === 0) {
+      return { success: false, message: "Offerte niet gevonden." };
+    }
+
+    revalidatePath("/offertes");
+    return { success: true };
+  } catch (error) {
+    console.error("DELETE_QUOTATION_FAILED", { error, quotationId, userId });
+    return { success: false, message: "Offerte verwijderen mislukt." };
+  }
+}
+
+export async function duplicateQuotation(quotationId: string) {
+  const userId = await getCurrentUserId();
+  if (!userId) {
+    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  }
+
+  const original = await prisma.quotation.findFirst({
+    where: { id: quotationId, userId },
+    include: { lines: true },
+  });
+
+  if (!original) {
+    return { success: false, message: "Offerte niet gevonden." };
+  }
+
+  const copyQuoteNum = `${original.quoteNum}-kopie`;
+
+  try {
+    const duplicated = await prisma.$transaction(async (tx) => {
+      const created = await tx.quotation.create({
+        data: {
+          userId,
+          clientId: original.clientId,
+          quoteNum: copyQuoteNum,
+          date: original.date,
+          validUntil: original.validUntil,
+          status: QuotationStatus.CONCEPT,
+        },
+      });
+
+      await tx.quotationLine.createMany({
+        data: original.lines.map((line) => ({
+          quotationId: created.id,
+          description: line.description,
+          quantity: line.quantity,
+          price: line.price,
+          amount: line.amount,
+          vatRate: line.vatRate,
+          unit: line.unit,
+        })),
+      });
+
+      return created;
+    });
+
+    revalidatePath("/offertes");
+    revalidatePath(`/offertes/${duplicated.id}`);
+    return { success: true, quotationId: duplicated.id };
+  } catch (error) {
+    console.error("DUPLICATE_QUOTATION_FAILED", { error, quotationId, userId });
+    return { success: false, message: "Dupliceren mislukt." };
+  }
+}
+
 export async function sendQuotationEmail(quotationId: string) {
   "use server";
 

@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatBedrag } from "@/lib/utils";
-import { createExpense } from "./actions";
+import { createExpense, deleteExpense, duplicateExpense } from "./actions";
 import { categories, expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { type BtwTarief } from "@prisma/client";
 import { CalendarClock, Euro, Loader2, PieChart, Plus, ReceiptText, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
+import { EntityActionsMenu } from "@/components/ui/entity-actions-menu";
 
 type UitgavenClientProps = {
   expenses: ExpenseClientShape[];
@@ -161,6 +162,30 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
     });
   });
 
+  const handleDeleteExpense = (id: string) => {
+    startTransition(async () => {
+      const result = await deleteExpense(id);
+      if (result?.success) {
+        toast.success("Uitgave verwijderd");
+        router.refresh();
+      } else {
+        toast.error(result?.message ?? "Verwijderen mislukt.");
+      }
+    });
+  };
+
+  const handleDuplicateExpense = (id: string) => {
+    startTransition(async () => {
+      const result = await duplicateExpense(id);
+      if (result?.success) {
+        toast.success("Uitgave gedupliceerd");
+        router.refresh();
+      } else {
+        toast.error(result?.message ?? "Dupliceren mislukt.");
+      }
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
@@ -252,6 +277,7 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                       <th className="px-3 py-2 text-right">Bedrag (excl.)</th>
                       <th className="px-3 py-2 text-right">BTW</th>
                       <th className="px-3 py-2 text-right">Totaal</th>
+                      <th className="px-3 py-2 text-right">Acties</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
@@ -283,6 +309,44 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                           <td className="px-3 py-3 text-right tabular-nums font-semibold text-slate-900">
                             {formatBedrag(total)}
                           </td>
+                          <td className="px-3 py-3 text-right">
+                            <EntityActionsMenu
+                              title="Uitgave acties"
+                              description={expense.description}
+                              triggerClassName="px-2 py-1 text-xs"
+                            >
+                              <div className="space-y-2 p-2">
+                                {expense.receiptUrl ? (
+                                  <a
+                                    href={expense.receiptUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="block text-left text-sm text-sky-700"
+                                  >
+                                    Bonnetje bekijken
+                                  </a>
+                                ) : null}
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  className="w-full justify-start gap-2"
+                                  onClick={() => handleDuplicateExpense(expense.id)}
+                                  disabled={isPending}
+                                >
+                                  Dupliceer
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  className="w-full justify-start gap-2"
+                                  onClick={() => handleDeleteExpense(expense.id)}
+                                  disabled={isPending}
+                                >
+                                  Verwijder
+                                </Button>
+                              </div>
+                            </EntityActionsMenu>
+                          </td>
                         </tr>
                       );
                     })}
@@ -309,15 +373,53 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                       key={expense.id}
                       className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <p className="text-sm font-bold text-slate-900">{expense.description}</p>
-                          <p className="text-xs text-slate-500 mt-1">{formatDate(expense.date)}</p>
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <p className="text-sm font-bold text-slate-900">{expense.description}</p>
+                            <p className="text-xs text-slate-500 mt-1">{formatDate(expense.date)}</p>
+                          </div>
+                          <span className="ml-2">
+                            <Badge variant="muted">{expense.category}</Badge>
+                          </span>
                         </div>
-                        <span className="ml-2">
-                          <Badge variant="muted">{expense.category}</Badge>
-                        </span>
-                      </div>
+                        <div className="flex justify-end">
+                          <EntityActionsMenu
+                            title="Uitgave acties"
+                            description={expense.description}
+                            triggerClassName="px-2 py-1 text-xs"
+                          >
+                            <div className="space-y-2 p-2">
+                              {expense.receiptUrl ? (
+                                <a
+                                  href={expense.receiptUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="block text-left text-sm text-sky-700"
+                                >
+                                  Bonnetje bekijken
+                                </a>
+                              ) : null}
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                className="w-full justify-start gap-2"
+                                onClick={() => handleDuplicateExpense(expense.id)}
+                                disabled={isPending}
+                              >
+                                Dupliceer
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                className="w-full justify-start gap-2"
+                                onClick={() => handleDeleteExpense(expense.id)}
+                                disabled={isPending}
+                              >
+                                Verwijder
+                              </Button>
+                            </div>
+                          </EntityActionsMenu>
+                        </div>
                       {expense.receiptUrl && (
                         <a
                           href={expense.receiptUrl}
