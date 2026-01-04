@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { motion, type MotionProps, type TargetAndTransition, type Transition } from "framer-motion";
-import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, ShieldCheck, LineChart, Infinity } from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, ShieldCheck, LineChart, Infinity, LifeBuoy, MailCheck } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SupportForm } from "@/components/support/support-form";
+import { AssistantDemo } from "@/components/assistant/assistant-demo";
 
 const BrandZ = ({ className }: { className?: string }) => (
   <svg
@@ -151,6 +153,12 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Link href="#pricing" className="transition-colors duration-200 hover:text-[#1e293b]">
                 Prijzen
               </Link>
+              <Link href="#assistant" className="transition-colors duration-200 hover:text-[#1e293b]">
+                AI assistent
+              </Link>
+              <Link href="#support" className="transition-colors duration-200 hover:text-[#1e293b]">
+                Support
+              </Link>
               <Link href="#preview" className="transition-colors duration-200 hover:text-[#1e293b]">
                 Preview
               </Link>
@@ -190,12 +198,12 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
       <main className="pt-16 sm:pt-20">
         <section
           id="preview"
-          className="relative overflow-hidden bg-[linear-gradient(135deg,#e5e7eb,#cbd5e1,#1e293b)] pb-24 pt-20 sm:pt-24 lg:pt-28"
+          className="relative overflow-hidden bg-gradient-to-br from-[#f6f9ff] via-[#eef3f8] to-white pb-24 pt-20 sm:pt-24 lg:pt-28"
         >
           <div className="absolute inset-0">
-            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-[#1e293b]/25 blur-3xl" />
-            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-[#334155]/30 blur-3xl" />
-            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#e2e8f0]" />
+            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-teal-100/60 blur-3xl" />
+            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-sky-100/70 blur-3xl" />
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#eef2f6]" />
           </div>
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
@@ -212,7 +220,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 {...fadeUp}
                 transition={fadeUpTransition(0.05)}
                 style={{
-                  backgroundImage: "linear-gradient(135deg,#1e293b 0%,#334155 45%,#0f172a 95%)",
+                  backgroundImage: "linear-gradient(125deg,#0f172a 0%,#0ea5e9 45%,#10b981 95%)",
                   backgroundSize: "160% 160%",
                   WebkitBackgroundClip: "text",
                   color: "transparent",
@@ -263,9 +271,9 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               </div>
 
               <div className="relative h-[540px]">
-                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-[#1e293b]/20 via-[#334155]/10 to-[#0f172a]/18 blur-[110px]" />
+                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-teal-100/60 via-white to-sky-100/50 blur-[110px]" />
                 <motion.div
-                  className="relative h-full overflow-hidden rounded-[32px] border border-white/40 bg-[linear-gradient(145deg,#dfe7f1_0%,#cbd5e1_55%,#94a3b8_100%)] bg-[length:200%_200%] p-6 shadow-[0_40px_120px_-70px_rgba(15,23,42,0.6)] ring-1 ring-[#1e293b]/20 backdrop-blur-[12px] animate-[metal-shine_8s_linear_infinite]"
+                  className="relative h-full overflow-hidden rounded-[32px] border border-white/60 bg-[linear-gradient(145deg,#f6f9ff_0%,#e2edf5_55%,#d6e7f4_100%)] bg-[length:200%_200%] p-6 shadow-[0_40px_120px_-70px_rgba(15,23,42,0.3)] ring-1 ring-[#0ea5e9]/15 backdrop-blur-[14px] animate-[metal-shine_8s_linear_infinite]"
                   {...tiltEffect}
                 >
                   <div className="flex items-center justify-between border-b border-white/40 pb-4">
@@ -462,6 +470,68 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   </motion.div>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        <section id="assistant" className="bg-gradient-to-br from-[#f7f9fb] via-white to-[#eef4fb] py-20 sm:py-24">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="space-y-4">
+                <p className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700 ring-1 ring-teal-100">
+                  <ShieldCheck className="h-4 w-4" aria-hidden />
+                  Guided AI
+                </p>
+                <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">AI assistent binnen veilige scope</h2>
+                <p className="text-lg text-slate-700">
+                  Gericht op ZZP HUB: wat we doen, starten, facturen, BTW, uren en abonnement. Geen open chat, alleen gerichte antwoorden.
+                </p>
+                <div className="grid gap-2 text-sm text-slate-700">
+                  <div className="flex items-center gap-2 rounded-lg bg-white/80 px-3 py-2 ring-1 ring-slate-200">
+                    <CheckCircle2 className="h-4 w-4 text-teal-600" aria-hidden />
+                    Vraag & antwoord per onderwerp, geen vrije chat.
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg bg-white/80 px-3 py-2 ring-1 ring-slate-200">
+                    <CheckCircle2 className="h-4 w-4 text-teal-600" aria-hidden />
+                    Buiten scope? Automatisch doorverwijzen naar support.
+                  </div>
+                </div>
+              </div>
+              <AssistantDemo className="backdrop-blur-md" />
+            </div>
+          </div>
+        </section>
+
+        <section id="support" className="bg-white py-20 sm:py-24">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+              <div className="space-y-4">
+                <p className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-800 ring-1 ring-slate-200">
+                  <LifeBuoy className="h-4 w-4" aria-hidden />
+                  Support
+                </p>
+                <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Kalm, premium support</h2>
+                <p className="text-lg text-slate-700">
+                  Bereik ons direct vanuit de landing. Naam, e-mail, onderwerp en bericht zijn genoeg. We bevestigen je aanvraag en antwoorden snel.
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-2 font-semibold">
+                      <MailCheck className="h-4 w-4 text-teal-600" aria-hidden />
+                      Bevestiging per mail
+                    </div>
+                    <p className="mt-1 text-slate-600">Heldere status na verzenden, zonder chat-widgets.</p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
+                    <div className="flex items-center gap-2 font-semibold">
+                      <ShieldCheck className="h-4 w-4 text-teal-600" aria-hidden />
+                      Focus op product
+                    </div>
+                    <p className="mt-1 text-slate-600">Facturen, BTW, uren en abonnement zijn onze prioriteit.</p>
+                  </div>
+                </div>
+              </div>
+              <SupportForm context="Landing" minimal />
             </div>
           </div>
         </section>
