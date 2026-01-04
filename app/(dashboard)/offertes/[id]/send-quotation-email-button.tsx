@@ -1,17 +1,29 @@
 "use client";
 
-import { useTransition } from "react";
+import { useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Mail } from "lucide-react";
+import { Button, type ButtonVariant } from "@/components/ui/button";
 import { sendQuotationEmail } from "../actions";
 
 type Props = {
   quotationId: string;
   recipientEmail: string;
+  className?: string;
+  variant?: ButtonVariant;
+  label?: string;
+  icon?: ReactNode;
 };
 
-export function SendQuotationEmailButton({ quotationId, recipientEmail }: Props) {
+export function SendQuotationEmailButton({ 
+  quotationId, 
+  recipientEmail, 
+  className,
+  variant = "primary",
+  label,
+  icon,
+}: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -27,9 +39,18 @@ export function SendQuotationEmailButton({ quotationId, recipientEmail }: Props)
     });
   };
 
+  const buttonLabel = label ?? "Verstuur via Email";
+
   return (
-    <Button type="button" variant="primary" onClick={handleSend} disabled={isPending}>
-      {isPending ? "Versturen..." : "Verstuur via Email"}
+    <Button type="button" variant={variant} onClick={handleSend} disabled={isPending} className={className}>
+      {isPending ? (
+        "Versturen..."
+      ) : (
+        <>
+          {icon ?? <Mail className="h-4 w-4" aria-hidden="true" />}
+          {buttonLabel}
+        </>
+      )}
     </Button>
   );
 }
