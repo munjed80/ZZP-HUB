@@ -435,7 +435,7 @@ export function AgendaView({ events }: AgendaViewProps) {
         className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg shadow-indigo-300 transition hover:scale-105 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200 md:hidden"
         aria-label="Nieuwe afspraak toevoegen"
       >
-                        <Plus className="h-6 w-6" aria-hidden="true" />
+        <Plus className="h-6 w-6" aria-hidden="true" />
       </button>
 
       <AddEventModal
