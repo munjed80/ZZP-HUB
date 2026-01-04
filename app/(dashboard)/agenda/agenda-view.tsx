@@ -95,7 +95,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
       <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200">
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#0a2e50]">Nieuwe afspraak</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">Nieuwe afspraak</p>
             <h2 className="text-lg font-bold text-slate-900">Voeg een afspraak toe aan je agenda</h2>
           </div>
           <button
@@ -188,7 +188,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#0a2e50] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#4A5568] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4A5568] disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isPending ? "Inplannen..." : "Inplannen"}
             </button>
@@ -273,7 +273,7 @@ export function AgendaView({ events }: AgendaViewProps) {
           <Card className="bg-white shadow-sm">
             <CardHeader className="items-start gap-3 md:items-center md:justify-between">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-[#e7eef4] p-2 text-[#0a2e50] ring-1 ring-[#c7d4de]">
+                <span className="rounded-full bg-teal-50 p-2 text-teal-700 ring-1 ring-teal-200">
                   <CalendarDays className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <div>
@@ -306,15 +306,15 @@ export function AgendaView({ events }: AgendaViewProps) {
                     <div
                       key={dag}
                       className={cn(
-                        "min-h-[110px] rounded-xl border border-slate-200 bg-white/70 p-3 shadow-sm transition hover:border-[#c7d4de] hover:shadow-md",
-                        dagEvents.length > 0 && "ring-1 ring-[#c7d4de]",
+                        "min-h-[110px] rounded-xl border border-slate-200 bg-white/70 p-3 shadow-sm transition hover:border-teal-200 hover:shadow-md",
+                        dagEvents.length > 0 && "ring-1 ring-teal-200",
                       )}
                     >
                       <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
                         <span
                           className={cn(
                             "flex h-7 w-7 items-center justify-center rounded-full",
-                            isVandaag(dag) ? "bg-[#0a2e50] text-white" : "bg-slate-100 text-slate-700",
+                            isVandaag(dag) ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-700",
                           )}
                           aria-label={isVandaag(dag) ? "Vandaag" : undefined}
                         >
@@ -329,10 +329,10 @@ export function AgendaView({ events }: AgendaViewProps) {
                         {dagEvents.map((event) => (
                           <div
                             key={event.id}
-                            className="rounded-lg border border-[#c7d4de] bg-[#e7eef4] p-2 text-xs text-[#0a2e50]"
+                            className="rounded-lg border border-teal-200 bg-teal-50 p-2 text-xs text-teal-700"
                           >
                             <p className="font-semibold leading-tight">{event.title}</p>
-                            <p className="flex items-center gap-1 text-[11px] text-[#4A5568]">
+                            <p className="flex items-center gap-1 text-[11px] text-slate-600">
                               <Clock3 className="h-3 w-3" aria-hidden="true" />
                               {formatTijd(event.start)} - {formatTijd(event.end)}
                             </p>
@@ -352,15 +352,15 @@ export function AgendaView({ events }: AgendaViewProps) {
                 {upcomingEvents.length === 0 ? (
                   <p className="text-sm text-slate-600">Nog geen afspraken gepland.</p>
                 ) : (
-                  <div className="relative space-y-4 pl-5 before:absolute before:left-[6px] before:top-0 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-[#4A5568]/70 before:via-[#c7d4de]/40 before:to-transparent">
+                  <div className="relative space-y-4 pl-5 before:absolute before:left-[6px] before:top-0 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-teal-600/70 before:via-teal-200/40 before:to-transparent">
                     {upcomingEvents.map((event) => (
                       <div
                         key={event.id}
-                        className="relative overflow-hidden rounded-2xl border border-white/50 bg-white/30 p-4 backdrop-blur-xl shadow-lg shadow-[0_16px_44px_-28px_rgba(10,46,80,0.36)] ring-1 ring-white/60"
+                        className="relative overflow-hidden rounded-2xl border border-white/50 bg-white/30 p-4 backdrop-blur-xl shadow-lg shadow-[0_16px_44px_-28px_rgba(13,148,136,0.30)] ring-1 ring-white/60"
                       >
                         <span
                           aria-hidden="true"
-                          className="absolute -left-[14px] top-4 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white/70 bg-[#0a2e50] shadow-sm shadow-[0_10px_26px_-18px_rgba(10,46,80,0.45)]"
+                          className="absolute -left-[14px] top-4 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white/70 bg-teal-600 shadow-sm shadow-[0_10px_26px_-18px_rgba(13,148,136,0.40)]"
                         />
                         <div className="space-y-1">
                           <p className="text-xs uppercase tracking-wide text-slate-500">
@@ -435,7 +435,7 @@ export function AgendaView({ events }: AgendaViewProps) {
       <button
         type="button"
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#0a2e50] text-white shadow-lg shadow-[0_18px_42px_-22px_rgba(10,46,80,0.35)] transition hover:scale-105 hover:bg-[#4A5568] focus:outline-none focus:ring-4 focus:ring-[#c7d4de] md:hidden"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-white shadow-lg shadow-[0_18px_42px_-22px_rgba(13,148,136,0.30)] transition hover:scale-105 hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-200 md:hidden"
         aria-label="Nieuwe afspraak toevoegen"
       >
         <Plus className="h-6 w-6" aria-hidden="true" />

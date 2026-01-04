@@ -62,8 +62,8 @@ export default async function DashboardPagina() {
       label: "Winst",
       value: stats.netProfit,
       icon: Euro,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
+      color: "text-teal-600",
+      bg: "bg-teal-50",
       trend: buildTrend(thisMonthProfit, previousMonthProfit),
     },
     {
@@ -100,7 +100,7 @@ export default async function DashboardPagina() {
                   <CardTitle
                     className={cn(
                       "text-xs md:text-sm font-semibold text-slate-700",
-                      isPrimaryMetric && "text-[13px] uppercase tracking-[0.16em] text-[#0A2E50]",
+                      isPrimaryMetric && "text-[13px] uppercase tracking-[0.16em] text-teal-700",
                     )}
                   >
                     {item.label}
@@ -111,7 +111,7 @@ export default async function DashboardPagina() {
                 <p
                   className={cn(
                     "text-xl md:text-2xl font-semibold text-slate-900",
-                    isPrimaryMetric && "text-3xl md:text-[32px] font-bold tracking-tight text-[#0A2E50]",
+                    isPrimaryMetric && "text-3xl md:text-[32px] font-bold tracking-tight text-teal-700",
                   )}
                 >
                   {formatBedrag(item.value)}
@@ -136,7 +136,7 @@ export default async function DashboardPagina() {
         <Card className="bg-white shadow-sm">
           <CardHeader className="flex flex-row items-center gap-3">
             <div className="rounded-full bg-slate-100 p-2">
-              <PiggyBank className="h-5 w-5 text-blue-600" aria-hidden />
+              <PiggyBank className="h-5 w-5 text-teal-600" aria-hidden />
             </div>
             <div>
               <CardTitle className="text-sm md:text-base">Inkomstenbelasting reservering</CardTitle>
