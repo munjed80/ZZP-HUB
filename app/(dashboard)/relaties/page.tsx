@@ -5,11 +5,11 @@ export default async function RelatiesPagina() {
   const clients = await getClients();
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">Relaties</h1>
-        <p className="text-sm text-slate-600">
-          Beheer klanten. Gegevens worden automatisch ingevuld bij facturen en offertes (adres, BTW-ID, betalingstermijn).
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900">Relaties</h1>
+        <p className="text-sm text-slate-600 mt-1">
+          Beheer klantgegevens voor facturen en offertes
         </p>
       </div>
 

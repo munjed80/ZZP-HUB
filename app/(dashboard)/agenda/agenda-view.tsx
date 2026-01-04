@@ -251,18 +251,18 @@ export function AgendaView({ events }: AgendaViewProps) {
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="space-y-8">
+        <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-slate-900">Agenda</h1>
-            <p className="text-sm text-slate-600">
-              Plan afspraken, zie je kalender en start snel een nieuwe afspraak.
+            <h1 className="text-2xl font-semibold text-slate-900">Agenda</h1>
+            <p className="text-sm text-slate-600 mt-1">
+              Plan afspraken en beheer je kalender
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className={cn(buttonVariants("primary", "inline-flex items-center gap-2"), "hidden md:inline-flex")}
+            className={cn(buttonVariants("primary"), "hidden md:inline-flex")}
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
             Nieuwe afspraak
@@ -270,22 +270,20 @@ export function AgendaView({ events }: AgendaViewProps) {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-          <Card className="bg-white shadow-sm">
-            <CardHeader className="items-start gap-3 md:items-center md:justify-between">
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-teal-50 p-2 text-teal-700 ring-1 ring-teal-200">
-                  <CalendarDays className="h-4 w-4" aria-hidden="true" />
-                </span>
+          <Card>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base">Kalender</CardTitle>
-                  <p className="text-xs text-slate-600">{maandNaam}</p>
+                  <CardTitle className="text-base font-medium text-slate-900">Kalender</CardTitle>
+                  <p className="text-sm text-slate-600 mt-0.5">{maandNaam}</p>
                 </div>
+                <CalendarDays className="h-5 w-5 text-slate-400" aria-hidden="true" />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="hidden md:grid grid-cols-7 gap-2 text-xs font-semibold uppercase text-slate-500">
+              <div className="hidden md:grid grid-cols-7 gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
                 {["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"].map((dag) => (
-                  <span key={dag} className="text-center tracking-wide">
+                  <span key={dag} className="text-center">
                     {dag}
                   </span>
                 ))}
@@ -306,35 +304,39 @@ export function AgendaView({ events }: AgendaViewProps) {
                     <div
                       key={dag}
                       className={cn(
-                        "min-h-[110px] rounded-xl border border-slate-200 bg-white/70 p-3 shadow-sm transition hover:border-teal-200 hover:shadow-md",
-                        dagEvents.length > 0 && "ring-1 ring-teal-200",
+                        "min-h-[110px] rounded-lg border p-3",
+                        dagEvents.length > 0 
+                          ? "border-teal-200 bg-teal-50/30" 
+                          : "border-slate-200 bg-white",
                       )}
                     >
-                      <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
+                      <div className="flex items-center justify-between">
                         <span
                           className={cn(
-                            "flex h-7 w-7 items-center justify-center rounded-full",
-                            isVandaag(dag) ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-700",
+                            "flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium",
+                            isVandaag(dag) 
+                              ? "bg-teal-600 text-white" 
+                              : "text-slate-700",
                           )}
                           aria-label={isVandaag(dag) ? "Vandaag" : undefined}
                         >
                           {dag}
                         </span>
                         {dagEvents.length > 0 && (
-                          <Badge variant="primary">{formatAfspraakLabel(dagEvents.length)}</Badge>
+                          <span className="text-xs font-medium text-slate-600">{dagEvents.length}</span>
                         )}
                       </div>
 
-                      <div className="mt-2 space-y-2">
+                      <div className="mt-2 space-y-1.5">
                         {dagEvents.map((event) => (
                           <div
                             key={event.id}
-                            className="rounded-lg border border-teal-200 bg-teal-50 p-2 text-xs text-teal-700"
+                            className="rounded px-2 py-1.5 bg-white border border-teal-200"
                           >
-                            <p className="font-semibold leading-tight">{event.title}</p>
-                            <p className="flex items-center gap-1 text-[11px] text-slate-600">
+                            <p className="text-xs font-medium text-slate-900 leading-tight truncate">{event.title}</p>
+                            <p className="flex items-center gap-1 text-[11px] text-slate-600 mt-0.5">
                               <Clock3 className="h-3 w-3" aria-hidden="true" />
-                              {formatTijd(event.start)} - {formatTijd(event.end)}
+                              {formatTijd(event.start)}
                             </p>
                           </div>
                         ))}
@@ -387,45 +389,45 @@ export function AgendaView({ events }: AgendaViewProps) {
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-sm">
-            <CardHeader className="flex items-center justify-between">
-              <CardTitle className="text-base">Aankomende afspraken</CardTitle>
-              <Badge variant="muted">Overzicht</Badge>
+          <Card>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-medium text-slate-900">Aankomende afspraken</CardTitle>
+                <Badge variant="muted">{gesorteerdeDagen.length}</Badge>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent>
               {gesorteerdeDagen.length === 0 ? (
-                <p className="text-sm text-slate-600">Nog geen afspraken gepland.</p>
+                <p className="text-sm text-slate-600">Geen afspraken gepland</p>
               ) : (
-                gesorteerdeDagen.map((dag) => (
-                  <div key={dag} className="space-y-2 rounded-lg border border-slate-100 p-3">
-                    <div className="flex items-center justify-between text-sm font-semibold text-slate-900">
-                      <span>
+                <div className="divide-y divide-slate-100">
+                  {gesorteerdeDagen.map((dag) => (
+                    <div key={dag} className="py-4 first:pt-0">
+                      <p className="text-sm font-medium text-slate-900 mb-3">
                         {new Intl.DateTimeFormat("nl-NL", {
                           weekday: "long",
                           day: "numeric",
                           month: "long",
                         }).format(new Date(dag))}
-                      </span>
-                      <Badge variant="primary">{formatAfspraakLabel(eventsByDag[dag].length)}</Badge>
-                    </div>
-                    <div className="space-y-2 text-sm text-slate-700">
-                      {eventsByDag[dag].map((event) => (
-                        <div key={event.id} className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-semibold text-slate-900">{event.title}</p>
-                            {event.description ? (
-                              <p className="text-xs text-slate-600">{event.description}</p>
-                            ) : null}
+                      </p>
+                      <div className="space-y-2">
+                        {eventsByDag[dag].map((event) => (
+                          <div key={event.id} className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-slate-900 truncate">{event.title}</p>
+                              {event.description && (
+                                <p className="text-sm text-slate-600 truncate">{event.description}</p>
+                              )}
+                            </div>
+                            <span className="text-xs font-medium text-slate-600 tabular-nums">
+                              {formatTijd(event.start)}
+                            </span>
                           </div>
-                          <div className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-700">
-                          <Clock3 className="h-3 w-3 text-[#4A5568]" aria-hidden="true" />
-                            {formatTijd(event.start)}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>

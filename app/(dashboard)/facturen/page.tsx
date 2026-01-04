@@ -62,26 +62,29 @@ export default async function FacturenPagina() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">Facturen</h1>
-        <p className="text-sm text-slate-600">
-          Beheer openstaande facturen, verstuur herinneringen en volg betalingen. BTW 21%, 9%, 0% en verlegd worden ondersteund.
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900">Facturen</h1>
+        <p className="text-sm text-slate-600 mt-1">
+          Beheer facturen, verstuur herinneringen en volg betalingen
         </p>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/facturen/nieuw" className={buttonVariants("primary")}>
-            Nieuwe factuur (concept)
-          </Link>
-          <Link href="/facturen/voorbeeld" className={buttonVariants("secondary")}>
-            Voorbeeld weergave / PDF
-          </Link>
-        </div>
       </div>
 
-      <Card className="bg-white">
-        <CardHeader>
-          <CardTitle>Laatste facturen</CardTitle>
-          <Badge variant="info">{facturen.length} items</Badge>
+      <div className="flex items-center gap-3">
+        <Link href="/facturen/nieuw" className={buttonVariants("primary")}>
+          Nieuwe factuur
+        </Link>
+        <Link href="/facturen/voorbeeld" className={buttonVariants("ghost")}>
+          Voorbeeld PDF
+        </Link>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base font-medium text-slate-900">Alle facturen</CardTitle>
+            <Badge variant="muted">{facturen.length}</Badge>
+          </div>
         </CardHeader>
         <CardContent>
           {facturen.length === 0 ? (
@@ -96,74 +99,76 @@ export default async function FacturenPagina() {
           ) : (
             <>
               {/* Desktop Table View */}
-              <div className="hidden md:block divide-y divide-slate-200">
+              <div className="hidden md:block divide-y divide-slate-100">
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => (
                   <div
                     key={factuur.id}
-                    className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between"
+                    className="flex items-center justify-between py-4 first:pt-0"
                   >
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">{factuur.invoiceNum}</p>
-                      <p className="text-sm text-slate-600">{factuur.client.name}</p>
-                      <p className="text-xs text-slate-500">
-                        Vervaldatum: {new Date(factuur.dueDate).toLocaleDateString("nl-NL")}
-                      </p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-900">{factuur.invoiceNum}</p>
+                      <p className="text-sm text-slate-600 mt-0.5">{factuur.client.name}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-2 md:flex-row md:items-center">
-                      <div className="flex items-center gap-3">
-                        <Badge variant={statusVariant(invoiceStatus(factuur.emailStatus))}>
-                          {invoiceStatus(factuur.emailStatus)}
-                        </Badge>
-                        <p className="text-sm font-semibold text-slate-900">
+                    <div className="flex items-center gap-6 ml-4">
+                      <div className="text-right">
+                        <p className="text-sm font-semibold tabular-nums text-slate-900">
                           {formatBedrag(invoiceAmount(factuur.lines))}
                         </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
+                        </p>
                       </div>
-                      {factuur.emailStatus === "CONCEPT" ? (
-                        <Link href={`/facturen/${factuur.id}/edit`} className={buttonVariants("secondary", "px-3 py-2")}>
-                          Bewerken
-                        </Link>
-                      ) : null}
-                      <InvoiceActionsMenu
-                        pdfInvoice={pdfInvoice}
-                        invoiceId={factuur.id}
-                        recipientEmail={factuur.client.email}
-                        emailStatus={factuur.emailStatus}
-                      />
+                      <Badge variant={statusVariant(invoiceStatus(factuur.emailStatus))}>
+                        {invoiceStatus(factuur.emailStatus)}
+                      </Badge>
+                      <div className="flex items-center gap-2">
+                        {factuur.emailStatus === "CONCEPT" && (
+                          <Link href={`/facturen/${factuur.id}/edit`} className={buttonVariants("ghost", "h-9 px-3")}>
+                            Bewerken
+                          </Link>
+                        )}
+                        <InvoiceActionsMenu
+                          pdfInvoice={pdfInvoice}
+                          invoiceId={factuur.id}
+                          recipientEmail={factuur.client.email}
+                          emailStatus={factuur.emailStatus}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Mobile Card View */}
-              <div className="block md:hidden space-y-3">
+              <div className="block md:hidden divide-y divide-slate-100">
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => (
                   <div
                     key={factuur.id}
-                    className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm hover:shadow-md transition-shadow"
+                    className="py-4 first:pt-0"
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-slate-900">{factuur.invoiceNum}</p>
-                        <p className="text-sm text-slate-600 mt-1">{factuur.client.name}</p>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900">{factuur.invoiceNum}</p>
+                        <p className="text-sm text-slate-600 mt-0.5">{factuur.client.name}</p>
                       </div>
                       <Badge variant={statusVariant(invoiceStatus(factuur.emailStatus))}>
                         {invoiceStatus(factuur.emailStatus)}
                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200">
+                    <div className="flex items-center justify-between">
                       <p className="text-xs text-slate-500">
-                        Vervalt: {new Date(factuur.dueDate).toLocaleDateString("nl-NL")}
+                        Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
                       </p>
-                      <p className="text-lg font-bold text-slate-900">
+                      <p className="text-base font-semibold tabular-nums text-slate-900">
                         {formatBedrag(invoiceAmount(factuur.lines))}
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 pt-3">
-                      {factuur.emailStatus === "CONCEPT" ? (
-                        <Link href={`/facturen/${factuur.id}/edit`} className={buttonVariants("secondary", "px-3 py-2")}>
+                    <div className="flex items-center gap-2 mt-3">
+                      {factuur.emailStatus === "CONCEPT" && (
+                        <Link href={`/facturen/${factuur.id}/edit`} className={buttonVariants("ghost", "h-9 px-3")}>
                           Bewerken
                         </Link>
-                      ) : null}
+                      )}
                       <InvoiceActionsMenu
                         pdfInvoice={pdfInvoice}
                         invoiceId={factuur.id}
