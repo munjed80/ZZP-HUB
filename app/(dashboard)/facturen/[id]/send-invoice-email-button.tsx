@@ -3,16 +3,18 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, type ButtonVariant } from "@/components/ui/button";
 import { sendInvoiceEmail } from "@/app/actions/invoice-actions";
 
 type Props = {
   invoiceId: string;
   recipientEmail: string;
   className?: string;
+  variant?: ButtonVariant;
+  label?: string;
 };
 
-export function SendInvoiceEmailButton({ invoiceId, recipientEmail, className }: Props) {
+export function SendInvoiceEmailButton({ invoiceId, recipientEmail, className, variant = "primary", label }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -29,8 +31,8 @@ export function SendInvoiceEmailButton({ invoiceId, recipientEmail, className }:
   };
 
   return (
-    <Button type="button" variant="primary" onClick={handleClick} disabled={isPending} className={className}>
-      {isPending ? "Versturen..." : "Verstuur via Email"}
+    <Button type="button" variant={variant} onClick={handleClick} disabled={isPending} className={className}>
+      {isPending ? "Versturen..." : label ?? "Verstuur via Email"}
     </Button>
   );
 }

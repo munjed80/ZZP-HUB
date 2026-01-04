@@ -47,15 +47,17 @@ export default async function DashboardPagina() {
       value: stats.yearlyRevenue,
       icon: ArrowUpRight,
       iconColor: "text-emerald-600",
-      iconBg: "bg-emerald-50",
+      iconBg: "bg-emerald-100/80",
+      gradient: "from-emerald-50 via-white to-teal-50/70",
       trend: buildTrend(thisMonth.revenue, previousMonth.revenue),
     },
     {
       label: "Uitgaven (jaar)",
       value: stats.yearlyExpenses,
       icon: ArrowDownRight,
-      iconColor: "text-slate-600",
-      iconBg: "bg-slate-50",
+      iconColor: "text-slate-700",
+      iconBg: "bg-slate-100",
+      gradient: "from-slate-50 via-white to-slate-100",
       trend: buildTrend(thisMonth.expenses, previousMonth.expenses, true),
     },
     {
@@ -63,7 +65,8 @@ export default async function DashboardPagina() {
       value: stats.netProfit,
       icon: Euro,
       iconColor: "text-teal-600",
-      iconBg: "bg-teal-50",
+      iconBg: "bg-cyan-100/80",
+      gradient: "from-teal-50 via-white to-cyan-50",
       trend: buildTrend(thisMonthProfit, previousMonthProfit),
     },
     {
@@ -71,7 +74,8 @@ export default async function DashboardPagina() {
       value: stats.vatToPay,
       icon: AlertTriangle,
       iconColor: "text-amber-600",
-      iconBg: "bg-amber-50",
+      iconBg: "bg-amber-100/80",
+      gradient: "from-amber-50 via-white to-amber-100/60",
       trend: buildTrend(currentVatBalance, previousVatBalance, true),
     },
   ];
@@ -90,13 +94,20 @@ export default async function DashboardPagina() {
           const Icon = item.icon;
 
           return (
-            <Card key={item.label}>
+            <Card
+              key={item.label}
+              className={cn(
+                "relative overflow-hidden bg-gradient-to-br border-slate-100 shadow-sm hover:shadow-md transition",
+                item.gradient,
+              )}
+            >
+              <div className="pointer-events-none absolute -right-6 -top-10 h-28 w-28 rounded-full bg-white/40 blur-lg" />
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xs font-medium uppercase tracking-wide text-slate-600">
                     {item.label}
                   </CardTitle>
-                  <div className={cn("rounded-lg p-2", item.iconBg)}>
+                  <div className={cn("rounded-xl p-2 shadow-inner shadow-white/80", item.iconBg)}>
                     <Icon className={cn("h-4 w-4", item.iconColor)} aria-hidden />
                   </div>
                 </div>
@@ -105,7 +116,7 @@ export default async function DashboardPagina() {
                 <p className="text-2xl font-semibold tabular-nums text-slate-900">
                   {formatBedrag(item.value)}
                 </p>
-                <Badge variant={item.trend.variant} className="text-xs">{item.trend.label}</Badge>
+                <Badge variant={item.trend.variant} className="text-xs shadow-sm shadow-white/40">{item.trend.label}</Badge>
               </CardContent>
             </Card>
           );
@@ -113,7 +124,7 @@ export default async function DashboardPagina() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <Card>
+        <Card className="bg-gradient-to-br from-white via-slate-50 to-slate-100/60 border-slate-100">
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-medium text-slate-900">Omzet vs kosten</CardTitle>
             <p className="text-sm text-slate-600">Maandelijks overzicht {now.getFullYear()}</p>
@@ -123,11 +134,11 @@ export default async function DashboardPagina() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-white via-teal-50/60 to-cyan-50 border-slate-100">
           <CardHeader className="pb-4">
             <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-teal-50 p-2.5">
-                <PiggyBank className="h-5 w-5 text-teal-600" aria-hidden />
+              <div className="rounded-xl bg-white/70 p-2.5 shadow-inner shadow-white/60">
+                <PiggyBank className="h-5 w-5 text-teal-700" aria-hidden />
               </div>
               <div className="flex-1">
                 <CardTitle className="text-base font-medium text-slate-900">IB reservering</CardTitle>
@@ -145,7 +156,7 @@ export default async function DashboardPagina() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="bg-white/90 border-slate-100 shadow-md shadow-slate-100/70">
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-medium text-slate-900">Recente facturen</CardTitle>
             <p className="text-sm text-slate-600">Laatste 5 definitieve facturen</p>
@@ -178,7 +189,7 @@ export default async function DashboardPagina() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white/90 border-slate-100 shadow-md shadow-slate-100/70">
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-medium text-slate-900">Recente uitgaven</CardTitle>
             <p className="text-sm text-slate-600">Laatste 5 geregistreerde uitgaven</p>

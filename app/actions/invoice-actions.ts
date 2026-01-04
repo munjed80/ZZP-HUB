@@ -71,3 +71,35 @@ export async function markAsPaid(invoiceId: string) {
     return { success: false, message: "Het markeren als betaald is mislukt." };
   }
 }
+
+export async function markAsUnpaid(invoiceId: string) {
+  try {
+    const sanitizedInvoiceId = invoiceId.trim();
+    const uuidPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidPattern.test(sanitizedInvoiceId)) {
+      return { success: false, message: "Ongeldig factuurnummer." };
+    }
+
+    const { id: userId, role } = await requireUser();
+    const invoice = await prisma.invoice.findFirst({
+      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
+    });
+
+    if (!invoice) {
+      return { success: false, message: "Factuur niet gevonden." };
+    }
+
+    await prisma.invoice.update({
+      where: { id: invoice.id },
+      data: { emailStatus: InvoiceEmailStatus.CONCEPT },
+    });
+
+    revalidatePath("/facturen");
+    revalidatePath("/");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Markeren als onbetaald mislukt", { error, invoiceId });
+    return { success: false, message: "Ongedaan maken mislukt." };
+  }
+}

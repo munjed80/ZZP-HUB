@@ -3,14 +3,15 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, MessageCircle, Share2, Undo2 } from "lucide-react";
 import { InvoiceEmailStatus } from "@prisma/client";
-import { Button } from "@/components/ui/button";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
 import { SendInvoiceEmailButton } from "../[id]/send-invoice-email-button";
-import { markAsPaid } from "@/app/actions/invoice-actions";
+import { markAsPaid, markAsUnpaid } from "@/app/actions/invoice-actions";
 import { type mapInvoiceToPdfData } from "@/lib/pdf-generator";
+import { calculateInvoiceTotals } from "@/components/pdf/InvoicePDF";
+import { formatBedrag } from "@/lib/utils";
 
 type Props = {
   pdfInvoice: ReturnType<typeof mapInvoiceToPdfData>;
@@ -37,29 +38,71 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
     });
   };
 
+  const handleMarkAsUnpaid = () => {
+    const confirmed = window.confirm("Weet je zeker dat je deze factuur wilt terugzetten naar onbetaald?");
+    if (!confirmed) return;
+
+    startTransition(async () => {
+      const result = await markAsUnpaid(invoiceId);
+      if (result?.success) {
+        toast.success("Factuur teruggezet naar onbetaald");
+        setIsOpen(false);
+        router.refresh();
+      } else {
+        toast.error(result?.message ?? "Ongedaan maken mislukt.");
+      }
+    });
+  };
+
+  const handleShareWhatsApp = () => {
+    const totals = calculateInvoiceTotals(pdfInvoice.lines);
+    const companyName = pdfInvoice.companyProfile?.companyName ?? "ZZP HUB";
+    const message = `Factuur ${pdfInvoice.invoiceNum} van ${companyName}. Totaal: ${formatBedrag(
+      totals.total,
+    )}. Verstuurd via ZZP HUB.`;
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <details className="relative inline-block" open={isOpen} onToggle={(e) => setIsOpen(e.currentTarget.open)}>
       <summary
         className={buttonVariants("secondary", "cursor-pointer list-none px-3 py-2")}
         role="button"
-        aria-label="Acties"
+        aria-label="Open deelopties"
         style={{ listStyle: "none" }}
       >
-        Acties
+        <Share2 className="h-4 w-4" aria-hidden />
+        Delen
       </summary>
-      <div className="absolute right-0 z-10 mt-2 w-48 rounded-lg border border-slate-200 bg-white shadow-lg">
-        <div className="flex flex-col gap-2 p-2">
+      <div className="absolute right-0 z-10 mt-2 w-64 rounded-xl border border-slate-200 bg-white shadow-lg shadow-teal-100/60">
+        <div className="flex flex-col gap-2 p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-600">Deel factuur</p>
           <InvoicePdfDownloadButton
             invoice={pdfInvoice}
-            label="Delen / Downloaden"
-            className="w-full justify-center"
+            label="Download PDF"
+            className="w-full justify-start"
+            variant="secondary"
           />
           <SendInvoiceEmailButton
             invoiceId={invoiceId}
             recipientEmail={recipientEmail}
-            className="w-full justify-center"
+            className="w-full justify-start"
+            variant="secondary"
+            label="Verstuur via e-mail"
           />
-          {emailStatus !== InvoiceEmailStatus.BETAALD && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleShareWhatsApp}
+            className="w-full justify-start gap-2"
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden />
+            Deel via WhatsApp
+          </Button>
+        </div>
+        <div className="border-t border-slate-200 p-3">
+          {emailStatus !== InvoiceEmailStatus.BETAALD ? (
             <Button
               type="button"
               onClick={handleMarkAsPaid}
@@ -68,7 +111,18 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
               variant="primary"
             >
               {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-              {isPending ? "Markeren..." : "Markeren als betaald"}
+              {isPending ? "Markeren..." : "Markeer als betaald"}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={handleMarkAsUnpaid}
+              disabled={isPending}
+              className="w-full justify-center gap-2"
+              variant="destructive"
+            >
+              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Undo2 className="h-4 w-4" />}
+              {isPending ? "Bezig..." : "Terug naar onbetaald"}
             </Button>
           )}
         </div>
