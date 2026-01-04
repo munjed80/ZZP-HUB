@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { UserAvatarMenu } from "@/components/layout/user-avatar-menu";
+import { AssistantDrawer } from "@/components/assistant/assistant-drawer";
 import { getServerAuthSession } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 
@@ -58,6 +59,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
         </div>
       </div>
       <MobileNav />
+      <AssistantDrawer />
     </div>
   );
 }
