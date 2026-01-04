@@ -26,7 +26,12 @@ self.addEventListener("fetch", (event) => {
       if (cached) return cached;
       return fetch(event.request).then((response) => {
         const responseClone = response.clone();
-        caches.open("zzp-hub-static-v1").then((cache) => cache.put(event.request, responseClone)).catch(() => undefined);
+        event.waitUntil(
+          caches
+            .open("zzp-hub-static-v1")
+            .then((cache) => cache.put(event.request, responseClone))
+            .catch(() => undefined),
+        );
         return response;
       });
     }),

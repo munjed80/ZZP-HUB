@@ -7,27 +7,32 @@ type KnowledgeSection = {
   content: string;
 };
 
-const knowledgePath = path.join(process.cwd(), "content", "help", "zzp-hub-knowledge.md");
+const knowledgePath = path.resolve(process.cwd(), "content", "help", "zzp-hub-knowledge.md");
 let cachedKnowledge: { text: string; sections: KnowledgeSection[] } | null = null;
 
 async function loadKnowledge(): Promise<{ text: string; sections: KnowledgeSection[] }> {
   if (cachedKnowledge) return cachedKnowledge;
-  const text = await fs.readFile(knowledgePath, "utf8");
-  const sections = text
-    .split(/^##\s+/m)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block, index) => {
-      if (index === 0 && block.startsWith("#")) {
+  try {
+    const text = await fs.readFile(knowledgePath, "utf8");
+    const sections = text
+      .split(/^##\s+/m)
+      .map((block) => block.trim())
+      .filter(Boolean)
+      .map((block, index) => {
+        if (index === 0 && block.startsWith("#")) {
+          const [headingLine, ...rest] = block.split("\n");
+          return { heading: headingLine.replace(/^#+\s*/, "").trim(), content: rest.join("\n").trim() };
+        }
         const [headingLine, ...rest] = block.split("\n");
-        return { heading: headingLine.replace(/^#+\s*/, "").trim(), content: rest.join("\n").trim() };
-      }
-      const [headingLine, ...rest] = block.split("\n");
-      return { heading: headingLine.trim(), content: rest.join("\n").trim() };
-    });
+        return { heading: headingLine.trim(), content: rest.join("\n").trim() };
+      });
 
-  cachedKnowledge = { text, sections };
-  return cachedKnowledge;
+    cachedKnowledge = { text, sections };
+    return cachedKnowledge;
+  } catch (error) {
+    console.error("Kennisbank laden mislukt", error);
+    throw new Error("Kennisbank niet beschikbaar.");
+  }
 }
 
 const keywordToHeading: { keywords: string[]; heading: string; topic: string }[] = [
