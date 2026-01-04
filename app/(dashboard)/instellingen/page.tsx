@@ -1,5 +1,7 @@
 import { SettingsTabs } from "./settings-tabs";
 import { fetchCompanyProfile } from "./actions";
+import { SupportForm } from "@/components/support/support-form";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 
 const abonnement = {
   type: "Maandelijks",
@@ -20,6 +22,19 @@ export default async function InstellingenPagina() {
       </div>
 
       <SettingsTabs initialProfile={profiel} abonnement={abonnement} />
+
+      <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <SupportForm minimal context="Instellingen" className="h-full" />
+        <Card className="h-full border-slate-200 bg-slate-50/80 shadow-none ring-1 ring-slate-100">
+          <CardContent className="space-y-2">
+            <CardTitle className="text-base font-semibold text-slate-900">Snel contact</CardTitle>
+            <p className="text-sm text-slate-700">
+              Bereik ons direct vanuit Instellingen. Vermeld je bedrijfsnaam of factuurnummer voor een gerichte reactie.
+            </p>
+            <p className="text-xs text-slate-500">Reactie binnen één werkdag.</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
