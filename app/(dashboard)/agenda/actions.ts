@@ -49,16 +49,13 @@ export async function createEvent(values: EventFormValues) {
   }
 
   try {
-    const startIso = startDate.toISOString();
-    const endIso = endDate.toISOString();
-
     const created = await prisma.event.create({
       data: {
         userId,
         title: data.title,
         description: data.description,
-        start: startIso,
-        end: endIso,
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
       },
     });
 
