@@ -12,12 +12,12 @@ const baseClasses = [
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-gradient-to-r from-teal-600 to-cyan-500 text-white border border-transparent hover:from-teal-700 hover:to-cyan-600 shadow-lg shadow-teal-200/60 hover:shadow-xl",
+    "bg-gradient-to-r from-[#0f4c5c] via-[#1b6b7a] to-[#2f9e7c] text-white border border-transparent hover:from-[#0c3d4b] hover:to-[#2a8b70] shadow-lg shadow-teal-200/50 hover:shadow-xl",
   secondary:
-    "bg-white text-slate-700 border border-slate-200 hover:border-teal-200/80 hover:bg-teal-50/60 shadow-sm hover:shadow-md",
-  ghost: "text-slate-700 border border-transparent hover:bg-slate-100 hover:text-slate-900",
+    "bg-white/90 text-[#0f2f3a] border border-[var(--border)] hover:border-[#2f9e7c]/40 hover:bg-[#eaf4f1] shadow-sm hover:shadow-md",
+  ghost: "text-[var(--muted)] border border-transparent hover:bg-[var(--background-secondary)] hover:text-[var(--foreground)]",
   destructive:
-    "bg-rose-600 text-white border border-rose-600 hover:bg-rose-700 hover:border-rose-700 shadow-sm hover:shadow-md focus-visible:ring-rose-600",
+    "bg-[#e77975] text-white border border-[#d86461] hover:bg-[#d86461] hover:border-[#c55451] shadow-sm hover:shadow-md focus-visible:ring-[#d86461]",
 };
 
 export function buttonVariants(variant: ButtonVariant = "primary", className?: string) {

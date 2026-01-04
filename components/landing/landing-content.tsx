@@ -100,6 +100,30 @@ const glassFlow = [
   { label: "Automatische incasso", icon: Calculator, tone: "text-amber-50 bg-amber-500/10 ring-amber-300/30" },
 ];
 
+const howItWorks = [
+  {
+    title: "Start & stel profiel in",
+    description: "Registreer, vul je bedrijfsprofiel in en voeg je eerste klant toe.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Documenten versturen",
+    description: "Maak een offerte of factuur, download de PDF of verstuur direct via e-mail.",
+    icon: FileText,
+  },
+  {
+    title: "Inzicht & BTW",
+    description: "Bekijk dashboard, BTW-kaarten en omzet/kosten verdeling in één oogopslag.",
+    icon: LineChart,
+  },
+];
+
+const landingFaq = [
+  { question: "Kan ik gratis starten?", answer: "Ja, 14 dagen volledig gratis. Daarna €4,99 p/m en maandelijks opzegbaar." },
+  { question: "Hoe verstuur ik facturen?", answer: "Maak een factuur en kies Acties → Verstuur via e-mail of Download PDF." },
+  { question: "Is mijn data veilig?", answer: "Ja, beveiligde hosting, audit trails en beperkte AI-scope binnen productvragen." },
+];
+
 type FadeUpProps = MotionProps & {
   whileInView: TargetAndTransition & { transition: Transition };
 };
@@ -131,7 +155,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
   const primaryCta = isLoggedIn ? "Naar Dashboard" : "Gratis starten";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#e2e8f0] via-white to-[#e5e7eb] text-slate-900">
+    <div className="min-h-screen bg-gradient-to-b from-[#e2e8f0] via-white to-[#e5e7eb] text-[var(--foreground)]">
       <header className="sticky top-4 z-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between rounded-full border border-[#1e293b]/10 bg-white/85 px-4 py-3 shadow-2xl shadow-slate-200/40 backdrop-blur-md">
@@ -198,11 +222,11 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
       <main className="pt-16 sm:pt-20">
         <section
           id="preview"
-          className="relative overflow-hidden bg-gradient-to-br from-[#f6f9ff] via-[#eef3f8] to-white pb-24 pt-20 sm:pt-24 lg:pt-28"
+          className="relative overflow-hidden bg-gradient-to-br from-[#0f4c5c] via-[#e1edf4] to-[#f6f9fb] pb-24 pt-20 sm:pt-24 lg:pt-28"
         >
           <div className="absolute inset-0">
-            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-teal-100/60 blur-3xl" />
-            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-sky-100/70 blur-3xl" />
+            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-teal-200/60 blur-3xl" />
+            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-sky-200/70 blur-3xl" />
             <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#eef2f6]" />
           </div>
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -215,13 +239,13 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <BrandZ className="h-4 w-4 text-[#1e293b]" aria-hidden />
                   <span>Elite Business Hub 2026</span>
                 </motion.div>
-              <motion.h1
-                className="text-3xl font-semibold leading-[1.05] tracking-[-0.05em] text-slate-900 drop-shadow-[0_10px_28px_rgba(15,23,42,0.28)] sm:text-5xl lg:text-6xl"
+               <motion.h1
+                className="text-3xl font-semibold leading-[1.05] tracking-[-0.05em] drop-shadow-[0_10px_28px_rgba(15,23,42,0.28)] sm:text-5xl lg:text-6xl"
                 {...fadeUp}
                 transition={fadeUpTransition(0.05)}
                 style={{
-                  backgroundImage: "linear-gradient(125deg,#0f172a 0%,#0ea5e9 45%,#10b981 95%)",
-                  backgroundSize: "160% 160%",
+                  backgroundImage: "linear-gradient(130deg,#e4f1f9 0%,#d2efe5 45%,#f6d49f 90%)",
+                  backgroundSize: "180% 180%",
                   WebkitBackgroundClip: "text",
                   color: "transparent",
                 }}
@@ -229,7 +253,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   Slimmer ondernemen met een premium financieel hub voor ZZP&apos;ers.
               </motion.h1>
                 <motion.p
-                  className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-800 sm:text-xl lg:mx-0"
+                  className="mx-auto max-w-2xl text-lg leading-relaxed text-[var(--foreground)] sm:text-xl lg:mx-0"
                   {...fadeUp}
                   transition={fadeUpTransition(0.1)}
                 >
@@ -250,14 +274,8 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     Start Nu Gratis
                     <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
                   </Link>
-                  <Link
-                    href="#pricing"
-                    className={buttonVariants(
-                      "secondary",
-                      "text-base px-8 py-3 border border-[#334155]/60 bg-white/90 shadow-sm hover:-translate-y-0.5 hover:bg-[#e2e8f0]"
-                    )}
-                  >
-                    Bekijk Demo
+                  <Link href="#pricing" className="text-sm font-semibold text-[var(--foreground)] underline underline-offset-4">
+                    Bekijk prijzen
                   </Link>
                 </motion.div>
                 <motion.div
@@ -474,6 +492,42 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
+        <section className="bg-gradient-to-br from-[#f4f7f9] via-white to-[#eef3f7] py-20 sm:py-24">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
+              <div className="space-y-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#4a6fa5]">Hoe het werkt</p>
+                <h2 className="text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl">
+                  In drie stappen live met facturen, offertes en BTW
+                </h2>
+                <p className="text-lg text-[var(--muted)]">
+                  Geen overbodige modules. Alleen wat je nodig hebt om documenten te versturen en overzicht te houden.
+                </p>
+              </div>
+              <div className="grid gap-4">
+                {howItWorks.map((step, idx) => {
+                  const Icon = step.icon;
+                  return (
+                    <div
+                      key={step.title}
+                      className="flex items-start gap-3 rounded-2xl border border-[var(--border)] bg-white/90 p-4 shadow-md shadow-slate-200/60"
+                    >
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--background-secondary)] text-[var(--foreground)] ring-1 ring-[var(--border)]">
+                        <Icon className="h-6 w-6" aria-hidden />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Stap {idx + 1}</p>
+                        <p className="text-base font-semibold text-[var(--foreground)]">{step.title}</p>
+                        <p className="text-sm text-[var(--muted)]">{step.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="assistant" className="bg-gradient-to-br from-[#f7f9fb] via-white to-[#eef4fb] py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
@@ -498,6 +552,33 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 </div>
               </div>
               <AssistantDemo className="backdrop-blur-md" />
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white py-20 sm:py-24">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
+              <div className="space-y-3">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#4a6fa5]">FAQ</p>
+                <h2 className="text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl">
+                  Snel antwoord op de belangrijkste vragen
+                </h2>
+                <p className="text-lg text-[var(--muted)]">
+                  Gericht op onboarding, betalingen en beveiliging. Alles binnen het product en zonder wachttijd.
+                </p>
+              </div>
+              <div className="grid gap-3">
+                {landingFaq.map((item) => (
+                  <div
+                    key={item.question}
+                    className="rounded-2xl border border-[var(--border)] bg-[var(--background-secondary)] p-4 shadow-sm"
+                  >
+                    <p className="text-base font-semibold text-[var(--foreground)]">{item.question}</p>
+                    <p className="text-sm text-[var(--muted)]">{item.answer}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

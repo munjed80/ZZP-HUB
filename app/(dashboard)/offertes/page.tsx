@@ -31,8 +31,8 @@ export default async function OffertesPagina() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Offertes</h1>
-            <p className="text-sm text-slate-600">
+            <h1 className="text-2xl font-bold text-[var(--foreground)]">Offertes</h1>
+            <p className="text-sm text-[var(--muted)]">
               Maak offertes, verstuur per mail en zet geaccepteerde offertes om naar facturen.
             </p>
           </div>
@@ -43,32 +43,32 @@ export default async function OffertesPagina() {
         </div>
       </div>
 
-      <Card className="bg-white">
-        <CardHeader className="flex items-center justify-between">
+      <Card className="bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+        <CardHeader className="flex items-center justify-between pb-3">
           <div className="flex items-center gap-2">
-            <FileSignature className="h-4 w-4 text-slate-500" aria-hidden />
+            <FileSignature className="h-4 w-4 text-[#1b6b7a]" aria-hidden />
             <CardTitle>Laatste offertes</CardTitle>
           </div>
-          <Badge variant="warning">Converteren naar factuur</Badge>
+          <Badge variant="primary">Converteren naar factuur</Badge>
         </CardHeader>
-        <CardContent className="divide-y divide-slate-200">
+        <CardContent className="divide-y divide-[var(--border-subtle)]">
           {offertes.length === 0 ? (
             <EmptyState />
           ) : (
             offertes.map((offerte) => (
               <div
                 key={offerte.id}
-                className="flex flex-col gap-2 py-3 md:flex-row md:items-center md:justify-between"
+                className="flex flex-col gap-3 py-3 md:flex-row md:items-center md:justify-between"
               >
-                <div>
-                  <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-slate-900 hover:underline">
+                <div className="space-y-1">
+                  <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-[var(--foreground)] hover:underline">
                     {offerte.quoteNum}
                   </Link>
-                  <p className="text-sm text-slate-600">{offerte.client?.name}</p>
+                  <p className="text-sm text-[var(--muted)]">{offerte.client?.name}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Badge variant={statusVariant(offerte.status)}>{statusLabel(offerte.status)}</Badge>
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-sm font-semibold text-[var(--foreground)]">
                     {formatBedrag(
                       offerte.lines.reduce((sum, line) => sum + Number(line.amount ?? 0), 0),
                     )}

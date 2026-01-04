@@ -15,7 +15,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={cn(
-        "rounded-lg border border-slate-200/80 bg-white p-4 md:p-5 shadow-sm hover:shadow-md transition-shadow duration-200",
+        "rounded-xl border border-[var(--border)]/80 bg-[var(--surface)] p-4 md:p-5 shadow-sm shadow-slate-200/60 hover:shadow-md hover:shadow-slate-200/80 transition-shadow duration-200 backdrop-blur-sm",
         className,
       )}
     >
@@ -29,11 +29,11 @@ export function CardHeader({ children, className }: CardSectionProps) {
 }
 
 export function CardTitle({ children, className }: CardSectionProps) {
-  return <h3 className={cn("text-base font-semibold text-slate-900", className)}>{children}</h3>;
+  return <h3 className={cn("text-base font-semibold text-[var(--foreground)]", className)}>{children}</h3>;
 }
 
 export function CardContent({ children, className }: CardSectionProps) {
-  return <div className={cn("text-sm text-slate-700 leading-relaxed", className)}>{children}</div>;
+  return <div className={cn("text-sm text-[var(--muted)] leading-relaxed", className)}>{children}</div>;
 }
 
 export function CardFooter({ children, className }: CardSectionProps) {
