@@ -358,7 +358,10 @@ export function AgendaView({ events }: AgendaViewProps) {
                         key={event.id}
                         className="relative overflow-hidden rounded-2xl border border-white/50 bg-white/30 p-4 backdrop-blur-xl shadow-lg shadow-indigo-200/40 ring-1 ring-white/60"
                       >
-                        <span className="absolute -left-[14px] top-4 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white/70 bg-indigo-500 shadow-sm shadow-indigo-200" />
+                        <span
+                          aria-hidden
+                          className="absolute -left-[14px] top-4 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white/70 bg-indigo-500 shadow-sm shadow-indigo-200"
+                        />
                         <div className="space-y-1">
                           <p className="text-xs uppercase tracking-wide text-slate-500">
                             {new Intl.DateTimeFormat("nl-NL", {
