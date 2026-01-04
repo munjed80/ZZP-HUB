@@ -101,7 +101,7 @@ export default async function DashboardPagina() {
                 item.gradient,
               )}
             >
-              <div className="pointer-events-none absolute -right-6 -top-10 h-28 w-28 rounded-full bg-white/40 blur-3" />
+              <div className="pointer-events-none absolute -right-6 -top-10 h-28 w-28 rounded-full bg-white/40 blur-lg" />
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xs font-medium uppercase tracking-wide text-slate-600">

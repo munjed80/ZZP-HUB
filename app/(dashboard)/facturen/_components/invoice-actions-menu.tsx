@@ -69,7 +69,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
       <summary
         className={buttonVariants("secondary", "cursor-pointer list-none px-3 py-2")}
         role="button"
-        aria-label="Delen"
+        aria-label="Open deelopties"
         style={{ listStyle: "none" }}
       >
         <Share2 className="h-4 w-4" aria-hidden />
@@ -122,7 +122,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
               variant="destructive"
             >
               {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Undo2 className="h-4 w-4" />}
-              {isPending ? "Bezig..." : "Maak onbetaald"}
+              {isPending ? "Bezig..." : "Terug naar onbetaald"}
             </Button>
           )}
         </div>
