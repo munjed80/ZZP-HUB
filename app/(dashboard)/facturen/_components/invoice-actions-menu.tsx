@@ -42,14 +42,26 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile viewport
+  // Detect mobile viewport with debouncing
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
+    
+    const debouncedCheckMobile = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 100);
+    };
+    
     checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    window.addEventListener("resize", debouncedCheckMobile);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", debouncedCheckMobile);
+    };
   }, []);
 
   const handleMarkAsPaid = () => {

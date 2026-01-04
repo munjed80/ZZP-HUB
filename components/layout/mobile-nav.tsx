@@ -48,7 +48,7 @@ export function MobileNav({ onAssistantClick, onMenuClick }: MobileNavProps = {}
   }, [fabMenuOpen]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-sm md:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-sm md:hidden pb-[env(safe-area-inset-bottom)]">
       <div className="relative flex items-center justify-around px-2 py-2">
         {navItems.slice(0, 2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
@@ -135,7 +135,7 @@ export function MobileNav({ onAssistantClick, onMenuClick }: MobileNavProps = {}
           className="flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-50"
           aria-label="Menu"
         >
-          <MenuIcon className="h-5 w-5" aria-hidden={true} />
+          <MenuIcon className="h-5 w-5" aria-hidden="true" />
           <span className="text-[10px] font-semibold leading-tight">Menu</span>
         </button>
       </div>

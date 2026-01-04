@@ -31,7 +31,7 @@ export function Sheet({ open, onOpenChange, children, title, description }: Shee
       <div
         className="absolute inset-0 bg-black/40 animate-in fade-in duration-200"
         onClick={() => onOpenChange(false)}
-        aria-hidden
+        aria-hidden="true"
       />
       
       {/* Sheet */}
@@ -52,7 +52,7 @@ export function Sheet({ open, onOpenChange, children, title, description }: Shee
               className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 transition-colors"
               aria-label="Sluiten"
             >
-              <X className="h-5 w-5" aria-hidden />
+              <X className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         )}

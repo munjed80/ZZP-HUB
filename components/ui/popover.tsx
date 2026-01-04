@@ -47,38 +47,49 @@ export function Popover({
   // Handle collision detection and positioning
   useEffect(() => {
     if (!open || !contentRef.current) return;
+    
+    const updatePosition = () => {
+      if (!contentRef.current) return;
+      
+      const content = contentRef.current;
+      const rect = content.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
 
-    const content = contentRef.current;
-    const rect = content.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+      // Reset transform
+      content.style.transform = "";
 
-    // Reset transform
-    content.style.transform = "";
+      // Check horizontal collision
+      if (rect.right > viewportWidth - collisionPadding) {
+        const offset = rect.right - (viewportWidth - collisionPadding);
+        content.style.transform = `translateX(-${offset}px)`;
+      } else if (rect.left < collisionPadding) {
+        const offset = collisionPadding - rect.left;
+        content.style.transform = `translateX(${offset}px)`;
+      }
 
-    // Check horizontal collision
-    if (rect.right > viewportWidth - collisionPadding) {
-      const offset = rect.right - (viewportWidth - collisionPadding);
-      content.style.transform = `translateX(-${offset}px)`;
-    } else if (rect.left < collisionPadding) {
-      const offset = collisionPadding - rect.left;
-      content.style.transform = `translateX(${offset}px)`;
-    }
-
-    // Check vertical collision (flip if needed)
-    if (side === "bottom" && rect.bottom > viewportHeight - collisionPadding) {
-      // Flip to top
-      content.style.bottom = "100%";
-      content.style.top = "auto";
-      content.style.marginBottom = "0.5rem";
-      content.style.marginTop = "0";
-    } else if (side === "top" && rect.top < collisionPadding) {
-      // Flip to bottom
-      content.style.top = "100%";
-      content.style.bottom = "auto";
-      content.style.marginTop = "0.5rem";
-      content.style.marginBottom = "0";
-    }
+      // Check vertical collision (flip if needed)
+      if (side === "bottom" && rect.bottom > viewportHeight - collisionPadding) {
+        // Flip to top
+        content.style.bottom = "100%";
+        content.style.top = "auto";
+        content.style.marginBottom = "0.5rem";
+        content.style.marginTop = "0";
+      } else if (side === "top" && rect.top < collisionPadding) {
+        // Flip to bottom
+        content.style.top = "100%";
+        content.style.bottom = "auto";
+        content.style.marginTop = "0.5rem";
+        content.style.marginBottom = "0";
+      }
+    };
+    
+    // Use RAF for better performance
+    const rafId = requestAnimationFrame(updatePosition);
+    
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
   }, [open, side, collisionPadding]);
 
   const getAlignmentClasses = () => {
