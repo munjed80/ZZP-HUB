@@ -5,10 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 
+export const DEFAULT_VAT_RATE = 0.21;
+
 const MONTH_LABELS = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const createMonthlyChartData = () => MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
 const VAT_PERCENTAGES: Record<BtwTarief, number> = {
-  [BtwTarief.HOOG_21]: 0.21,
+  [BtwTarief.HOOG_21]: DEFAULT_VAT_RATE,
   [BtwTarief.LAAG_9]: 0.09,
   [BtwTarief.NUL_0]: 0,
   [BtwTarief.VRIJGESTELD]: 0,

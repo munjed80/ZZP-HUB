@@ -3,18 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatBedrag } from "@/lib/utils";
 import { RevenueExpensesChart } from "@/components/dashboard/revenue-expenses-chart";
-import { getDashboardStats } from "@/actions/get-dashboard-stats";
+import { DEFAULT_VAT_RATE, getDashboardStats } from "@/actions/get-dashboard-stats";
 
 export default async function DashboardPagina() {
   const stats = await getDashboardStats();
   const now = new Date();
-  const thisMonthIndex = Math.max(0, now.getMonth());
+  const thisMonthIndex = now.getMonth();
   const previousMonthIndex = thisMonthIndex === 0 ? 11 : thisMonthIndex - 1;
   const thisMonth = stats.monthlyChartData[thisMonthIndex] ?? { revenue: 0, expenses: 0 };
   const previousMonth = stats.monthlyChartData[previousMonthIndex] ?? { revenue: 0, expenses: 0 };
   const thisMonthProfit = thisMonth.revenue - thisMonth.expenses;
   const previousMonthProfit = previousMonth.revenue - previousMonth.expenses;
-  const VAT_TREND_RATE = 0.21;
+  const VAT_TREND_RATE = DEFAULT_VAT_RATE;
 
   const buildTrend = (current: number, previous: number, invert = false) => {
     const change =
