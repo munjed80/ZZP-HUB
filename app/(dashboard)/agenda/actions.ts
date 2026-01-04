@@ -62,7 +62,11 @@ export async function createEvent(values: EventFormValues) {
     revalidatePath("/agenda");
     return { success: true, event: created };
   } catch (error) {
-    console.error("AGENDA_SAVE_ERROR:", error);
+    console.error("AGENDA_SAVE_ERROR:", {
+      error,
+      userId,
+      payload: { title: data.title, start: data.start, end: data.end },
+    });
     return { success: false, message: "Opslaan van de afspraak is mislukt." };
   }
 }
