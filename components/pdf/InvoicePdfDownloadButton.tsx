@@ -6,6 +6,16 @@ import { Share2 } from "lucide-react";
 import { InvoicePDF, type InvoicePdfData } from "./InvoicePDF";
 
 const DOWNLOAD_CLEANUP_DELAY_MS = 100;
+const DEFAULT_COMPANY_NAME = "Je bedrijf";
+const hasWebShareSupport = () => typeof navigator !== "undefined" && typeof navigator.share === "function";
+const canShareFiles = (data: ShareData) => {
+  try {
+    return typeof navigator.canShare === "function" ? navigator.canShare(data) : false;
+  } catch (shareSupportError) {
+    console.error("Share API support check failed for PDF data", shareSupportError);
+    return false;
+  }
+};
 
 type Props = {
   invoice: InvoicePdfData;
@@ -22,7 +32,7 @@ export function InvoicePdfDownloadButton({ invoice, documentType = "FACTUUR", fi
     "inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white ring-1 ring-slate-900 hover:bg-slate-800";
   const linkClass = className ?? defaultClass;
   const documentLabel = documentType === "OFFERTE" ? "Offerte" : "Factuur";
-  const companyName = invoice.companyProfile?.companyName ?? "je bedrijf";
+  const companyName = invoice.companyProfile?.companyName ?? DEFAULT_COMPANY_NAME;
   const shareTitle = `${documentLabel} ${invoice.invoiceNum}`;
   const shareText = `Hier is de ${documentLabel.toLowerCase()} van ${companyName}`;
   const buttonLabel = label ?? "Delen / Downloaden";
@@ -42,32 +52,32 @@ export function InvoicePdfDownloadButton({ invoice, documentType = "FACTUUR", fi
   };
 
   const handleShareOrDownload = async () => {
-    let blob: Blob | null = null;
     try {
       setIsGenerating(true);
-      blob = await pdf(<InvoicePDF invoice={invoice} documentType={documentType} />).toBlob();
+      const blob = await pdf(<InvoicePDF invoice={invoice} documentType={documentType} />).toBlob();
       const pdfFile = new File([blob], downloadName, { type: "application/pdf" });
       const shareData = {
         title: shareTitle,
         text: shareText,
         files: [pdfFile],
       };
-      const canUseShare =
-        typeof navigator !== "undefined" &&
-        typeof navigator.share === "function" &&
-        (!navigator.canShare || navigator.canShare({ files: shareData.files }));
+      const hasWebShare = hasWebShareSupport();
 
-      if (canUseShare) {
-        await navigator.share(shareData);
-        return;
+      if (hasWebShare && canShareFiles(shareData)) {
+        try {
+          await navigator.share(shareData);
+          return;
+        } catch (shareError) {
+          if (shareError instanceof DOMException && shareError.name === "AbortError") {
+            return;
+          }
+          console.error("Sharing invoice PDF failed", shareError);
+        }
       }
 
       downloadBlob(blob);
     } catch (error) {
-      console.error("PDF share/download failed", error);
-      if (blob) {
-        downloadBlob(blob);
-      }
+      console.error("Invoice PDF generation or download failed", error);
     } finally {
       setIsGenerating(false);
     }
@@ -79,7 +89,7 @@ export function InvoicePdfDownloadButton({ invoice, documentType = "FACTUUR", fi
         "PDF genereren..."
       ) : (
         <>
-          <Share2 className="h-4 w-4" aria-hidden />
+          <Share2 className="h-4 w-4" aria-hidden="true" />
           {buttonLabel}
         </>
       )}
