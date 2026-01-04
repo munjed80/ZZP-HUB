@@ -51,7 +51,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
         <div className="flex flex-col gap-2 p-2">
           <InvoicePdfDownloadButton
             invoice={pdfInvoice}
-            label="Download PDF"
+            label="Delen / Downloaden"
             className="w-full justify-center bg-slate-900 text-white hover:bg-slate-800"
           />
           <SendInvoiceEmailButton
