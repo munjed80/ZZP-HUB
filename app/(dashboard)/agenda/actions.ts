@@ -49,20 +49,23 @@ export async function createEvent(values: EventFormValues) {
   }
 
   try {
+    const startIso = new Date(data.start).toISOString();
+    const endIso = new Date(data.end).toISOString();
+
     const created = await prisma.event.create({
       data: {
         userId,
         title: data.title,
         description: data.description,
-        start: startDate,
-        end: endDate,
+        start: startIso,
+        end: endIso,
       },
     });
 
     revalidatePath("/agenda");
     return { success: true, event: created };
   } catch (error) {
-    console.error("Opslaan van afspraak mislukt", { error, userId });
+    console.error("AGENDA_SAVE_ERROR:", error);
     return { success: false, message: "Opslaan van de afspraak is mislukt." };
   }
 }
