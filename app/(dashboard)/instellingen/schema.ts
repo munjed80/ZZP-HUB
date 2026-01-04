@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+const isValidUrlLike = (value: string) => {
+  try {
+    // Allow data URLs for inline avatars/previews in addition to http(s) URLs
+    return value.startsWith("data:") || Boolean(new URL(value));
+  } catch {
+    return false;
+  }
+};
+
 export const companySettingsSchema = z.object({
   companyName: z.string().min(2, "Bedrijfsnaam is verplicht"),
   address: z.string().min(2, "Adres is verplicht"),
@@ -12,9 +21,12 @@ export const companySettingsSchema = z.object({
   paymentTerms: z.coerce.number().int().positive().min(1, "Betaaltermijn is verplicht"),
   logoUrl: z
     .string()
-    .url("Voer een geldige URL in")
+    .trim()
     .optional()
-    .or(z.literal("")),
+    .or(z.literal(""))
+    .refine((value) => !value || isValidUrlLike(value), {
+      message: "Voer een geldige URL of upload een afbeelding",
+    }),
   korEnabled: z.boolean().default(false),
 });
 
@@ -30,3 +42,11 @@ export const emailSettingsSchema = z.object({
 });
 
 export type EmailSettingsInput = z.infer<typeof emailSettingsSchema>;
+
+export const profileBasicsSchema = z.object({
+  name: z.string().min(2, "Naam is verplicht"),
+  companyName: z.string().min(2, "Bedrijfsnaam is verplicht").optional(),
+  email: z.string().email("Voer een geldig e-mailadres in"),
+});
+
+export type ProfileBasicsInput = z.infer<typeof profileBasicsSchema>;
