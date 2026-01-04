@@ -3,7 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatBedrag } from "@/lib/utils";
 import { RevenueExpensesChart } from "@/components/dashboard/revenue-expenses-chart";
-import { DEFAULT_VAT_RATE, getDashboardStats } from "@/actions/get-dashboard-stats";
+import { getDashboardStats } from "@/actions/get-dashboard-stats";
+import { DEFAULT_VAT_RATE } from "@/lib/constants";
 
 export default async function DashboardPagina() {
   const stats = await getDashboardStats();

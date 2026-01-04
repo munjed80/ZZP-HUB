@@ -4,8 +4,7 @@ import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
-
-export const DEFAULT_VAT_RATE = 0.21;
+import { DEFAULT_VAT_RATE } from "@/lib/constants";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const createMonthlyChartData = () => MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
