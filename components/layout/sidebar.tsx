@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -18,7 +17,6 @@ import {
    Settings,
    LifeBuoy,
    Sparkles,
-  Menu,
   X,
   LogOut,
 } from "lucide-react";

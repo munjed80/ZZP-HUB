@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 type SheetProps = {
   open: boolean;
