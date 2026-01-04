@@ -43,7 +43,28 @@ export function DistributionDonut({ revenue, expenses, profit }: Props) {
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>
           <Tooltip
-            formatter={(value: number, name: string) => [`${formatBedrag(value)} (${((value / total) * 100).toFixed(0)}%)`, name]}
+            formatter={(value: number | string | undefined, name: string): [string, string] => {
+              const toFiniteNumber = (input: number | string | undefined) => {
+                if (typeof input === "number" && Number.isFinite(input)) {
+                  return input;
+                }
+                if (typeof input === "string") {
+                  const parsed = Number(input);
+                  if (Number.isFinite(parsed)) {
+                    return parsed;
+                  }
+                }
+                return undefined;
+              };
+
+              const numericValue = toFiniteNumber(value);
+
+              if (numericValue === undefined) {
+                return ["-", name];
+              }
+
+              return [`${formatBedrag(numericValue)} (${((numericValue / total) * 100).toFixed(0)}%)`, name];
+            }}
             contentStyle={{
               borderRadius: 12,
               border: "1px solid var(--border)",
