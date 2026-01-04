@@ -52,7 +52,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
           <InvoicePdfDownloadButton
             invoice={pdfInvoice}
             label="Delen / Downloaden"
-            className="w-full justify-center bg-slate-900 text-white hover:bg-slate-800"
+            className="w-full justify-center"
           />
           <SendInvoiceEmailButton
             invoiceId={invoiceId}
