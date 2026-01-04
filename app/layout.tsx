@@ -17,27 +17,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ZZP-HUB | Elite Business Management for Professionals",
+  title: "Elite Business Hub | Slimmer Ondernemen voor ZZP'ers",
   description:
-    "Elite Business Management for Professionals. All-in-one administratie, facturen, uren en BTW-aangifte in een premium financiële uitstraling.",
+    "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
   icons: {
-    icon: '/favicon.svg',
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
   openGraph: {
-    title: "ZZP-HUB | Elite Business Management voor Professionals",
+    title: "Elite Business Hub | Slimmer Ondernemen voor ZZP'ers",
     description:
-      "Beheer je business met een premium financiële look: facturen, uren, BTW en rapportages in één strak dashboard.",
+      "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
     url: "https://zzp-hub.nl",
-    siteName: "ZZP-HUB",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "ZZP-HUB premium hero" }],
+    siteName: "Elite Business Hub",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Elite Hub social preview" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZZP-HUB | Elite Business Management",
+    title: "Elite Business Hub | Slimmer Ondernemen voor ZZP'ers",
     description:
-      "Premium financieel dashboard voor ZZP'ers met facturen, uren, BTW en rapportages.",
+      "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
     images: ["/og-image.png"],
   },
+  themeColor: "#0A2E50",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -48,7 +52,9 @@ export default function RootLayout({
   return (
     <html lang="nl">
       <head>
-        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="apple-touch-icon" href="/favicon.ico" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F8F9FA] text-slate-900`}

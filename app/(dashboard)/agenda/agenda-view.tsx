@@ -119,7 +119,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
                 required
                 value={form.title}
                 onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#1b4965] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
                 placeholder="Bijv. Intakegesprek met klant"
               />
           </div>
@@ -134,7 +134,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
                 id="event-description"
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                className="min-h-[72px] w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#1b4965] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
+                className="min-h-[72px] w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
                 placeholder="Notities of locatie"
               />
             </div>
@@ -153,7 +153,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
                   required
                   value={form.start}
                   onChange={(e) => setForm((prev) => ({ ...prev, start: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#1b4965] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
+                  className="w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
                 />
               </div>
             </div>
@@ -169,7 +169,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
                   required
                   value={form.end}
                   onChange={(e) => setForm((prev) => ({ ...prev, end: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#1b4965] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
+                  className="w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
                 />
               </div>
             </div>
@@ -188,7 +188,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#0a2e50] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1b4965] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1b4965] disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#0a2e50] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#4A5568] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4A5568] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isPending ? "Inplannen..." : "Inplannen"}
             </button>
@@ -332,7 +332,7 @@ export function AgendaView({ events }: AgendaViewProps) {
                             className="rounded-lg border border-[#c7d4de] bg-[#e7eef4] p-2 text-xs text-[#0a2e50]"
                           >
                             <p className="font-semibold leading-tight">{event.title}</p>
-                            <p className="flex items-center gap-1 text-[11px] text-[#1b4965]">
+                            <p className="flex items-center gap-1 text-[11px] text-[#4A5568]">
                               <Clock3 className="h-3 w-3" aria-hidden="true" />
                               {formatTijd(event.start)} - {formatTijd(event.end)}
                             </p>
@@ -352,7 +352,7 @@ export function AgendaView({ events }: AgendaViewProps) {
                 {upcomingEvents.length === 0 ? (
                   <p className="text-sm text-slate-600">Nog geen afspraken gepland.</p>
                 ) : (
-                  <div className="relative space-y-4 pl-5 before:absolute before:left-[6px] before:top-0 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-[#1b4965]/70 before:via-[#c7d4de]/40 before:to-transparent">
+                  <div className="relative space-y-4 pl-5 before:absolute before:left-[6px] before:top-0 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-[#4A5568]/70 before:via-[#c7d4de]/40 before:to-transparent">
                     {upcomingEvents.map((event) => (
                       <div
                         key={event.id}
@@ -376,7 +376,7 @@ export function AgendaView({ events }: AgendaViewProps) {
                           ) : null}
                         </div>
                         <div className="mt-3 flex items-center gap-2 rounded-lg border border-white/40 bg-white/20 px-3 py-2 text-xs font-semibold text-slate-800 backdrop-blur">
-                          <Clock3 className="h-4 w-4 text-[#1b4965]" aria-hidden="true" />
+                          <Clock3 className="h-4 w-4 text-[#4A5568]" aria-hidden="true" />
                           {formatTijd(event.start)} - {formatTijd(event.end)}
                         </div>
                       </div>
@@ -418,7 +418,7 @@ export function AgendaView({ events }: AgendaViewProps) {
                             ) : null}
                           </div>
                           <div className="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-700">
-                          <Clock3 className="h-3 w-3 text-[#1b4965]" aria-hidden="true" />
+                          <Clock3 className="h-3 w-3 text-[#4A5568]" aria-hidden="true" />
                             {formatTijd(event.start)}
                           </div>
                         </div>
@@ -435,7 +435,7 @@ export function AgendaView({ events }: AgendaViewProps) {
       <button
         type="button"
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#0a2e50] text-white shadow-lg shadow-[0_18px_42px_-22px_rgba(10,46,80,0.35)] transition hover:scale-105 hover:bg-[#1b4965] focus:outline-none focus:ring-4 focus:ring-[#c7d4de] md:hidden"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#0a2e50] text-white shadow-lg shadow-[0_18px_42px_-22px_rgba(10,46,80,0.35)] transition hover:scale-105 hover:bg-[#4A5568] focus:outline-none focus:ring-4 focus:ring-[#c7d4de] md:hidden"
         aria-label="Nieuwe afspraak toevoegen"
       >
         <Plus className="h-6 w-6" aria-hidden="true" />

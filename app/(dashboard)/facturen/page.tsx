@@ -139,7 +139,7 @@ export default async function FacturenPagina() {
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => (
                   <div
                     key={factuur.id}
-                    className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm hover:shadow-md transition-shadow"
+                    className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">

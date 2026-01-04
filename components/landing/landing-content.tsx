@@ -53,7 +53,7 @@ const glassStats = [
     value: "€12.480",
     chip: "+18% vs vorige maand",
     icon: LineChart,
-    accent: "from-[#0a2e50] to-[#1b4965]",
+    accent: "from-[#0a2e50] to-[#4A5568]",
   },
   {
     label: "Openstaand",
@@ -123,7 +123,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <Sparkles className="h-5 w-5 text-slate-700" aria-hidden />
               </div>
               <motion.span
-                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(79,70,229,0.25)]"
+                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(10,46,80,0.25)]"
                 transition={{ duration: 0.6 }}
               >
                 ZZP-HUB
@@ -173,7 +173,10 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
       </header>
 
       <main className="pt-16 sm:pt-20">
-        <section id="preview" className="relative overflow-hidden pb-24 pt-20 sm:pt-24 lg:pt-28">
+        <section
+          id="preview"
+          className="relative overflow-hidden bg-[linear-gradient(135deg,#f7f8fb,#e6e9ef,#cfd4dd)] pb-24 pt-20 sm:pt-24 lg:pt-28"
+        >
           <div className="absolute inset-0">
             <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-[#d7e1ea] blur-3xl" />
             <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-[#c7d4de]/70 blur-3xl" />
@@ -194,20 +197,20 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 {...fadeUp}
                 transition={fadeUpTransition(0.05)}
                 style={{
-                  backgroundImage: "linear-gradient(135deg,#e6e9f0 0%,#cfd5dd 32%,#9ba3b5 58%,#f4f6fb 100%)",
+                  backgroundImage: "linear-gradient(135deg,#f5f7fa 0%,#d6dbe3 36%,#b6bec9 62%,#f8fafc 100%)",
                   backgroundSize: "160% 160%",
                   WebkitBackgroundClip: "text",
                   color: "transparent",
                 }}
               >
-                  Elite Business Management for Professionals.
+                  Slimmer ondernemen met een premium financieel hub voor ZZP&apos;ers.
               </motion.h1>
               <motion.p
                 className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-700 sm:text-xl lg:mx-0"
                 {...fadeUp}
                 transition={fadeUpTransition(0.1)}
               >
-                  The all-in-one platform for modern professionals. Manage trips, stops, quotes and bookkeeping in a premium financial workflow.
+                  Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.
               </motion.p>
                 <motion.div
                   className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start"
@@ -240,7 +243,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   transition={fadeUpTransition(0.2)}
                 >
                   <CheckCircle2 className="h-5 w-5 text-emerald-500" aria-hidden />
-                  <span>14 dagen gratis • Geen creditcard • Magnetic UI</span>
+                  <span>14 dagen gratis • Geen creditcard • Premium ervaring</span>
                 </motion.div>
               </div>
 
@@ -252,7 +255,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 >
                   <div className="flex items-center justify-between border-b border-white/40 pb-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a2e50] via-[#1b4965] to-[#4f6f86] text-white shadow-lg shadow-[0_12px_32px_-18px_rgba(10,46,80,0.6)] ring-1 ring-white/50">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a2e50] via-[#4A5568] to-[#4f6f86] text-white shadow-lg shadow-[0_12px_32px_-18px_rgba(10,46,80,0.6)] ring-1 ring-white/50">
                         <Sparkles className="h-5 w-5" aria-hidden />
                       </div>
                       <div>
@@ -307,7 +310,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                           {[36, 62, 78, 68, 92, 74, 108, 98, 86, 94, 120, 104].map((height, idx) => (
                             <div key={idx} className="space-y-2">
                               <div
-                                className="rounded-xl bg-gradient-to-t from-[#0a2e50] to-[#1b4965] shadow-[0_14px_36px_-18px_rgba(10,46,80,0.55)]"
+                                className="rounded-xl bg-gradient-to-t from-[#0a2e50] to-[#4A5568] shadow-[0_14px_36px_-18px_rgba(10,46,80,0.55)]"
                                 style={{ height: `${height}px` }}
                               />
                               <div
@@ -342,7 +345,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                                 </div>
                                 <div className="text-right">
                                   <p className="text-sm font-semibold text-slate-900">{invoice.bedrag}</p>
-                                  <span className="text-[11px] font-semibold text-emerald-600">{invoice.status}</span>
+                                  <span className="text-[11px] font-semibold text-[#10B981]">{invoice.status}</span>
                                 </div>
                               </div>
                             ))}
@@ -397,7 +400,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 </h3>
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/85 px-3 py-2 text-sm text-slate-600 shadow-sm">
-                <Sparkles className="h-4 w-4 text-[#1b4965]" aria-hidden />
+                <Sparkles className="h-4 w-4 text-[#4A5568]" aria-hidden />
                 <span>Glasheldere premium workflow</span>
               </div>
             </div>
@@ -418,7 +421,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
         <section id="features" className="bg-white py-24 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#1b4965]">Features</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#4A5568]">Features</p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Alles wat je nodig hebt</h2>
               <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
                 Staggered reveals, glasheldere flows en invisible inputs voor je klanten.
@@ -432,7 +435,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <motion.div key={feature.title} className="h-full" {...staggeredCard(0.05 * index)}>
                     <Card className="h-full border-slate-200/70 bg-white/90 shadow-[0_18px_80px_-45px_rgba(10,46,80,0.32)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[0_24px_90px_-48px_rgba(27,73,101,0.24)]">
                       <CardHeader className="space-y-4">
-                        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a2e50] to-[#1b4965] text-white shadow-lg shadow-[0_16px_40px_-24px_rgba(10,46,80,0.5)] ring-1 ring-white/40">
+                        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a2e50] to-[#4A5568] text-white shadow-lg shadow-[0_16px_40px_-24px_rgba(10,46,80,0.5)] ring-1 ring-white/40">
                           <Icon className="h-7 w-7" aria-hidden />
                         </div>
                         <CardTitle className="text-xl font-semibold tracking-tight text-slate-900">{feature.title}</CardTitle>
@@ -450,7 +453,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
 
         <section id="pricing" className="relative overflow-hidden bg-gradient-to-br from-[#0a2e50] via-[#0c3d66] to-[#0a2e50] py-24 sm:py-28 text-slate-100">
           <div className="absolute inset-0">
-            <div className="absolute left-10 top-8 h-72 w-72 rounded-full bg-[#1b4965]/40 blur-3xl" />
+            <div className="absolute left-10 top-8 h-72 w-72 rounded-full bg-[#4A5568]/40 blur-3xl" />
             <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-[#0a2e50]/35 blur-[140px]" />
           </div>
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -480,7 +483,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
             </div>
 
             <div className="relative mx-auto mt-16 max-w-3xl">
-              <div className="absolute inset-6 -z-10 rounded-[36px] bg-[#1b4965]/45 blur-[100px]" />
+              <div className="absolute inset-6 -z-10 rounded-[36px] bg-[#4A5568]/45 blur-[100px]" />
               <motion.div
                 className="relative overflow-hidden rounded-[32px] border border-white/15 bg-white/5 p-8 shadow-[0_35px_120px_-70px_rgba(10,46,80,0.65)] backdrop-blur-2xl"
                 {...fadeUp}
@@ -531,7 +534,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section className="bg-gradient-to-r from-[#0a2e50] via-[#1b4965] to-[#0a2e50] py-16 sm:py-20">
+        <section className="bg-gradient-to-r from-[#0a2e50] via-[#4A5568] to-[#0a2e50] py-16 sm:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center text-white">
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Klaar om te starten?</h2>

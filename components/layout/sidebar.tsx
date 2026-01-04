@@ -91,7 +91,7 @@ export function Sidebar({ userRole }: { userRole?: UserRole }) {
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex w-full items-center gap-2 rounded-lg border border-[#d5dae0] bg-white/90 px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:bg-slate-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1b4965]"
+          className="flex w-full items-center gap-2 rounded-lg border border-[#d5dae0] bg-white/90 px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:bg-slate-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A5568]"
         >
           <LogOut className="h-4 w-4" aria-hidden />
           Sign Out
@@ -174,7 +174,7 @@ export function MobileSidebar({ userRole }: { userRole?: UserRole }) {
                   setOpen(false);
                   signOut({ callbackUrl: "/" });
                 }}
-                className="flex w-full items-center gap-2 rounded-lg border border-[#d5dae0] bg-white/90 px-3 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:bg-slate-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1b4965]"
+                className="flex w-full items-center gap-2 rounded-lg border border-[#d5dae0] bg-white/90 px-3 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:bg-slate-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A5568]"
               >
                 <LogOut className="h-4 w-4" aria-hidden />
                 Sign Out

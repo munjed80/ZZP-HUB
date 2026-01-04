@@ -60,7 +60,7 @@ export default function RegisterPagina() {
           <input
             id="bedrijfsnaam"
             required
-            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-[#1b4965] focus:outline-none focus:ring-0"
+            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-[#4A5568] focus:outline-none focus:ring-0"
             {...form.register("bedrijfsnaam")}
             aria-invalid={!!form.formState.errors.bedrijfsnaam}
           />
@@ -78,7 +78,7 @@ export default function RegisterPagina() {
             id="email"
             type="email"
             required
-            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-[#1b4965] focus:outline-none focus:ring-0"
+            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-[#4A5568] focus:outline-none focus:ring-0"
             {...form.register("email")}
             aria-invalid={!!form.formState.errors.email}
           />
@@ -94,7 +94,7 @@ export default function RegisterPagina() {
             id="password"
             type="password"
             required
-            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-[#1b4965] focus:outline-none focus:ring-0"
+            className="w-full border-0 border-b border-slate-200 bg-transparent px-1 pb-3 pt-1 text-sm text-slate-900 transition-all duration-300 focus:border-b-[2px] focus:border-[#4A5568] focus:outline-none focus:ring-0"
             {...form.register("password")}
             aria-invalid={!!form.formState.errors.password}
           />
