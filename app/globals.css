@@ -41,7 +41,7 @@
   --destructive: var(--danger);
   --destructive-foreground: 255 255 255;
   --success-foreground: 255 255 255;
-  --warning-foreground: var(--text-primary);
+  --warning-foreground: 102 64 0;
   --danger-foreground: 255 255 255;
   --link: var(--brand-primary);
   --link-hover: var(--brand-primary-hover);

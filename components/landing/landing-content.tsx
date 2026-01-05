@@ -77,7 +77,7 @@ const glassStats = [
     value: "€2.130",
     chip: "3 facturen",
     icon: FileText,
-    accent: "from-[rgb(var(--warning))] to-[rgb(var(--warning))]",
+    accent: "from-warning/90 to-warning/70",
   },
   {
     label: "Focus sprint",
@@ -158,13 +158,13 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
     <div className="min-h-screen bg-gradient-to-b from-[rgb(var(--bg-surface))] via-[rgb(var(--bg-card))] to-[rgb(var(--bg-surface))] text-foreground">
       <header className="sticky top-4 z-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between rounded-full border border-border bg-card/85 px-4 py-3 shadow-2xl shadow-[color:rgba(13,26,31,0.08)] backdrop-blur-md">
+          <div className="flex items-center justify-between rounded-full border border-border bg-card/85 px-4 py-3 shadow-2xl shadow-[0_10px_30px_rgb(var(--text-primary)/0.08)] backdrop-blur-md">
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[rgb(var(--brand-primary-active))] via-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary-hover))] shadow-[0_10px_40px_-18px_rgba(12,126,112,0.45)] ring-1 ring-[rgb(var(--brand-primary-active))]/30">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[rgb(var(--brand-primary-active))] via-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary-hover))] shadow-[0_10px_40px_-18px_rgb(var(--brand-primary)/0.45)] ring-1 ring-[rgb(var(--brand-primary-active))]/30">
                 <BrandZ className="h-5 w-5 text-white" aria-hidden />
               </div>
               <motion.span
-                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(13,26,31,0.25)]"
+                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgb(var(--text-primary)/0.25)]"
                 transition={{ duration: 0.6 }}
               >
                 ZZP-HUB
@@ -261,7 +261,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 >
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/register"}
-                    className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary-hover))] px-8 py-4 text-base font-semibold text-[rgb(var(--brand-on-primary))] shadow-lg shadow-[color:rgba(12,126,112,0.32)] transition-all duration-300 hover:shadow-[0_0_50px_rgba(12,126,112,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand-primary))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--bg-main))]"
+                    className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary-hover))] px-8 py-4 text-base font-semibold text-[rgb(var(--brand-on-primary))] shadow-lg shadow-[0_0_40px_rgb(var(--brand-primary)/0.32)] transition-all duration-300 hover:shadow-[0_0_50px_rgb(var(--brand-primary)/0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--brand-primary))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--bg-main))]"
                   >
                     <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     Start 14 dagen gratis
@@ -528,7 +528,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <motion.div
-                className="mx-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[rgb(var(--brand-primary-active))] via-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary-hover))] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[rgb(var(--brand-on-primary))] shadow-[0_12px_40px_-18px_rgba(6,26,22,0.35)]"
+                className="mx-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[rgb(var(--brand-primary-active))] via-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary-hover))] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[rgb(var(--brand-on-primary))] shadow-[0_12px_40px_-18px_rgb(var(--brand-on-primary)/0.35)]"
                 {...fadeUp}
               >
                 14 Dagen Gratis
@@ -554,7 +554,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
             <div className="relative mx-auto mt-16 max-w-3xl">
               <div className="absolute inset-6 -z-10 rounded-[36px] bg-[rgb(var(--brand-primary-active))]/25 blur-[100px]" />
               <motion.div
-                className="relative overflow-hidden rounded-[32px] border border-[rgb(var(--brand-on-primary))]/15 bg-[rgb(var(--brand-on-primary))]/5 p-8 shadow-[0_35px_120px_-70px_rgba(6,26,22,0.55)] backdrop-blur-2xl"
+                className="relative overflow-hidden rounded-[32px] border border-[rgb(var(--brand-on-primary))]/15 bg-[rgb(var(--brand-on-primary))]/5 p-8 shadow-[0_35px_120px_-70px_rgb(var(--brand-on-primary)/0.55)] backdrop-blur-2xl"
                 {...fadeUp}
                 transition={fadeUpTransition(0.15)}
               >
@@ -572,7 +572,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   {elitePerks.map((perk) => (
                     <div
                       key={perk}
-                      className="flex items-start gap-3 rounded-2xl border border-[rgb(var(--brand-on-primary))]/15 bg-[rgb(var(--brand-on-primary))]/10 px-4 py-3 text-sm text-[rgb(var(--brand-on-primary))] shadow-[0_18px_50px_-40px_rgba(6,26,22,0.45)]"
+                      className="flex items-start gap-3 rounded-2xl border border-[rgb(var(--brand-on-primary))]/15 bg-[rgb(var(--brand-on-primary))]/10 px-4 py-3 text-sm text-[rgb(var(--brand-on-primary))] shadow-[0_18px_50px_-40px_rgb(var(--brand-on-primary)/0.45)]"
                     >
                       <CheckCircle2 className="mt-0.5 h-5 w-5 text-[rgb(var(--brand-on-primary))]" aria-hidden />
                       <span>{perk}</span>
@@ -587,7 +587,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href={isLoggedIn ? "/dashboard" : "/register"}
                     className={buttonVariants(
                       "primary",
-                      "w-full justify-center bg-[rgb(var(--brand-on-primary))] text-[rgb(var(--brand-primary-active))] px-8 py-3 text-base shadow-[0_20px_70px_-35px_rgba(6,26,22,0.4)] hover:bg-[rgb(var(--brand-on-primary))]"
+                      "w-full justify-center bg-[rgb(var(--brand-on-primary))] text-[rgb(var(--brand-primary-active))] px-8 py-3 text-base shadow-[0_20px_70px_-35px_rgb(var(--brand-on-primary)/0.4)] hover:bg-[rgb(var(--brand-on-primary))]"
                     )}
                   >
                     {primaryCta}
