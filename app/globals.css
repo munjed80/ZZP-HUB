@@ -1,124 +1,106 @@
 @import "tailwindcss";
 
-/* Light theme (default) - Premium mauve + fiery accents, soft off-white */
+/* Light theme (default) - Emerald/teal identity */
 :root {
-  /* Base colors */
-  --background: 251 248 252; /* Soft off-white with hint of mauve */
-  --foreground: 28 25 35; /* Warm charcoal, not pure black */
-  
-  /* Surface/Card colors */
-  --card: 255 255 255;
-  --card-foreground: 28 25 35;
-  
-  /* Popover colors */
-  --popover: 255 255 255;
-  --popover-foreground: 28 25 35;
-  
-  /* Muted colors */
-  --muted: 245 242 248; /* Light mauve-tinted gray */
-  --muted-foreground: 100 95 110; /* Medium mauve-gray for secondary text */
-  
-  /* Border and input */
-  --border: 228 224 235; /* Subtle mauve-tinted border */
-  --input: 228 224 235;
-  --ring: 139 92 246; /* Mauve for focus rings */
-  
-  /* Primary - Mauve gradient (subtle premium) */
-  --primary: 139 92 246; /* Mauve/purple */
-  --primary-foreground: 255 255 255;
-  
-  /* Secondary - Neutral surface */
-  --secondary: 245 242 248;
-  --secondary-foreground: 28 25 35;
-  
-  /* Accent - Complementary mauve shade */
-  --accent: 167 139 250; /* Lighter mauve */
-  --accent-foreground: 28 25 35;
-  
-  /* Destructive - Fiery (warm red-orange) */
-  --destructive: 239 68 68; /* Warm red */
+  /* Core theme tokens */
+  --bg-main: 245 250 249;
+  --bg-surface: 236 246 243;
+  --bg-card: 255 255 255;
+  --text-primary: 13 26 31;
+  --text-secondary: 32 56 64;
+  --text-muted: 92 116 122;
+  --border-subtle: 204 224 220;
+  --brand-primary: 20 184 166;
+  --brand-primary-hover: 16 149 131;
+  --brand-primary-active: 12 126 112;
+  --brand-on-primary: 236 252 250;
+  --success: 22 163 74;
+  --warning: 234 179 8;
+  --danger: 239 68 68;
+
+  /* Derived tokens for utilities */
+  --background: var(--bg-main);
+  --foreground: var(--text-primary);
+  --card: var(--bg-card);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --muted: var(--bg-surface);
+  --muted-foreground: var(--text-muted);
+  --border: var(--border-subtle);
+  --input: var(--border-subtle);
+  --ring: var(--brand-primary);
+  --primary: var(--brand-primary);
+  --primary-hover: var(--brand-primary-hover);
+  --primary-active: var(--brand-primary-active);
+  --primary-foreground: var(--brand-on-primary);
+  --secondary: var(--bg-surface);
+  --secondary-foreground: var(--text-secondary);
+  --accent: var(--brand-primary-hover);
+  --accent-foreground: var(--brand-on-primary);
+  --destructive: var(--danger);
   --destructive-foreground: 255 255 255;
-  
-  /* Success - Balanced green */
-  --success: 34 197 94;
   --success-foreground: 255 255 255;
-  
-  /* Warning - Amber */
-  --warning: 245 158 11;
-  --warning-foreground: 255 255 255;
-  
-  /* Link colors */
-  --link: 139 92 246; /* Mauve */
-  --link-hover: 109 40 217; /* Darker mauve on hover */
-  
-  /* Legacy support (kept for gradual migration) */
-  --background-secondary: 245 242 248;
-  --surface: 255 255 255;
-  --surface-2: 250 250 250;
-  --border-subtle: 228 224 235;
-  --shadow: rgba(0, 0, 0, 0.1);
+  --warning-foreground: var(--text-primary);
+  --danger-foreground: 255 255 255;
+  --link: var(--brand-primary);
+  --link-hover: var(--brand-primary-hover);
+  --background-secondary: var(--bg-surface);
+  --surface: var(--bg-surface);
+  --surface-2: var(--bg-card);
+  --shadow: rgba(13, 26, 31, 0.1);
   --font-geist-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-geist-mono: "SFMono-Regular", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
 }
 
-/* Dark theme - Warm charcoal dark (not pure black) */
+/* Dark theme - Clean deep teal charcoal */
 .dark {
-  /* Base colors */
-  --background: 20 18 25; /* Warm charcoal, not pure black */
-  --foreground: 248 245 250; /* Soft off-white */
-  
-  /* Surface/Card colors */
-  --card: 30 27 38; /* Slightly lighter charcoal for cards */
-  --card-foreground: 248 245 250;
-  
-  /* Popover colors */
-  --popover: 30 27 38;
-  --popover-foreground: 248 245 250;
-  
-  /* Muted colors */
-  --muted: 40 37 48; /* Muted charcoal */
-  --muted-foreground: 161 155 170; /* Medium gray with mauve tint */
-  
-  /* Border and input */
-  --border: 50 47 58; /* Subtle border in dark */
-  --input: 50 47 58;
-  --ring: 167 139 250; /* Lighter mauve for dark mode focus */
-  
-  /* Primary - Adjusted mauve for dark mode */
-  --primary: 167 139 250; /* Lighter mauve for better contrast */
-  --primary-foreground: 20 18 25;
-  
-  /* Secondary - Muted surface */
-  --secondary: 40 37 48;
-  --secondary-foreground: 248 245 250;
-  
-  /* Accent */
-  --accent: 196 181 253; /* Even lighter mauve for dark */
-  --accent-foreground: 20 18 25;
-  
-  /* Destructive - Fiery but softer in dark */
-  --destructive: 248 113 113; /* Softer warm red */
-  --destructive-foreground: 255 255 255;
-  
-  /* Success */
+  --bg-main: 7 15 20;
+  --bg-surface: 10 21 27;
+  --bg-card: 15 28 36;
+  --text-primary: 226 241 238;
+  --text-secondary: 186 205 200;
+  --text-muted: 130 151 146;
+  --border-subtle: 28 44 50;
+  --brand-primary: 52 211 153;
+  --brand-primary-hover: 16 185 129;
+  --brand-primary-active: 5 150 105;
+  --brand-on-primary: 6 26 22;
   --success: 74 222 128;
-  --success-foreground: 20 18 25;
-  
-  /* Warning */
-  --warning: 251 191 36;
-  --warning-foreground: 20 18 25;
-  
-  /* Link colors */
-  --link: 167 139 250;
-  --link-hover: 196 181 253;
-  
-  /* Legacy support */
-  --background-secondary: 26 23 32;
-  --surface: 30 27 38;
-  --surface-2: 40 37 48;
-  --border-subtle: 50 47 58;
-  --shadow: rgba(0, 0, 0, 0.3);
+  --warning: 250 204 21;
+  --danger: 248 113 113;
+
+  --background: var(--bg-main);
+  --foreground: var(--text-primary);
+  --card: var(--bg-card);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-primary);
+  --muted: var(--bg-surface);
+  --muted-foreground: var(--text-muted);
+  --border: var(--border-subtle);
+  --input: var(--border-subtle);
+  --ring: var(--brand-primary);
+  --primary: var(--brand-primary);
+  --primary-hover: var(--brand-primary-hover);
+  --primary-active: var(--brand-primary-active);
+  --primary-foreground: var(--brand-on-primary);
+  --secondary: var(--bg-surface);
+  --secondary-foreground: var(--text-secondary);
+  --accent: var(--brand-primary-hover);
+  --accent-foreground: var(--brand-on-primary);
+  --destructive: var(--danger);
+  --destructive-foreground: 6 26 22;
+  --success-foreground: 6 26 22;
+  --warning-foreground: 7 15 20;
+  --danger-foreground: 6 26 22;
+  --link: var(--brand-primary);
+  --link-hover: var(--brand-primary-hover);
+  --background-secondary: var(--bg-surface);
+  --surface: var(--bg-surface);
+  --surface-2: var(--bg-card);
+  --shadow: rgba(0, 0, 0, 0.32);
 }
 
 @theme inline {
@@ -157,16 +139,6 @@ body {
   color: rgb(var(--foreground));
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-}
-
-/* Light mode gradient - subtle mauve-tinted */
-:root body {
-  background: radial-gradient(circle at 10% 20%, rgb(251, 248, 252) 0%, rgb(248, 244, 250) 40%, rgb(245, 242, 248) 100%);
-}
-
-/* Dark mode gradient - warm charcoal */
-.dark body {
-  background: radial-gradient(circle at 10% 20%, rgb(20, 18, 25) 0%, rgb(25, 22, 32) 40%, rgb(20, 18, 25) 100%);
 }
 
 button,

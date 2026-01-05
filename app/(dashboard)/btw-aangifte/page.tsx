@@ -43,10 +43,7 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
 
   const finalLabel = report.totalDue >= 0 ? "Te betalen" : "Terug te vragen";
   const finalVariant = report.totalDue > 0 ? "warning" : "success";
-  const finalTone =
-    report.totalDue > 0
-      ? "from-[#fff4e5] via-white to-[#ffe7c2]"
-      : "from-[#e7f6f0] via-white to-[#d5f1e3]";
+  const finalTone = report.totalDue > 0 ? "bg-warning/10" : "bg-success/10";
 
   const omzetRubrieken = [
     {
@@ -75,26 +72,26 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-[var(--foreground)]">BTW-aangifte</h1>
-        <p className="text-sm text-[var(--muted)]">
+        <h1 className="text-2xl font-bold text-foreground">BTW-aangifte</h1>
+        <p className="text-sm text-muted-foreground">
           Bereken je aangifte per kwartaal met officiële rubrieken zoals bij de Belastingdienst.
         </p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.6fr_0.9fr]">
-        <Card className="bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+        <Card className="bg-card/95 border-border shadow-sm">
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-2">
             <div>
               <CardTitle>Kwartaal & jaar</CardTitle>
-              <p className="text-sm text-[var(--muted)]">Directe herberekening zonder het dashboard te verlaten.</p>
+              <p className="text-sm text-muted-foreground">Directe herberekening zonder het dashboard te verlaten.</p>
             </div>
             <form className="flex flex-wrap gap-3" method="get" aria-live="polite">
-              <label className="flex items-center gap-2 text-sm text-[var(--muted)]">
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 Jaar
                 <select
                   name="year"
                   defaultValue={selectedYear}
-                  className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm shadow-inner shadow-slate-100"
+                  className="rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-inner"
                 >
                   {years.map((year) => (
                     <option key={year} value={year}>
@@ -103,12 +100,12 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
                   ))}
                 </select>
               </label>
-              <label className="flex items-center gap-2 text-sm text-[var(--muted)]">
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 Kwartaal
                 <select
                   name="quarter"
                   defaultValue={selectedQuarter}
-                  className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm shadow-inner shadow-slate-100"
+                  className="rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-inner"
                 >
                   {([1, 2, 3, 4] as const).map((q) => (
                     <option key={q} value={q}>
@@ -119,7 +116,7 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
               </label>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#0f4c5c] via-[#1b6b7a] to-[#2f9e7c] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-teal-200/50 transition hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[rgb(var(--brand-primary-active))] via-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary-hover))] px-4 py-2 text-sm font-semibold text-[rgb(var(--brand-on-primary))] shadow-md transition hover:-translate-y-0.5"
               >
                 <Percent className="h-4 w-4" aria-hidden="true" />
                 Berekenen
@@ -127,18 +124,18 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
             </form>
           </CardHeader>
           <CardContent className="space-y-3" aria-live="polite">
-            <div className="flex items-center gap-2 rounded-xl bg-[var(--background-secondary)] px-3 py-2 text-sm text-[var(--muted)] ring-1 ring-[var(--border)]">
-              <Percent className="h-4 w-4 text-[#4a6fa5]" aria-hidden="true" />
+            <div className="flex items-center gap-2 rounded-xl bg-[rgb(var(--bg-surface))] px-3 py-2 text-sm text-muted-foreground ring-1 ring-border">
+              <Percent className="h-4 w-4 text-[rgb(var(--brand-primary))]" aria-hidden="true" />
               Rubriek berekening voor {quarterLabels[report.quarter]} {report.year}
             </div>
-            <div className="flex items-start gap-2 rounded-xl bg-[#fff4e5] px-3 py-2 text-sm text-[#8b5b0b] ring-1 ring-[#ffe2b8]">
+            <div className="flex items-start gap-2 rounded-xl bg-warning/10 px-3 py-2 text-sm text-warning-foreground ring-1 ring-warning/30">
               <Info className="h-4 w-4" aria-hidden="true" />
               <p>Let op: Als je meedoet aan de KOR, hoef je geen BTW-aangifte te doen.</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className={`bg-gradient-to-br ${finalTone} border-[var(--border)] shadow-lg shadow-amber-100/40`}>
+        <Card className={`${finalTone} border-border shadow-md`}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle>Eindbedrag</CardTitle>
@@ -147,20 +144,20 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
             <Badge variant={finalVariant}>{finalLabel}</Badge>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="rounded-2xl bg-white/70 p-4 text-2xl font-semibold text-[var(--foreground)] shadow-inner shadow-white/60">
+            <div className="rounded-2xl bg-card/80 p-4 text-2xl font-semibold text-foreground shadow-inner">
               {formatBedrag(report.totalDue)}
             </div>
-            <div className="grid gap-2 text-sm text-[var(--muted)]">
-              <div className="flex items-center justify-between rounded-lg bg-white/70 px-3 py-2">
-                <span className="font-semibold text-[var(--foreground)]">Totaal verschuldigde BTW</span>
+            <div className="grid gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center justify-between rounded-lg bg-card/80 px-3 py-2">
+                <span className="font-semibold text-foreground">Totaal verschuldigde BTW</span>
                 <span className="font-semibold">{formatBedrag(report.totalSalesVat)}</span>
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-white/70 px-3 py-2">
-                <span className="font-semibold text-[var(--foreground)]">Voorbelasting (5b)</span>
+              <div className="flex items-center justify-between rounded-lg bg-card/80 px-3 py-2">
+                <span className="font-semibold text-foreground">Voorbelasting (5b)</span>
                 <span className="font-semibold">{formatBedrag(report.deductibleVat)}</span>
               </div>
             </div>
-            <p className="text-xs text-[var(--muted)]">
+            <p className="text-xs text-muted-foreground">
               Eindbedrag = verschuldigde BTW - voorbelasting. Gebruik deze kaart voor je aangifte of reservering.
             </p>
           </CardContent>
@@ -168,7 +165,7 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.6fr_0.9fr]">
-        <Card className="bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+        <Card className="bg-card/95 border-border shadow-sm">
           <CardHeader>
             <CardTitle>Omzet (Prestaties)</CardTitle>
           </CardHeader>
@@ -177,22 +174,22 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
               {omzetRubrieken.map((rubriek) => (
                 <div
                   key={rubriek.key}
-                  className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-[var(--background-secondary)] p-3"
+                  className="flex flex-col gap-2 rounded-xl border border-border bg-[rgb(var(--bg-surface))] p-3"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-[var(--foreground)]">{rubriek.title}</p>
-                      <p className="text-xs text-[var(--muted)]">{rubriek.description}</p>
+                      <p className="text-sm font-semibold text-foreground">{rubriek.title}</p>
+                      <p className="text-xs text-muted-foreground">{rubriek.description}</p>
                     </div>
                     <Badge variant="info">Rubriek {rubriek.key}</Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-[var(--muted)]">Omzet</p>
-                    <p className="text-sm font-semibold text-[var(--foreground)]">{formatBedrag(rubriek.base)}</p>
+                    <p className="text-sm text-muted-foreground">Omzet</p>
+                    <p className="text-sm font-semibold text-foreground">{formatBedrag(rubriek.base)}</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-[var(--muted)]">BTW</p>
-                    <p className="text-sm font-semibold text-[var(--foreground)]">
+                    <p className="text-sm text-muted-foreground">BTW</p>
+                    <p className="text-sm font-semibold text-foreground">
                       {rubriek.vat ? formatBedrag(rubriek.vat) : "n.v.t."}
                     </p>
                   </div>
@@ -200,7 +197,7 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
               ))}
             </div>
 
-            <div className="rounded-xl bg-[var(--background-secondary)] p-3 text-sm text-[var(--muted)] ring-1 ring-[var(--border)]">
+            <div className="rounded-xl bg-[rgb(var(--bg-surface))] p-3 text-sm text-muted-foreground ring-1 ring-border">
               Totaal omzet: {formatBedrag(report.revenueTotal)} · Totaal verschuldigde BTW:{" "}
               {formatBedrag(report.totalSalesVat)}
             </div>
@@ -208,44 +205,44 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
         </Card>
 
         <div className="space-y-4">
-          <Card className="bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+          <Card className="bg-card/95 border-border shadow-sm">
             <CardHeader>
               <CardTitle>Voorbelasting</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--background-secondary)] p-3">
+              <div className="flex items-center justify-between rounded-xl border border-border bg-[rgb(var(--bg-surface))] p-3">
                 <div>
-                  <p className="text-sm font-semibold text-[var(--foreground)]">Rubriek 5b</p>
-                  <p className="text-xs text-[var(--muted)]">Aftrekbare BTW op uitgaven</p>
+                  <p className="text-sm font-semibold text-foreground">Rubriek 5b</p>
+                  <p className="text-xs text-muted-foreground">Aftrekbare BTW op uitgaven</p>
                 </div>
-                <p className="text-sm font-semibold text-[var(--foreground)]">{formatBedrag(report.deductibleVat)}</p>
+                <p className="text-sm font-semibold text-foreground">{formatBedrag(report.deductibleVat)}</p>
               </div>
-              <p className="text-xs text-[var(--muted)]">
+              <p className="text-xs text-muted-foreground">
                 Totale kosten (excl. BTW): {formatBedrag(report.expenseTotal)}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+          <Card className="bg-card/95 border-border shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Controlepunten</CardTitle>
-                <p className="text-sm text-[var(--muted)]">Align met Belastingdienst rubrieken</p>
+                <p className="text-sm text-muted-foreground">Align met Belastingdienst rubrieken</p>
               </div>
               <Badge variant="info">Checklist</Badge>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2 text-sm text-[var(--muted)]">
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-[#4a6fa5]" />
+                  <span className="mt-2 h-2 w-2 rounded-full bg-[rgb(var(--brand-primary))]" />
                   <span>Controleer intracommunautaire prestaties en verlegde BTW (rubriek 3 & 4 indien van toepassing).</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-[#4a6fa5]" />
+                  <span className="mt-2 h-2 w-2 rounded-full bg-[rgb(var(--brand-primary))]" />
                   <span>Controleer correcties privégebruik en eventuele kleine ondernemersregeling (KOR).</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-[#4a6fa5]" />
+                  <span className="mt-2 h-2 w-2 rounded-full bg-[rgb(var(--brand-primary))]" />
                   <span>Bewaar onderbouwing van omzet, uitgaven en BTW-tarieven voor audit trail.</span>
                 </li>
               </ul>
