@@ -34,6 +34,11 @@ type Props = {
   shareLink?: string;
 };
 
+function buildShareLink(shareLink: string | undefined, invoiceId: string) {
+  if (shareLink && shareLink.startsWith("http")) return shareLink;
+  return `${window.location.origin}${shareLink ?? `/facturen/${invoiceId}`}`;
+}
+
 export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emailStatus, editHref, shareLink }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -112,11 +117,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
     window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
   };
 
-   const handleCopyLink = async () => {
-     const link =
-       shareLink && shareLink.startsWith("http")
-         ? shareLink
-         : `${window.location.origin}${shareLink ?? `/facturen/${invoiceId}`}`;
+  const handleCopyLink = async () => {
+    const link = buildShareLink(shareLink, invoiceId);
     try {
       await navigator.clipboard.writeText(link);
       toast.success("Link gekopieerd");
@@ -127,10 +129,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
   };
 
   const handleNativeShare = async () => {
-    const link =
-      shareLink && shareLink.startsWith("http")
-        ? shareLink
-        : `${window.location.origin}${shareLink ?? `/facturen/${invoiceId}`}`;
+    const link = buildShareLink(shareLink, invoiceId);
 
     if (navigator.share) {
       try {
@@ -143,7 +142,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
         setIsOpen(false);
         return;
       } catch (error) {
-        console.error("native share", error);
+        console.error("Failed to share invoice via native API", error);
       }
     }
 

@@ -66,15 +66,20 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
   useEffect(() => {
     if (!mounted || !active || !step) return;
 
+    let frame: number | null = null;
     const updateRect = () => {
-      const el = findTarget(step.selectors);
-      setTargetRect(el ? el.getBoundingClientRect() : null);
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const el = findTarget(step.selectors);
+        setTargetRect(el ? el.getBoundingClientRect() : null);
+      });
     };
 
     updateRect();
     window.addEventListener("resize", updateRect);
     window.addEventListener("scroll", updateRect, true);
     return () => {
+      if (frame) cancelAnimationFrame(frame);
       window.removeEventListener("resize", updateRect);
       window.removeEventListener("scroll", updateRect, true);
     };
@@ -98,7 +103,7 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
   if (!mounted || !active || !step) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] pointer-events-auto">
+    <div className="fixed inset-0 z-[60] pointer-events-auto" role="dialog" aria-modal="true" aria-labelledby="onboarding-tour-title">
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
       {targetRect ? (
         <div
@@ -121,7 +126,9 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
                 <Sparkles className="h-4 w-4" aria-hidden />
               </span>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Onboarding</p>
+                <p id="onboarding-tour-title" className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">
+                  Onboarding
+                </p>
                 <p className="text-sm text-slate-600">
                   Stap {currentStep + 1} / {totalSteps}
                 </p>
