@@ -63,8 +63,8 @@ export default async function FacturenPagina() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-[var(--foreground)]">Facturen</h1>
-        <p className="text-sm text-[var(--muted)] mt-1">
+        <h1 className="text-2xl font-semibold text-foreground">Facturen</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Beheer facturen, verstuur herinneringen en volg betalingen
         </p>
       </div>
@@ -78,19 +78,19 @@ export default async function FacturenPagina() {
         </Link>
       </div>
 
-      <Card className="p-3 sm:p-5 shadow-md shadow-slate-200/70">
+      <Card className="p-3 sm:p-5 shadow-md">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-medium text-slate-900">Alle facturen</CardTitle>
+            <CardTitle className="text-base font-medium text-card-foreground">Alle facturen</CardTitle>
             <Badge variant="muted">{facturen.length}</Badge>
           </div>
         </CardHeader>
-        <CardContent className="text-[15px] text-slate-700">
+        <CardContent className="text-[15px] text-card-foreground">
           {facturen.length === 0 ? (
             fetchError ? (
-              <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center">
-                <p className="text-lg font-semibold text-slate-900">Facturen konden niet worden geladen</p>
-                <p className="text-sm text-slate-600">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
+              <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/20 px-6 py-10 text-center">
+                <p className="text-lg font-semibold text-foreground">Facturen konden niet worden geladen</p>
+                <p className="text-sm text-muted-foreground">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
               </div>
             ) : (
               <EmptyState />
@@ -98,25 +98,25 @@ export default async function FacturenPagina() {
           ) : (
             <>
               {/* Desktop Table View */}
-              <div className="hidden md:block divide-y divide-slate-100">
+              <div className="hidden md:block divide-y divide-border">
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => (
                   <div
                     key={factuur.id}
                     className="flex items-center justify-between py-3.5 first:pt-0"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900">{factuur.invoiceNum}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         Datum {new Date(factuur.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
-                      <p className="text-sm text-slate-600 mt-0.5">{factuur.client.name}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
                     </div>
                     <div className="flex items-center gap-6 ml-4">
                       <div className="text-right">
-                        <p className="text-sm font-semibold tabular-nums text-slate-900">
+                        <p className="text-sm font-semibold tabular-nums text-foreground">
                           {formatBedrag(invoiceAmount(factuur.lines))}
                         </p>
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
                         </p>
                       </div>
@@ -137,7 +137,7 @@ export default async function FacturenPagina() {
               </div>
 
               {/* Mobile Card View */}
-              <div className="block md:hidden divide-y divide-slate-100">
+              <div className="block md:hidden divide-y divide-border">
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => (
                   <div
                     key={factuur.id}
@@ -145,21 +145,21 @@ export default async function FacturenPagina() {
                   >
                     <div className="flex items-start justify-between mb-2.5">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-900">{factuur.invoiceNum}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">
+                        <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           Datum {new Date(factuur.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}
                         </p>
-                        <p className="text-sm text-slate-600 mt-0.5">{factuur.client.name}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
                       </div>
                       <Badge variant={statusInfo(factuur.emailStatus).variant}>
                         {statusInfo(factuur.emailStatus).label}
                       </Badge>
                     </div>
                      <div className="flex items-center justify-between">
-                       <p className="text-xs text-slate-500">
+                       <p className="text-xs text-muted-foreground">
                          Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
                        </p>
-                       <p className="text-base font-semibold tabular-nums text-slate-900">
+                       <p className="text-base font-semibold tabular-nums text-foreground">
                          {formatBedrag(invoiceAmount(factuur.lines))}
                        </p>
                      </div>
