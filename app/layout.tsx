@@ -6,31 +6,44 @@ import { ServiceWorkerRegister } from "@/components/providers/service-worker-reg
 import { InstallPWA } from "@/components/ui/install-pwa";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://zzp-hub.nl"),
-  title: "Elite Business Hub | Slimmer Ondernemen voor ZZP'ers",
+  metadataBase: new URL("https://matrixtop.com"),
+  title: {
+    default: "ZZP-HUB | Elite Business Hub",
+    template: "%s | ZZP-HUB",
+  },
   applicationName: "ZZP HUB",
+  authors: [{ name: "MHM IT" }],
   description:
-    "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
+    "Professioneel financieel dashboard voor ZZP'ers. Beheer facturen, offertes, BTW-aangifte, uren en planning. De #1 keuze voor Nederlandse ondernemers.",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/pwa/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
     ],
-    apple: "/apple-touch-icon.png",
+    shortcut: ["/favicon.ico"],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Elite Business Hub | Slimmer Ondernemen voor ZZP'ers",
+    type: "website",
+    url: "/",
+    siteName: "ZZP-HUB",
+    title: "ZZP-HUB | Elite Business Hub",
     description:
-      "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
-    url: "https://zzp-hub.nl",
-    siteName: "Elite Business Hub",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Elite Hub social preview" }],
+      "Professioneel financieel dashboard voor ZZP'ers. Beheer facturen, offertes, BTW-aangifte, uren en planning. De #1 keuze voor Nederlandse ondernemers.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "ZZP-HUB social preview" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Elite Business Hub | Slimmer Ondernemen voor ZZP'ers",
+    title: "ZZP-HUB | Elite Business Hub",
     description:
-      "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
+      "Professioneel financieel dashboard voor ZZP'ers. Beheer facturen, offertes, BTW-aangifte, uren en planning. De #1 keuze voor Nederlandse ondernemers.",
     images: ["/og-image.png"],
   },
   appleWebApp: {

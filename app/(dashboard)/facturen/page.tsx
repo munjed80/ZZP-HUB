@@ -9,6 +9,12 @@ import { requireUser } from "@/lib/auth";
 import { formatBedrag } from "@/lib/utils";
 import { InvoiceActionsMenu } from "./_components/invoice-actions-menu";
 import { InvoiceEmailStatus, Prisma, UserRole } from "@prisma/client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Facturen",
+  description: "Beheer en verstuur facturen. Overzicht van alle openstaande en betaalde facturen.",
+};
 
 function statusInfo(status: InvoiceEmailStatus | string) {
   if (status === InvoiceEmailStatus.BETAALD) return { label: "Betaald", variant: "success" as const };

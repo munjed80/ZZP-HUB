@@ -3,6 +3,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBedrag } from "@/lib/utils";
 import { getVatReport } from "./actions";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "BTW Aangifte",
+  description: "Overzicht en beheer van uw BTW-aangiften per kwartaal.",
+};
 
 type SearchParams = { year?: string; quarter?: string };
 

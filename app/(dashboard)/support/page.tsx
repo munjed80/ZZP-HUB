@@ -2,6 +2,12 @@ import { LifeBuoy, MailCheck, ShieldCheck } from "lucide-react";
 import { assistantGuide } from "@/lib/assistant/guide";
 import { SupportForm } from "@/components/support/support-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Support",
+  description: "Hulp en ondersteuning voor ZZP-HUB. Neem contact met ons op voor vragen en problemen.",
+};
 
 export default function SupportPage() {
   return (

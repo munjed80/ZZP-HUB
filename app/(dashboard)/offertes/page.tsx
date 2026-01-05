@@ -9,6 +9,12 @@ import { getQuotations } from "./actions";
 import { ConvertQuotationButton } from "./[id]/convert-quotation-button";
 import { QuotationActionsMenu } from "./_components/quotation-actions-menu";
 import { type InvoicePdfData } from "@/components/pdf/InvoicePDF";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Offertes",
+  description: "Maak en beheer offertes. Converteer geaccepteerde offertes naar facturen.",
+};
 
 function statusVariant(status: string) {
   if (status === "GEACCEPTEERD" || status === "OMGEZET") return "success" as const;

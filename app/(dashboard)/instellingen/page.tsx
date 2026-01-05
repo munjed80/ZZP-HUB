@@ -1,5 +1,11 @@
 import { SettingsTabs } from "./settings-tabs";
 import { fetchCompanyProfile, fetchUserAccount } from "./actions";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Instellingen",
+  description: "Beheer uw bedrijfsprofiel, accountinstellingen en abonnement.",
+};
 
 const abonnement = {
   type: "Elite",
