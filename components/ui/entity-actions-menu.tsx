@@ -67,8 +67,8 @@ export function EntityActionsMenu({
       className={cn(
         buttonVariants(iconOnly ? "ghost" : "secondary"),
         iconOnly
-          ? "min-h-0 h-10 w-10 rounded-full border border-slate-200 bg-white/90 p-0 text-slate-600 shadow-none transition hover:border-teal-200 hover:text-teal-700"
-          : "px-3 py-2 gap-2 border border-slate-200 text-slate-700 shadow-sm",
+          ? "min-h-0 h-10 w-10 rounded-full border border-border bg-card p-0 text-muted-foreground shadow-none transition hover:border-primary/30 hover:text-primary"
+          : "px-3 py-2 gap-2 border border-border text-card-foreground shadow-sm",
         triggerClassName,
       )}
       aria-haspopup="menu"

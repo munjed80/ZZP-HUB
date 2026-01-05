@@ -56,7 +56,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "hidden shrink-0 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-6 text-slate-800 dark:text-slate-100 md:flex md:flex-col",
+        "hidden shrink-0 border-r border-border bg-card px-4 py-6 text-card-foreground md:flex md:flex-col",
         collapsed ? "w-24" : "w-68",
       )}
     >
@@ -78,10 +78,10 @@ export function Sidebar({
                 onClick={onAssistantClick}
                 className={cn(
                   "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors text-left",
-                  "text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800"
+                  "text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
                 )}
               >
-                <Icon className="h-4 w-4 text-slate-500 dark:text-slate-400" aria-hidden />
+                <Icon className="h-4 w-4 text-muted-foreground" aria-hidden />
                 <span>{item.label}</span>
               </button>
             );
@@ -95,13 +95,13 @@ export function Sidebar({
               className={cn(
                 "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                 actief
-                  ? "bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 font-semibold border border-teal-200 dark:border-teal-800"
-                  : "text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800"
+                  ? "bg-primary/10 text-primary font-semibold border border-primary/20"
+                  : "text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
               )}
               aria-current={actief ? "page" : undefined}
             >
               <Icon
-                className={cn("h-4 w-4", actief ? "text-teal-700 dark:text-teal-300" : "text-slate-500 dark:text-slate-400")}
+                className={cn("h-4 w-4", actief ? "text-primary" : "text-muted-foreground")}
                 aria-hidden
               />
               <span>{item.label}</span>
@@ -109,23 +109,23 @@ export function Sidebar({
           );
         })}
       </nav>
-      <div className="mt-auto space-y-3 border-t border-slate-200 dark:border-slate-700 pt-4">
-        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-3 text-sm text-slate-700 dark:text-slate-300">
-          <p className="font-semibold text-slate-900 dark:text-slate-100">Beveiliging</p>
-          <p className="text-slate-600 dark:text-slate-400">
+      <div className="mt-auto space-y-3 border-t border-border pt-4">
+        <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+          <p className="font-semibold text-foreground">Beveiliging</p>
+          <p className="text-muted-foreground">
             Sessies beveiligd via NextAuth met rolgebaseerde toegang. MFA en webhooks volgen.
           </p>
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex w-full items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 shadow-sm transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400"
+          className="flex w-full items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <LogOut className="h-4 w-4" aria-hidden />
           Sign Out
         </button>
-        <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2 text-center border border-slate-200 dark:border-slate-700">
-          <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
-            Powered by <span className="font-semibold text-slate-900 dark:text-slate-100">MHM IT</span>
+        <div className="rounded-lg bg-muted/30 px-3 py-2 text-center border border-border">
+          <p className="text-xs font-medium text-muted-foreground">
+            Powered by <span className="font-semibold text-foreground">MHM IT</span>
           </p>
         </div>
       </div>

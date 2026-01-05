@@ -53,45 +53,52 @@ export default async function DashboardPagina() {
       label: "Omzet (jaar)",
       value: stats.yearlyRevenue,
       icon: ArrowUpRight,
-      iconColor: "text-[#2f9e7c]",
-      iconBg: "bg-[#e7f6f0]",
-      gradient: "from-white via-[#e7f3f8] to-[#e0f2ec]",
-      trend: buildTrend(thisMonth.revenue, previousMonth.revenue),
+      iconColor: "text-success",
+      iconBg: "bg-success/10",
     },
     {
       label: "Uitgaven (jaar)",
       value: stats.yearlyExpenses,
       icon: ArrowDownRight,
-      iconColor: "text-[#4a6fa5]",
-      iconBg: "bg-[#e8f0fa]",
-      gradient: "from-white via-[#eef3fa] to-[#e6edf7]",
-      trend: buildTrend(thisMonth.expenses, previousMonth.expenses, true),
+      iconColor: "text-accent",
+      iconBg: "bg-accent/10",
     },
     {
       label: "Winst",
       value: stats.netProfit,
       icon: Euro,
-      iconColor: "text-[#0f4c5c]",
-      iconBg: "bg-[#e5f0f4]",
-      gradient: "from-white via-[#e7f1f5] to-[#d9e8ef]",
-      trend: buildTrend(thisMonthProfit, previousMonthProfit),
+      iconColor: "text-primary",
+      iconBg: "bg-primary/10",
     },
     {
       label: "Te betalen BTW",
       value: stats.vatToPay,
       icon: AlertTriangle,
-      iconColor: "text-[#c56d0a]",
-      iconBg: "bg-[#fff4e5]",
-      gradient: "from-white via-[#fff6eb] to-[#ffe9cc]",
-      trend: buildTrend(currentVatBalance, previousVatBalance, true),
+      iconColor: "text-warning",
+      iconBg: "bg-warning/10",
     },
   ];
+
+  const getTrendForKpi = (label: string) => {
+    switch (label) {
+      case "Omzet (jaar)":
+        return buildTrend(thisMonth.revenue, previousMonth.revenue);
+      case "Uitgaven (jaar)":
+        return buildTrend(thisMonth.expenses, previousMonth.expenses, true);
+      case "Winst":
+        return buildTrend(thisMonthProfit, previousMonthProfit);
+      case "Te betalen BTW":
+        return buildTrend(currentVatBalance, previousVatBalance, true);
+      default:
+        return { label: "", variant: "muted" as const };
+    }
+  };
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-[var(--foreground)]">Dashboard</h1>
-        <p className="text-sm text-[var(--muted)]">
+        <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">
           Financieel overzicht {now.getFullYear()}
         </p>
       </div>
@@ -99,32 +106,30 @@ export default async function DashboardPagina() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => {
           const Icon = item.icon;
+          const trend = getTrendForKpi(item.label);
 
           return (
             <Card
               key={item.label}
-              className={cn(
-                "relative overflow-hidden rounded-2xl bg-gradient-to-br border-[var(--border)] shadow-md shadow-slate-200/50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl",
-                item.gradient,
-              )}
+              className="relative overflow-hidden rounded-2xl shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
             >
-              <div className="pointer-events-none absolute -right-10 -top-14 h-32 w-32 rounded-full bg-white/50 blur-3xl" />
+              <div className="pointer-events-none absolute -right-10 -top-14 h-32 w-32 rounded-full bg-primary/5 blur-3xl" />
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--muted)]">
+                  <CardTitle className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     {item.label}
                   </CardTitle>
-                  <div className={cn("rounded-xl p-2 shadow-inner shadow-white/70 ring-1 ring-white/60 backdrop-blur", item.iconBg)}>
+                  <div className={cn("rounded-xl p-2 shadow-inner ring-1 ring-border/50 backdrop-blur", item.iconBg)}>
                     <Icon className={cn("h-4 w-4", item.iconColor)} aria-hidden />
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-2 pb-4">
-                <p className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">
+                <p className="text-3xl font-semibold tabular-nums text-foreground">
                   {formatBedrag(item.value)}
                 </p>
-                <Badge variant={item.trend.variant} className="inline-flex items-center gap-1 text-xs shadow-sm shadow-white/40">
-                  {item.trend.label}
+                <Badge variant={trend.variant} className="inline-flex items-center gap-1 text-xs shadow-sm">
+                  {trend.label}
                 </Badge>
               </CardContent>
             </Card>
@@ -133,10 +138,10 @@ export default async function DashboardPagina() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.65fr_1.05fr]">
-        <Card className="rounded-2xl bg-gradient-to-br from-white via-[#f3f7fb] to-[#e9f1f5] border-[var(--border)] shadow-md shadow-slate-200/60">
+        <Card className="rounded-2xl shadow-md">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-medium text-[var(--foreground)]">Omzet vs kosten</CardTitle>
-            <p className="text-sm text-[var(--muted)]">Maandelijks overzicht {now.getFullYear()}</p>
+            <CardTitle className="text-base font-medium text-card-foreground">Omzet vs kosten</CardTitle>
+            <p className="text-sm text-muted-foreground">Maandelijks overzicht {now.getFullYear()}</p>
           </CardHeader>
           <CardContent>
             <RevenueExpensesChart data={chartData} />
@@ -144,20 +149,20 @@ export default async function DashboardPagina() {
         </Card>
 
         <div className="space-y-4">
-          <Card className="rounded-2xl bg-gradient-to-br from-white via-[#e9f2f5] to-[#dff1ed] border-[var(--border)] shadow-md shadow-slate-200/60">
+          <Card className="rounded-2xl shadow-md">
             <CardHeader className="pb-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-xl bg-white/80 p-2.5 shadow-inner shadow-white/70 ring-1 ring-white/50">
-                  <PiggyBank className="h-5 w-5 text-[#0f4c5c]" aria-hidden />
+                <div className="rounded-xl bg-primary/10 p-2.5 shadow-inner ring-1 ring-border/50">
+                  <PiggyBank className="h-5 w-5 text-primary" aria-hidden />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-base font-medium text-[var(--foreground)]">IB reservering</CardTitle>
-                  <p className="text-sm text-[var(--muted)] mt-0.5">35% buffer voor belasting</p>
+                  <CardTitle className="text-base font-medium text-card-foreground">IB reservering</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-0.5">35% buffer voor belasting</p>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-2">
-              <p className="text-2xl font-semibold tabular-nums text-[var(--foreground)]">
+              <p className="text-2xl font-semibold tabular-nums text-foreground">
                 {formatBedrag(stats.incomeTaxReservation)}
               </p>
               <Badge variant="info" className="text-xs">
@@ -166,15 +171,15 @@ export default async function DashboardPagina() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+          <Card className="rounded-2xl shadow-md">
             <CardHeader className="pb-4">
               <div className="flex items-center gap-2">
-                <div className="rounded-lg bg-[#e8f0fa] p-2">
-                  <Gauge className="h-5 w-5 text-[#4a6fa5]" aria-hidden />
+                <div className="rounded-lg bg-accent/10 p-2">
+                  <Gauge className="h-5 w-5 text-accent" aria-hidden />
                 </div>
                 <div>
-                  <CardTitle className="text-base font-medium text-[var(--foreground)]">Verdeling resultaten</CardTitle>
-                  <p className="text-sm text-[var(--muted)]">Omzet, kosten en winst</p>
+                  <CardTitle className="text-base font-medium text-card-foreground">Verdeling resultaten</CardTitle>
+                  <p className="text-sm text-muted-foreground">Omzet, kosten en winst</p>
                 </div>
               </div>
             </CardHeader>
@@ -190,21 +195,21 @@ export default async function DashboardPagina() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="rounded-2xl bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+        <Card className="rounded-2xl shadow-md">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-medium text-[var(--foreground)]">Recente facturen</CardTitle>
-            <p className="text-sm text-[var(--muted)]">Laatste 5 definitieve facturen</p>
+            <CardTitle className="text-base font-medium text-card-foreground">Recente facturen</CardTitle>
+            <p className="text-sm text-muted-foreground">Laatste 5 definitieve facturen</p>
           </CardHeader>
           <CardContent>
-            <div className="divide-y divide-[var(--border-subtle)]">
+            <div className="divide-y divide-border">
               {stats.recentInvoices.map((invoice) => (
                 <div key={invoice.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--foreground)] truncate">{invoice.invoiceNum}</p>
-                    <p className="text-sm text-[var(--muted)] truncate">{invoice.client.name}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{invoice.invoiceNum}</p>
+                    <p className="text-sm text-muted-foreground truncate">{invoice.client.name}</p>
                   </div>
                   <div className="text-right ml-4">
-                    <p className="text-sm font-semibold tabular-nums text-[var(--foreground)]">
+                    <p className="text-sm font-semibold tabular-nums text-foreground">
                       {formatBedrag(
                         invoice.lines.reduce(
                           (sum, line) =>
@@ -213,7 +218,7 @@ export default async function DashboardPagina() {
                         ),
                       )}
                     </p>
-                    <p className="text-xs text-[var(--muted)]">
+                    <p className="text-xs text-muted-foreground">
                       {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(invoice.date)}
                     </p>
                   </div>
@@ -223,26 +228,26 @@ export default async function DashboardPagina() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+        <Card className="rounded-2xl shadow-md">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-medium text-[var(--foreground)]">Recente uitgaven</CardTitle>
-            <p className="text-sm text-[var(--muted)]">Laatste 5 geregistreerde uitgaven</p>
+            <CardTitle className="text-base font-medium text-card-foreground">Recente uitgaven</CardTitle>
+            <p className="text-sm text-muted-foreground">Laatste 5 geregistreerde uitgaven</p>
           </CardHeader>
           <CardContent>
-            <div className="divide-y divide-[var(--border-subtle)]">
+            <div className="divide-y divide-border">
               {stats.recentExpenses.map((expense) => (
                 <div key={expense.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--foreground)] truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {expense.description}
                     </p>
-                    <p className="text-sm text-[var(--muted)]">{expense.category}</p>
+                    <p className="text-sm text-muted-foreground">{expense.category}</p>
                   </div>
                   <div className="text-right ml-4">
-                    <p className="text-sm font-semibold tabular-nums text-[var(--foreground)]">
+                    <p className="text-sm font-semibold tabular-nums text-foreground">
                       {formatBedrag(Number(expense.amountExcl))}
                     </p>
-                    <p className="text-xs text-[var(--muted)]">
+                    <p className="text-xs text-muted-foreground">
                       {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(expense.date)}
                     </p>
                   </div>

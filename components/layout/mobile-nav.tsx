@@ -60,7 +60,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
   }, [fabMenuOpen]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 shadow-lg shadow-slate-200/40 dark:shadow-black/40 backdrop-blur md:hidden pb-[calc(0.65rem+env(safe-area-inset-bottom))]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 shadow-lg backdrop-blur md:hidden pb-[calc(0.65rem+env(safe-area-inset-bottom))]">
       <div className="relative flex items-center justify-between gap-1 px-2 py-2">
         {navItems.slice(0, 2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
@@ -73,8 +73,8 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
               className={cn(
                 "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors",
                 actief
-                  ? "text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
               aria-current={actief ? "page" : undefined}
             >
@@ -89,7 +89,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
           <button
             onClick={() => setFabMenuOpen(!fabMenuOpen)}
             data-tour="fab-add"
-            className="absolute -top-7 flex h-12 w-12 items-center justify-center rounded-full border border-teal-700 dark:border-teal-600 bg-teal-600 dark:bg-teal-600 text-white shadow-md shadow-teal-200 dark:shadow-teal-900/50 transition-transform hover:-translate-y-0.5 hover:bg-teal-700 dark:hover:bg-teal-700"
+            className="absolute -top-7 flex h-12 w-12 items-center justify-center rounded-full border border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20 transition-transform hover:-translate-y-0.5 hover:opacity-90"
             aria-label="Toevoegen"
           >
             <Plus className={cn("h-6 w-6 transition-transform duration-200", fabMenuOpen && "rotate-45")} aria-hidden />
@@ -97,8 +97,8 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
           
           {/* FAB Menu */}
             {fabMenuOpen && (
-              <div className="absolute bottom-20 left-1/2 min-w-[220px] -translate-x-1/2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg">
-                <div className="flex flex-col divide-y divide-slate-100 dark:divide-slate-700 py-1.5">
+              <div className="absolute bottom-20 left-1/2 min-w-[220px] -translate-x-1/2 rounded-lg border border-border bg-popover shadow-lg">
+                <div className="flex flex-col divide-y divide-border py-1.5">
                   {fabActions.map((action) => {
                     const Icon = action.icon;
                     return (
@@ -106,9 +106,9 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
                         key={action.label}
                         href={action.href}
                         onClick={() => setFabMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3.5 text-sm font-semibold text-slate-800 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-teal-700 dark:hover:text-teal-400"
+                        className="flex items-center gap-3 px-4 py-3.5 text-sm font-semibold text-popover-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                       >
-                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground border border-border">
                           <Icon className="h-5 w-5" aria-hidden />
                       </span>
                       <span className="flex-1">{action.label}</span>
@@ -131,8 +131,8 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
               className={cn(
                 "flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors",
                 actief
-                  ? "text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
               aria-current={actief ? "page" : undefined}
             >
@@ -147,7 +147,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
             setFabMenuOpen(false);
             onAssistantClick?.();
           }}
-          className="flex flex-1 min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-slate-600 dark:text-slate-400 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
+          className="flex flex-1 min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="Open AI assistent"
         >
           <Sparkles className="h-5 w-5" aria-hidden />
@@ -157,7 +157,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
         {/* Menu button - opens full navigation drawer */}
         <button
           onClick={onMenuClick}
-          className="flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+          className="flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"
           aria-label="Menu"
         >
           <MenuIcon className="h-5 w-5" aria-hidden="true" />

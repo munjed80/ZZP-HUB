@@ -36,7 +36,7 @@ export function DropdownMenu({ trigger, children, align = "right" }: DropdownMen
       {open && (
         <div
           className={cn(
-            "absolute top-full mt-2 z-50 min-w-[200px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-md",
+            "absolute top-full mt-2 z-50 min-w-[200px] rounded-lg border border-border bg-popover shadow-md",
             align === "right" ? "right-0" : "left-0"
           )}
         >
@@ -63,8 +63,8 @@ export function DropdownMenuItem({ children, onClick, className, danger }: Dropd
       className={cn(
         "w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors text-left",
         danger
-          ? "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950"
-          : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700",
+          ? "text-destructive hover:bg-destructive/10"
+          : "text-popover-foreground hover:bg-accent hover:text-accent-foreground",
         className
       )}
     >
@@ -78,5 +78,5 @@ type DropdownMenuSeparatorProps = {
 };
 
 export function DropdownMenuSeparator({ className }: DropdownMenuSeparatorProps) {
-  return <div className={cn("my-1 h-px bg-slate-200 dark:bg-slate-700", className)} />;
+  return <div className={cn("my-1 h-px bg-border", className)} />;
 }
