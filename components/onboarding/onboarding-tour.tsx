@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ArrowRight, Check, MoveLeft, Sparkles, X } from "lucide-react";
 import { ONBOARDING_STORAGE_KEY } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 type Step = {
   id: string;
@@ -137,7 +138,7 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
             <button
               type="button"
               onClick={completeTour}
-              className="rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+              className="rounded-full p-1.5 text-[rgb(var(--brand-primary))] transition hover:bg-[rgb(var(--brand-primary)/0.08)] hover:text-[rgb(var(--brand-primary-active))]"
               aria-label="Tour sluiten"
             >
               <X className="h-4 w-4" aria-hidden />
@@ -158,7 +159,7 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
             <button
               type="button"
               onClick={completeTour}
-              className="text-sm font-semibold text-slate-500 underline-offset-4 hover:text-slate-700"
+              className="text-sm font-semibold text-[rgb(var(--brand-primary))] underline-offset-4 hover:text-[rgb(var(--brand-primary-active))]"
             >
               Overslaan
             </button>
@@ -167,10 +168,7 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
                 type="button"
                 onClick={prevStep}
                 disabled={currentStep === 0}
-                className={cn(
-                  "flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50",
-                  currentStep === 0 && "pointer-events-none opacity-50",
-                )}
+                className={buttonVariants("outline", cn("items-center gap-2 px-3 py-2 text-sm font-semibold", currentStep === 0 && "opacity-50"))}
               >
                 <MoveLeft className="h-4 w-4" aria-hidden />
                 Vorige
@@ -178,7 +176,7 @@ export function OnboardingTour({ userId }: OnboardingTourProps) {
               <button
                 type="button"
                 onClick={nextStep}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-700 via-teal-600 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-teal-200/50 transition hover:shadow-lg"
+                className={buttonVariants("primary", "flex items-center gap-2 px-4 py-2 text-sm font-semibold")}
               >
                 {currentStep === totalSteps - 1 ? (
                   <>

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { RefreshCw, AlertCircle } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function Error({
   error,
@@ -31,7 +32,7 @@ export default function Error({
         </p>
         <button
           onClick={() => reset()}
-          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-sky-600 px-6 py-3 text-base font-semibold text-white shadow-lg transition-all hover:from-blue-700 hover:to-sky-700 hover:shadow-xl"
+          className={buttonVariants("primary", "inline-flex items-center gap-2 px-6 py-3 text-base font-semibold shadow-lg")}
         >
           <RefreshCw className="h-5 w-5" />
           Probeer opnieuw

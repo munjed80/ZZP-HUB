@@ -156,31 +156,31 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#e2e8f0] via-white to-[#e5e7eb] text-[var(--foreground)]">
-      <header className="sticky top-4 z-50">
+      <header className="sticky top-4 z-50 text-[rgb(var(--brand-on-primary))]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between rounded-full border border-[#1e293b]/10 bg-white/85 px-4 py-3 shadow-2xl shadow-slate-200/40 backdrop-blur-md">
+          <div className="flex items-center justify-between rounded-full border border-[rgb(var(--brand-on-primary))/0.22] bg-[rgb(var(--brand-primary))/0.18] px-4 py-3 shadow-[0_20px_70px_-36px_rgba(var(--brand-primary),0.75)] backdrop-blur-xl">
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1e293b] via-[#334155] to-[#1e293b] shadow-[0_10px_40px_-18px_rgba(30,41,59,0.55)] ring-1 ring-[#1e293b]/30">
-                <BrandZ className="h-5 w-5 text-white" aria-hidden />
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(140deg,rgb(var(--brand-primary)),rgb(var(--brand-primary-hover)))] shadow-[0_10px_40px_-18px_rgba(var(--brand-primary),0.7)] ring-1 ring-[rgb(var(--brand-on-primary))/0.35]">
+                <BrandZ className="h-5 w-5 text-[rgb(var(--brand-on-primary))]" aria-hidden />
               </div>
               <motion.span
-                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(30,41,59,0.25)]"
+                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(var(--brand-primary),0.3)]"
                 transition={{ duration: 0.6 }}
               >
                 ZZP-HUB
               </motion.span>
             </Link>
-            <nav className="hidden items-center gap-8 text-sm font-medium text-slate-700 md:flex">
-              <Link href="#features" className="transition-colors duration-200 hover:text-[#1e293b]">
+            <nav className="hidden items-center gap-8 text-sm font-medium text-[rgb(var(--brand-on-primary))/0.9] md:flex">
+              <Link href="#features" className="transition-colors duration-200 hover:text-[rgb(var(--brand-on-primary))]">
                 Features
               </Link>
-              <Link href="#pricing" className="transition-colors duration-200 hover:text-[#1e293b]">
+              <Link href="#pricing" className="transition-colors duration-200 hover:text-[rgb(var(--brand-on-primary))]">
                 Prijzen
               </Link>
-              <Link href="#assistant" className="transition-colors duration-200 hover:text-[#1e293b]">
+              <Link href="#assistant" className="transition-colors duration-200 hover:text-[rgb(var(--brand-on-primary))]">
                 AI assistent
               </Link>
-              <Link href="#support" className="transition-colors duration-200 hover:text-[#1e293b]">
+              <Link href="#support" className="transition-colors duration-200 hover:text-[rgb(var(--brand-on-primary))]">
                 Support
               </Link>
             </nav>
@@ -190,21 +190,21 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href="/dashboard"
                     className={buttonVariants(
                       "primary",
-                      "shadow-lg shadow-[0_18px_48px_-30px_rgba(10,46,80,0.36)] px-5 py-2.5 text-sm tracking-tight"
+                      "shadow-lg shadow-[0_18px_48px_-30px_rgba(var(--brand-primary),0.42)] px-5 py-2.5 text-sm tracking-tight"
                     )}
                   >
                     Naar Dashboard
                   </Link>
                 ) : (
                 <>
-                  <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-[#1e293b]")}>
+                  <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-[rgb(var(--brand-on-primary))]")}>
                     Inloggen
                   </Link>
                   <Link
                     href="/register"
                     className={buttonVariants(
                       "primary",
-                      "shadow-lg shadow-[0_18px_48px_-30px_rgba(10,46,80,0.36)] px-5 py-2.5 text-sm tracking-tight"
+                      "shadow-lg shadow-[0_18px_48px_-30px_rgba(var(--brand-primary),0.42)] px-5 py-2.5 text-sm tracking-tight"
                     )}
                   >
                     Gratis starten
@@ -261,9 +261,12 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 >
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/register"}
-                    className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-base font-semibold text-white shadow-[0_0_40px_rgba(16,185,129,0.3)] transition-all duration-300 hover:shadow-[0_0_60px_rgba(16,185,129,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d4f4f]"
+                    className={buttonVariants(
+                      "primary",
+                      "group relative px-8 py-4 text-base font-semibold shadow-[0_0_44px_rgba(var(--brand-primary),0.3)] hover:shadow-[0_0_64px_rgba(var(--brand-primary),0.52)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d4f4f]"
+                    )}
                   >
-                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/0 via-amber-400/12 to-amber-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     Start 14 dagen gratis
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden />
                   </Link>
@@ -587,7 +590,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     href={isLoggedIn ? "/dashboard" : "/register"}
                     className={buttonVariants(
                       "primary",
-                      "w-full justify-center bg-white text-[#0a2e50] px-8 py-3 text-base shadow-[0_20px_70px_-35px_rgba(255,255,255,0.8)] hover:bg-white"
+                      "w-full justify-center px-8 py-3 text-base shadow-[0_20px_70px_-35px_rgba(var(--brand-primary),0.55)]"
                     )}
                   >
                     {primaryCta}
@@ -614,8 +617,8 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/register"}
                     className={buttonVariants(
-                      "secondary",
-                      "text-base px-8 py-3 bg-white text-[#1e293b] hover:bg-[#e2e8f0] shadow-xl shadow-[0_22px_64px_-40px_rgba(30,41,59,0.35)]"
+                      "primary",
+                      "text-base px-8 py-3 shadow-[0_22px_64px_-40px_rgba(var(--brand-primary),0.58)]"
                     )}
                   >
                   {primaryCta}

@@ -75,7 +75,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
         type="button"
         onClick={() => setAssistantOpen(true)}
         className={cn(
-          "fixed right-3 z-40 hidden h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-800 shadow-lg shadow-slate-200/80 backdrop-blur transition hover:-translate-y-0.5 hover:border-teal-200 hover:text-teal-700 md:inline-flex md:right-6",
+          "fixed right-3 z-40 hidden h-11 w-11 items-center justify-center rounded-full border border-[rgb(var(--brand-primary))/0.35] bg-[rgb(var(--brand-primary))/0.12] text-[rgb(var(--brand-primary))] shadow-lg shadow-[0_12px_32px_-18px_rgba(var(--brand-primary),0.65)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[rgb(var(--brand-primary))] md:inline-flex md:right-6",
           "md:bottom-8"
         )}
         aria-label="Open AI assistent"

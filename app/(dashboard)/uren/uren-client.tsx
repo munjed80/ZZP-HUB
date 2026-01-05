@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 import { deleteTimeEntry, logTimeEntry, type TimeEntryDto } from "@/actions/time-actions";
 import { CalendarDays, CheckCircle2, Clock3, Loader2, Plus, Timer, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -188,7 +189,7 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-80"
+              className={buttonVariants("primary", "h-10 min-h-0 items-center gap-2 px-4 text-sm font-semibold")}
             >
               {isPending ? (
                 <>
@@ -243,7 +244,7 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
                         <button
                           type="button"
                           onClick={() => handleDelete(entry.id)}
-                          className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-sm font-semibold text-rose-700 hover:bg-rose-50 disabled:cursor-not-allowed"
+                          className={buttonVariants("destructive", "inline-flex h-auto min-h-0 items-center gap-2 px-3 py-2 text-sm font-semibold")}
                           disabled={isPending}
                           aria-label="Verwijder registratie"
                         >

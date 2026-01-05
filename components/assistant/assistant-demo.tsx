@@ -56,7 +56,7 @@ export function AssistantDemo({ className }: { className?: string }) {
             key={q}
             type="button"
             onClick={() => handleAsk(q)}
-            className="flex items-start gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 text-left text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:bg-teal-50/80"
+            className="flex items-start gap-2 rounded-xl border border-[rgb(var(--brand-primary))/0.28] bg-white px-3 py-3 text-left text-sm font-semibold text-[rgb(var(--brand-primary))] shadow-sm transition hover:-translate-y-0.5 hover:border-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.08)]"
           >
             <Sparkles className="mt-0.5 h-4 w-4 text-teal-600" aria-hidden />
             {q}
@@ -99,7 +99,7 @@ export function AssistantDemo({ className }: { className?: string }) {
           href="#support"
           className={cn(
             buttonVariants("secondary"),
-            "w-fit rounded-lg bg-white text-sm font-semibold text-teal-800 shadow-sm",
+            "w-fit rounded-lg text-sm font-semibold shadow-sm",
           )}
         >
           Naar support

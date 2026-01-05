@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBedrag } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 const bedrijf = {
   companyName: "ZZP HUB Demo BV",
@@ -140,7 +141,7 @@ export default function FactuurVoorbeeldPagina() {
 
           <div className="flex items-center justify-between rounded-lg bg-slate-100 px-4 py-3 text-sm text-slate-800">
             <p>Print/PDF-view zorgt voor duidelijke scheiding tussen verzender en ontvanger.</p>
-            <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+            <button className={buttonVariants("primary", "px-4 py-2 text-sm font-semibold")}>
               Print / Exporteer PDF
             </button>
           </div>

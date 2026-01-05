@@ -108,7 +108,7 @@ export function InstallPWA() {
                 </button>
                 <button
                   onClick={dismiss}
-                  className="inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-3 py-1.5 text-[var(--foreground)] text-sm font-medium transition hover:bg-[var(--background-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--border)]"
+                  className="inline-flex items-center justify-center rounded-lg border border-[rgb(var(--brand-primary))] px-3 py-1.5 text-[rgb(var(--brand-primary))] text-sm font-medium transition hover:bg-[rgb(var(--brand-primary)/0.08)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--brand-primary))]"
                 >
                   Later
                 </button>
@@ -118,7 +118,7 @@ export function InstallPWA() {
           <button
             aria-label="Sluit installatiesuggestie"
             onClick={dismiss}
-            className="text-[var(--muted)] hover:text-[var(--foreground)] transition"
+            className="text-[rgb(var(--brand-primary))] hover:text-[rgb(var(--brand-primary-active))] transition"
           >
             ×
           </button>
