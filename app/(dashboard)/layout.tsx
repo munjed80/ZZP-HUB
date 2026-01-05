@@ -33,7 +33,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
   return (
     <div className="min-h-screen bg-[var(--background-secondary)]">
       <div className="flex min-h-screen">
-        <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl}>
+        <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl} userId={sessie.user.id}>
           <div className="flex flex-1 flex-col">
             <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-gradient-to-r from-white/95 via-white to-teal-50/40 px-4 pb-3 pt-[calc(0.9rem+env(safe-area-inset-top))] shadow-[0_10px_40px_-24px_rgba(15,76,92,0.35)] backdrop-blur-md md:px-6 md:py-4">
               <div className="flex items-center justify-between gap-4">

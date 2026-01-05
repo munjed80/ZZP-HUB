@@ -15,6 +15,8 @@ type EntityActionsMenuProps = {
   triggerClassName?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  iconOnly?: boolean;
+  ariaLabel?: string;
 };
 
 export function EntityActionsMenu({
@@ -25,6 +27,8 @@ export function EntityActionsMenu({
   triggerClassName,
   open,
   onOpenChange,
+  iconOnly = false,
+  ariaLabel,
 }: EntityActionsMenuProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -60,12 +64,19 @@ export function EntityActionsMenu({
     <button
       type="button"
       onClick={() => handleOpenChange(!resolvedOpen)}
-      className={cn(buttonVariants("secondary"), "px-3 py-2 gap-2", triggerClassName)}
+      className={cn(
+        buttonVariants(iconOnly ? "ghost" : "secondary"),
+        iconOnly
+          ? "min-h-0 h-10 w-10 rounded-full border border-slate-200 bg-white/90 p-0 text-slate-600 shadow-none transition hover:border-teal-200 hover:text-teal-700"
+          : "px-3 py-2 gap-2 border border-slate-200 text-slate-700 shadow-sm",
+        triggerClassName,
+      )}
       aria-haspopup="menu"
       aria-expanded={resolvedOpen}
+      aria-label={ariaLabel ?? label}
     >
       <MoreVertical className="h-4 w-4" aria-hidden />
-      {label}
+      {iconOnly ? <span className="sr-only">{label}</span> : label}
     </button>
   );
 

@@ -88,6 +88,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
         <div className="relative flex-1 flex justify-center" ref={fabMenuRef}>
           <button
             onClick={() => setFabMenuOpen(!fabMenuOpen)}
+            data-tour="fab-add"
             className="absolute -top-7 flex h-12 w-12 items-center justify-center rounded-full border border-teal-700 bg-teal-600 text-white shadow-md shadow-teal-200 transition-transform hover:-translate-y-0.5 hover:bg-teal-700"
             aria-label="Toevoegen"
           >
