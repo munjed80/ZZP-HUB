@@ -25,6 +25,13 @@
   --font-geist-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-geist-mono: "SFMono-Regular", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
+  
+  /* New hero color system */
+  --hero-emerald: #10b981;
+  --hero-emerald-light: #34d399;
+  --hero-teal: #14b8a6;
+  --hero-amber: #f59e0b;
+  --hero-amber-glow: #fbbf24;
 }
 
 /* Dark theme */
