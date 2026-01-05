@@ -264,7 +264,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                     className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-base font-semibold text-white shadow-[0_0_40px_rgba(16,185,129,0.3)] transition-all duration-300 hover:shadow-[0_0_60px_rgba(16,185,129,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d4f4f]"
                   >
                     <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    Start vandaag gratis
+                    Start 14 dagen gratis
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden />
                   </Link>
 
