@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 type Theme = "light" | "dark" | "system";
 type ResolvedTheme = "light" | "dark";
@@ -35,49 +35,39 @@ function getStoredTheme(): Theme {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => getStoredTheme());
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => {
-    const stored = getStoredTheme();
-    return stored === "system" ? getSystemTheme() : stored;
-  });
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(() => getSystemTheme());
+
+  // Compute resolved theme using useMemo
+  const resolvedTheme = useMemo<ResolvedTheme>(() => {
+    return theme === "system" ? systemTheme : theme;
+  }, [theme, systemTheme]);
 
   useEffect(() => {
     const root = document.documentElement;
     
-    // Update resolved theme
-    const newResolvedTheme = theme === "system" ? getSystemTheme() : theme;
-    setResolvedTheme(newResolvedTheme);
-    
     // Apply theme class to html element
     root.classList.remove("light", "dark");
-    root.classList.add(newResolvedTheme);
-    root.setAttribute("data-theme", newResolvedTheme);
+    root.classList.add(resolvedTheme);
+    root.setAttribute("data-theme", resolvedTheme);
     
     // Update theme-color meta tag
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      const themeColor = newResolvedTheme === "dark" ? "#0f1419" : "#0f4c5c";
+      const themeColor = resolvedTheme === "dark" ? "#0f1419" : "#0f4c5c";
       metaThemeColor.setAttribute("content", themeColor);
     }
-  }, [theme]);
+  }, [resolvedTheme]);
 
   useEffect(() => {
     // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
-      if (theme === "system") {
-        const newResolvedTheme = getSystemTheme();
-        setResolvedTheme(newResolvedTheme);
-        
-        const root = document.documentElement;
-        root.classList.remove("light", "dark");
-        root.classList.add(newResolvedTheme);
-        root.setAttribute("data-theme", newResolvedTheme);
-      }
+      setSystemTheme(getSystemTheme());
     };
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme]);
+  }, []);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -88,8 +78,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const contextValue = useMemo(
+    () => ({ theme, resolvedTheme, setTheme }),
+    [theme, resolvedTheme]
+  );
+
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );
