@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "/",
+    url: "https://matrixtop.com/",
     siteName: "ZZP-HUB",
     title: "ZZP-HUB | Elite Business Hub",
     description:
