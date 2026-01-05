@@ -6,6 +6,12 @@ import { RevenueExpensesChart } from "@/components/dashboard/revenue-expenses-ch
 import { DistributionDonut } from "@/components/dashboard/distribution-donut";
 import { getDashboardStats } from "@/actions/get-dashboard-stats";
 import { DEFAULT_VAT_RATE } from "@/lib/constants";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Overzicht van uw financiële situatie, omzet, uitgaven en BTW-aangifte.",
+};
 
 export default async function DashboardPagina() {
   const stats = await getDashboardStats();
