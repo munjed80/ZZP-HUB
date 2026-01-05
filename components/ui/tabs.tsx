@@ -49,7 +49,7 @@ function useTabsContext(component: string) {
 }
 
 export function TabsList({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("inline-flex items-center gap-2 rounded-lg bg-slate-100 p-1", className)}>{children}</div>;
+  return <div className={cn("inline-flex items-center gap-2 rounded-lg bg-slate-100 dark:bg-slate-800 p-1", className)}>{children}</div>;
 }
 
 export function TabsTrigger({ value, children, className }: { value: string; children: ReactNode; className?: string }) {
@@ -63,7 +63,7 @@ export function TabsTrigger({ value, children, className }: { value: string; chi
       onClick={() => setValue(value)}
       className={cn(
         "rounded-md px-4 py-2 text-sm font-semibold transition-colors",
-        active ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900",
+        active ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100",
         className,
       )}
       aria-pressed={active}

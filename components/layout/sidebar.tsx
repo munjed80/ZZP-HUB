@@ -56,7 +56,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "hidden shrink-0 border-r border-slate-200 bg-white px-4 py-6 text-slate-800 md:flex md:flex-col",
+        "hidden shrink-0 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-6 text-slate-800 dark:text-slate-100 md:flex md:flex-col",
         collapsed ? "w-24" : "w-68",
       )}
     >
@@ -78,10 +78,10 @@ export function Sidebar({
                 onClick={onAssistantClick}
                 className={cn(
                   "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors text-left",
-                  "text-slate-700 font-medium hover:bg-slate-50"
+                  "text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800"
                 )}
               >
-                <Icon className="h-4 w-4 text-slate-500" aria-hidden />
+                <Icon className="h-4 w-4 text-slate-500 dark:text-slate-400" aria-hidden />
                 <span>{item.label}</span>
               </button>
             );
@@ -95,13 +95,13 @@ export function Sidebar({
               className={cn(
                 "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                 actief
-                  ? "bg-teal-50 text-teal-700 font-semibold border border-teal-200"
-                  : "text-slate-700 font-medium hover:bg-slate-50"
+                  ? "bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 font-semibold border border-teal-200 dark:border-teal-800"
+                  : "text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800"
               )}
               aria-current={actief ? "page" : undefined}
             >
               <Icon
-                className={cn("h-4 w-4", actief ? "text-teal-700" : "text-slate-500")}
+                className={cn("h-4 w-4", actief ? "text-teal-700 dark:text-teal-300" : "text-slate-500 dark:text-slate-400")}
                 aria-hidden
               />
               <span>{item.label}</span>
@@ -109,23 +109,23 @@ export function Sidebar({
           );
         })}
       </nav>
-      <div className="mt-auto space-y-3 border-t border-slate-200 pt-4">
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-          <p className="font-semibold text-slate-900">Beveiliging</p>
-          <p className="text-slate-600">
+      <div className="mt-auto space-y-3 border-t border-slate-200 dark:border-slate-700 pt-4">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-3 text-sm text-slate-700 dark:text-slate-300">
+          <p className="font-semibold text-slate-900 dark:text-slate-100">Beveiliging</p>
+          <p className="text-slate-600 dark:text-slate-400">
             Sessies beveiligd via NextAuth met rolgebaseerde toegang. MFA en webhooks volgen.
           </p>
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+          className="flex w-full items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 shadow-sm transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400"
         >
           <LogOut className="h-4 w-4" aria-hidden />
           Sign Out
         </button>
-        <div className="rounded-lg bg-slate-50 px-3 py-2 text-center border border-slate-200">
-          <p className="text-xs font-medium text-slate-600">
-            Powered by <span className="font-semibold text-slate-900">MHM IT</span>
+        <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2 text-center border border-slate-200 dark:border-slate-700">
+          <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+            Powered by <span className="font-semibold text-slate-900 dark:text-slate-100">MHM IT</span>
           </p>
         </div>
       </div>
@@ -161,17 +161,17 @@ export function MobileSidebar({
     <div className="md:hidden">
       <div className="fixed inset-0 z-50">
         <div
-          className="absolute inset-0 bg-black/40"
+          className="absolute inset-0 bg-black/40 dark:bg-black/60"
           aria-hidden
           onClick={() => onOpenChange?.(false)}
         />
-        <div className="absolute left-0 top-0 flex h-full w-80 max-w-[85%] flex-col gap-6 border-r border-slate-200 bg-white px-5 py-6 text-slate-800 shadow-lg animate-in slide-in-from-left duration-300">
+        <div className="absolute left-0 top-0 flex h-full w-80 max-w-[85%] flex-col gap-6 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-6 text-slate-800 dark:text-slate-100 shadow-lg animate-in slide-in-from-left duration-300">
           <div className="flex items-center justify-between">
             <SidebarBrand className="flex-1" />
             <button
               type="button"
               onClick={() => onOpenChange?.(false)}
-              className="ml-3 rounded-lg p-2 text-slate-700 hover:bg-slate-100"
+              className="ml-3 rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
               aria-label="Sluit menu"
             >
               <X className="h-5 w-5" aria-hidden />
@@ -193,10 +193,10 @@ export function MobileSidebar({
                     onClick={() => handleItemClick(item.href)}
                     className={cn(
                       "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors text-left",
-                      "text-slate-700 hover:bg-slate-50"
+                      "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                     )}
                   >
-                    <Icon className="h-5 w-5 text-slate-500" aria-hidden />
+                    <Icon className="h-5 w-5 text-slate-500 dark:text-slate-400" aria-hidden />
                     <span>{item.label}</span>
                   </button>
                 );
@@ -211,12 +211,12 @@ export function MobileSidebar({
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",
                     actief
-                      ? "bg-teal-50 text-teal-700 border border-teal-200"
-                      : "text-slate-700 hover:bg-slate-50"
+                      ? "bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                   )}
                 >
                   <Icon
-                    className={cn("h-5 w-5", actief ? "text-teal-700" : "text-slate-500")}
+                    className={cn("h-5 w-5", actief ? "text-teal-700 dark:text-teal-300" : "text-slate-500 dark:text-slate-400")}
                     aria-hidden
                   />
                   <span>{item.label}</span>
@@ -224,20 +224,20 @@ export function MobileSidebar({
               );
             })}
           </nav>
-          <div className="space-y-3 border-t border-slate-200 pt-4">
+          <div className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-4">
             <button
               onClick={() => {
                 onOpenChange?.(false);
                 signOut({ callbackUrl: "/" });
               }}
-              className="flex w-full items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500"
+              className="flex w-full items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 shadow-sm transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400"
             >
               <LogOut className="h-4 w-4" aria-hidden />
               Sign Out
             </button>
-            <div className="rounded-lg bg-slate-50 px-3 py-2 text-center border border-slate-200">
-              <p className="text-xs font-medium text-slate-600">
-                Powered by <span className="font-semibold text-slate-900">MHM IT</span>
+            <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2 text-center border border-slate-200 dark:border-slate-700">
+              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                Powered by <span className="font-semibold text-slate-900 dark:text-slate-100">MHM IT</span>
               </p>
             </div>
           </div>
