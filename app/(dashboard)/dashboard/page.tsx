@@ -104,7 +104,7 @@ export default async function DashboardPagina() {
             <Card
               key={item.label}
               className={cn(
-                "relative overflow-hidden bg-gradient-to-br border-[var(--border)] shadow-md shadow-slate-200/50 hover:shadow-lg transition",
+                "relative overflow-hidden rounded-2xl bg-gradient-to-br border-[var(--border)] shadow-md shadow-slate-200/50 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl",
                 item.gradient,
               )}
             >
@@ -114,16 +114,16 @@ export default async function DashboardPagina() {
                   <CardTitle className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--muted)]">
                     {item.label}
                   </CardTitle>
-                  <div className={cn("rounded-xl p-2 shadow-inner shadow-white/70 ring-1 ring-white/60", item.iconBg)}>
+                  <div className={cn("rounded-xl p-2 shadow-inner shadow-white/70 ring-1 ring-white/60 backdrop-blur", item.iconBg)}>
                     <Icon className={cn("h-4 w-4", item.iconColor)} aria-hidden />
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <p className="text-2xl font-semibold tabular-nums text-[var(--foreground)]">
+              <CardContent className="space-y-2 pb-4">
+                <p className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">
                   {formatBedrag(item.value)}
                 </p>
-                <Badge variant={item.trend.variant} className="text-xs shadow-sm shadow-white/40">
+                <Badge variant={item.trend.variant} className="inline-flex items-center gap-1 text-xs shadow-sm shadow-white/40">
                   {item.trend.label}
                 </Badge>
               </CardContent>
@@ -133,7 +133,7 @@ export default async function DashboardPagina() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.65fr_1.05fr]">
-        <Card className="bg-gradient-to-br from-white via-[#f3f7fb] to-[#e9f1f5] border-[var(--border)]">
+        <Card className="rounded-2xl bg-gradient-to-br from-white via-[#f3f7fb] to-[#e9f1f5] border-[var(--border)] shadow-md shadow-slate-200/60">
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-medium text-[var(--foreground)]">Omzet vs kosten</CardTitle>
             <p className="text-sm text-[var(--muted)]">Maandelijks overzicht {now.getFullYear()}</p>
@@ -144,7 +144,7 @@ export default async function DashboardPagina() {
         </Card>
 
         <div className="space-y-4">
-          <Card className="bg-gradient-to-br from-white via-[#e9f2f5] to-[#dff1ed] border-[var(--border)]">
+          <Card className="rounded-2xl bg-gradient-to-br from-white via-[#e9f2f5] to-[#dff1ed] border-[var(--border)] shadow-md shadow-slate-200/60">
             <CardHeader className="pb-4">
               <div className="flex items-start gap-3">
                 <div className="rounded-xl bg-white/80 p-2.5 shadow-inner shadow-white/70 ring-1 ring-white/50">
@@ -166,7 +166,7 @@ export default async function DashboardPagina() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/90 border-[var(--border)] shadow-md shadow-slate-200/60">
+          <Card className="rounded-2xl bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
             <CardHeader className="pb-4">
               <div className="flex items-center gap-2">
                 <div className="rounded-lg bg-[#e8f0fa] p-2">
@@ -190,7 +190,7 @@ export default async function DashboardPagina() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+        <Card className="rounded-2xl bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-medium text-[var(--foreground)]">Recente facturen</CardTitle>
             <p className="text-sm text-[var(--muted)]">Laatste 5 definitieve facturen</p>
@@ -223,7 +223,7 @@ export default async function DashboardPagina() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+        <Card className="rounded-2xl bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
           <CardHeader className="pb-4">
             <CardTitle className="text-base font-medium text-[var(--foreground)]">Recente uitgaven</CardTitle>
             <p className="text-sm text-[var(--muted)]">Laatste 5 geregistreerde uitgaven</p>

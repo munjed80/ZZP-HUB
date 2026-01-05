@@ -6,15 +6,24 @@ import { ServiceWorkerRegister } from "@/components/providers/service-worker-reg
 import { InstallPWA } from "@/components/ui/install-pwa";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://matrixtop.com"),
+  metadataBase: new URL("https://zzp-hub.app"),
   title: {
-    default: "ZZP-HUB | Elite Business Hub",
+    default: "ZZP-HUB | Financieel dashboard voor zzp'ers",
     template: "%s | ZZP-HUB",
   },
   applicationName: "ZZP HUB",
   authors: [{ name: "MHM IT" }],
   description:
-    "Professioneel financieel dashboard voor ZZP'ers. Beheer facturen, offertes, BTW-aangifte, uren en planning. De #1 keuze voor Nederlandse ondernemers.",
+    "Professioneel, mobiel-first financieel dashboard voor ZZP'ers. Beheer facturen, offertes, BTW-aangifte, uren en planning met premium templates en PWA support.",
+  keywords: [
+    "zzp hub",
+    "facturatie",
+    "btw aangifte",
+    "urenregistratie",
+    "pwa",
+    "financieel dashboard",
+    "zzp app",
+  ],
   alternates: {
     canonical: "/",
   },
@@ -26,24 +35,25 @@ export const metadata: Metadata = {
     icon: [
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.ico", type: "image/x-icon" },
     ],
     shortcut: ["/favicon.ico"],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     type: "website",
-    url: "https://matrixtop.com/",
+    url: "https://zzp-hub.app/",
     siteName: "ZZP-HUB",
-    title: "ZZP-HUB | Elite Business Hub",
+    title: "ZZP-HUB | Financieel dashboard voor zzp'ers",
     description:
-      "Professioneel financieel dashboard voor ZZP'ers. Beheer facturen, offertes, BTW-aangifte, uren en planning. De #1 keuze voor Nederlandse ondernemers.",
+      "Professioneel, mobiel-first financieel dashboard voor ZZP'ers met facturen, offertes, BTW en PWA-ondersteuning.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "ZZP-HUB social preview" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZZP-HUB | Elite Business Hub",
+    title: "ZZP-HUB | Financieel dashboard voor zzp'ers",
     description:
-      "Professioneel financieel dashboard voor ZZP'ers. Beheer facturen, offertes, BTW-aangifte, uren en planning. De #1 keuze voor Nederlandse ondernemers.",
+      "Modern ZZP-dashboard met facturatie, BTW-hulp en agenda. Optimaliseer je business mobiel-first.",
     images: ["/og-image.png"],
   },
   appleWebApp: {

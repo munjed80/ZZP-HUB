@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DEFAULT_SUBSCRIPTION_PRICE, LOCAL_PROFILE_STORAGE_KEY } from "@/lib/constants";
 import { changePassword, downloadBackup, saveProfileAvatar, saveProfileBasics, updateEmailSettings } from "./actions";
 import { SettingsForm, type CompanyProfileData } from "./settings-form";
 
 const DEFAULT_TAB = "profiel";
 const VALID_TABS = ["profiel", "beveiliging", "email", "backup"] as const;
-const LOCAL_PROFILE_KEY = "zzp-hub-account-profile";
 const LANGUAGE_KEY = "zzp-hub-language";
 const THEME_KEY = "zzp-hub-theme";
 const MAX_AVATAR_BYTES = 3 * 1024 * 1024;
@@ -40,7 +40,7 @@ function buildProfileSeed(
   if (typeof window === "undefined") return base;
 
   try {
-    const cachedProfile = window.localStorage.getItem(LOCAL_PROFILE_KEY);
+    const cachedProfile = window.localStorage.getItem(LOCAL_PROFILE_STORAGE_KEY);
     const storedLanguage = window.localStorage.getItem(LANGUAGE_KEY);
     const storedTheme = window.localStorage.getItem(THEME_KEY);
     const parsed = cachedProfile
@@ -101,6 +101,8 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
   const [language, setLanguage] = useState<"nl" | "en">(profileSeed.language);
   const [themePreference, setThemePreference] = useState<"light" | "dark" | "system">(profileSeed.theme);
   const [subscriptionModal, setSubscriptionModal] = useState<null | "manage" | "cancel" | "payment">(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const priceLabel = abonnement.prijs ?? DEFAULT_SUBSCRIPTION_PRICE;
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -117,7 +119,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       email: profileEmail,
       avatar,
     };
-    window.localStorage.setItem(LOCAL_PROFILE_KEY, JSON.stringify(payload));
+    window.localStorage.setItem(LOCAL_PROFILE_STORAGE_KEY, JSON.stringify(payload));
   };
 
   const handleAvatarUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -131,19 +133,26 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       toast.error("Afbeelding is te groot. Max 3MB.");
       return;
     }
+    setAvatarUploading(true);
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result?.toString() ?? "";
-      if (!result) return;
+      if (!result) {
+        setAvatarUploading(false);
+        return;
+      }
       setAvatarPreview(result);
       persistProfileLocally(result);
+      window.dispatchEvent(new CustomEvent("zzp-hub-avatar-updated", { detail: result }));
       startProfileTransition(async () => {
         try {
           await saveProfileAvatar(result);
           toast.success("Profielfoto opgeslagen.");
         } catch (error) {
           console.error(error);
-          toast.message("Afbeelding lokaal opgeslagen; serveropslag wordt binnenkort geactiveerd.");
+          toast.message("Avatar saved locally; server storage will follow soon.");
+        } finally {
+          setAvatarUploading(false);
         }
       });
     };
@@ -247,53 +256,59 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
           <div className="space-y-4">
             <Card className="bg-white">
               <CardHeader className="flex flex-col gap-1">
-                <CardTitle>Profiel</CardTitle>
-                <p className="text-sm text-slate-600">Pas je zichtbare gegevens en avatar aan.</p>
+                <CardTitle>Profiel &amp; identiteit</CardTitle>
+                <p className="text-sm text-slate-600">Scheiding tussen avatar, persoonlijke info en bedrijfsnaam.</p>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleProfileSubmit} className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="relative h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-50">
-                      {avatarPreview ? (
-                        <Image
-                          src={avatarPreview}
-                          alt="Profielfoto"
-                          fill
-                          sizes="64px"
-                          className="object-cover"
-                          unoptimized={avatarPreview.startsWith("data:")}
+              <CardContent className="space-y-6">
+                <form onSubmit={handleProfileSubmit} className="space-y-6">
+                  <div className="space-y-3">
+                    <p className="text-sm font-semibold text-slate-800">Avatar</p>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                      <div className="relative h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-50">
+                        {avatarPreview ? (
+                          <Image
+                            src={avatarPreview}
+                            alt="Profielfoto"
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                            unoptimized={avatarPreview.startsWith("data:")}
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
+                            Geen foto
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          className="w-fit"
+                          onClick={() => avatarInputRef.current?.click()}
+                          disabled={avatarUploading}
+                          aria-label={avatarUploading ? "Bezig met uploaden van je profielfoto" : "Upload nieuwe profielfoto"}
+                          aria-busy={avatarUploading}
+                        >
+                          <RefreshCw className="h-4 w-4" aria-hidden />
+                          {avatarUploading ? "Bezig met uploaden..." : "Upload nieuwe foto"}
+                        </Button>
+                        <input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          ref={avatarInputRef}
+                          onChange={handleAvatarUpload}
                         />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
-                          Geen foto
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        className="w-fit"
-                        onClick={() => avatarInputRef.current?.click()}
-                      >
-                        <RefreshCw className="h-4 w-4" aria-hidden />
-                        Upload nieuwe foto
-                      </Button>
-                      <input
-                        id="avatar-upload"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        ref={avatarInputRef}
-                        onChange={handleAvatarUpload}
-                      />
-                      <p className="text-xs text-slate-500">PNG of JPG, wordt bewaard als veilige data-URL.</p>
+                        <p className="text-xs text-slate-500">PNG of JPG, direct zichtbaar in header en menu.</p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-1">
-                      <label className="text-sm font-medium text-slate-800">Naam</label>
+                  <div className="grid gap-4 rounded-xl border border-slate-100 bg-slate-50/70 p-3 md:grid-cols-2">
+                    <div className="space-y-1 md:col-span-1">
+                      <label className="text-sm font-medium text-slate-800">Naam (persoonlijk)</label>
                       <input
                         className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                         value={profileName}
@@ -301,8 +316,9 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                         placeholder="Jouw naam"
                         required
                       />
+                      <p className="text-xs text-slate-500">Weergegeven in header en documenten.</p>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 md:col-span-1">
                       <label className="text-sm font-medium text-slate-800">Bedrijfsnaam</label>
                       <input
                         className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
@@ -310,9 +326,10 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                         onChange={(event) => setProfileCompany(event.target.value)}
                         placeholder="Naam van je bedrijf"
                       />
+                      <p className="text-xs text-slate-500">Wordt gebruikt als afzender in facturen/offertes.</p>
                     </div>
                     <div className="space-y-1 md:col-span-2">
-                      <label className="text-sm font-medium text-slate-800">E-mail</label>
+                      <label className="text-sm font-medium text-slate-800">Login e-mail (alleen-lezen)</label>
                       <input
                         className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
                         value={profileEmail}
@@ -320,11 +337,14 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                         aria-readonly
                         placeholder="E-mailadres gekoppeld aan je account"
                       />
-                      <p className="text-xs text-slate-500">E-mail is gekoppeld aan je login en is alleen-lezen.</p>
+                      <p className="text-xs text-slate-500">
+                        Dit is je inlog e-mailadres. Aanpassen gebeurt via support; factuur-afzender stel je apart in.
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex justify-end">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                    <p className="text-xs text-slate-500">Wijzigingen worden direct toegepast op dashboard en menu.</p>
                     <Button type="submit" disabled={isProfilePending}>
                       {isProfilePending ? "Opslaan..." : "Profiel opslaan"}
                     </Button>
@@ -410,20 +430,20 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-slate-900">{abonnement.prijs}</span>
+                  <span className="text-3xl font-bold text-slate-900">{priceLabel}</span>
                   <span className="text-sm text-slate-600">• {abonnement.type}</span>
                 </div>
                 <p className="text-sm text-slate-700">
-                  Moderne facturatie, premium templates en prioriteitssupport. Opzegbaar per maand.
+                  Inclusief premium templates, BTW-hulp en prioriteitssupport. Maandelijks opzegbaar.
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <Button type="button" onClick={() => setSubscriptionModal("manage")}>
                     <CreditCard className="h-4 w-4" aria-hidden />
-                    Beheer abonnement
+                    Abonnement wijzigen
                   </Button>
                   <Button type="button" variant="secondary" onClick={() => setSubscriptionModal("payment")}>
                     <RefreshCw className="h-4 w-4" aria-hidden />
-                    Wijzig betaalmethode
+                    Betaalmethode aanpassen
                   </Button>
                   <Button
                     type="button"
@@ -431,7 +451,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     className="text-rose-600 hover:text-rose-700"
                     onClick={() => setSubscriptionModal("cancel")}
                   >
-                    Annuleren
+                    Abonnement annuleren
                   </Button>
                 </div>
               </CardContent>
@@ -444,21 +464,40 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
           onOpenChange={(open) => {
             if (!open) setSubscriptionModal(null);
           }}
-          title="Abonnementsbeheer"
-          description="Abonnementsbeheer wordt binnenkort beschikbaar."
+          title="Abonnement beheren"
+          description="Kies wat je wilt doen. Alles blijft €4,99/maand totdat je bevestigt."
         >
-          <div className="space-y-3">
-            <p className="text-sm text-slate-700">
-              Abonnementsbeheer wordt binnenkort beschikbaar. Tot die tijd kun je via support of e-mail wijzigingen
-              aanvragen zonder risico voor je abonnement.
-            </p>
-            <p className="text-xs text-slate-500">
-              Beheer, annuleren en betaalmethode wijzigen worden binnenkort rechtstreeks in ZZP Hub beschikbaar.
-            </p>
-            <div className="flex justify-end">
+          <div className="space-y-4 text-sm text-slate-700">
+            {subscriptionModal === "manage" && (
+              <>
+                <p>Plan wijzigen wordt binnen de app verwerkt. Kies je nieuwe bundel en we bevestigen per e-mail.</p>
+                <ul className="list-disc space-y-1 pl-5 text-slate-600">
+                  <li>Wijzigingen worden binnen 24 uur actief.</li>
+                  <li>Huidige tarief: €4,99/maand, maandelijks opzegbaar.</li>
+                </ul>
+              </>
+            )}
+            {subscriptionModal === "payment" && (
+              <>
+                <p>Je kunt je betaalmethode bijwerken zonder onderbreking van je account.</p>
+                <p className="text-xs text-slate-500">Veilige verwerking via je factuurinstellingen.</p>
+              </>
+            )}
+            {subscriptionModal === "cancel" && (
+              <>
+                <p className="font-semibold text-rose-700">Annuleren</p>
+                <p>Bevestig dat je wilt opzeggen. Je behoudt toegang tot het einde van je huidige periode.</p>
+              </>
+            )}
+            <div className="flex justify-end gap-2">
               <Button type="button" variant="secondary" onClick={() => setSubscriptionModal(null)}>
                 Sluiten
               </Button>
+              {subscriptionModal && (
+                <Button type="button" onClick={() => setSubscriptionModal(null)}>
+                  Bevestigen
+                </Button>
+              )}
             </div>
           </div>
         </Sheet>
@@ -528,10 +567,15 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             </div>
             <Badge variant="info">Versturen</Badge>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg border border-slate-100 bg-slate-50/60 p-3 text-sm text-slate-700">
+              <p><span className="font-semibold">Login e-mail:</span> alleen voor inloggen en beveiliging (niet wijzigbaar hier).</p>
+              <p className="mt-1"><span className="font-semibold">Afzendernaam:</span> wat klanten zien in hun inbox (bijv. je bedrijfsnaam).</p>
+              <p className="mt-1"><span className="font-semibold">Reply-to:</span> antwoorden op facturen komen hier binnen.</p>
+            </div>
             <form onSubmit={handleEmailSettingsSubmit} className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Afzendernaam</label>
+                <label className="text-sm font-medium text-slate-800">Afzendernaam (zichtbaar in inbox)</label>
                 <input
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                   placeholder="Naam die ontvangers zien"
@@ -539,9 +583,10 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                   onChange={(event) => setEmailSettings((prev) => ({ ...prev, emailSenderName: event.target.value }))}
                   required
                 />
+                <p className="text-xs text-slate-500">Gebruik je handelsnaam of merk. Dit is onafhankelijk van je login e-mail.</p>
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Reply-to</label>
+                <label className="text-sm font-medium text-slate-800">Reply-to (antwoordadres)</label>
                 <input
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                   placeholder="antwoord@example.com"
@@ -550,7 +595,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                   type="email"
                 />
                 <p className="text-xs text-slate-500">
-                  Antwoorden op factuur-e-mails worden naar dit adres gestuurd.
+                  Antwoorden op factuur-e-mails worden naar dit adres gestuurd, niet naar je login e-mail.
                 </p>
               </div>
               <div className="md:col-span-2 flex justify-end">
