@@ -3,7 +3,18 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Receipt, Plus, FileText, Users, Send, Wallet, CalendarDays, Menu as MenuIcon } from "lucide-react";
+import {
+  LayoutDashboard,
+  Receipt,
+  Plus,
+  FileText,
+  Users,
+  Send,
+  Wallet,
+  CalendarDays,
+  Menu as MenuIcon,
+  Sparkles,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Order aligned with mobile navigation requirement: Dashboard, Facturen, Agenda, Uitgaven.
@@ -27,7 +38,8 @@ type MobileNavProps = {
   onMenuClick?: () => void;
 };
 
-export function MobileNav({ onAssistantClick, onMenuClick }: MobileNavProps = {}) {
+export function MobileNav(mobileNavProps: MobileNavProps = {}) {
+  const { onAssistantClick, onMenuClick } = mobileNavProps;
   const pathname = usePathname();
   const [fabMenuOpen, setFabMenuOpen] = useState(false);
   const fabMenuRef = useRef<HTMLDivElement>(null);
@@ -48,8 +60,8 @@ export function MobileNav({ onAssistantClick, onMenuClick }: MobileNavProps = {}
   }, [fabMenuOpen]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white shadow-sm md:hidden pb-[env(safe-area-inset-bottom)]">
-      <div className="relative flex items-center justify-around px-2 py-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 shadow-lg shadow-slate-200/40 backdrop-blur md:hidden pb-[calc(0.65rem+env(safe-area-inset-bottom))]">
+      <div className="relative flex items-center justify-between gap-1 px-2 py-2">
         {navItems.slice(0, 2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -76,7 +88,7 @@ export function MobileNav({ onAssistantClick, onMenuClick }: MobileNavProps = {}
         <div className="relative flex-1 flex justify-center" ref={fabMenuRef}>
           <button
             onClick={() => setFabMenuOpen(!fabMenuOpen)}
-            className="absolute -top-8 flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-white shadow-md border border-teal-700 hover:bg-teal-700 transition-colors"
+            className="absolute -top-7 flex h-12 w-12 items-center justify-center rounded-full border border-teal-700 bg-teal-600 text-white shadow-md shadow-teal-200 transition-transform hover:-translate-y-0.5 hover:bg-teal-700"
             aria-label="Toevoegen"
           >
             <Plus className={cn("h-6 w-6 transition-transform duration-200", fabMenuOpen && "rotate-45")} aria-hidden />
@@ -128,6 +140,18 @@ export function MobileNav({ onAssistantClick, onMenuClick }: MobileNavProps = {}
             </Link>
           );
         })}
+        <button
+          type="button"
+          onClick={() => {
+            setFabMenuOpen(false);
+            onAssistantClick?.();
+          }}
+          className="flex flex-1 min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+          aria-label="Open AI assistent"
+        >
+          <Sparkles className="h-5 w-5" aria-hidden />
+          <span className="text-[10px] font-semibold leading-tight">AI</span>
+        </button>
         
         {/* Menu button - opens full navigation drawer */}
         <button

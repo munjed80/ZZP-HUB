@@ -1,22 +1,39 @@
 {
-  "name": "Elite Hub",
-  "short_name": "Hub",
-  "description": "Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.",
-  "start_url": "/",
+  "name": "ZZP HUB",
+  "short_name": "ZZP HUB",
+  "description": "Premium financieel dashboard voor zzp'ers: facturen, offertes, BTW, uren en planning.",
+  "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#f8f9fa",
-  "theme_color": "#0a2e50",
+  "background_color": "#ecf2f4",
+  "theme_color": "#0f4c5c",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "any",
-      "type": "image/x-icon"
+      "src": "/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/pwa/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ]
 }
