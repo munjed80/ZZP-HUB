@@ -183,9 +183,6 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Link href="#support" className="transition-colors duration-200 hover:text-[#1e293b]">
                 Support
               </Link>
-              <Link href="#preview" className="transition-colors duration-200 hover:text-[#1e293b]">
-                Preview
-              </Link>
             </nav>
             <div className="flex items-center gap-3">
               {isLoggedIn ? (
@@ -220,207 +217,113 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
       </header>
 
       <main className="pt-16 sm:pt-20">
+        {/* Hero Section - Redesigned from scratch */}
         <section
-          id="preview"
-          className="relative overflow-hidden bg-gradient-to-br from-[#0f4c5c] via-[#e1edf4] to-[#f6f9fb] pb-24 pt-20 sm:pt-24 lg:pt-28"
+          id="hero"
+          className="relative min-h-[85vh] overflow-hidden bg-gradient-to-br from-[#0d4f4f] via-[#115e59] to-[#0891b2] pb-20 pt-16 sm:min-h-[90vh] sm:pb-24 sm:pt-20 lg:pt-24"
         >
+          {/* Background ambient effects */}
           <div className="absolute inset-0">
-            <div className="absolute -left-32 top-6 h-72 w-72 rounded-full bg-teal-200/60 blur-3xl" />
-            <div className="absolute right-6 top-[-40px] h-96 w-96 rounded-full bg-sky-200/70 blur-3xl" />
-            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#eef2f6]" />
+            <div className="absolute left-1/4 top-1/4 h-[500px] w-[500px] rounded-full bg-emerald-400/10 blur-[120px]" />
+            <div className="absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-teal-400/10 blur-[100px]" />
           </div>
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-              <div className="space-y-6 text-center lg:text-left">
-                <motion.div
-                  className="mx-auto inline-flex items-center gap-2 rounded-full border border-[#334155] bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#0f172a] shadow-md backdrop-blur sm:mx-0"
+
+          <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="flex min-h-[calc(85vh-8rem)] flex-col items-center justify-center text-center sm:min-h-[calc(90vh-10rem)]">
+              {/* Main content */}
+              <div className="max-w-4xl space-y-8">
+                {/* Emotional headline */}
+                <motion.h1
+                  className="text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl"
                   {...fadeUp}
                 >
-                  <BrandZ className="h-4 w-4 text-[#1e293b]" aria-hidden />
-                  <span>Elite Business Hub 2026</span>
-                </motion.div>
-               <motion.h1
-                className="text-3xl font-semibold leading-[1.05] tracking-[-0.05em] drop-shadow-[0_10px_28px_rgba(15,23,42,0.28)] sm:text-5xl lg:text-6xl"
-                {...fadeUp}
-                transition={fadeUpTransition(0.05)}
-                style={{
-                  backgroundImage: "linear-gradient(130deg,#e4f1f9 0%,#d2efe5 45%,#f6d49f 90%)",
-                  backgroundSize: "180% 180%",
-                  WebkitBackgroundClip: "text",
-                  color: "transparent",
-                }}
-              >
-                  Slimmer ondernemen met een premium financieel hub voor ZZP&apos;ers.
-              </motion.h1>
+                  Jouw financiën onder controle.
+                  <br />
+                  <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-300 bg-clip-text text-transparent">
+                    Simpel. Professioneel.
+                  </span>
+                </motion.h1>
+
+                {/* Subheadline */}
                 <motion.p
-                  className="mx-auto max-w-2xl text-lg leading-relaxed text-[var(--foreground)] sm:text-xl lg:mx-0"
+                  className="mx-auto max-w-2xl text-lg leading-relaxed text-teal-50 sm:text-xl"
                   {...fadeUp}
                   transition={fadeUpTransition(0.1)}
                 >
-                  Beheer je facturen, ritten en agenda met de snelheid van licht. De #1 keuze voor professionele koeriers en ondernemers.
+                  Facturen, BTW-aangifte en uren — alles in één overzichtelijk platform voor ZZP&apos;ers in Nederland.
                 </motion.p>
+
+                {/* Primary CTA */}
                 <motion.div
-                  className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start"
+                  className="flex flex-col items-center gap-4 pt-2"
                   {...fadeUp}
                   transition={fadeUpTransition(0.15)}
                 >
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/register"}
-                    className={buttonVariants(
-                      "primary",
-                      "text-base px-8 py-3 shadow-xl shadow-[0_22px_64px_-36px_rgba(30,41,59,0.45)] transition-all hover:shadow-2xl hover:shadow-[0_26px_72px_-34px_rgba(51,65,85,0.42)]"
-                    )}
+                    className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-base font-semibold text-white shadow-[0_0_40px_rgba(16,185,129,0.3)] transition-all duration-300 hover:shadow-[0_0_60px_rgba(16,185,129,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d4f4f]"
                   >
-                    Start Nu Gratis
-                    <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
+                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    Start 14 dagen gratis
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden />
                   </Link>
-                  <Link href="#pricing" className="text-sm font-semibold text-[var(--foreground)] underline underline-offset-4">
-                    Bekijk prijzen
-                  </Link>
+
+                  {/* Trust signals */}
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+                    <div className="flex items-center justify-center gap-2 text-sm text-teal-100">
+                      <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-300" aria-hidden />
+                      <span className="font-medium">14 dagen gratis</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-sm text-teal-100">
+                      <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-300" aria-hidden />
+                      <span className="font-medium">Geen creditcard</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-sm text-teal-100">
+                      <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-300" aria-hidden />
+                      <span className="font-medium">Voor ZZP&apos;ers in NL</span>
+                    </div>
+                  </div>
                 </motion.div>
+
+                {/* Soft visual hint - Abstract financial flow */}
                 <motion.div
-                  className="flex items-center justify-center gap-3 text-sm text-slate-700 lg:justify-start"
+                  className="mx-auto mt-12 max-w-3xl"
                   {...fadeUp}
                   transition={fadeUpTransition(0.2)}
                 >
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" aria-hidden />
-                  <span>14 dagen gratis • Geen creditcard • Premium ervaring</span>
-                </motion.div>
-              </div>
-
-              <div className="relative h-[540px]">
-                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-teal-100/60 via-white to-sky-100/50 blur-[110px]" />
-                <motion.div
-                  className="relative h-full overflow-hidden rounded-[32px] border border-white/60 bg-[linear-gradient(145deg,#f6f9ff_0%,#e2edf5_55%,#d6e7f4_100%)] bg-[length:200%_200%] p-6 shadow-[0_40px_120px_-70px_rgba(15,23,42,0.3)] ring-1 ring-[#0ea5e9]/15 backdrop-blur-[14px] animate-[metal-shine_8s_linear_infinite]"
-                  {...tiltEffect}
-                >
-                  <div className="flex items-center justify-between border-b border-white/40 pb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1e293b] via-[#334155] to-[#1f2937] text-white shadow-lg shadow-[0_12px_32px_-18px_rgba(30,41,59,0.6)] ring-1 ring-white/40">
-                        <BrandZ className="h-5 w-5" aria-hidden />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">Glass preview</p>
-                        <p className="text-base font-semibold text-slate-900">Elite Dashboard</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 rounded-full border border-white/50 bg-white/30 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
-                      <ShieldCheck className="h-4 w-4 text-emerald-500" aria-hidden />
-                      Midnight beveiliging
-                    </div>
-                  </div>
-
-                  <div className="mt-5 grid gap-4">
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      {glassStats.map((stat) => {
-                        const Icon = stat.icon;
-                        return (
-                          <div
-                            key={stat.label}
-                            className="rounded-2xl border border-white/50 bg-white/45 p-4 shadow-[0_18px_60px_-40px_rgba(15,23,42,0.35)] backdrop-blur-xl"
-                          >
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">{stat.label}</p>
-                              <span
-                                className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${stat.accent} text-white shadow-md shadow-[0_12px_32px_-18px_rgba(10,46,80,0.45)] ring-1 ring-white/40`}
-                              >
-                                <Icon className="h-4 w-4" aria-hidden />
-                              </span>
-                            </div>
-                            <div className="mt-3 text-2xl font-semibold text-slate-900">{stat.value}</div>
-                            <p className="mt-1 text-xs font-semibold text-[#1e293b]">{stat.chip}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                      <div className="relative overflow-hidden rounded-2xl border border-white/45 bg-white/45 p-5 shadow-[0_22px_80px_-55px_rgba(10,46,80,0.45)]">
-                        <div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[#1e293b]/20 blur-3xl" />
-                        <div className="absolute right-0 -bottom-10 h-32 w-40 rounded-full bg-[#334155]/18 blur-3xl" />
-                        <div className="relative flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-700">Realtime rapportage</p>
-                            <p className="text-lg font-semibold text-slate-900">Cashflow & uptime</p>
-                          </div>
-                          <span className="rounded-full bg-[#e2e8f0] px-3 py-1 text-[11px] font-semibold text-[#1e293b] ring-1 ring-[#334155]/50">
-                            Live sync
-                          </span>
+                  <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
+                    {/* Subtle glow overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5" />
+                    
+                    <div className="relative grid grid-cols-3 gap-4 sm:gap-6">
+                      {/* Financial flow items */}
+                      <div className="space-y-3 text-left">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 backdrop-blur-sm">
+                          <FileText className="h-6 w-6 text-emerald-300" aria-hidden />
                         </div>
-                        <div className="relative mt-6 grid grid-cols-12 items-end gap-2">
-                          {[36, 62, 78, 68, 92, 74, 108, 98, 86, 94, 120, 104].map((height, idx) => (
-                            <div key={idx} className="space-y-2">
-                              <div
-                                className="rounded-xl bg-gradient-to-t from-[#0a2e50] to-[#4A5568] shadow-[0_14px_36px_-18px_rgba(10,46,80,0.55)]"
-                                style={{ height: `${height}px` }}
-                              />
-                              <div
-                                className="rounded-xl bg-gradient-to-t from-amber-400 to-orange-300 shadow-[0_12px_28px_-18px_rgba(251,191,36,0.6)]"
-                                style={{ height: `${Math.max(22, height - 34)}px` }}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-4 flex items-center justify-between text-[11px] uppercase tracking-[0.16em] text-slate-700">
-                          <span>Omzet</span>
-                          <span>Kosten</span>
-                          <span>Prognose</span>
+                        <div>
+                          <div className="text-2xl font-semibold text-white">€12.4k</div>
+                          <div className="text-sm text-teal-200">Facturen</div>
                         </div>
                       </div>
-
-                      <div className="space-y-3">
-                        <div className="rounded-2xl border border-white/45 bg-white/45 p-4 shadow-[0_18px_60px_-50px_rgba(10,46,80,0.38)]">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-semibold text-slate-900">Recente betalingen</p>
-                            <ArrowRight className="h-4 w-4 text-slate-700" aria-hidden />
-                          </div>
-                          <div className="mt-3 space-y-2 text-sm">
-                            {glassPayments.map((invoice) => (
-                              <div
-                                key={invoice.klant}
-                                className="flex items-center justify-between rounded-xl border border-white/50 bg-white/70 px-3 py-2 shadow-sm backdrop-blur"
-                              >
-                                <div>
-                                  <p className="font-semibold text-slate-900">{invoice.klant}</p>
-                                  <p className="text-xs text-slate-700">Elite factuur</p>
-                                </div>
-                                <div className="text-right">
-                                  <p className="text-sm font-semibold text-slate-900">{invoice.bedrag}</p>
-                                  <span className="text-[11px] font-semibold text-[#10B981]">{invoice.status}</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                      
+                      <div className="space-y-3 text-left">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-500/10 backdrop-blur-sm">
+                          <Calculator className="h-6 w-6 text-teal-300" aria-hidden />
                         </div>
-
-                        <div className="rounded-2xl border border-white/45 bg-white/40 p-4 shadow-[0_18px_60px_-55px_rgba(15,23,42,0.35)]">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-semibold text-slate-900">Flow</p>
-                            <span className="rounded-full bg-[#0a2e50] px-3 py-1 text-[11px] font-semibold text-white shadow-sm shadow-[0_10px_26px_-18px_rgba(10,46,80,0.6)]">
-                              14 dagen gratis
-                            </span>
-                          </div>
-                          <div className="mt-3 space-y-2">
-                            {glassFlow.map((item) => {
-                              const Icon = item.icon;
-                              return (
-                                <div
-                                  key={item.label}
-                                  className="flex items-center justify-between rounded-xl border border-white/40 bg-white/60 px-3 py-2 shadow-sm backdrop-blur"
-                                >
-                                  <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                                    <span
-                                      className={`flex h-8 w-8 items-center justify-center rounded-lg ring-1 ${item.tone}`}
-                                    >
-                                      <Icon className="h-4 w-4" aria-hidden />
-                                    </span>
-                                    {item.label}
-                                  </div>
-                                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-700">Sync</span>
-                                </div>
-                              );
-                            })}
-                          </div>
+                        <div>
+                          <div className="text-2xl font-semibold text-white">€2.6k</div>
+                          <div className="text-sm text-teal-200">BTW klaar</div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3 text-left">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 backdrop-blur-sm">
+                          <Timer className="h-6 w-6 text-amber-300" aria-hidden />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-semibold text-white">1,180</div>
+                          <div className="text-sm text-teal-200">Uren</div>
                         </div>
                       </div>
                     </div>
