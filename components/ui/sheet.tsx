@@ -29,27 +29,27 @@ export function Sheet({ open, onOpenChange, children, title, description }: Shee
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 animate-in fade-in duration-200"
+        className="absolute inset-0 bg-black/40 dark:bg-black/60 animate-in fade-in duration-200"
         onClick={() => onOpenChange(false)}
         aria-hidden="true"
       />
       
       {/* Sheet */}
-      <div className="absolute bottom-0 left-0 right-0 flex flex-col bg-white rounded-t-2xl shadow-xl max-h-[90vh] animate-in slide-in-from-bottom duration-300">
+      <div className="absolute bottom-0 left-0 right-0 flex flex-col bg-white dark:bg-slate-900 rounded-t-2xl shadow-xl max-h-[90vh] animate-in slide-in-from-bottom duration-300">
         {(title || description) && (
-          <div className="flex items-start justify-between border-b border-slate-200 px-4 py-4">
+          <div className="flex items-start justify-between border-b border-slate-200 dark:border-slate-700 px-4 py-4">
             <div className="flex-1">
               {title && (
-                <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
               )}
               {description && (
-                <p className="mt-1 text-sm text-slate-600">{description}</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{description}</p>
               )}
             </div>
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 transition-colors"
+              className="rounded-lg p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               aria-label="Sluiten"
             >
               <X className="h-5 w-5" aria-hidden="true" />

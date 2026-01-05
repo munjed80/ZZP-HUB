@@ -249,17 +249,17 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       <TabsContent value="profiel">
         <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
           <div className="space-y-4">
-            <Card className="bg-white">
+            <Card className="bg-white dark:bg-slate-900">
               <CardHeader className="flex flex-col gap-1">
                 <CardTitle>Profiel &amp; identiteit</CardTitle>
-                <p className="text-sm text-slate-600">Scheiding tussen avatar, persoonlijke info en bedrijfsnaam.</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Scheiding tussen avatar, persoonlijke info en bedrijfsnaam.</p>
               </CardHeader>
               <CardContent className="space-y-6">
                 <form onSubmit={handleProfileSubmit} className="space-y-6">
                   <div className="space-y-3">
-                    <p className="text-sm font-semibold text-slate-800">Avatar</p>
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Avatar</p>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                      <div className="relative h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-50">
+                      <div className="relative h-16 w-16 overflow-hidden rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                         {avatarPreview ? (
                           <Image
                             src={avatarPreview}
@@ -270,7 +270,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                             unoptimized={avatarPreview.startsWith("data:")}
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-xs text-slate-500">
+                          <div className="flex h-full w-full items-center justify-center text-xs text-slate-500 dark:text-slate-400">
                             Geen foto
                           </div>
                         )}
@@ -296,50 +296,50 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                           ref={avatarInputRef}
                           onChange={handleAvatarUpload}
                         />
-                        <p className="text-xs text-slate-500">PNG of JPG, direct zichtbaar in header en menu.</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">PNG of JPG, direct zichtbaar in header en menu.</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid gap-4 rounded-xl border border-slate-100 bg-slate-50/70 p-3 md:grid-cols-2">
+                  <div className="grid gap-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/50 p-3 md:grid-cols-2">
                     <div className="space-y-1 md:col-span-1">
-                      <label className="text-sm font-medium text-slate-800">Naam (persoonlijk)</label>
+                      <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Naam (persoonlijk)</label>
                       <input
-                        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
                         value={profileName}
                         onChange={(event) => setProfileName(event.target.value)}
                         placeholder="Jouw naam"
                         required
                       />
-                      <p className="text-xs text-slate-500">Weergegeven in header en documenten.</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Weergegeven in header en documenten.</p>
                     </div>
                     <div className="space-y-1 md:col-span-1">
-                      <label className="text-sm font-medium text-slate-800">Bedrijfsnaam</label>
+                      <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Bedrijfsnaam</label>
                       <input
-                        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
                         value={profileCompany}
                         onChange={(event) => setProfileCompany(event.target.value)}
                         placeholder="Naam van je bedrijf"
                       />
-                      <p className="text-xs text-slate-500">Wordt gebruikt als afzender in facturen/offertes.</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Wordt gebruikt als afzender in facturen/offertes.</p>
                     </div>
                     <div className="space-y-1 md:col-span-2">
-                      <label className="text-sm font-medium text-slate-800">Login e-mail (alleen-lezen)</label>
+                      <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Login e-mail (alleen-lezen)</label>
                       <input
-                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700"
+                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-300"
                         value={profileEmail}
                         readOnly
                         aria-readonly
                         placeholder="E-mailadres gekoppeld aan je account"
                       />
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         Dit is je inlog e-mailadres. Aanpassen gebeurt via support; factuur-afzender stel je apart in.
                       </p>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-                    <p className="text-xs text-slate-500">Wijzigingen worden direct toegepast op dashboard en menu.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Wijzigingen worden direct toegepast op dashboard en menu.</p>
                     <Button type="submit" disabled={isProfilePending}>
                       {isProfilePending ? "Opslaan..." : "Profiel opslaan"}
                     </Button>
@@ -348,17 +348,17 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
               </CardContent>
             </Card>
 
-            <Card className="bg-white">
+            <Card className="bg-white dark:bg-slate-900">
               <CardHeader className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4 text-slate-600" aria-hidden />
+                  <Bell className="h-4 w-4 text-slate-600 dark:text-slate-400" aria-hidden />
                   <CardTitle>Voorkeuren</CardTitle>
                 </div>
-                <p className="text-sm text-slate-600">Taal en thema worden direct opgeslagen in je instellingen.</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Taal en thema worden direct opgeslagen in je instellingen.</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <p className="text-sm font-semibold text-slate-800">Taal</p>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Taal</p>
                   <div className="flex flex-wrap gap-2">
                     <Button
                       type="button"
@@ -437,11 +437,11 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
           </div>
 
           <div className="space-y-4">
-            <Card className="bg-white">
+            <Card className="bg-white dark:bg-slate-900">
               <CardHeader className="flex items-start justify-between">
                 <div className="space-y-1">
                   <CardTitle>Abonnement</CardTitle>
-                  <p className="text-sm text-slate-600">{abonnement.type} lidmaatschap</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{abonnement.type} lidmaatschap</p>
                 </div>
                 <Badge variant={abonnement.status.toLowerCase() === "actief" ? "success" : "muted"}>
                   {abonnement.status}
@@ -449,10 +449,10 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-slate-900">{priceLabel}</span>
-                  <span className="text-sm text-slate-600">• {abonnement.type}</span>
+                  <span className="text-3xl font-bold text-slate-900 dark:text-slate-100">{priceLabel}</span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">• {abonnement.type}</span>
                 </div>
-                <p className="text-sm text-slate-700">
+                <p className="text-sm text-slate-700 dark:text-slate-300">
                   Inclusief premium templates, BTW-hulp en prioriteitssupport. Maandelijks opzegbaar.
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -467,7 +467,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                   <Button
                     type="button"
                     variant="ghost"
-                    className="text-rose-600 hover:text-rose-700"
+                    className="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300"
                     onClick={() => setSubscriptionModal("cancel")}
                   >
                     Abonnement annuleren
@@ -486,11 +486,11 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
           title="Abonnement beheren"
           description="Kies wat je wilt doen. Alles blijft €4,99/maand totdat je bevestigt."
         >
-          <div className="space-y-4 text-sm text-slate-700">
+          <div className="space-y-4 text-sm text-slate-700 dark:text-slate-300">
             {subscriptionModal === "manage" && (
               <>
                 <p>Plan wijzigen wordt binnen de app verwerkt. Kies je nieuwe bundel en we bevestigen per e-mail.</p>
-                <ul className="list-disc space-y-1 pl-5 text-slate-600">
+                <ul className="list-disc space-y-1 pl-5 text-slate-600 dark:text-slate-400">
                   <li>Wijzigingen worden binnen 24 uur actief.</li>
                   <li>Huidige tarief: €4,99/maand, maandelijks opzegbaar.</li>
                 </ul>
@@ -499,12 +499,12 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             {subscriptionModal === "payment" && (
               <>
                 <p>Je kunt je betaalmethode bijwerken zonder onderbreking van je account.</p>
-                <p className="text-xs text-slate-500">Veilige verwerking via je factuurinstellingen.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Veilige verwerking via je factuurinstellingen.</p>
               </>
             )}
             {subscriptionModal === "cancel" && (
               <>
-                <p className="font-semibold text-rose-700">Annuleren</p>
+                <p className="font-semibold text-rose-700 dark:text-rose-400">Annuleren</p>
                 <p>Bevestig dat je wilt opzeggen. Je behoudt toegang tot het einde van je huidige periode.</p>
               </>
             )}
@@ -523,10 +523,10 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="beveiliging">
-        <Card className="bg-white">
+        <Card className="bg-white dark:bg-slate-900">
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-slate-600" aria-hidden />
+              <ShieldCheck className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
               <CardTitle>Beveiliging</CardTitle>
             </div>
             <Badge variant="info">Accountbeveiliging</Badge>
@@ -534,10 +534,10 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
           <CardContent>
             <form onSubmit={handlePasswordChange} className="grid gap-4 md:grid-cols-3">
               <div className="space-y-1 md:col-span-1">
-                <label className="text-sm font-medium text-slate-800">Huidig wachtwoord</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Huidig wachtwoord</label>
                 <input
                   type="password"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
                   value={passwords.current}
                   onChange={(event) => setPasswords((prev) => ({ ...prev, current: event.target.value }))}
                   placeholder="••••••••"
@@ -545,10 +545,10 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                 />
               </div>
               <div className="space-y-1 md:col-span-1">
-                <label className="text-sm font-medium text-slate-800">Nieuw wachtwoord</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Nieuw wachtwoord</label>
                 <input
                   type="password"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
                   value={passwords.next}
                   onChange={(event) => setPasswords((prev) => ({ ...prev, next: event.target.value }))}
                   placeholder="Nieuw wachtwoord"
@@ -556,10 +556,10 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                 />
               </div>
               <div className="space-y-1 md:col-span-1">
-                <label className="text-sm font-medium text-slate-800">Bevestig wachtwoord</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Bevestig wachtwoord</label>
                 <input
                   type="password"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
                   value={passwords.confirm}
                   onChange={(event) => setPasswords((prev) => ({ ...prev, confirm: event.target.value }))}
                   placeholder="Herhaal"
@@ -578,42 +578,42 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="email">
-        <Card className="bg-white">
+        <Card className="bg-white dark:bg-slate-900">
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-slate-600" aria-hidden />
+              <ShieldCheck className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
               <CardTitle>E-mailinstellingen</CardTitle>
             </div>
             <Badge variant="info">Versturen</Badge>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-lg border border-slate-100 bg-slate-50/60 p-3 text-sm text-slate-700">
+            <div className="rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/50 p-3 text-sm text-slate-700 dark:text-slate-300">
               <p><span className="font-semibold">Login e-mail:</span> alleen voor inloggen en beveiliging (niet wijzigbaar hier).</p>
               <p className="mt-1"><span className="font-semibold">Afzendernaam:</span> wat klanten zien in hun inbox (bijv. je bedrijfsnaam).</p>
               <p className="mt-1"><span className="font-semibold">Reply-to:</span> antwoorden op facturen komen hier binnen.</p>
             </div>
             <form onSubmit={handleEmailSettingsSubmit} className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Afzendernaam (zichtbaar in inbox)</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Afzendernaam (zichtbaar in inbox)</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
                   placeholder="Naam die ontvangers zien"
                   value={emailSettings.emailSenderName}
                   onChange={(event) => setEmailSettings((prev) => ({ ...prev, emailSenderName: event.target.value }))}
                   required
                 />
-                <p className="text-xs text-slate-500">Gebruik je handelsnaam of merk. Dit is onafhankelijk van je login e-mail.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Gebruik je handelsnaam of merk. Dit is onafhankelijk van je login e-mail.</p>
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Reply-to (antwoordadres)</label>
+                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Reply-to (antwoordadres)</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
                   placeholder="antwoord@example.com"
                   value={emailSettings.emailReplyTo}
                   onChange={(event) => setEmailSettings((prev) => ({ ...prev, emailReplyTo: event.target.value }))}
                   type="email"
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Antwoorden op factuur-e-mails worden naar dit adres gestuurd, niet naar je login e-mail.
                 </p>
               </div>
@@ -628,16 +628,16 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="backup">
-        <Card className="bg-white">
+        <Card className="bg-white dark:bg-slate-900">
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Database className="h-5 w-5 text-slate-600" aria-hidden />
+              <Database className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
               <CardTitle>Data &amp; Backup</CardTitle>
             </div>
             <Badge variant="muted">JSON export</Badge>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-slate-700">
+            <p className="text-sm text-slate-700 dark:text-slate-300">
               Download al je gegevens (facturen, relaties, uitgaven) als JSON-backup. Veilig voor archief of migratie.
             </p>
             <Button type="button" onClick={handleBackupDownload} disabled={isBackupPending}>
