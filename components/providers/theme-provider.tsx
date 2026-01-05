@@ -48,7 +48,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     // Apply theme class to html element
     root.classList.remove("light", "dark");
     root.classList.add(resolvedTheme);
-    root.setAttribute("data-theme", resolvedTheme);
     
     // Update theme-color meta tag
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');

@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
-import { Download, Lock, ShieldCheck, Database, CreditCard, RefreshCw, Bell, Sun, Moon, Monitor } from "lucide-react";
+import { Download, Lock, ShieldCheck, Database, CreditCard, RefreshCw, Bell } from "lucide-react";
+import { Sun, Moon, Monitor } from "lucide-react"; // Theme selector icons
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { DEFAULT_SUBSCRIPTION_PRICE, LOCAL_PROFILE_STORAGE_KEY } from "@/lib/con
 import { changePassword, downloadBackup, saveProfileAvatar, saveProfileBasics, updateEmailSettings } from "./actions";
 import { SettingsForm, type CompanyProfileData } from "./settings-form";
 import { useTheme } from "@/components/providers/theme-provider";
+import { cn } from "@/lib/utils";
 
 const DEFAULT_TAB = "profiel";
 const VALID_TABS = ["profiel", "beveiliging", "email", "backup"] as const;
@@ -383,14 +385,28 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     <button
                       type="button"
                       onClick={() => setTheme("light")}
-                      className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-all ${
+                      className={cn(
+                        "flex flex-col items-center gap-2 rounded-lg border p-3 transition-all",
                         themePreference === "light"
                           ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
                           : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
-                      }`}
+                      )}
                     >
-                      <Sun className={`h-5 w-5 ${themePreference === "light" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"}`} aria-hidden />
-                      <span className={`text-xs font-semibold ${themePreference === "light" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"}`}>Licht</span>
+                      <Sun
+                        className={cn(
+                          "h-5 w-5",
+                          themePreference === "light" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"
+                        )}
+                        aria-hidden
+                      />
+                      <span
+                        className={cn(
+                          "text-xs font-semibold",
+                          themePreference === "light" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"
+                        )}
+                      >
+                        Licht
+                      </span>
                       {themePreference === "light" && (
                         <div className="h-2 w-2 rounded-full bg-teal-600" />
                       )}
@@ -398,14 +414,28 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     <button
                       type="button"
                       onClick={() => setTheme("dark")}
-                      className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-all ${
+                      className={cn(
+                        "flex flex-col items-center gap-2 rounded-lg border p-3 transition-all",
                         themePreference === "dark"
                           ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
                           : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
-                      }`}
+                      )}
                     >
-                      <Moon className={`h-5 w-5 ${themePreference === "dark" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"}`} aria-hidden />
-                      <span className={`text-xs font-semibold ${themePreference === "dark" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"}`}>Donker</span>
+                      <Moon
+                        className={cn(
+                          "h-5 w-5",
+                          themePreference === "dark" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"
+                        )}
+                        aria-hidden
+                      />
+                      <span
+                        className={cn(
+                          "text-xs font-semibold",
+                          themePreference === "dark" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"
+                        )}
+                      >
+                        Donker
+                      </span>
                       {themePreference === "dark" && (
                         <div className="h-2 w-2 rounded-full bg-teal-600" />
                       )}
@@ -413,14 +443,28 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     <button
                       type="button"
                       onClick={() => setTheme("system")}
-                      className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-all ${
+                      className={cn(
+                        "flex flex-col items-center gap-2 rounded-lg border p-3 transition-all",
                         themePreference === "system"
                           ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
                           : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
-                      }`}
+                      )}
                     >
-                      <Monitor className={`h-5 w-5 ${themePreference === "system" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"}`} aria-hidden />
-                      <span className={`text-xs font-semibold ${themePreference === "system" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"}`}>Systeem</span>
+                      <Monitor
+                        className={cn(
+                          "h-5 w-5",
+                          themePreference === "system" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"
+                        )}
+                        aria-hidden
+                      />
+                      <span
+                        className={cn(
+                          "text-xs font-semibold",
+                          themePreference === "system" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"
+                        )}
+                      >
+                        Systeem
+                      </span>
                       {themePreference === "system" && (
                         <div className="h-2 w-2 rounded-full bg-teal-600" />
                       )}

@@ -14,7 +14,6 @@ export function ThemeScript() {
       
       const theme = getTheme();
       document.documentElement.classList.add(theme);
-      document.documentElement.setAttribute('data-theme', theme);
     })();
   `;
 
