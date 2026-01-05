@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Light theme (default) */
 :root {
   --background: #f4f7f9;
   --background-secondary: #ecf2f4;
@@ -27,7 +28,7 @@
 }
 
 /* Dark theme */
-html.dark {
+.dark {
   --background: #0f1419;
   --background-secondary: #161b22;
   --surface: #1c2128;
@@ -68,12 +69,12 @@ body {
 }
 
 /* Light mode gradient */
-html.light body {
+:root body {
   background: radial-gradient(circle at 10% 20%, #f5f7fb 0, #eef3f6 35%, #e8eff2 65%, #e4edf1 100%);
 }
 
 /* Dark mode gradient */
-html.dark body {
+.dark body {
   background: radial-gradient(circle at 10% 20%, #0f1419 0, #161b22 35%, #1a1f26 65%, #0f1419 100%);
 }
 
