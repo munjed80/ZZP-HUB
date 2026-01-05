@@ -11,17 +11,16 @@ const baseClasses = [
 ].join(" ");
 
 const variantClasses: Record<ButtonVariant, string> = {
-  // Primary - Mauve gradient subtle premium
-  primary:
-    "bg-gradient-to-r from-primary via-accent to-primary/90 text-primary-foreground border border-transparent hover:opacity-90 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30",
+primary:
+    "text-[rgb(var(--brand-on-primary))] bg-[linear-gradient(120deg,rgb(var(--brand-primary)),rgb(var(--brand-primary-hover)))] border border-transparent shadow-[0_18px_48px_-28px_rgba(var(--brand-primary),0.55)] hover:shadow-[0_22px_56px_-26px_rgba(var(--brand-primary),0.65)] hover:translate-y-[-1px] active:bg-[linear-gradient(120deg,rgb(var(--brand-primary-active)),rgb(var(--brand-primary)))] active:shadow-[0_14px_40px_-28px_rgba(var(--brand-primary),0.6)]",
   
-  // Secondary - Neutral surface
+  // Secondary - Subtle brand tint
   secondary:
-    "bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 shadow-sm hover:shadow-md",
+    "text-[rgb(var(--brand-primary))] bg-[rgb(var(--brand-primary)/0.08)] border border-[rgb(var(--brand-primary)/0.5)] hover:bg-[rgb(var(--brand-primary)/0.14)] shadow-sm hover:shadow-md",
   
   // Outline - Token border
   outline:
-    "bg-transparent text-foreground border border-border hover:bg-accent hover:text-accent-foreground shadow-sm",
+    "bg-transparent text-[rgb(var(--brand-primary))] border border-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.1)] shadow-sm",
   
   // Destructive - Fiery
   destructive:
@@ -29,11 +28,11 @@ const variantClasses: Record<ButtonVariant, string> = {
   
   // Ghost - Minimal
   ghost:
-    "text-muted-foreground border border-transparent hover:bg-muted hover:text-foreground",
+    "text-[rgb(var(--brand-primary))] border border-transparent hover:bg-[rgb(var(--brand-primary)/0.08)]",
   
   // Link - Text only
   link:
-    "text-link border border-transparent hover:text-link-hover underline-offset-4 hover:underline",
+    "text-[rgb(var(--brand-primary))] border border-transparent hover:text-[rgb(var(--brand-primary-hover))] underline-offset-4 hover:underline",
 };
 
 export function buttonVariants(variant: ButtonVariant = "primary", className?: string) {

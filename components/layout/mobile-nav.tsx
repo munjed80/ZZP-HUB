@@ -147,7 +147,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
             setFabMenuOpen(false);
             onAssistantClick?.();
           }}
-          className="flex flex-1 min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="flex flex-1 min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[rgb(var(--brand-primary))] transition-colors hover:bg-[rgb(var(--brand-primary)/0.08)] hover:text-[rgb(var(--brand-primary-active))]"
           aria-label="Open AI assistent"
         >
           <Sparkles className="h-5 w-5" aria-hidden />
@@ -157,7 +157,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
         {/* Menu button - opens full navigation drawer */}
         <button
           onClick={onMenuClick}
-          className="flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-muted"
+          className="flex flex-1 flex-col items-center justify-center gap-1.5 py-2 px-2 rounded-lg transition-colors text-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.08)] hover:text-[rgb(var(--brand-primary-active))]"
           aria-label="Menu"
         >
           <MenuIcon className="h-5 w-5" aria-hidden="true" />

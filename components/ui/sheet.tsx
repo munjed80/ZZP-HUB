@@ -49,7 +49,7 @@ export function Sheet({ open, onOpenChange, children, title, description }: Shee
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="rounded-lg p-2 text-muted-foreground hover:bg-muted transition-colors"
+              className="rounded-lg p-2 text-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.08)] transition-colors"
               aria-label="Sluiten"
             >
               <X className="h-5 w-5" aria-hidden="true" />

@@ -85,7 +85,7 @@ export function AssistantDrawer({ open: controlledOpen, onOpenChange }: Assistan
             type="button"
             aria-label="Sluit assistent"
             onClick={() => setOpen(false)}
-            className="rounded-full p-1.5 text-slate-500 hover:bg-slate-100"
+            className="rounded-full p-1.5 text-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.08)]"
           >
             <X className="h-4 w-4" aria-hidden />
           </button>
@@ -104,7 +104,7 @@ export function AssistantDrawer({ open: controlledOpen, onOpenChange }: Assistan
                 key={q}
                 type="button"
                 onClick={() => askAssistant(q)}
-                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:bg-teal-50"
+                className="rounded-full border border-[rgb(var(--brand-primary))/0.28] bg-white px-3 py-1.5 text-xs font-medium text-[rgb(var(--brand-primary))] shadow-sm transition hover:-translate-y-0.5 hover:border-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.08)]"
               >
                 <span className="inline-flex items-center gap-2">
                   <Sparkles className="h-3.5 w-3.5 text-teal-600" aria-hidden />

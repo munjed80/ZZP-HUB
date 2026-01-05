@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { buttonVariants } from "@/components/ui/button";
 
 function subscribe(listener: () => void) {
   if (typeof window === "undefined") return () => {};
@@ -44,7 +45,7 @@ export function CookieBanner() {
         <div className="flex gap-2">
           <button
             onClick={handleAccept}
-            className="rounded-lg bg-background px-6 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-background/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            className={buttonVariants("primary", "px-6 py-2 text-sm font-semibold")}
             aria-label="Accepteer cookies"
           >
             Akkoord

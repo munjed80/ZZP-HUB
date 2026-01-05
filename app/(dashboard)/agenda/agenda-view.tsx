@@ -101,7 +101,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100"
+            className="rounded-full p-2 text-[rgb(var(--brand-primary))] transition hover:bg-[rgb(var(--brand-primary)/0.08)]"
             aria-label="Sluiten"
           >
             <X className="h-5 w-5" aria-hidden="true" />
@@ -181,14 +181,14 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100"
+              className={buttonVariants("outline", "px-4 py-2 text-sm font-semibold")}
             >
               Annuleren
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-600 disabled:cursor-not-allowed disabled:opacity-70"
+              className={buttonVariants("primary", "inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold")}
             >
               {isPending ? "Inplannen..." : "Inplannen"}
             </button>

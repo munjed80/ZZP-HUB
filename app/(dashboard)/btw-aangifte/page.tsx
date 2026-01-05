@@ -1,6 +1,7 @@
 import { Info, Percent } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { getVatReport } from "./actions";
 import type { Metadata } from "next";
@@ -119,7 +120,10 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
               </label>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#0f4c5c] via-[#1b6b7a] to-[#2f9e7c] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-teal-200/50 transition hover:-translate-y-0.5"
+                className={buttonVariants(
+                  "primary",
+                  "inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold shadow-md shadow-[0_16px_36px_-24px_rgba(var(--brand-primary),0.65)]"
+                )}
               >
                 <Percent className="h-4 w-4" aria-hidden="true" />
                 Berekenen

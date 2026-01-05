@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { UserRole } from "@prisma/client";
+import { buttonVariants } from "@/components/ui/button";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -76,10 +77,7 @@ export function Sidebar({
               <button
                 key={item.href}
                 onClick={onAssistantClick}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors text-left",
-                  "text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
-                )}
+                className={cn(buttonVariants("ghost", "w-full justify-start px-3 py-2 text-sm text-left font-medium"))}
               >
                 <Icon className="h-4 w-4 text-muted-foreground" aria-hidden />
                 <span>{item.label}</span>
@@ -118,7 +116,7 @@ export function Sidebar({
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex w-full items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-muted-foreground shadow-sm transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className={buttonVariants("outline", "w-full justify-start gap-2 px-3 py-2 text-sm font-medium")}
         >
           <LogOut className="h-4 w-4" aria-hidden />
           Sign Out
@@ -171,7 +169,7 @@ export function MobileSidebar({
             <button
               type="button"
               onClick={() => onOpenChange?.(false)}
-              className="ml-3 rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="ml-3 rounded-lg p-2 text-[rgb(var(--brand-primary))] dark:text-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.08)] dark:hover:bg-[rgb(var(--brand-primary)/0.12)]"
               aria-label="Sluit menu"
             >
               <X className="h-5 w-5" aria-hidden />
@@ -191,12 +189,9 @@ export function MobileSidebar({
                   <button
                     key={item.href}
                     onClick={() => handleItemClick(item.href)}
-                    className={cn(
-                      "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors text-left",
-                      "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
-                    )}
+                    className={cn(buttonVariants("ghost", "w-full justify-start px-3 py-2.5 text-sm font-semibold text-left"))}
                   >
-                    <Icon className="h-5 w-5 text-slate-500 dark:text-slate-400" aria-hidden />
+                    <Icon className="h-5 w-5 text-[rgb(var(--brand-primary))]" aria-hidden />
                     <span>{item.label}</span>
                   </button>
                 );
@@ -230,7 +225,7 @@ export function MobileSidebar({
                 onOpenChange?.(false);
                 signOut({ callbackUrl: "/" });
               }}
-              className="flex w-full items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 shadow-sm transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400"
+              className={buttonVariants("outline", "w-full justify-start gap-2 px-3 py-2.5 text-sm font-medium")}
             >
               <LogOut className="h-4 w-4" aria-hidden />
               Sign Out
