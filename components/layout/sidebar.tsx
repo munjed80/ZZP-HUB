@@ -206,12 +206,12 @@ export function MobileSidebar({
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",
                     actief
-                      ? "bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800"
+                      ? "bg-[rgb(var(--brand-primary))/0.08] dark:bg-[rgb(var(--brand-primary))/0.12] text-[rgb(var(--brand-primary))] dark:text-[rgb(var(--brand-primary))] border border-[rgb(var(--brand-primary))/0.35] dark:border-[rgb(var(--brand-primary))/0.35]"
                       : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                   )}
                 >
                   <Icon
-                    className={cn("h-5 w-5", actief ? "text-teal-700 dark:text-teal-300" : "text-slate-500 dark:text-slate-400")}
+                    className={cn("h-5 w-5", actief ? "text-[rgb(var(--brand-primary))]" : "text-slate-500 dark:text-slate-400")}
                     aria-hidden
                   />
                   <span>{item.label}</span>

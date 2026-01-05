@@ -107,7 +107,7 @@ export function AssistantDrawer({ open: controlledOpen, onOpenChange }: Assistan
                 className="rounded-full border border-[rgb(var(--brand-primary))/0.28] bg-white px-3 py-1.5 text-xs font-medium text-[rgb(var(--brand-primary))] shadow-sm transition hover:-translate-y-0.5 hover:border-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.08)]"
               >
                 <span className="inline-flex items-center gap-2">
-                  <Sparkles className="h-3.5 w-3.5 text-teal-600" aria-hidden />
+                  <Sparkles className="h-3.5 w-3.5 text-[rgb(var(--brand-primary))]" aria-hidden />
                   {q}
                 </span>
               </button>

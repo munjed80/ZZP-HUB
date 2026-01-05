@@ -164,7 +164,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <BrandZ className="h-5 w-5 text-[rgb(var(--brand-on-primary))]" aria-hidden />
               </div>
               <motion.span
-                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(16,185,129,0.3)]"
+                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(var(--brand-primary),0.3)]"
                 transition={{ duration: 0.6 }}
               >
                 ZZP-HUB
