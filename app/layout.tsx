@@ -5,7 +5,6 @@ import { CookieBanner } from "@/components/ui/cookie-banner";
 import { ServiceWorkerRegister } from "@/components/providers/service-worker-register";
 import { InstallPWA } from "@/components/ui/install-pwa";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { ThemeScript } from "@/components/providers/theme-script";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://zzp-hub.app"),
@@ -81,14 +80,11 @@ export default function RootLayout({
   return (
     <html lang="nl" suppressHydrationWarning>
       <head>
-        <ThemeScript />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body
-        className="antialiased bg-[var(--background-secondary)] text-[var(--foreground)]"
-      >
+      <body className="antialiased">
         <ThemeProvider>
           {children}
           <SonnerToaster />
