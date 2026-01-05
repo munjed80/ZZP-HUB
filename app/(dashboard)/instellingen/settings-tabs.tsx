@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
-import { Download, Lock, ShieldCheck, Database, CreditCard, RefreshCw, Bell } from "lucide-react";
+import { Download, Lock, ShieldCheck, Database, CreditCard, RefreshCw, Bell, Sun, Moon, Monitor } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DEFAULT_SUBSCRIPTION_PRICE, LOCAL_PROFILE_STORAGE_KEY } from "@/lib/constants";
 import { changePassword, downloadBackup, saveProfileAvatar, saveProfileBasics, updateEmailSettings } from "./actions";
 import { SettingsForm, type CompanyProfileData } from "./settings-form";
+import { useTheme } from "@/components/providers/theme-provider";
 
 const DEFAULT_TAB = "profiel";
 const VALID_TABS = ["profiel", "beveiliging", "email", "backup"] as const;
 const LANGUAGE_KEY = "zzp-hub-language";
-const THEME_KEY = "zzp-hub-theme";
 const MAX_AVATAR_BYTES = 3 * 1024 * 1024;
 
 function buildProfileSeed(
@@ -28,21 +28,18 @@ function buildProfileSeed(
   companyName: string;
   avatar: string | null;
   language: "nl" | "en";
-  theme: "light" | "dark" | "system";
 } {
   const base = {
     name: user?.name ?? "",
     companyName: initialProfile?.companyName ?? "",
     avatar: initialProfile?.logoUrl ?? null,
     language: "nl" as const,
-    theme: "system" as const,
   };
   if (typeof window === "undefined") return base;
 
   try {
     const cachedProfile = window.localStorage.getItem(LOCAL_PROFILE_STORAGE_KEY);
     const storedLanguage = window.localStorage.getItem(LANGUAGE_KEY);
-    const storedTheme = window.localStorage.getItem(THEME_KEY);
     const parsed = cachedProfile
       ? (JSON.parse(cachedProfile) as {
           name?: string;
@@ -57,7 +54,6 @@ function buildProfileSeed(
       companyName: parsed?.companyName ?? base.companyName,
       avatar: parsed?.avatar ?? base.avatar,
       language: storedLanguage === "en" ? "en" : "nl",
-      theme: storedTheme === "dark" || storedTheme === "light" ? (storedTheme as "light" | "dark") : "system",
     };
   } catch (error) {
     console.error("Kon voorkeuren niet laden", error);
@@ -80,6 +76,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
   const tabParam = searchParams?.get("tab");
   const initialTab = tabParam && VALID_TABS.includes(tabParam as (typeof VALID_TABS)[number]) ? tabParam : DEFAULT_TAB;
   const profileSeed = buildProfileSeed(initialProfile, user);
+  const { theme: themePreference, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isPasswordPending, startPasswordTransition] = useTransition();
   const [isBackupPending, startBackupTransition] = useTransition();
@@ -99,7 +96,6 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
   const [profileEmail] = useState(user?.email ?? "");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(profileSeed.avatar);
   const [language, setLanguage] = useState<"nl" | "en">(profileSeed.language);
-  const [themePreference, setThemePreference] = useState<"light" | "dark" | "system">(profileSeed.theme);
   const [subscriptionModal, setSubscriptionModal] = useState<null | "manage" | "cancel" | "payment">(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const priceLabel = abonnement.prijs ?? DEFAULT_SUBSCRIPTION_PRICE;
@@ -108,8 +104,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
   useEffect(() => {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(LANGUAGE_KEY, language);
-    window.localStorage.setItem(THEME_KEY, themePreference);
-  }, [language, themePreference]);
+  }, [language]);
 
   const persistProfileLocally = (avatar: string | null, nameValue?: string, companyValue?: string) => {
     if (typeof window === "undefined") return;
@@ -383,32 +378,56 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-sm font-semibold text-slate-800">Thema</p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Thema</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
                       type="button"
-                      variant={themePreference === "light" ? "primary" : "secondary"}
-                      onClick={() => setThemePreference("light")}
+                      onClick={() => setTheme("light")}
+                      className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-all ${
+                        themePreference === "light"
+                          ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
+                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
+                      }`}
                     >
-                      Licht
-                    </Button>
-                    <Button
+                      <Sun className={`h-5 w-5 ${themePreference === "light" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"}`} aria-hidden />
+                      <span className={`text-xs font-semibold ${themePreference === "light" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"}`}>Licht</span>
+                      {themePreference === "light" && (
+                        <div className="h-2 w-2 rounded-full bg-teal-600" />
+                      )}
+                    </button>
+                    <button
                       type="button"
-                      variant={themePreference === "dark" ? "primary" : "secondary"}
-                      onClick={() => setThemePreference("dark")}
+                      onClick={() => setTheme("dark")}
+                      className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-all ${
+                        themePreference === "dark"
+                          ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
+                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
+                      }`}
                     >
-                      Donker
-                    </Button>
-                    <Button
+                      <Moon className={`h-5 w-5 ${themePreference === "dark" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"}`} aria-hidden />
+                      <span className={`text-xs font-semibold ${themePreference === "dark" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"}`}>Donker</span>
+                      {themePreference === "dark" && (
+                        <div className="h-2 w-2 rounded-full bg-teal-600" />
+                      )}
+                    </button>
+                    <button
                       type="button"
-                      variant={themePreference === "system" ? "primary" : "secondary"}
-                      onClick={() => setThemePreference("system")}
+                      onClick={() => setTheme("system")}
+                      className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-all ${
+                        themePreference === "system"
+                          ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
+                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
+                      }`}
                     >
-                      Systeem
-                    </Button>
+                      <Monitor className={`h-5 w-5 ${themePreference === "system" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"}`} aria-hidden />
+                      <span className={`text-xs font-semibold ${themePreference === "system" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"}`}>Systeem</span>
+                      {themePreference === "system" && (
+                        <div className="h-2 w-2 rounded-full bg-teal-600" />
+                      )}
+                    </button>
                   </div>
-                  <p className="text-xs text-slate-500">
-                    Voorkeuren worden opgeslagen voor toekomstige sessies, ook als thema&apos;s nog beperkt zijn.
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Kies je voorkeur of gebruik systeeminstellingen voor automatische aanpassing.
                   </p>
                 </div>
               </CardContent>
