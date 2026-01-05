@@ -142,7 +142,7 @@ export function Popover({
         <div
           ref={contentRef}
           className={cn(
-            "absolute z-50 min-w-[200px] rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/70",
+            "absolute z-50 min-w-[200px] rounded-xl border border-border bg-popover shadow-xl",
             getSideClasses(),
             getAlignmentClasses()
           )}

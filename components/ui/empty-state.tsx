@@ -24,16 +24,16 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center",
+        "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border bg-muted/30 px-6 py-10 text-center",
         className,
       )}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground border border-border">
         {icon ?? <FileQuestion className="h-5 w-5" aria-hidden />}
       </div>
       <div className="space-y-1">
-        <p className="text-lg font-semibold text-slate-900">{title}</p>
-        <p className="text-sm text-slate-600">{description}</p>
+        <p className="text-lg font-semibold text-foreground">{title}</p>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <Link href={actionHref} className={buttonVariants("primary")}>
         {actionLabel}

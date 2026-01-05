@@ -1,81 +1,172 @@
 @import "tailwindcss";
 
-/* Light theme (default) */
+/* Light theme (default) - Premium mauve + fiery accents, soft off-white */
 :root {
-  --background: #f4f7f9;
-  --background-secondary: #ecf2f4;
+  /* Base colors */
+  --background: 251 248 252; /* Soft off-white with hint of mauve */
+  --foreground: 28 25 35; /* Warm charcoal, not pure black */
+  
+  /* Surface/Card colors */
+  --card: 255 255 255;
+  --card-foreground: 28 25 35;
+  
+  /* Popover colors */
+  --popover: 255 255 255;
+  --popover-foreground: 28 25 35;
+  
+  /* Muted colors */
+  --muted: 245 242 248; /* Light mauve-tinted gray */
+  --muted-foreground: 100 95 110; /* Medium mauve-gray for secondary text */
+  
+  /* Border and input */
+  --border: 228 224 235; /* Subtle mauve-tinted border */
+  --input: 228 224 235;
+  --ring: 139 92 246; /* Mauve for focus rings */
+  
+  /* Primary - Mauve gradient (subtle premium) */
+  --primary: 139 92 246; /* Mauve/purple */
+  --primary-foreground: 255 255 255;
+  
+  /* Secondary - Neutral surface */
+  --secondary: 245 242 248;
+  --secondary-foreground: 28 25 35;
+  
+  /* Accent - Complementary mauve shade */
+  --accent: 167 139 250; /* Lighter mauve */
+  --accent-foreground: 28 25 35;
+  
+  /* Destructive - Fiery (warm red-orange) */
+  --destructive: 239 68 68; /* Warm red */
+  --destructive-foreground: 255 255 255;
+  
+  /* Success - Balanced green */
+  --success: 34 197 94;
+  --success-foreground: 255 255 255;
+  
+  /* Warning - Amber */
+  --warning: 245 158 11;
+  --warning-foreground: 255 255 255;
+  
+  /* Link colors */
+  --link: 139 92 246; /* Mauve */
+  --link-hover: 109 40 217; /* Darker mauve on hover */
+  
+  /* Legacy support (kept for gradual migration) */
+  --background-secondary: #f5f2f8;
   --surface: #ffffff;
-  --surface-2: #f9fafb;
-  --foreground: #0f2f3a;
-  --muted: #4a6076;
-  --border: #d6e1e7;
-  --border-subtle: #e8eef1;
+  --surface-2: #fafafa;
+  --border-subtle: #e4e0eb;
   --shadow: rgba(0, 0, 0, 0.1);
-  --primary: #0f4c5c;
-  --primary-accent: #4a6fa5;
-  --accent: #0D9488;
-  --accent-2: #14b8a6;
-  --accent-emerald: #3caf86;
-  --accent-amber: #f2c14e;
-  --accent-rose: #e77975;
-  --success: #10B981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
   --font-geist-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-geist-mono: "SFMono-Regular", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
     monospace;
 }
 
-/* Dark theme */
+/* Dark theme - Warm charcoal dark (not pure black) */
 .dark {
-  --background: #0f1419;
-  --background-secondary: #161b22;
-  --surface: #1c2128;
-  --surface-2: #22272e;
-  --foreground: #e6edf3;
-  --muted: #8b949e;
-  --border: #30363d;
-  --border-subtle: #21262d;
+  /* Base colors */
+  --background: 20 18 25; /* Warm charcoal, not pure black */
+  --foreground: 248 245 250; /* Soft off-white */
+  
+  /* Surface/Card colors */
+  --card: 30 27 38; /* Slightly lighter charcoal for cards */
+  --card-foreground: 248 245 250;
+  
+  /* Popover colors */
+  --popover: 30 27 38;
+  --popover-foreground: 248 245 250;
+  
+  /* Muted colors */
+  --muted: 40 37 48; /* Muted charcoal */
+  --muted-foreground: 161 155 170; /* Medium gray with mauve tint */
+  
+  /* Border and input */
+  --border: 50 47 58; /* Subtle border in dark */
+  --input: 50 47 58;
+  --ring: 167 139 250; /* Lighter mauve for dark mode focus */
+  
+  /* Primary - Adjusted mauve for dark mode */
+  --primary: 167 139 250; /* Lighter mauve for better contrast */
+  --primary-foreground: 20 18 25;
+  
+  /* Secondary - Muted surface */
+  --secondary: 40 37 48;
+  --secondary-foreground: 248 245 250;
+  
+  /* Accent */
+  --accent: 196 181 253; /* Even lighter mauve for dark */
+  --accent-foreground: 20 18 25;
+  
+  /* Destructive - Fiery but softer in dark */
+  --destructive: 248 113 113; /* Softer warm red */
+  --destructive-foreground: 255 255 255;
+  
+  /* Success */
+  --success: 74 222 128;
+  --success-foreground: 20 18 25;
+  
+  /* Warning */
+  --warning: 251 191 36;
+  --warning-foreground: 20 18 25;
+  
+  /* Link colors */
+  --link: 167 139 250;
+  --link-hover: 196 181 253;
+  
+  /* Legacy support */
+  --background-secondary: #1a1720;
+  --surface: #1e1b26;
+  --surface-2: #28252f;
+  --border-subtle: #322f3a;
   --shadow: rgba(0, 0, 0, 0.3);
-  --primary: #0D9488;
-  --primary-accent: #14b8a6;
-  --accent: #14b8a6;
-  --accent-2: #2dd4bf;
-  --accent-emerald: #34d399;
-  --accent-amber: #fbbf24;
-  --accent-rose: #fb7185;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #f87171;
-  --info: #60a5fa;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-secondary: var(--primary-accent);
-  --color-emerald: var(--accent-emerald);
+  /* Expose tokens as Tailwind utilities */
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+  --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
+  --color-popover: rgb(var(--popover));
+  --color-popover-foreground: rgb(var(--popover-foreground));
+  --color-muted: rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+  --color-border: rgb(var(--border));
+  --color-input: rgb(var(--input));
+  --color-ring: rgb(var(--ring));
+  --color-primary: rgb(var(--primary));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-secondary: rgb(var(--secondary));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-accent: rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+  --color-destructive: rgb(var(--destructive));
+  --color-destructive-foreground: rgb(var(--destructive-foreground));
+  --color-success: rgb(var(--success));
+  --color-success-foreground: rgb(var(--success-foreground));
+  --color-warning: rgb(var(--warning));
+  --color-warning-foreground: rgb(var(--warning-foreground));
+  --color-link: rgb(var(--link));
+  --color-link-hover: rgb(var(--link-hover));
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background-secondary);
-  color: var(--foreground);
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
-/* Light mode gradient */
+/* Light mode gradient - subtle mauve-tinted */
 :root body {
-  background: radial-gradient(circle at 10% 20%, #f5f7fb 0, #eef3f6 35%, #e8eff2 65%, #e4edf1 100%);
+  background: radial-gradient(circle at 10% 20%, rgb(251, 248, 252) 0%, rgb(248, 244, 250) 40%, rgb(245, 242, 248) 100%);
 }
 
-/* Dark mode gradient */
+/* Dark mode gradient - warm charcoal */
 .dark body {
-  background: radial-gradient(circle at 10% 20%, #0f1419 0, #161b22 35%, #1a1f26 65%, #0f1419 100%);
+  background: radial-gradient(circle at 10% 20%, rgb(20, 18, 25) 0%, rgb(25, 22, 32) 40%, rgb(20, 18, 25) 100%);
 }
 
 button,
