@@ -91,6 +91,7 @@ export function Sidebar({
             <Link
               key={item.href}
               href={item.href}
+              data-tour={item.href === "/instellingen" ? "profile-link" : item.href === "/relaties" ? "relations-link" : undefined}
               className={cn(
                 "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                 actief
@@ -206,6 +207,7 @@ export function MobileSidebar({
                   key={item.href}
                   href={item.href}
                   onClick={() => handleItemClick(item.href)}
+                  data-tour={item.href === "/instellingen" ? "profile-link" : item.href === "/relaties" ? "relations-link" : undefined}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",
                     actief

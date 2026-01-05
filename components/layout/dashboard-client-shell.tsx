@@ -8,6 +8,7 @@ import { UserRole } from "@prisma/client";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LOCAL_PROFILE_STORAGE_KEY } from "@/lib/constants";
+import { OnboardingTour } from "@/components/onboarding/onboarding-tour";
 
 export const AvatarContext = createContext<string | null>(null);
 
@@ -15,9 +16,10 @@ type DashboardClientShellProps = {
   children: ReactNode;
   userRole?: UserRole;
   avatarUrl?: string | null;
+  userId?: string;
 };
 
-export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl }: DashboardClientShellProps) {
+export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl, userId }: DashboardClientShellProps) {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const avatarUrl = useSyncExternalStore(
@@ -81,6 +83,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
         <Sparkles className="h-5 w-5" aria-hidden />
       </button>
       <AssistantDrawer open={assistantOpen} onOpenChange={setAssistantOpen} />
+      <OnboardingTour userId={userId} />
     </AvatarContext.Provider>
   );
 }

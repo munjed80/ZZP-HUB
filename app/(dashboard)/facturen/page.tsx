@@ -70,7 +70,7 @@ export default async function FacturenPagina() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Link href="/facturen/nieuw" className={buttonVariants("primary")}>
+        <Link href="/facturen/nieuw" className={buttonVariants("primary")} data-tour="new-invoice-button">
           Nieuwe factuur
         </Link>
         <Link href="/facturen/voorbeeld" className={buttonVariants("ghost")}>
@@ -78,14 +78,14 @@ export default async function FacturenPagina() {
         </Link>
       </div>
 
-      <Card>
-        <CardHeader className="pb-4">
+      <Card className="p-3 sm:p-5 shadow-md shadow-slate-200/70">
+        <CardHeader className="pb-3 sm:pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-medium text-slate-900">Alle facturen</CardTitle>
             <Badge variant="muted">{facturen.length}</Badge>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="text-[15px] text-slate-700">
           {facturen.length === 0 ? (
             fetchError ? (
               <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center">
@@ -102,10 +102,13 @@ export default async function FacturenPagina() {
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => (
                   <div
                     key={factuur.id}
-                    className="flex items-center justify-between py-4 first:pt-0"
+                    className="flex items-center justify-between py-3.5 first:pt-0"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-slate-900">{factuur.invoiceNum}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Datum {new Date(factuur.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}
+                      </p>
                       <p className="text-sm text-slate-600 mt-0.5">{factuur.client.name}</p>
                     </div>
                     <div className="flex items-center gap-6 ml-4">
@@ -138,16 +141,19 @@ export default async function FacturenPagina() {
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => (
                   <div
                     key={factuur.id}
-                    className="py-4 first:pt-0"
+                    className="py-3 first:pt-0"
                   >
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between mb-2.5">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-slate-900">{factuur.invoiceNum}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Datum {new Date(factuur.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}
+                        </p>
                         <p className="text-sm text-slate-600 mt-0.5">{factuur.client.name}</p>
                       </div>
-                       <Badge variant={statusInfo(factuur.emailStatus).variant}>
-                         {statusInfo(factuur.emailStatus).label}
-                       </Badge>
+                      <Badge variant={statusInfo(factuur.emailStatus).variant}>
+                        {statusInfo(factuur.emailStatus).label}
+                      </Badge>
                     </div>
                      <div className="flex items-center justify-between">
                        <p className="text-xs text-slate-500">

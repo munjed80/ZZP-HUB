@@ -8,6 +8,7 @@ import {
   Check,
   Copy,
   Edit3,
+  Eye,
   FileDown,
   Loader2,
   Mail,
@@ -18,7 +19,6 @@ import {
 import { InvoiceEmailStatus } from "@prisma/client";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
-import { SendInvoiceEmailButton } from "../[id]/send-invoice-email-button";
 import { deleteInvoice, markAsPaid, markAsUnpaid } from "@/app/actions/invoice-actions";
 import { type mapInvoiceToPdfData } from "@/lib/pdf-generator";
 import { calculateInvoiceTotals } from "@/components/pdf/InvoicePDF";
@@ -34,11 +34,15 @@ type Props = {
   shareLink?: string;
 };
 
+function buildShareLink(shareLink: string | undefined, invoiceId: string) {
+  if (shareLink && shareLink.startsWith("http")) return shareLink;
+  return `${window.location.origin}${shareLink ?? `/facturen/${invoiceId}`}`;
+}
+
 export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emailStatus, editHref, shareLink }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
-  const isPaid = emailStatus === InvoiceEmailStatus.BETAALD;
 
   const handleMarkAsPaid = () => {
     startTransition(async () => {
@@ -114,10 +118,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
   };
 
   const handleCopyLink = async () => {
-    const link =
-      shareLink && shareLink.startsWith("http")
-        ? shareLink
-        : `${window.location.origin}${shareLink ?? `/facturen/${invoiceId}`}`;
+    const link = buildShareLink(shareLink, invoiceId);
     try {
       await navigator.clipboard.writeText(link);
       toast.success("Link gekopieerd");
@@ -127,10 +128,43 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
     }
   };
 
+  const handleNativeShare = async () => {
+    const link = buildShareLink(shareLink, invoiceId);
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Factuur ${pdfInvoice.invoiceNum}`,
+          text: `Factuur ${pdfInvoice.invoiceNum} delen`,
+          url: link,
+        });
+        toast.success("Factuur gedeeld");
+        setIsOpen(false);
+        return;
+      } catch (error) {
+        console.error("Failed to share invoice via native API", error);
+      }
+    }
+
+    await handleCopyLink();
+  };
+
   const menuContent = (
-    <div className="flex flex-col">
-      <div className="flex flex-col gap-2 p-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Document</p>
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 rounded-xl bg-slate-50/70 p-3 ring-1 ring-slate-100">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Snel</p>
+        {shareLink ? (
+          <Link href={shareLink} className={buttonVariants("ghost", "w-full justify-start gap-2 bg-white")}>
+            <Eye className="h-4 w-4" aria-hidden />
+            Bekijk factuur
+          </Link>
+        ) : null}
+        {editHref ? (
+          <Link href={editHref} className={buttonVariants("ghost", "w-full justify-start gap-2 bg-white")}>
+            <Edit3 className="h-4 w-4" aria-hidden />
+            Bewerk factuur
+          </Link>
+        ) : null}
         <InvoicePdfDownloadButton
           invoice={pdfInvoice}
           label="Download PDF"
@@ -138,60 +172,26 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
           variant="secondary"
           icon={<FileDown className="h-4 w-4" aria-hidden />}
         />
-        <SendInvoiceEmailButton
-          invoiceId={invoiceId}
-          recipientEmail={recipientEmail}
-          className="w-full justify-start"
-          variant="secondary"
-          label="Verstuur via e-mail"
-        />
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={handleShareEmail}
-          className="w-full justify-start gap-2"
-        >
-          <Mail className="h-4 w-4" aria-hidden />
-          Deel via e-mail
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={handleShareWhatsApp}
-          className="w-full justify-start gap-2"
-        >
-          <MessageCircle className="h-4 w-4" aria-hidden />
-          Deel via WhatsApp
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={handleCopyLink}
-          className="w-full justify-start gap-2"
-        >
-          <Copy className="h-4 w-4" aria-hidden />
-          Kopieer link
-        </Button>
       </div>
-      <div className="border-t border-[var(--border)] p-3 space-y-2">
+
+      <div className="space-y-2 rounded-xl border border-slate-200/80 p-3 shadow-sm">
         <div className="flex flex-wrap gap-2">
-          {editHref ? (
-            <Link href={editHref} className={buttonVariants("ghost", "w-full justify-start gap-2")}>
-              <Edit3 className="h-4 w-4" aria-hidden />
-              Bewerk factuur
-            </Link>
-          ) : null}
-          <Button
-            type="button"
-            onClick={handleDelete}
-            disabled={isPending}
-            className="w-full justify-start gap-2"
-            variant="ghost"
-          >
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-            {isPending ? "Verwijderen..." : "Verwijder"}
+          <Button type="button" variant="secondary" onClick={handleShareEmail} className="flex-1 min-w-[140px] justify-start gap-2">
+            <Mail className="h-4 w-4" aria-hidden />
+            Deel via e-mail
+          </Button>
+          <Button type="button" variant="secondary" onClick={handleShareWhatsApp} className="flex-1 min-w-[140px] justify-start gap-2">
+            <MessageCircle className="h-4 w-4" aria-hidden />
+            Deel via WhatsApp
+          </Button>
+          <Button type="button" variant="secondary" onClick={handleNativeShare} className="flex-1 min-w-[140px] justify-start gap-2">
+            <Copy className="h-4 w-4" aria-hidden />
+            Deel of kopieer
           </Button>
         </div>
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-slate-200/80 p-3 shadow-sm">
         {emailStatus === InvoiceEmailStatus.BETAALD ? (
           <Button
             type="button"
@@ -215,6 +215,17 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
             {isPending ? "Markeren..." : "Markeer als betaald"}
           </Button>
         )}
+
+        <Button
+          type="button"
+          onClick={handleDelete}
+          disabled={isPending}
+          className="w-full justify-start gap-2"
+          variant="ghost"
+        >
+          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+          {isPending ? "Verwijderen..." : "Verwijder"}
+        </Button>
       </div>
     </div>
   );
@@ -225,7 +236,9 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
       onOpenChange={setIsOpen}
       title="Factuur acties"
       description={`Factuur ${pdfInvoice.invoiceNum}`}
-      triggerClassName="h-10 px-3 shadow-sm"
+      iconOnly
+      ariaLabel="Factuur acties"
+      triggerClassName="h-9 w-9 border border-slate-200 shadow-none"
     >
       {menuContent}
     </EntityActionsMenu>
