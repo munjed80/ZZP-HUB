@@ -79,6 +79,21 @@ export default async function DashboardPagina() {
     },
   ];
 
+  const getTrendForKpi = (label: string) => {
+    switch (label) {
+      case "Omzet (jaar)":
+        return buildTrend(thisMonth.revenue, previousMonth.revenue);
+      case "Uitgaven (jaar)":
+        return buildTrend(thisMonth.expenses, previousMonth.expenses, true);
+      case "Winst":
+        return buildTrend(thisMonthProfit, previousMonthProfit);
+      case "Te betalen BTW":
+        return buildTrend(currentVatBalance, previousVatBalance, true);
+      default:
+        return { label: "", variant: "muted" as const };
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-1">
@@ -91,13 +106,7 @@ export default async function DashboardPagina() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => {
           const Icon = item.icon;
-          const trend = item.label === "Omzet (jaar)" 
-            ? buildTrend(thisMonth.revenue, previousMonth.revenue)
-            : item.label === "Uitgaven (jaar)"
-            ? buildTrend(thisMonth.expenses, previousMonth.expenses, true)
-            : item.label === "Winst"
-            ? buildTrend(thisMonthProfit, previousMonthProfit)
-            : buildTrend(currentVatBalance, previousVatBalance, true);
+          const trend = getTrendForKpi(item.label);
 
           return (
             <Card

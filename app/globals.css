@@ -52,10 +52,10 @@
   --link-hover: 109 40 217; /* Darker mauve on hover */
   
   /* Legacy support (kept for gradual migration) */
-  --background-secondary: #f5f2f8;
-  --surface: #ffffff;
-  --surface-2: #fafafa;
-  --border-subtle: #e4e0eb;
+  --background-secondary: 245 242 248;
+  --surface: 255 255 255;
+  --surface-2: 250 250 250;
+  --border-subtle: 228 224 235;
   --shadow: rgba(0, 0, 0, 0.1);
   --font-geist-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-geist-mono: "SFMono-Regular", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
@@ -114,10 +114,10 @@
   --link-hover: 196 181 253;
   
   /* Legacy support */
-  --background-secondary: #1a1720;
-  --surface: #1e1b26;
-  --surface-2: #28252f;
-  --border-subtle: #322f3a;
+  --background-secondary: 26 23 32;
+  --surface: 30 27 38;
+  --surface-2: 40 37 48;
+  --border-subtle: 50 47 58;
   --shadow: rgba(0, 0, 0, 0.3);
 }
 

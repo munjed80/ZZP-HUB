@@ -51,8 +51,8 @@ const config = {
         },
       },
       borderRadius: {
-        DEFAULT: '0.5rem', // 8px - unified default
         'sm': '0.375rem', // 6px
+        DEFAULT: '0.5rem', // 8px - unified default
         'md': '0.5rem', // 8px
         'lg': '0.75rem', // 12px
         'xl': '1rem', // 16px
