@@ -47,6 +47,20 @@ export function NewActionMenu() {
     router.push(href);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent, index: number) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      const nextIndex = (index + 1) % createActions.length;
+      const nextButton = document.querySelector(`[data-menu-item="${nextIndex}"]`) as HTMLButtonElement;
+      nextButton?.focus();
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      const prevIndex = (index - 1 + createActions.length) % createActions.length;
+      const prevButton = document.querySelector(`[data-menu-item="${prevIndex}"]`) as HTMLButtonElement;
+      prevButton?.focus();
+    }
+  };
+
   return (
     <div className="relative" ref={menuRef}>
       <button
@@ -78,12 +92,14 @@ export function NewActionMenu() {
           role="menu"
         >
           <div className="py-1.5">
-            {createActions.map((action) => {
+            {createActions.map((action, index) => {
               const Icon = action.icon;
               return (
                 <button
                   key={action.href}
+                  data-menu-item={index}
                   onClick={() => handleActionClick(action.href)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3",
                     "text-sm font-medium text-popover-foreground",

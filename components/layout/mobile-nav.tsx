@@ -53,9 +53,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
         })}
         <button
           type="button"
-          onClick={() => {
-            onAssistantClick?.();
-          }}
+          onClick={onAssistantClick}
           className="flex w-full min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[10px] font-semibold leading-tight text-primary transition-colors hover:bg-primary/10"
           aria-label="Open AI assistent"
         >
