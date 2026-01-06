@@ -9,13 +9,13 @@ type BadgeProps = {
 export function Badge({ children, variant = "info", className, ...props }: BadgeProps) {
   const styles: Record<NonNullable<BadgeProps["variant"]>, string> = {
     // Info - for "Verzonden" (Sent) invoice status
-    info: "bg-accent/10 text-accent-foreground border-accent/20",
+    info: "bg-accent/12 text-accent border border-accent/30",
     
     // Success - for "Betaald" (Paid) invoice status
-    success: "bg-success/10 text-success-foreground border-success/20",
+    success: "bg-success/12 text-success border border-success/25",
     
     // Warning - for "Herinnering" (Reminder) invoice status
-    warning: "bg-warning/10 text-warning-foreground border-warning/20",
+    warning: "bg-warning/12 text-warning-foreground border-warning/25",
     
     // Muted - for "Concept" (Draft) invoice status
     muted: "bg-muted text-muted-foreground border-border",
@@ -24,7 +24,7 @@ export function Badge({ children, variant = "info", className, ...props }: Badge
     destructive: "bg-destructive/10 text-destructive-foreground border-destructive/20",
     
     // Primary - for emphasis
-    primary: "bg-primary text-primary-foreground border-primary/80",
+    primary: "bg-primary/10 text-primary border-primary/40",
   };
 
   return (
