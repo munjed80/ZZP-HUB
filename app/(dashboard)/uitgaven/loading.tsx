@@ -12,7 +12,7 @@ export default function LoadingUitgaven() {
           <Skeleton key={key} className="h-24 rounded-xl" />
         ))}
       </div>
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
+      <div className="rounded-xl border border-border bg-card p-4">
         <Skeleton className="h-5 w-48" />
         {[1, 2, 3, 4, 5].map((key) => (
           <Skeleton key={key} className="mt-2 h-10 w-full" />
