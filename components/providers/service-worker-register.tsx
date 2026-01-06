@@ -10,7 +10,12 @@ export function ServiceWorkerRegister() {
       try {
         await navigator.serviceWorker.register("/sw.js");
       } catch (error) {
-        console.error("Service worker registratie mislukt", error);
+        // Silently fail in production - service worker is optional enhancement
+        // In development/debug mode, developers can check browser console
+        if (process.env.NODE_ENV !== "production") {
+          // eslint-disable-next-line no-console
+          console.error("Service worker registratie mislukt", error);
+        }
       }
     };
 

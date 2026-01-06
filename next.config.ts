@@ -7,6 +7,9 @@ const pwaOptions: PluginOptions = {
   register: true,
   cacheStartUrl: false,
   dynamicStartUrl: true,
+  fallbacks: {
+    document: "/offline.html",
+  },
   workboxOptions: {
     skipWaiting: true,
     clientsClaim: true,

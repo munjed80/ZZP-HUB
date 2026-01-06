@@ -68,7 +68,11 @@ export function InstallPWA() {
         localStorage.setItem(DISMISS_KEY, "true");
       }
     } catch (error) {
-      console.error("Installatieprompt kon niet worden afgehandeld", error);
+      // Silently handle install prompt errors in production
+      if (process.env.NODE_ENV !== "production") {
+        // eslint-disable-next-line no-console
+        console.error("Installatieprompt kon niet worden afgehandeld", error);
+      }
     } finally {
       setPromptEvent(null);
       setVisible(false);
