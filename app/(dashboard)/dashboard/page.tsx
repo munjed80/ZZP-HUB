@@ -95,7 +95,7 @@ export default async function DashboardPagina() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
           <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-primary via-accent to-success"></div>
@@ -106,7 +106,7 @@ export default async function DashboardPagina() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => {
           const Icon = item.icon;
           const trend = getTrendForKpi(item.label);
@@ -141,7 +141,7 @@ export default async function DashboardPagina() {
         })}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.65fr_1.05fr]">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-[1.65fr_1.05fr]">
         <Card className="group rounded-2xl shadow-lg border-2 hover:shadow-2xl hover:border-primary/20 transition-all duration-300">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold text-card-foreground flex items-center gap-2">
@@ -155,7 +155,7 @@ export default async function DashboardPagina() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <Card className="group rounded-2xl shadow-lg border-2 hover:shadow-2xl hover:border-primary/20 transition-all duration-300">
             <CardHeader className="pb-4">
               <div className="flex items-start gap-3">
@@ -201,7 +201,7 @@ export default async function DashboardPagina() {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2">
         <Card className="group rounded-2xl shadow-lg border-2 hover:shadow-2xl hover:border-success/20 transition-all duration-300">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold text-card-foreground flex items-center gap-2">

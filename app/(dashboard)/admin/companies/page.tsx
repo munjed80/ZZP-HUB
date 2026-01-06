@@ -18,8 +18,11 @@ export default async function CompaniesPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">Companies</h1>
-        <p className="text-sm text-slate-600">
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-primary via-accent to-success"></div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Companies</h1>
+        </div>
+        <p className="text-sm text-muted-foreground font-medium">
           Beheer company accounts. Alleen zichtbaar voor SuperAdmins.
         </p>
       </div>

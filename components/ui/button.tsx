@@ -4,10 +4,16 @@ import { cn } from "@/lib/utils";
 export type ButtonVariant = "primary" | "secondary" | "outline" | "destructive" | "ghost" | "link";
 
 const baseClasses = [
-  "relative inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5",
+  // Enhanced mobile touch targets (min 44px recommended by Apple, 48px by Android)
+  "relative inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-4 py-2.5",
+  // Improved typography and spacing for mobile
   "text-sm font-semibold transition-all duration-200",
+  // Better focus visibility for accessibility
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-  "disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-[1px]",
+  // Improved disabled state and touch feedback
+  "disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-[1px] active:scale-[0.98]",
+  // Prevent text selection on mobile for better UX
+  "select-none touch-manipulation",
 ].join(" ");
 
 const variantClasses: Record<ButtonVariant, string> = {
