@@ -3,11 +3,11 @@
 /* Light theme (default) - crisp neutral base with emerald + amber accents */
 :root {
   /* Brand tokens */
-  --brand: 16 185 129; /* Emerald base */
-  --brand-hover: 5 150 105; /* Richer teal for hover */
-  --brand-active: 4 120 87; /* Pressed state */
+  --brand: 12 150 121; /* Emerald/teal base */
+  --brand-hover: 9 132 108; /* Richer teal for hover */
+  --brand-active: 5 107 90; /* Pressed state */
   --brand-foreground: 255 255 255;
-  --brand-glow: 16 185 129;
+  --brand-glow: 14 165 129;
 
   --brand-primary: var(--brand);
   --brand-primary-hover: var(--brand-hover);
@@ -17,7 +17,7 @@
   /* Base colors */
   --background: 249 250 251; /* Soft neutral white */
   --bg: var(--background);
-  --foreground: 20 24 33; /* Crisp charcoal */
+  --foreground: 18 26 32; /* Crisp charcoal */
   --text: var(--foreground);
   
   /* Surface/Card colors */
@@ -29,12 +29,12 @@
   --popover-foreground: 28 25 35;
   
   /* Muted colors */
-  --muted: 242 244 247; /* Soft neutral gray */
-  --muted-foreground: 86 99 114; /* Medium slate for secondary text */
+  --muted: 238 243 242; /* Soft neutral gray with teal tint */
+  --muted-foreground: 70 88 96; /* Medium slate for secondary text */
   
   /* Border and input */
-  --border: 225 231 239; /* Subtle neutral border */
-  --input: 225 231 239;
+  --border: 215 227 224; /* Subtle neutral border */
+  --input: 215 227 224;
   --ring: var(--brand); /* Brand focus */
   
   /* Primary - Emerald brand */
@@ -42,24 +42,24 @@
   --primary-foreground: 255 255 255; /* White text on emerald - WCAG AA compliant for large text */
   
   /* Secondary - Calm neutral */
-  --secondary: 234 247 240; /* Tinted by brand */
-  --secondary-foreground: 26 86 64;
+  --secondary: 226 241 235; /* Tinted by brand */
+  --secondary-foreground: 18 92 70;
   
   /* Accent - Amber/Orange for emphasis */
-  --accent: 249 115 22;
-  --accent-foreground: 74 34 15;
+  --accent: 20 184 166; /* Teal accent for hero glow */
+  --accent-foreground: 1 68 60;
   
   /* Destructive - Fiery (warm red-orange) */
   --destructive: 239 68 68; /* Warm red */
   --destructive-foreground: 255 255 255;
   
   /* Success - Balanced green */
-  --success: 22 163 74;
-  --success-foreground: 255 255 255;
+  --success: 10 114 96;
+  --success-foreground: 236 253 245;
   
   /* Warning - Amber */
-  --warning: 245 158 11;
-  --warning-foreground: 69 26 3;
+  --warning: 234 179 8;
+  --warning-foreground: 60 33 2;
   
   /* Link colors */
   --link: var(--brand);
@@ -91,26 +91,26 @@
   --brand-on-primary: var(--brand-foreground);
 
   /* Base colors */
-  --background: 20 18 25; /* Warm charcoal, not pure black */
+  --background: 16 18 22; /* Warm charcoal, not pure black */
   --bg: var(--background);
-  --foreground: 248 245 250; /* Soft off-white */
+  --foreground: 235 242 240; /* Soft off-white with teal tint */
   --text: var(--foreground);
   
   /* Surface/Card colors */
-  --card: 30 27 38; /* Slightly lighter charcoal for cards */
-  --card-foreground: 248 245 250;
+  --card: 24 28 32; /* Slightly lighter charcoal for cards */
+  --card-foreground: 235 242 240;
   
   /* Popover colors */
-  --popover: 30 27 38;
-  --popover-foreground: 248 245 250;
+  --popover: 24 28 32;
+  --popover-foreground: 235 242 240;
   
   /* Muted colors */
-  --muted: 40 37 48; /* Muted charcoal */
-  --muted-foreground: 161 155 170; /* Medium gray with mauve tint */
+  --muted: 32 36 40; /* Muted charcoal */
+  --muted-foreground: 152 164 166; /* Medium gray with teal tint */
   
   /* Border and input */
-  --border: 50 47 58; /* Subtle border in dark */
-  --input: 50 47 58;
+  --border: 48 58 60; /* Subtle border in dark */
+  --input: 48 58 60;
   --ring: var(--brand); /* Brand focus */
   
   /* Primary - Adjusted for dark mode */
@@ -118,23 +118,23 @@
   --primary-foreground: 255 255 255; /* White text - maintains consistency */
   
   /* Secondary - Muted surface */
-  --secondary: 28 66 63; /* Tinted by brand for dark */
-  --secondary-foreground: 222 255 249;
+  --secondary: 24 64 58; /* Tinted by brand for dark */
+  --secondary-foreground: 210 246 236;
   
   /* Accent */
-  --accent: 249 115 22;
-  --accent-foreground: 255 247 237;
+  --accent: 16 185 158;
+  --accent-foreground: 218 255 247;
   
   /* Destructive - Fiery but softer in dark */
-  --destructive: 248 113 113; /* Softer warm red */
-  --destructive-foreground: 255 255 255;
+  --destructive: 225 29 72; /* Deeper crimson */
+  --destructive-foreground: 255 240 243;
   
   /* Success */
-  --success: 74 222 128;
-  --success-foreground: 20 18 25;
+  --success: 16 185 129;
+  --success-foreground: 14 20 27;
   
   /* Warning */
-  --warning: 251 191 36;
+  --warning: 234 179 8;
   --warning-foreground: 20 18 25;
   
   /* Link colors */

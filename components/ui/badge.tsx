@@ -8,29 +8,18 @@ type BadgeProps = {
 
 export function Badge({ children, variant = "info", className, ...props }: BadgeProps) {
   const styles: Record<NonNullable<BadgeProps["variant"]>, string> = {
-    // Info - for "Verzonden" (Sent) invoice status - amber/orange accent
-    info: "bg-gradient-to-r from-accent/20 to-accent/10 text-accent border-2 border-accent/40 shadow-lg shadow-accent/10",
-    
-    // Success - for "Betaald" (Paid) invoice status
-    success: "bg-gradient-to-r from-success/20 to-success/10 text-success-foreground border-2 border-success/40 shadow-lg shadow-success/10",
-    
-    // Warning - for "Herinnering" (Reminder) invoice status
-    warning: "bg-gradient-to-r from-warning/20 to-warning/10 text-warning-foreground border-2 border-warning/40 shadow-lg shadow-warning/10",
-    
-    // Muted - for "Concept" (Draft) invoice status
-    muted: "bg-muted text-muted-foreground border-2 border-border shadow-md",
-    
-    // Destructive - for errors or critical states
-    destructive: "bg-gradient-to-r from-destructive/20 to-destructive/10 text-destructive-foreground border-2 border-destructive/40 shadow-lg shadow-destructive/10",
-    
-    // Primary - for emphasis
-    primary: "bg-gradient-to-r from-primary/20 to-primary/10 text-primary border-2 border-primary/40 shadow-lg shadow-primary/10",
+    info: "bg-sky-900 text-sky-50 border border-sky-500/80 shadow-[0_10px_30px_-22px_rgba(14,165,233,0.75)]",
+    success: "bg-emerald-800 text-emerald-50 border border-emerald-500/80 shadow-[0_10px_30px_-22px_rgba(16,185,129,0.75)]",
+    warning: "bg-amber-700 text-amber-50 border border-amber-400/80 shadow-[0_10px_30px_-22px_rgba(245,158,11,0.65)]",
+    muted: "bg-muted/80 text-foreground border border-border/80 shadow-sm",
+    destructive: "bg-rose-800 text-rose-50 border border-rose-500/80 shadow-[0_10px_30px_-22px_rgba(244,63,94,0.65)]",
+    primary: "bg-emerald-900 text-emerald-50 border border-emerald-500/80 shadow-[0_10px_30px_-22px_rgba(16,185,129,0.7)]",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold transition-all duration-200 hover:scale-105",
+        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-200 hover:scale-105 will-change-transform",
         styles[variant],
         className,
       )}
