@@ -62,12 +62,12 @@ export default async function FacturenPagina() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2 rounded-3xl border border-[#123C37] bg-gradient-to-r from-[#0F5E57] via-[#0E6F64] to-[#0B4E48] p-4 shadow-[0_28px_72px_-36px_rgba(12,94,87,0.78)]">
         <div className="flex items-center gap-3">
-          <div className="h-1.5 w-14 rounded-full bg-gradient-to-r from-primary/90 via-accent/90 to-success/80 shadow-[0_6px_18px_-10px_rgba(16,185,129,0.55)]" />
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Facturen</h1>
+          <div className="h-1.5 w-14 rounded-full bg-white/35 shadow-[0_8px_20px_-12px_rgba(255,255,255,0.55)]" />
+          <h1 className="text-3xl font-bold tracking-tight text-white">Facturen</h1>
         </div>
-        <p className="text-sm text-muted-foreground font-medium max-w-2xl">
+        <p className="text-sm font-medium text-[#CFEDEA] max-w-2xl">
           Beheer facturen, verstuur herinneringen en volg betalingen met een strak, professioneel overzicht.
         </p>
       </div>
@@ -75,40 +75,51 @@ export default async function FacturenPagina() {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/facturen/nieuw"
-          className={buttonVariants("primary", "shadow-[0_18px_40px_-20px_rgba(16,185,129,0.55)]")}
+          className={buttonVariants(
+            "primary",
+            "bg-gradient-to-r from-[#0F5E57] via-[#0E6F64] to-[#0B4E48] text-white shadow-[0_20px_48px_-22px_rgba(15,94,87,0.88)] ring-1 ring-[#1FBF84]/45",
+          )}
           data-tour="new-invoice-button"
         >
           Nieuwe factuur
         </Link>
-        <Link href="/facturen/voorbeeld" className={buttonVariants("ghost", "border-border/70 bg-card/60")}>
+        <Link
+          href="/facturen/voorbeeld"
+          className={buttonVariants(
+            "ghost",
+            "border-[#123C37] bg-[#0F2F2C] text-[#CFEDEA] hover:border-[#1FBF84]/45 hover:text-white shadow-[0_16px_44px_-28px_rgba(0,0,0,0.6)]",
+          )}
+        >
           Voorbeeld PDF
         </Link>
       </div>
 
-      <Card className="p-4 sm:p-6 shadow-xl border border-border/80 bg-gradient-to-br from-card to-muted/30">
+      <Card className="p-4 sm:p-6 shadow-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#123C37] to-[#0B4E48] text-[#CFEDEA]">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-bold text-card-foreground flex items-center gap-2">
-              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-primary via-accent to-success" />
+            <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-[#0F5E57] via-[#0E6F64] to-[#0B4E48] shadow-[0_10px_26px_-18px_rgba(12,94,87,0.85)]" />
               Alle facturen
             </CardTitle>
-            <Badge variant="primary">{facturen.length}</Badge>
+            <Badge variant="primary" className="bg-[#0F2F2C] text-white border-[#1FBF84]/40 shadow-[0_12px_30px_-22px_rgba(0,0,0,0.6)]">
+              {facturen.length}
+            </Badge>
           </div>
         </CardHeader>
-        <CardContent className="text-[15px] text-card-foreground">
+        <CardContent className="text-[15px] text-[#CFEDEA]">
           {facturen.length === 0 ? (
             fetchError ? (
-              <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/20 px-6 py-10 text-center">
-                <p className="text-lg font-semibold text-foreground">Facturen konden niet worden geladen</p>
-                <p className="text-sm text-muted-foreground">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
+              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[#123C37] bg-[#0F2F2C]/70 px-6 py-10 text-center shadow-[0_18px_46px_-30px_rgba(0,0,0,0.6)]">
+                <p className="text-lg font-semibold text-white">Facturen konden niet worden geladen</p>
+                <p className="text-sm text-[#9FCBC4]">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
               </div>
             ) : (
-              <EmptyState />
+              <EmptyState tone="dark" />
             )
           ) : (
             <>
               {/* Desktop Table View */}
-              <div className="hidden md:block divide-y divide-border">
+              <div className="hidden md:block divide-y divide-[#123C37]">
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => {
                   const formattedDate = new Date(factuur.date).toLocaleDateString("nl-NL", {
                     day: "numeric",
@@ -126,21 +137,24 @@ export default async function FacturenPagina() {
                       className="flex items-center justify-between py-3.5 first:pt-0"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5 flex flex-wrap gap-3">
+                        <p className="text-sm font-semibold text-white">{factuur.invoiceNum}</p>
+                        <p className="text-xs text-[#9FCBC4] mt-0.5 flex flex-wrap gap-3">
                           <span>Datum {formattedDate}</span>
-                          <span className="text-warning-foreground font-semibold">Vervalt {formattedDueDate}</span>
+                          <span className="text-[#F2B705] font-semibold">Vervalt {formattedDueDate}</span>
                         </p>
-                        <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
+                        <p className="text-sm text-[#CFEDEA] mt-0.5">{factuur.client.name}</p>
                       </div>
                       <div className="flex items-center gap-6 ml-4">
                         <div className="text-right">
-                          <p className="text-sm font-semibold tabular-nums text-foreground">
+                          <p className="text-sm font-semibold tabular-nums text-white">
                             {formatBedrag(invoiceAmount(factuur.lines))}
                           </p>
-                          <p className="text-xs text-amber-600 dark:text-amber-300 mt-0.5">Vervalt {formattedDueDate}</p>
+                          <p className="text-xs font-medium text-[#F2B705] mt-0.5">Vervalt {formattedDueDate}</p>
                         </div>
-                        <Badge variant={statusInfo(factuur.emailStatus).variant} className="shadow-md">
+                        <Badge
+                          variant={statusInfo(factuur.emailStatus).variant}
+                          className="shadow-[0_12px_30px_-22px_rgba(0,0,0,0.6)] border-[#1FBF84]/40 bg-[#123C37] text-[#CFEDEA]"
+                        >
                           {statusInfo(factuur.emailStatus).label}
                         </Badge>
                         <InvoiceActionsMenu
@@ -158,7 +172,7 @@ export default async function FacturenPagina() {
               </div>
 
               {/* Mobile Card View */}
-              <div className="block md:hidden divide-y divide-border">
+              <div className="block md:hidden divide-y divide-[#123C37]">
                 {mappedInvoices.map(({ factuur, pdfInvoice }) => {
                   const formattedDate = new Date(factuur.date).toLocaleDateString("nl-NL", {
                     day: "numeric",
@@ -177,30 +191,33 @@ export default async function FacturenPagina() {
                     >
                       <div className="flex items-start justify-between mb-2.5">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Datum {formattedDate}</p>
-                          <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
+                          <p className="text-sm font-semibold text-white">{factuur.invoiceNum}</p>
+                          <p className="text-xs text-[#9FCBC4] mt-0.5">Datum {formattedDate}</p>
+                          <p className="text-sm text-[#CFEDEA] mt-0.5">{factuur.client.name}</p>
                         </div>
-                        <Badge variant={statusInfo(factuur.emailStatus).variant}>
+                        <Badge
+                          variant={statusInfo(factuur.emailStatus).variant}
+                          className="border-[#1FBF84]/40 bg-[#123C37] text-[#CFEDEA] shadow-[0_12px_30px_-22px_rgba(0,0,0,0.6)]"
+                        >
                           {statusInfo(factuur.emailStatus).label}
                         </Badge>
                       </div>
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-semibold text-amber-600 dark:text-amber-300">Vervalt {formattedDueDate}</p>
-                          <p className="text-base font-semibold tabular-nums text-foreground">
-                            {formatBedrag(invoiceAmount(factuur.lines))}
-                          </p>
-                        </div>
-                        <div className="mt-3 flex items-center justify-end gap-2">
-                          <InvoiceActionsMenu
-                            pdfInvoice={pdfInvoice}
-                            invoiceId={factuur.id}
-                            recipientEmail={factuur.client.email}
-                            emailStatus={factuur.emailStatus}
-                            editHref={`/facturen/${factuur.id}/edit`}
-                            shareLink={`/facturen/${factuur.id}`}
-                          />
-                        </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-semibold text-[#F2B705]">Vervalt {formattedDueDate}</p>
+                        <p className="text-base font-semibold tabular-nums text-white">
+                          {formatBedrag(invoiceAmount(factuur.lines))}
+                        </p>
+                      </div>
+                      <div className="mt-3 flex items-center justify-end gap-2">
+                        <InvoiceActionsMenu
+                          pdfInvoice={pdfInvoice}
+                          invoiceId={factuur.id}
+                          recipientEmail={factuur.client.email}
+                          emailStatus={factuur.emailStatus}
+                          editHref={`/facturen/${factuur.id}/edit`}
+                          shareLink={`/facturen/${factuur.id}`}
+                        />
+                      </div>
                     </div>
                   );
                 })}
