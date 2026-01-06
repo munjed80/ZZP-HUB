@@ -13,27 +13,27 @@ const baseClasses = [
 const variantClasses: Record<ButtonVariant, string> = {
   // Primary - Green base with amber accent glow (inspired by hero CTA)
   primary:
-    "group bg-primary text-primary-foreground border border-primary/90 shadow-[0_14px_32px_-18px_rgba(var(--primary),0.65)] hover:bg-primary/90 hover:shadow-[0_16px_36px_-16px_rgba(var(--primary),0.7)] overflow-hidden",
+    "group bg-gradient-to-r from-primary to-primary/90 text-primary-foreground border-2 border-primary/90 shadow-[0_16px_36px_-18px_rgba(var(--primary),0.75)] hover:shadow-[0_20px_42px_-16px_rgba(var(--primary),0.85)] hover:scale-[1.02] overflow-hidden",
 
   // Secondary - Subtle surface with border
   secondary:
-    "text-foreground bg-secondary border border-border shadow-sm hover:bg-secondary/90 hover:text-foreground",
+    "text-foreground bg-gradient-to-r from-secondary to-secondary/95 border-2 border-border shadow-md hover:shadow-lg hover:border-primary/30 hover:scale-[1.02]",
 
   // Outline - Neutral border with better contrast
   outline:
-    "bg-transparent text-foreground border border-border shadow-sm hover:bg-muted hover:border-muted-foreground/20",
+    "bg-transparent text-foreground border-2 border-border shadow-md hover:bg-muted hover:border-primary/30 hover:shadow-lg hover:scale-[1.02]",
 
   // Destructive - Fiery red with strong contrast
   destructive:
-    "bg-destructive text-destructive-foreground border border-destructive/80 hover:bg-destructive/90 shadow-sm hover:shadow-md focus-visible:ring-destructive",
+    "bg-gradient-to-r from-destructive to-destructive/90 text-destructive-foreground border-2 border-destructive/80 shadow-[0_16px_36px_-18px_rgba(var(--destructive),0.75)] hover:shadow-[0_20px_42px_-16px_rgba(var(--destructive),0.85)] hover:scale-[1.02] focus-visible:ring-destructive",
 
   // Ghost - Minimal with stronger hover
   ghost:
-    "text-foreground border border-transparent hover:bg-muted hover:text-foreground",
+    "text-foreground border-2 border-transparent hover:bg-muted hover:text-foreground hover:border-border hover:scale-[1.02]",
 
   // Link - Text only with primary color
   link:
-    "text-primary border border-transparent hover:text-primary/80 underline-offset-4 hover:underline",
+    "text-primary border-2 border-transparent hover:text-primary/80 underline-offset-4 hover:underline",
 };
 
 export function buttonVariants(variant: ButtonVariant = "primary", className?: string) {
@@ -51,9 +51,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   return (
     <button ref={ref} className={buttonVariants(variant, className)} {...props}>
       {variant === "primary" && (
-        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent/0 via-accent/12 to-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent/0 via-accent/20 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       )}
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 flex items-center gap-2">{children}</span>
     </button>
   );
 });

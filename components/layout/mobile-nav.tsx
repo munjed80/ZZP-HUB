@@ -30,7 +30,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 shadow-[0_-10px_30px_-24px_rgba(var(--foreground),0.35)] backdrop-blur md:hidden pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-border bg-gradient-to-t from-card/98 via-card/95 to-card/90 shadow-[0_-12px_36px_-24px_rgba(var(--foreground),0.4)] backdrop-blur-md md:hidden pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
       <div className="relative grid grid-cols-6 items-end gap-1 px-3">
         {navItems.map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
@@ -41,12 +41,14 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex w-full flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[10px] font-semibold leading-tight transition-colors",
-                actief ? "text-primary bg-primary/10 shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                "flex w-full flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-[10px] font-bold leading-tight transition-all duration-200",
+                actief 
+                  ? "text-primary bg-gradient-to-br from-primary/15 to-primary/10 shadow-lg border-2 border-primary/30 scale-105" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted hover:scale-[1.02]"
               )}
               aria-current={actief ? "page" : undefined}
             >
-              <Icon className={cn("h-5 w-5", actief && "stroke-[2.5]")} aria-hidden={true} />
+              <Icon className={cn("h-5 w-5 transition-transform duration-200", actief && "stroke-[2.5] scale-110")} aria-hidden={true} />
               <span>{item.label}</span>
             </Link>
           );
@@ -54,7 +56,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
         <button
           type="button"
           onClick={onAssistantClick}
-          className="flex w-full min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[10px] font-semibold leading-tight text-primary transition-colors hover:bg-primary/10"
+          className="flex w-full min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-[10px] font-bold leading-tight text-primary transition-all duration-200 hover:bg-gradient-to-br hover:from-primary/15 hover:to-primary/10 hover:scale-[1.02]"
           aria-label="Open AI assistent"
         >
           <Sparkles className="h-5 w-5 text-primary" aria-hidden />
@@ -64,7 +66,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
         {/* Menu button - opens full navigation drawer */}
         <button
           onClick={onMenuClick}
-          className="flex w-full flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-[10px] font-semibold leading-tight text-foreground transition-colors hover:bg-muted"
+          className="flex w-full flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-[10px] font-bold leading-tight text-foreground transition-all duration-200 hover:bg-muted hover:scale-[1.02]"
           aria-label="Menu"
         >
           <MenuIcon className="h-5 w-5 text-foreground" aria-hidden="true" />

@@ -192,9 +192,12 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Uitgaven</h1>
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-destructive via-accent to-warning"></div>
+              <h1 className="text-3xl font-bold text-foreground">Uitgaven</h1>
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">
               Registreer kosten, bereken BTW automatisch en bewaar een link naar je bonnetjes.
             </p>
           </div>
@@ -212,56 +215,67 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
       )}
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
+        <Card className="group border-2 hover:shadow-xl hover:border-primary/20 transition-all duration-300">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Euro className="h-4 w-4 text-primary" aria-hidden />
+              <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 p-2.5 shadow-lg ring-2 ring-primary/30 group-hover:scale-105 transition-transform duration-300">
+                <Euro className="h-5 w-5 text-primary" aria-hidden />
+              </div>
               <CardTitle>Totaal deze maand</CardTitle>
             </div>
             <Badge variant="info">Live</Badge>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-foreground">{formatBedrag(totals.monthTotal)}</p>
-            <p className="text-xs text-muted-foreground">Inclusief BTW op basis van gekozen tarieven.</p>
+            <p className="text-2xl font-bold text-foreground">{formatBedrag(totals.monthTotal)}</p>
+            <p className="text-xs text-muted-foreground font-medium">Inclusief BTW op basis van gekozen tarieven.</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="group border-2 hover:shadow-xl hover:border-success/20 transition-all duration-300">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <ReceiptText className="h-4 w-4 text-success" aria-hidden />
+              <div className="rounded-2xl bg-gradient-to-br from-success/20 to-success/10 p-2.5 shadow-lg ring-2 ring-success/30 group-hover:scale-105 transition-transform duration-300">
+                <ReceiptText className="h-5 w-5 text-success" aria-hidden />
+              </div>
               <CardTitle>Te vorderen BTW</CardTitle>
             </div>
             <Badge variant="success">Recente periode</Badge>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-foreground">{formatBedrag(totals.vatRecoverable)}</p>
-            <p className="text-xs text-muted-foreground">Gebaseerd op ingevoerde uitgaven.</p>
+            <p className="text-2xl font-bold text-foreground">{formatBedrag(totals.vatRecoverable)}</p>
+            <p className="text-xs text-muted-foreground font-medium">Gebaseerd op ingevoerde uitgaven.</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="group border-2 hover:shadow-xl hover:border-accent/20 transition-all duration-300">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <PieChart className="h-4 w-4 text-accent" aria-hidden />
+              <div className="rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 p-2.5 shadow-lg ring-2 ring-accent/30 group-hover:scale-105 transition-transform duration-300">
+                <PieChart className="h-5 w-5 text-accent" aria-hidden />
+              </div>
               <CardTitle>Grootste kostenpost</CardTitle>
             </div>
             <Badge variant="warning">Realtime</Badge>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-foreground">{totals.largestCategory}</p>
-            <p className="text-xs text-muted-foreground">Op basis van huidige lijst.</p>
+            <p className="text-2xl font-bold text-foreground">{totals.largestCategory}</p>
+            <p className="text-xs text-muted-foreground font-medium">Op basis van huidige lijst.</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="shadow-md">
+      <Card className="shadow-lg border-2">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CalendarClock className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <CardTitle>Recente uitgaven</CardTitle>
+            <div className="rounded-2xl bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/10 p-2.5 shadow-lg ring-2 ring-border/30">
+              <CalendarClock className="h-5 w-5 text-muted-foreground" aria-hidden />
+            </div>
+            <CardTitle className="flex items-center gap-2">
+              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-destructive to-accent"></span>
+              Recente uitgaven
+            </CardTitle>
           </div>
-          <Badge variant="info">{expenses.length} items</Badge>
+          <Badge variant="primary">{expenses.length} items</Badge>
         </CardHeader>
         <CardContent>
               {expenses.length === 0 ? (
