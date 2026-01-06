@@ -106,8 +106,11 @@ export default async function FacturenPagina() {
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Datum {new Date(factuur.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}
+                      <p className="text-xs text-muted-foreground mt-0.5 flex flex-wrap gap-3">
+                        <span>Datum {new Date(factuur.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}</span>
+                        <span className="text-warning-foreground font-semibold">
+                          Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
+                        </span>
                       </p>
                       <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
                     </div>
@@ -116,9 +119,9 @@ export default async function FacturenPagina() {
                         <p className="text-sm font-semibold tabular-nums text-foreground">
                           {formatBedrag(invoiceAmount(factuur.lines))}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
-                        </p>
+                         <p className="text-xs text-warning-foreground mt-0.5">
+                           Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
+                         </p>
                       </div>
                        <Badge variant={statusInfo(factuur.emailStatus).variant}>
                          {statusInfo(factuur.emailStatus).label}
@@ -156,7 +159,7 @@ export default async function FacturenPagina() {
                       </Badge>
                     </div>
                      <div className="flex items-center justify-between">
-                       <p className="text-xs text-muted-foreground">
+                       <p className="text-xs text-warning-foreground font-semibold">
                          Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
                        </p>
                        <p className="text-base font-semibold tabular-nums text-foreground">

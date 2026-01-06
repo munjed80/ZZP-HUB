@@ -191,8 +191,8 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Uitgaven</h1>
-            <p className="text-sm text-slate-600">
+            <h1 className="text-2xl font-bold text-foreground">Uitgaven</h1>
+            <p className="text-sm text-muted-foreground">
               Registreer kosten, bereken BTW automatisch en bewaar een link naar je bonnetjes.
             </p>
           </div>
@@ -204,7 +204,7 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
       </div>
 
       {errorMessage && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        <div className="rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
           {errorMessage}
         </div>
       )}
@@ -213,47 +213,47 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Euro className="h-4 w-4 text-slate-500" aria-hidden />
+              <Euro className="h-4 w-4 text-primary" aria-hidden />
               <CardTitle>Totaal deze maand</CardTitle>
             </div>
             <Badge variant="info">Live</Badge>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-slate-900">{formatBedrag(totals.monthTotal)}</p>
-            <p className="text-xs text-slate-500">Inclusief BTW op basis van gekozen tarieven.</p>
+            <p className="text-2xl font-semibold text-foreground">{formatBedrag(totals.monthTotal)}</p>
+            <p className="text-xs text-muted-foreground">Inclusief BTW op basis van gekozen tarieven.</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <ReceiptText className="h-4 w-4 text-slate-500" aria-hidden />
+              <ReceiptText className="h-4 w-4 text-success" aria-hidden />
               <CardTitle>Te vorderen BTW</CardTitle>
             </div>
             <Badge variant="success">Recente periode</Badge>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-slate-900">{formatBedrag(totals.vatRecoverable)}</p>
-            <p className="text-xs text-slate-500">Gebaseerd op ingevoerde uitgaven.</p>
+            <p className="text-2xl font-semibold text-foreground">{formatBedrag(totals.vatRecoverable)}</p>
+            <p className="text-xs text-muted-foreground">Gebaseerd op ingevoerde uitgaven.</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <PieChart className="h-4 w-4 text-slate-500" aria-hidden />
+              <PieChart className="h-4 w-4 text-accent" aria-hidden />
               <CardTitle>Grootste kostenpost</CardTitle>
             </div>
             <Badge variant="warning">Realtime</Badge>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-slate-900">{totals.largestCategory}</p>
-            <p className="text-xs text-slate-500">Op basis van huidige lijst.</p>
+            <p className="text-2xl font-semibold text-foreground">{totals.largestCategory}</p>
+            <p className="text-xs text-muted-foreground">Op basis van huidige lijst.</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-white">
+      <Card className="shadow-md">
         <CardHeader>
           <div className="flex items-center gap-2">
             <CalendarClock className="h-4 w-4 text-slate-500" aria-hidden />
@@ -262,59 +262,59 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
           <Badge variant="info">{expenses.length} items</Badge>
         </CardHeader>
         <CardContent>
-          {expenses.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <>
-              {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200 text-sm">
-                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
-                    <tr>
-                      <th className="px-3 py-2">Datum</th>
-                      <th className="px-3 py-2">Omschrijving</th>
-                      <th className="px-3 py-2">Categorie</th>
-                      <th className="px-3 py-2 text-right">Bedrag (excl.)</th>
-                      <th className="px-3 py-2 text-right">BTW</th>
-                      <th className="px-3 py-2 text-right">Totaal</th>
-                      <th className="px-3 py-2 text-right">Acties</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {expenses.map((expense) => {
-                      const { vatAmount, total } = calculateExpenseAmounts(expense);
-                      return (
-                        <tr key={expense.id} className="hover:bg-slate-50">
-                          <td className="px-3 py-3 text-slate-700">{formatDate(expense.date)}</td>
-                          <td className="px-3 py-3">
-                            <div className="font-medium text-slate-900">{expense.description}</div>
-                            {expense.receiptUrl && (
-                              <a
-                                href={expense.receiptUrl}
-                                className="text-xs text-sky-600 underline"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Bonnetje
-                              </a>
-                            )}
-                          </td>
-                          <td className="px-3 py-3 text-slate-700">{expense.category}</td>
-                          <td className="px-3 py-3 text-right tabular-nums text-slate-900">
-                            {formatBedrag(expense.amountExcl)}
-                          </td>
-                          <td className="px-3 py-3 text-right tabular-nums text-slate-700">
-                            {vatLabels[expense.vatRate]} ({formatBedrag(vatAmount)})
-                          </td>
-                          <td className="px-3 py-3 text-right tabular-nums font-semibold text-slate-900">
-                            {formatBedrag(total)}
-                          </td>
-                          <td className="px-3 py-3 text-right">
-                            <EntityActionsMenu
-                              title="Uitgave acties"
-                              description={expense.description}
-                              triggerClassName="px-2 py-1 text-xs"
-                            >
+              {expenses.length === 0 ? (
+                <EmptyState />
+              ) : (
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="min-w-full divide-y divide-border text-sm">
+                      <thead className="bg-muted text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        <tr>
+                          <th className="px-3 py-2">Datum</th>
+                          <th className="px-3 py-2">Omschrijving</th>
+                          <th className="px-3 py-2">Categorie</th>
+                          <th className="px-3 py-2 text-right">Bedrag (excl.)</th>
+                          <th className="px-3 py-2 text-right">BTW</th>
+                          <th className="px-3 py-2 text-right">Totaal</th>
+                          <th className="px-3 py-2 text-right">Acties</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {expenses.map((expense) => {
+                          const { vatAmount, total } = calculateExpenseAmounts(expense);
+                          return (
+                            <tr key={expense.id} className="hover:bg-muted/60">
+                              <td className="px-3 py-3 text-muted-foreground">{formatDate(expense.date)}</td>
+                              <td className="px-3 py-3">
+                                <div className="font-medium text-foreground">{expense.description}</div>
+                                {expense.receiptUrl && (
+                                  <a
+                                    href={expense.receiptUrl}
+                                    className="text-xs text-accent underline"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    Bonnetje
+                                  </a>
+                                )}
+                              </td>
+                              <td className="px-3 py-3 text-muted-foreground">{expense.category}</td>
+                              <td className="px-3 py-3 text-right tabular-nums text-foreground">
+                                {formatBedrag(expense.amountExcl)}
+                              </td>
+                              <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">
+                                {vatLabels[expense.vatRate]} ({formatBedrag(vatAmount)})
+                              </td>
+                              <td className="px-3 py-3 text-right tabular-nums font-semibold text-foreground">
+                                {formatBedrag(total)}
+                              </td>
+                              <td className="px-3 py-3 text-right">
+                                <EntityActionsMenu
+                                  title="Uitgave acties"
+                                  description={expense.description}
+                                  triggerClassName="min-h-0 h-9 px-2 py-1 text-xs"
+                                >
                               <div className="space-y-2 p-2">
                                 {expense.receiptUrl ? (
                                   <a
@@ -346,22 +346,22 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                                 </Button>
                               </div>
                             </EntityActionsMenu>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                      <tfoot className="bg-muted/80">
+                        <tr>
+                          <td className="px-3 py-3 text-sm font-semibold text-muted-foreground" colSpan={5}>
+                            Totaal huidige lijst
+                          </td>
+                          <td className="px-3 py-3 text-right text-sm font-semibold text-foreground">
+                            {formatBedrag(totals.pageTotal)}
                           </td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                  <tfoot className="bg-slate-50">
-                    <tr>
-                      <td className="px-3 py-3 text-sm font-semibold text-slate-700" colSpan={5}>
-                        Totaal huidige lijst
-                      </td>
-                      <td className="px-3 py-3 text-right text-sm font-semibold text-slate-900">
-                        {formatBedrag(totals.pageTotal)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
+                      </tfoot>
+                    </table>
               </div>
 
               {/* Mobile Card View */}
@@ -371,12 +371,12 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                   return (
                     <div
                       key={expense.id}
-                      className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm"
+                      className="rounded-lg border border-border bg-muted p-4 shadow-sm"
                     >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex-1">
-                            <p className="text-sm font-bold text-slate-900">{expense.description}</p>
-                            <p className="text-xs text-slate-500 mt-1">{formatDate(expense.date)}</p>
+                            <p className="text-sm font-bold text-foreground">{expense.description}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{formatDate(expense.date)}</p>
                           </div>
                           <span className="ml-2">
                             <Badge variant="muted">{expense.category}</Badge>
@@ -386,7 +386,7 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                           <EntityActionsMenu
                             title="Uitgave acties"
                             description={expense.description}
-                            triggerClassName="px-2 py-1 text-xs"
+                            triggerClassName="min-h-0 h-9 px-2 py-1 text-xs"
                           >
                             <div className="space-y-2 p-2">
                               {expense.receiptUrl ? (
@@ -423,33 +423,33 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                       {expense.receiptUrl && (
                         <a
                           href={expense.receiptUrl}
-                          className="text-xs text-sky-600 underline inline-block mb-2"
+                          className="text-xs text-accent underline inline-block mb-2"
                           target="_blank"
                           rel="noreferrer"
                         >
                           Bonnetje bekijken
                         </a>
                       )}
-                      <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200 text-xs">
+                      <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-border text-xs">
                         <div>
-                          <span className="text-slate-600">Excl. BTW:</span>
-                          <p className="font-semibold text-slate-900">{formatBedrag(expense.amountExcl)}</p>
+                          <span className="text-muted-foreground">Excl. BTW:</span>
+                          <p className="font-semibold text-foreground">{formatBedrag(expense.amountExcl)}</p>
                         </div>
                         <div>
-                          <span className="text-slate-600">BTW ({vatLabels[expense.vatRate]}):</span>
-                          <p className="font-semibold text-slate-900">{formatBedrag(vatAmount)}</p>
+                          <span className="text-muted-foreground">BTW ({vatLabels[expense.vatRate]}):</span>
+                          <p className="font-semibold text-foreground">{formatBedrag(vatAmount)}</p>
                         </div>
                       </div>
-                      <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
-                        <span className="text-sm font-medium text-slate-600">Totaal:</span>
-                        <span className="text-lg font-bold text-slate-900">{formatBedrag(total)}</span>
+                      <div className="mt-2 pt-2 border-t border-border flex items-center justify-between">
+                        <span className="text-sm font-medium text-muted-foreground">Totaal:</span>
+                        <span className="text-lg font-bold text-foreground">{formatBedrag(total)}</span>
                       </div>
                     </div>
                   );
                 })}
-                <div className="rounded-lg bg-slate-100 p-3 flex items-center justify-between border border-slate-200">
-                  <span className="text-sm font-semibold text-slate-700">Totaal lijst:</span>
-                  <span className="text-lg font-bold text-slate-900">{formatBedrag(totals.pageTotal)}</span>
+                <div className="rounded-lg bg-muted p-3 flex items-center justify-between border border-border">
+                  <span className="text-sm font-semibold text-muted-foreground">Totaal lijst:</span>
+                  <span className="text-lg font-bold text-foreground">{formatBedrag(totals.pageTotal)}</span>
                 </div>
               </div>
             </>
@@ -459,11 +459,11 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-2xl rounded-xl bg-card p-6 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Nieuwe uitgave</h2>
-                <p className="text-sm text-slate-600">
+                <h2 className="text-lg font-semibold text-foreground">Nieuwe uitgave</h2>
+                <p className="text-sm text-muted-foreground">
                   Vul de kosten in. Je kunt een bedrag incl. of excl. BTW invoeren, de ander wordt berekend.
                 </p>
               </div>
@@ -474,21 +474,21 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
 
             <form onSubmit={onSubmit} className="mt-4 grid gap-4 md:grid-cols-2">
               <div className="space-y-1 md:col-span-2">
-                <label className="text-sm font-medium text-slate-800">Omschrijving</label>
+                <label className="text-sm font-medium text-foreground">Omschrijving</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   placeholder="Softwarelicentie, kantoorartikelen..."
                   {...form.register("description")}
                 />
                 {form.formState.errors.description && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.description.message}</p>
+                  <p className="text-xs text-warning-foreground">{form.formState.errors.description.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Categorie</label>
+                <label className="text-sm font-medium text-foreground">Categorie</label>
                 <select
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   {...form.register("category")}
                 >
                   {categories.map((category) => (
@@ -498,52 +498,52 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                   ))}
                 </select>
                 {form.formState.errors.category && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.category.message}</p>
+                  <p className="text-xs text-warning-foreground">{form.formState.errors.category.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Datum</label>
+                <label className="text-sm font-medium text-foreground">Datum</label>
                 <input
                   type="date"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   {...form.register("date")}
                 />
                 {form.formState.errors.date && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.date.message}</p>
+                  <p className="text-xs text-warning-foreground">{form.formState.errors.date.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Bedrag excl. BTW</label>
+                <label className="text-sm font-medium text-foreground">Bedrag excl. BTW</label>
                 <input
                   type="number"
                   step="0.01"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   {...form.register("amountExcl", { valueAsNumber: true })}
                 />
                 {form.formState.errors.amountExcl && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.amountExcl.message}</p>
+                  <p className="text-xs text-warning-foreground">{form.formState.errors.amountExcl.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Bedrag incl. BTW</label>
+                <label className="text-sm font-medium text-foreground">Bedrag incl. BTW</label>
                 <input
                   type="number"
                   step="0.01"
                   value={amountInclDisplay}
                   onChange={(event) => handleAmountInclChange(event.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   placeholder="Wordt berekend"
                 />
-                <p className="text-xs text-slate-500">Automatische koppeling met gekozen BTW-tarief.</p>
+                <p className="text-xs text-muted-foreground">Automatische koppeling met gekozen BTW-tarief.</p>
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">BTW tarief</label>
+                <label className="text-sm font-medium text-foreground">BTW tarief</label>
                 <select
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   {...form.register("vatRate")}
                 >
                   <option value="HOOG_21">21%</option>
@@ -553,17 +553,17 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                   <option value="VERLEGD">Verlegd</option>
                 </select>
                 {form.formState.errors.vatRate && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.vatRate.message}</p>
+                  <p className="text-xs text-warning-foreground">{form.formState.errors.vatRate.message}</p>
                 )}
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-slate-800">Bonnetje uploaden</label>
-                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-200 px-4 py-6 text-sm text-slate-600 hover:border-slate-300">
-                  <UploadCloud className="h-5 w-5 text-slate-500" aria-hidden />
+                <label className="text-sm font-medium text-foreground">Bonnetje uploaden</label>
+                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border px-4 py-6 text-sm text-muted-foreground hover:border-primary/40">
+                  <UploadCloud className="h-5 w-5 text-muted-foreground" aria-hidden />
                   <div className="text-center">
-                    <p className="font-semibold text-slate-800">Sleep je bonnetje hierheen of kies bestand</p>
-                    <p className="text-xs text-slate-500">{RECEIPT_UPLOAD_NOTE}</p>
+                    <p className="font-semibold text-foreground">Sleep je bonnetje hierheen of kies bestand</p>
+                    <p className="text-xs text-muted-foreground">{RECEIPT_UPLOAD_NOTE}</p>
                   </div>
                   <input
                     type="file"
@@ -577,22 +577,22 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                     }}
                   />
                 </label>
-                {selectedFile && <p className="text-xs text-slate-600">Gekozen bestand: {selectedFile}</p>}
+                {selectedFile && <p className="text-xs text-muted-foreground">Gekozen bestand: {selectedFile}</p>}
               </div>
 
               <div className="space-y-1 md:col-span-2">
-                <label className="text-sm font-medium text-slate-800">Link naar bonnetje (optioneel)</label>
+                <label className="text-sm font-medium text-foreground">Link naar bonnetje (optioneel)</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   placeholder="https://..."
                   {...form.register("receiptUrl")}
                 />
                 {form.formState.errors.receiptUrl && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.receiptUrl.message}</p>
+                  <p className="text-xs text-warning-foreground">{form.formState.errors.receiptUrl.message}</p>
                 )}
               </div>
 
-              {formError && <p className="text-xs text-amber-700 md:col-span-2">{formError}</p>}
+              {formError && <p className="text-xs text-warning-foreground md:col-span-2">{formError}</p>}
 
               <div className="flex items-center gap-3 md:col-span-2">
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>

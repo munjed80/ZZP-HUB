@@ -4,35 +4,35 @@ import { cn } from "@/lib/utils";
 export type ButtonVariant = "primary" | "secondary" | "outline" | "destructive" | "ghost" | "link";
 
 const baseClasses = [
-  "relative inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5",
+  "relative inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2.5",
   "text-sm font-semibold transition-all duration-200",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   "disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-[1px]",
 ].join(" ");
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "text-[rgb(var(--brand-foreground))] bg-[linear-gradient(120deg,rgb(var(--brand)),rgb(var(--brand-hover)))] border border-transparent shadow-[0_18px_48px_-28px_rgba(var(--brand-glow,var(--brand)),0.55)] hover:shadow-[0_22px_56px_-26px_rgba(var(--brand-glow,var(--brand)),0.65)] hover:translate-y-[-1px] active:bg-[linear-gradient(120deg,rgb(var(--brand-active)),rgb(var(--brand)))] active:shadow-[0_14px_40px_-28px_rgba(var(--brand-glow,var(--brand)),0.6)]",
-  
-  // Secondary - Subtle brand tint
+    "bg-primary text-primary-foreground border border-primary/90 shadow-[0_14px_32px_-18px_rgba(var(--primary),0.65)] hover:bg-primary/90 hover:shadow-[0_16px_36px_-16px_rgba(var(--primary),0.7)]",
+
+  // Secondary - Subtle surface with border
   secondary:
-    "text-[rgb(var(--brand))] bg-[rgb(var(--brand)/0.08)] border border-[rgb(var(--brand)/0.5)] hover:bg-[rgb(var(--brand)/0.14)] shadow-sm hover:shadow-md",
-  
-  // Outline - Token border
+    "text-foreground bg-secondary border border-border shadow-sm hover:bg-secondary/90 hover:text-foreground",
+
+  // Outline - Neutral border
   outline:
-    "bg-transparent text-[rgb(var(--brand))] border border-[rgb(var(--brand))] hover:bg-[rgb(var(--brand)/0.1)] shadow-sm",
-  
+    "bg-transparent text-foreground border border-border shadow-sm hover:bg-muted",
+
   // Destructive - Fiery
   destructive:
     "bg-destructive text-destructive-foreground border border-destructive/80 hover:bg-destructive/90 shadow-sm hover:shadow-md focus-visible:ring-destructive",
-  
+
   // Ghost - Minimal
   ghost:
-    "text-[rgb(var(--brand))] border border-transparent hover:bg-[rgb(var(--brand)/0.08)]",
-  
+    "text-foreground border border-transparent hover:bg-muted",
+
   // Link - Text only
   link:
-    "text-[rgb(var(--brand))] border border-transparent hover:text-[rgb(var(--brand-hover))] underline-offset-4 hover:underline",
+    "text-primary border border-transparent hover:text-primary/80 underline-offset-4 hover:underline",
 };
 
 export function buttonVariants(variant: ButtonVariant = "primary", className?: string) {
