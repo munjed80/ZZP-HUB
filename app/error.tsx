@@ -15,7 +15,6 @@ export default function Error({
     // Log the error to an error reporting service in production
     // In development, log to console for debugging
     if (process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
       console.error(error);
     }
     // TODO: Send to error reporting service like Sentry in production

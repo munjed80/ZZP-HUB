@@ -54,7 +54,6 @@ export async function authorize(
     const shouldLogAuth =
       process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
     if (shouldLogAuth) {
-      // eslint-disable-next-line no-console
       console.log("Authorize attempt", { emailMasked: maskedEmail });
     }
 
@@ -75,7 +74,6 @@ export async function authorize(
 
     if (!user) {
       if (shouldLogAuth) {
-        // eslint-disable-next-line no-console
         console.log("Authorize failed: user not found", { emailMasked: maskedEmail });
       }
       return null;
@@ -83,14 +81,12 @@ export async function authorize(
 
     if (user.isSuspended) {
       if (shouldLogAuth) {
-        // eslint-disable-next-line no-console
         console.log("Authorize blocked: user suspended", { emailMasked: maskedEmail });
       }
       return null;
     }
 
     if (shouldLogAuth) {
-      // eslint-disable-next-line no-console
       console.log("Authorize comparing password", {
         user: {
           idSuffix: user.id.slice(-6),
@@ -109,14 +105,12 @@ export async function authorize(
 
     if (!isPasswordValid) {
       if (shouldLogAuth) {
-        // eslint-disable-next-line no-console
         console.log("Authorize failed: invalid password", { emailMasked: maskedEmail });
       }
       return null;
     }
 
     if (shouldLogAuth) {
-      // eslint-disable-next-line no-console
       console.log("Authorize success", { emailMasked: maskedEmail });
     }
 

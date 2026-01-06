@@ -48,7 +48,6 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
         } catch (error) {
           // Silently ignore localStorage parse errors in production
           if (process.env.NODE_ENV !== "production") {
-            // eslint-disable-next-line no-console
             console.warn("Could not load avatar from localStorage", error);
           }
         }

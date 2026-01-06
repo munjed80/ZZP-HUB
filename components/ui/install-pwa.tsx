@@ -70,7 +70,6 @@ export function InstallPWA() {
     } catch (error) {
       // Silently handle install prompt errors in production
       if (process.env.NODE_ENV !== "production") {
-        // eslint-disable-next-line no-console
         console.error("Installatieprompt kon niet worden afgehandeld", error);
       }
     } finally {

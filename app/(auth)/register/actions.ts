@@ -11,7 +11,6 @@ export async function registerCompany(values: RegisterInput) {
   try {
     const shouldLogAuth = process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
     if (shouldLogAuth) {
-      // eslint-disable-next-line no-console
       console.log("Register attempt", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
     }
 
@@ -32,12 +31,10 @@ export async function registerCompany(values: RegisterInput) {
     });
 
     if (shouldLogAuth) {
-      // eslint-disable-next-line no-console
       console.log("Register success", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
     }
     return { success: true };
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Register failed", error);
     return { success: false, message: "Er ging iets mis. Probeer opnieuw." };
   }
