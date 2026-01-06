@@ -15,7 +15,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-border bg-card p-4 md:p-5 shadow-sm hover:shadow-md transition-shadow duration-200",
+        "rounded-2xl border-2 border-border bg-card p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-primary/20",
         className,
       )}
     >
@@ -29,7 +29,7 @@ export function CardHeader({ children, className }: CardSectionProps) {
 }
 
 export function CardTitle({ children, className }: CardSectionProps) {
-  return <h3 className={cn("text-base font-semibold text-card-foreground", className)}>{children}</h3>;
+  return <h3 className={cn("text-base font-bold text-card-foreground", className)}>{children}</h3>;
 }
 
 export function CardContent({ children, className }: CardSectionProps) {

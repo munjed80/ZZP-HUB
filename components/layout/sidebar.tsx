@@ -91,15 +91,15 @@ export function Sidebar({
               href={item.href}
               data-tour={item.href === "/instellingen" ? "profile-link" : item.href === "/relaties" ? "relations-link" : undefined}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                "flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
                 actief
-                  ? "bg-primary/10 text-primary font-semibold border border-primary/20"
-                  : "text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
+                  ? "bg-gradient-to-r from-primary/15 to-primary/10 text-primary font-bold border-2 border-primary/30 shadow-lg shadow-primary/10"
+                  : "text-muted-foreground font-semibold hover:bg-muted hover:text-foreground hover:scale-[1.02]"
               )}
               aria-current={actief ? "page" : undefined}
             >
               <Icon
-                className={cn("h-4 w-4", actief ? "text-primary" : "text-muted-foreground")}
+                className={cn("h-4 w-4 transition-transform duration-200", actief ? "text-primary scale-110" : "text-muted-foreground")}
                 aria-hidden
               />
               <span>{item.label}</span>
