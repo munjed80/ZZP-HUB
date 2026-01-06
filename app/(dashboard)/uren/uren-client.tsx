@@ -95,17 +95,25 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">Urenregistratie</h1>
-        <p className="text-sm text-slate-600">
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-accent via-warning to-success"></div>
+          <h1 className="text-3xl font-bold text-foreground">Urenregistratie</h1>
+        </div>
+        <p className="text-sm text-muted-foreground font-medium pl-15">
           Schrijf je uren richting het 1225-criterium en houd overzicht over je voortgang.
         </p>
       </div>
 
-      <Card className="bg-white">
+      <Card className="border-2 shadow-lg hover:shadow-xl hover:border-success/20 transition-all duration-300">
         <CardHeader className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
-            <Timer className="h-4 w-4 text-slate-500" aria-hidden="true" />
-            <CardTitle>1225-criterium</CardTitle>
+            <div className="rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 p-2.5 shadow-lg ring-2 ring-accent/30">
+              <Timer className="h-5 w-5 text-accent" aria-hidden="true" />
+            </div>
+            <CardTitle className="flex items-center gap-2">
+              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-accent to-success"></span>
+              1225-criterium
+            </CardTitle>
           </div>
           <Badge variant={badgeVariant}>
             {goalReached ? "Doel gehaald!" : `Gewerkte uren: ${totalHours.toFixed(2)} / 1225`}

@@ -76,18 +76,24 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-foreground">BTW-aangifte</h1>
-        <p className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-warning via-accent to-primary"></div>
+          <h1 className="text-3xl font-bold text-foreground">BTW-aangifte</h1>
+        </div>
+        <p className="text-sm text-muted-foreground font-medium pl-15">
           Bereken je aangifte per kwartaal met officiële rubrieken zoals bij de Belastingdienst.
         </p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.6fr_0.9fr]">
-        <Card className="shadow-md">
+        <Card className="shadow-lg border-2 hover:shadow-xl hover:border-primary/20 transition-all duration-300">
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-2">
             <div>
-              <CardTitle className="text-card-foreground">Kwartaal & jaar</CardTitle>
-              <p className="text-sm text-muted-foreground">Directe herberekening zonder het dashboard te verlaten.</p>
+              <CardTitle className="text-card-foreground font-bold flex items-center gap-2">
+                <span className="h-1 w-8 rounded-full bg-gradient-to-r from-warning to-primary"></span>
+                Kwartaal & jaar
+              </CardTitle>
+              <p className="text-sm text-muted-foreground font-medium">Directe herberekening zonder het dashboard te verlaten.</p>
             </div>
             <form className="flex flex-wrap gap-3" method="get" aria-live="polite">
               <label className="flex items-center gap-2 text-sm text-muted-foreground">

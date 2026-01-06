@@ -6,9 +6,12 @@ export default async function RelatiesPagina() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Relaties</h1>
-        <p className="text-sm text-slate-600 mt-1">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-primary via-accent to-warning"></div>
+          <h1 className="text-3xl font-bold text-foreground">Relaties</h1>
+        </div>
+        <p className="text-sm text-muted-foreground font-medium pl-15">
           Beheer klantgegevens voor facturen en offertes
         </p>
       </div>

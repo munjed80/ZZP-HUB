@@ -62,9 +62,12 @@ export default async function FacturenPagina() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Facturen</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-success via-primary to-accent"></div>
+          <h1 className="text-3xl font-bold text-foreground">Facturen</h1>
+        </div>
+        <p className="text-sm text-muted-foreground font-medium pl-15">
           Beheer facturen, verstuur herinneringen en volg betalingen
         </p>
       </div>
@@ -78,11 +81,14 @@ export default async function FacturenPagina() {
         </Link>
       </div>
 
-      <Card className="p-3 sm:p-5 shadow-md">
+      <Card className="p-3 sm:p-5 shadow-lg border-2">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-medium text-card-foreground">Alle facturen</CardTitle>
-            <Badge variant="muted">{facturen.length}</Badge>
+            <CardTitle className="text-lg font-bold text-card-foreground flex items-center gap-2">
+              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-success to-primary"></span>
+              Alle facturen
+            </CardTitle>
+            <Badge variant="primary">{facturen.length}</Badge>
           </div>
         </CardHeader>
         <CardContent className="text-[15px] text-card-foreground">
