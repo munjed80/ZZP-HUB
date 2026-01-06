@@ -9,8 +9,10 @@ export async function registerCompany(values: RegisterInput) {
   const data = registerSchema.parse(values);
 
   try {
-    console.log("Register Attempt:", data.email);
-    console.log("Register attempt", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
+    const shouldLogAuth = process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
+    if (shouldLogAuth) {
+      console.log("Register attempt", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
+    }
 
     const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (existingUser) {
@@ -28,7 +30,9 @@ export async function registerCompany(values: RegisterInput) {
       },
     });
 
-    console.log("Register success", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
+    if (shouldLogAuth) {
+      console.log("Register success", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
+    }
     return { success: true };
   } catch (error) {
     console.error("Register failed", error);

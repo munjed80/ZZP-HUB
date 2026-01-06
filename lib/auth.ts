@@ -50,7 +50,6 @@ export async function authorize(
   }
 
   try {
-    console.log("Login Attempt:", credentials.email);
     const maskedEmail = credentials.email.replace(/(.).+(@.*)/, "$1***$2");
     const shouldLogAuth =
       process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";

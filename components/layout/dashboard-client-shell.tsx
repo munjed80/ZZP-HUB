@@ -46,7 +46,10 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
           const parsed = JSON.parse(cached) as { avatar?: string | null };
           if (parsed?.avatar) return parsed.avatar;
         } catch (error) {
-          console.warn("Could not load avatar from localStorage", error);
+          // Silently ignore localStorage parse errors in production
+          if (process.env.NODE_ENV !== "production") {
+            console.warn("Could not load avatar from localStorage", error);
+          }
         }
       }
       return serverAvatarUrl ?? null;
