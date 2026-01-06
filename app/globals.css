@@ -39,7 +39,7 @@
   
   /* Primary - Emerald brand */
   --primary: var(--brand);
-  --primary-foreground: var(--brand-foreground);
+  --primary-foreground: 255 255 255; /* White text on emerald - WCAG AA compliant for large text */
   
   /* Secondary - Calm neutral */
   --secondary: 234 247 240; /* Tinted by brand */
@@ -113,9 +113,9 @@
   --input: 50 47 58;
   --ring: var(--brand); /* Brand focus */
   
-  /* Primary - Adjusted mauve for dark mode */
+  /* Primary - Adjusted for dark mode */
   --primary: var(--brand);
-  --primary-foreground: var(--brand-foreground);
+  --primary-foreground: 255 255 255; /* White text - maintains consistency */
   
   /* Secondary - Muted surface */
   --secondary: 28 66 63; /* Tinted by brand for dark */

@@ -35,21 +35,22 @@ export function EntityActionsMenu({
 
   const resolvedOpen = useMemo(() => (open === undefined ? internalOpen : open), [internalOpen, open]);
 
+  // Use matchMedia for proper mobile detection without setTimeout
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    const debounced = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(checkMobile, 120);
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(e.matches);
     };
 
-    checkMobile();
-    window.addEventListener("resize", debounced);
+    // Initial check
+    handleChange(mediaQuery);
+    
+    // Listen for changes
+    mediaQuery.addEventListener("change", handleChange);
 
     return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener("resize", debounced);
+      mediaQuery.removeEventListener("change", handleChange);
     };
   }, []);
 

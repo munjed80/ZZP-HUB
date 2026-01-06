@@ -23,19 +23,51 @@ export function Sheet({ open, onOpenChange, children, title, description }: Shee
     };
   }, [open]);
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!open) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onOpenChange(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [open, onOpenChange]);
+
   if (!open) return null;
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking the backdrop itself, not children
+    if (e.target === e.currentTarget) {
+      onOpenChange(false);
+    }
+  };
+
+  const handleCloseClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent event from bubbling to avoid triggering actions
+    e.preventDefault();
+    e.stopPropagation();
+    onOpenChange(false);
+  };
+
   return (
-    <div className="fixed inset-0 z-50">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50" onClick={handleBackdropClick}>
+      {/* Backdrop - blocks pointer events to elements behind */}
       <div
         className="absolute inset-0 bg-foreground/40 animate-in fade-in duration-200"
-        onClick={() => onOpenChange(false)}
+        style={{ pointerEvents: "auto" }}
         aria-hidden="true"
       />
       
-      {/* Sheet */}
-      <div className="absolute bottom-0 left-0 right-0 flex flex-col bg-card rounded-t-2xl shadow-xl max-h-[90vh] animate-in slide-in-from-bottom duration-300">
+      {/* Sheet - prevent click-through */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 flex flex-col bg-card rounded-t-2xl shadow-xl max-h-[90vh] animate-in slide-in-from-bottom duration-300"
+        style={{ pointerEvents: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {(title || description) && (
           <div className="flex items-start justify-between border-b border-border px-4 py-4">
             <div className="flex-1">
@@ -48,8 +80,8 @@ export function Sheet({ open, onOpenChange, children, title, description }: Shee
             </div>
             <button
               type="button"
-              onClick={() => onOpenChange(false)}
-              className="rounded-lg p-2 text-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.08)] transition-colors"
+              onClick={handleCloseClick}
+              className="rounded-lg p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
               aria-label="Sluiten"
             >
               <X className="h-5 w-5" aria-hidden="true" />
