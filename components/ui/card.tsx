@@ -15,7 +15,10 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={cn(
-        "rounded-2xl border-2 border-border bg-card p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-primary/20",
+        // Enhanced mobile-friendly spacing and visual design
+        "rounded-2xl border-2 border-border bg-card p-3 sm:p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-primary/20",
+        // Better touch feedback on mobile
+        "active:scale-[0.99] touch-manipulation",
         className,
       )}
     >
@@ -25,7 +28,7 @@ export function Card({ children, className }: CardProps) {
 }
 
 export function CardHeader({ children, className }: CardSectionProps) {
-  return <div className={cn("flex items-start justify-between gap-2 pb-3", className)}>{children}</div>;
+  return <div className={cn("flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3 pb-3", className)}>{children}</div>;
 }
 
 export function CardTitle({ children, className }: CardSectionProps) {

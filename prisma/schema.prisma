@@ -184,3 +184,23 @@ model Event {
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
 }
+
+enum ReleaseCategory {
+  BUTTONS
+  COLORS
+  FUNCTIONS
+  MOBILE_COMPATIBILITY
+  GENERAL
+}
+
+model Release {
+  id          String          @id @default(uuid())
+  version     String          @unique
+  title       String
+  description String
+  category    ReleaseCategory
+  isPublished Boolean         @default(false)
+  releaseDate DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}

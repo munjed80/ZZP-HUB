@@ -154,19 +154,23 @@ export function CompaniesClient({ companies }: { companies: Company[] }) {
 
   return (
     <>
-      <Card className="bg-white">
-        <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <CardTitle>Companies</CardTitle>
-          <div className="flex gap-3">
-            <Badge variant="info">{sortedCompanies.length} accounts</Badge>
-            <Button type="button" onClick={openCreate}>
+      <Card className="rounded-2xl border-2 shadow-lg">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-xl font-bold">Companies</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">Beheer company accounts</p>
+          </div>
+          <div className="flex gap-2 sm:gap-3 flex-wrap">
+            <Badge variant="info" className="font-bold">{sortedCompanies.length} accounts</Badge>
+            <Button type="button" onClick={openCreate} className="w-full sm:w-auto">
               Nieuwe company
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+        <CardContent className="overflow-x-auto -mx-3 sm:mx-0">
+          <div className="min-w-[640px] sm:min-w-0">
+            <table className="w-full divide-y divide-slate-200 text-sm">
+            <thead className="bg-slate-50 dark:bg-slate-900 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
               <tr>
                 <th className="px-3 py-2">Bedrijf</th>
                 <th className="px-3 py-2">E-mail</th>
@@ -195,175 +199,178 @@ export function CompaniesClient({ companies }: { companies: Company[] }) {
                       {company.isSuspended ? "Geblokkeerd" : "Actief"}
                     </Badge>
                   </td>
-                  <td className="px-3 py-3 text-right space-x-2">
-                    <Button type="button" variant="secondary" onClick={() => openEdit(company)}>
-                      Bewerken
-                    </Button>
-                    <Button type="button" variant="ghost" onClick={() => toggleSuspended(company)}>
-                      {company.isSuspended ? "Deblokkeren" : "Blokkeren"}
-                    </Button>
-                    <Button type="button" variant="destructive" onClick={() => handleDelete(company)}>
-                      Verwijderen
-                    </Button>
+                  <td className="px-3 py-3 text-right">
+                    <div className="flex gap-1 sm:gap-2 justify-end flex-wrap">
+                      <Button type="button" variant="secondary" onClick={() => openEdit(company)} className="text-xs px-2 sm:px-3">
+                        Bewerken
+                      </Button>
+                      <Button type="button" variant="ghost" onClick={() => toggleSuspended(company)} className="text-xs px-2 sm:px-3">
+                        {company.isSuspended ? "Deblokkeren" : "Blokkeren"}
+                      </Button>
+                      <Button type="button" variant="destructive" onClick={() => handleDelete(company)} className="text-xs px-2 sm:px-3">
+                        Verwijderen
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </CardContent>
       </Card>
 
       {open === "form" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-3xl rounded-xl bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4 overflow-y-auto">
+          <div className="w-full max-w-3xl rounded-2xl bg-card border-2 border-border p-4 sm:p-6 shadow-2xl my-4 sm:my-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className="text-lg sm:text-xl font-bold text-foreground">
                   {mode === "create" ? "Nieuwe company" : "Company bewerken"}
                 </h2>
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-muted-foreground mt-1">
                   Vul alle bedrijfsgegevens in. Wachtwoord is optioneel bij bewerken.
                 </p>
               </div>
-              <Button type="button" variant="ghost" className="px-3 py-2" onClick={() => setOpen(null)}>
+              <Button type="button" variant="ghost" className="px-3 py-2 self-end sm:self-auto" onClick={() => setOpen(null)}>
                 Sluiten
               </Button>
             </div>
 
-            <form onSubmit={submitForm} className="mt-4 grid gap-4 md:grid-cols-2">
+            <form onSubmit={submitForm} className="mt-4 sm:mt-6 grid gap-3 sm:gap-4 md:grid-cols-2">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Bedrijfsnaam</label>
+                <label className="text-sm font-semibold text-foreground">Bedrijfsnaam</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("companyName")}
                 />
                 {form.formState.errors.companyName && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.companyName.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.companyName.message}</p>
                 )}
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Contactnaam</label>
+                <label className="text-sm font-semibold text-foreground">Contactnaam</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("naam")}
                 />
                 {form.formState.errors.naam && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.naam.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.naam.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">E-mail</label>
+                <label className="text-sm font-semibold text-foreground">E-mail</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("email")}
                 />
                 {form.formState.errors.email && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.email.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.email.message}</p>
                 )}
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Wachtwoord</label>
+                <label className="text-sm font-semibold text-foreground">Wachtwoord</label>
                 <input
                   type="password"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   placeholder={mode === "edit" ? "Laat leeg om ongewijzigd te laten" : ""}
                   {...form.register("password")}
                 />
                 {form.formState.errors.password && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.password.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.password.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Adres</label>
+                <label className="text-sm font-semibold text-foreground">Adres</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("address")}
                 />
                 {form.formState.errors.address && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.address.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.address.message}</p>
                 )}
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Stad</label>
+                <label className="text-sm font-semibold text-foreground">Stad</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("city")}
                 />
                 {form.formState.errors.city && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.city.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.city.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Postcode</label>
+                <label className="text-sm font-semibold text-foreground">Postcode</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("postalCode")}
                 />
                 {form.formState.errors.postalCode && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.postalCode.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.postalCode.message}</p>
                 )}
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">KVK</label>
+                <label className="text-sm font-semibold text-foreground">KVK</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("kvkNumber")}
                 />
                 {form.formState.errors.kvkNumber && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.kvkNumber.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.kvkNumber.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">BTW nummer</label>
+                <label className="text-sm font-semibold text-foreground">BTW nummer</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("btwNumber")}
                 />
                 {form.formState.errors.btwNumber && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.btwNumber.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.btwNumber.message}</p>
                 )}
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">IBAN</label>
+                <label className="text-sm font-semibold text-foreground">IBAN</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("iban")}
                 />
                 {form.formState.errors.iban && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.iban.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.iban.message}</p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Bank</label>
+                <label className="text-sm font-semibold text-foreground">Bank</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("bankName")}
                 />
                 {form.formState.errors.bankName && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.bankName.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.bankName.message}</p>
                 )}
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">Betalingstermijn</label>
+                <label className="text-sm font-semibold text-foreground">Betalingstermijn</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-lg border-2 border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none transition-colors"
                   {...form.register("paymentTerms")}
                 />
                 {form.formState.errors.paymentTerms && (
-                  <p className="text-xs text-amber-700">{form.formState.errors.paymentTerms.message}</p>
+                  <p className="text-xs text-destructive font-medium">{form.formState.errors.paymentTerms.message}</p>
                 )}
               </div>
 
-              <div className="flex justify-end gap-2 md:col-span-2">
-                <Button type="button" variant="secondary" onClick={() => setOpen(null)}>
+              <div className="flex flex-col sm:flex-row justify-end gap-2 md:col-span-2 pt-2">
+                <Button type="button" variant="secondary" onClick={() => setOpen(null)} className="w-full sm:w-auto">
                   Annuleren
                 </Button>
-                <Button type="submit" disabled={isPending}>
+                <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
                   {submitLabel}
                 </Button>
               </div>
