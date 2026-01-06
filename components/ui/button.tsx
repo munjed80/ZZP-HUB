@@ -11,16 +11,16 @@ const baseClasses = [
 ].join(" ");
 
 const variantClasses: Record<ButtonVariant, string> = {
-primary:
-    "text-[rgb(var(--brand-on-primary))] bg-[linear-gradient(120deg,rgb(var(--brand-primary)),rgb(var(--brand-primary-hover)))] border border-transparent shadow-[0_18px_48px_-28px_rgba(var(--brand-primary),0.55)] hover:shadow-[0_22px_56px_-26px_rgba(var(--brand-primary),0.65)] hover:translate-y-[-1px] active:bg-[linear-gradient(120deg,rgb(var(--brand-primary-active)),rgb(var(--brand-primary)))] active:shadow-[0_14px_40px_-28px_rgba(var(--brand-primary),0.6)]",
+  primary:
+    "text-[rgb(var(--brand-foreground))] bg-[linear-gradient(120deg,rgb(var(--brand)),rgb(var(--brand-hover)))] border border-transparent shadow-[0_18px_48px_-28px_rgba(var(--brand-glow,var(--brand)),0.55)] hover:shadow-[0_22px_56px_-26px_rgba(var(--brand-glow,var(--brand)),0.65)] hover:translate-y-[-1px] active:bg-[linear-gradient(120deg,rgb(var(--brand-active)),rgb(var(--brand)))] active:shadow-[0_14px_40px_-28px_rgba(var(--brand-glow,var(--brand)),0.6)]",
   
   // Secondary - Subtle brand tint
   secondary:
-    "text-[rgb(var(--brand-primary))] bg-[rgb(var(--brand-primary)/0.08)] border border-[rgb(var(--brand-primary)/0.5)] hover:bg-[rgb(var(--brand-primary)/0.14)] shadow-sm hover:shadow-md",
+    "text-[rgb(var(--brand))] bg-[rgb(var(--brand)/0.08)] border border-[rgb(var(--brand)/0.5)] hover:bg-[rgb(var(--brand)/0.14)] shadow-sm hover:shadow-md",
   
   // Outline - Token border
   outline:
-    "bg-transparent text-[rgb(var(--brand-primary))] border border-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-primary)/0.1)] shadow-sm",
+    "bg-transparent text-[rgb(var(--brand))] border border-[rgb(var(--brand))] hover:bg-[rgb(var(--brand)/0.1)] shadow-sm",
   
   // Destructive - Fiery
   destructive:
@@ -28,11 +28,11 @@ primary:
   
   // Ghost - Minimal
   ghost:
-    "text-[rgb(var(--brand-primary))] border border-transparent hover:bg-[rgb(var(--brand-primary)/0.08)]",
+    "text-[rgb(var(--brand))] border border-transparent hover:bg-[rgb(var(--brand)/0.08)]",
   
   // Link - Text only
   link:
-    "text-[rgb(var(--brand-primary))] border border-transparent hover:text-[rgb(var(--brand-primary-hover))] underline-offset-4 hover:underline",
+    "text-[rgb(var(--brand))] border border-transparent hover:text-[rgb(var(--brand-hover))] underline-offset-4 hover:underline",
 };
 
 export function buttonVariants(variant: ButtonVariant = "primary", className?: string) {

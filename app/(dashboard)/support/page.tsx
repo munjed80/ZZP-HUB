@@ -14,18 +14,18 @@ export default function SupportPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-2">
-          <p className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700 ring-1 ring-teal-100">
+          <p className="inline-flex items-center gap-2 rounded-full bg-[rgb(var(--brand)/0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-[rgb(var(--brand))] ring-1 ring-[rgb(var(--brand)/0.2)]">
             <LifeBuoy className="h-4 w-4" aria-hidden />
             Support
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--foreground)]">We helpen je graag verder</h1>
-          <p className="text-[var(--muted)]">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">We helpen je graag verder</h1>
+          <p className="text-muted-foreground">
             Stel je vraag over facturatie, BTW, uren of abonnement. Ons team reageert snel met een concreet antwoord.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
-          <ShieldCheck className="h-4 w-4 text-teal-600" aria-hidden />
-          <span>Premium support in het Nederlands</span>
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground shadow-sm shadow-[0_6px_28px_-22px_rgba(var(--brand-glow,var(--brand)),0.18)]">
+          <ShieldCheck className="h-4 w-4 text-[rgb(var(--brand))]" aria-hidden />
+          <span className="text-muted-foreground">Premium support in het Nederlands</span>
         </div>
       </div>
 
@@ -33,14 +33,14 @@ export default function SupportPage() {
         <SupportForm context="Dashboard" />
 
         <div className="space-y-4">
-          <Card className="border-[var(--border)] bg-white/95 shadow-md shadow-slate-200/70">
+          <Card className="border-border bg-card/95 shadow-md shadow-[0_18px_48px_-28px_rgba(var(--brand-glow,var(--brand)),0.18)]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <MailCheck className="h-5 w-5 text-teal-600" aria-hidden />
+                <MailCheck className="h-5 w-5 text-[rgb(var(--brand))]" aria-hidden />
                 Veelgestelde onderwerpen
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-[var(--muted)]">
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>• Eerste factuur of offerte verzenden</p>
               <p>• BTW-overzicht en kwartaalrapport</p>
               <p>• Urenregistratie voor het 1225-criterium</p>
@@ -48,23 +48,23 @@ export default function SupportPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-[var(--border)] bg-[var(--background-secondary)] shadow-none ring-1 ring-[var(--border)]/80">
-            <CardContent className="space-y-2 p-5 text-sm text-[var(--muted)]">
-              <p className="font-semibold text-[var(--foreground)]">Snellere reactie</p>
+          <Card className="border-border bg-muted/80 shadow-none ring-1 ring-border/80">
+            <CardContent className="space-y-2 p-5 text-sm text-muted-foreground">
+              <p className="font-semibold text-foreground">Snellere reactie</p>
               <p>Vermeld je bedrijfsnaam of factuurnummer zodat we je direct kunnen helpen.</p>
-              <p className="text-xs text-[var(--muted)]">We reageren doorgaans binnen één werkdag.</p>
+              <p className="text-xs text-muted-foreground">We reageren doorgaans binnen één werkdag.</p>
             </CardContent>
           </Card>
 
-          <Card className="border-[var(--border)] bg-white/95 shadow-md shadow-slate-200/70">
+          <Card className="border-border bg-card/95 shadow-md shadow-[0_18px_48px_-28px_rgba(var(--brand-glow,var(--brand)),0.18)]">
             <CardHeader>
               <CardTitle>FAQ</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {assistantGuide.faq.slice(0, 4).map((item) => (
-                <div key={item.question} className="rounded-lg border border-[var(--border)] bg-[var(--background-secondary)] px-3 py-2">
-                  <p className="text-sm font-semibold text-[var(--foreground)]">{item.question}</p>
-                  <p className="text-sm text-[var(--muted)]">{item.answer}</p>
+                <div key={item.question} className="rounded-lg border border-border bg-muted px-3 py-2">
+                  <p className="text-sm font-semibold text-foreground">{item.question}</p>
+                  <p className="text-sm text-muted-foreground">{item.answer}</p>
                 </div>
               ))}
             </CardContent>
