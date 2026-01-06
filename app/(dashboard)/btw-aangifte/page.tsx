@@ -32,12 +32,13 @@ function parseYear(value: string | undefined, fallback: number) {
 
 const quarterLabels: Record<number, string> = { 1: "Q1", 2: "Q2", 3: "Q3", 4: "Q4" };
 
-export default async function BtwPagina({ searchParams }: { searchParams?: SearchParams }) {
+export default async function BtwPagina({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const resolvedSearchParams = await searchParams;
   const currentYear = new Date().getFullYear();
   const activeQuarter = getActiveQuarter();
 
-  const selectedYear = parseYear(searchParams?.year, currentYear);
-  const selectedQuarter = parseQuarter(searchParams?.quarter, activeQuarter);
+  const selectedYear = parseYear(resolvedSearchParams?.year, currentYear);
+  const selectedQuarter = parseQuarter(resolvedSearchParams?.quarter, activeQuarter);
 
   const report = await getVatReport(selectedYear, selectedQuarter);
   const years = [currentYear, currentYear - 1, currentYear - 2];

@@ -40,6 +40,7 @@ const withPWA = withPWAInit(pwaOptions);
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  output: "standalone",
   async headers() {
     return [
       {
