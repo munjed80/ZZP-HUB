@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 export type ButtonVariant = "primary" | "secondary" | "outline" | "destructive" | "ghost" | "link";
 
 const baseClasses = [
-  "relative inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2.5",
+  "relative inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5",
   "text-sm font-semibold transition-all duration-200",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
   "disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-[1px]",
 ].join(" ");
 

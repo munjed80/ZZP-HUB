@@ -38,6 +38,8 @@ const vatLabels: Record<BtwTarief, string> = {
   VERLEGD: "Verlegd",
 };
 
+const COMPACT_ACTION_TRIGGER = "h-10 px-2 py-1 text-xs";
+
 // Rounding factor for currency values (100 = 10^2 for two decimals)
 const CURRENCY_ROUNDING_FACTOR = 100;
 const RECEIPT_UPLOAD_NOTE = "Upload integratie volgt; we tonen nu alleen de bestandsnaam.";
@@ -313,7 +315,7 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                                 <EntityActionsMenu
                                   title="Uitgave acties"
                                   description={expense.description}
-                                  triggerClassName="min-h-0 h-9 px-2 py-1 text-xs"
+                                  triggerClassName={COMPACT_ACTION_TRIGGER}
                                 >
                               <div className="space-y-2 p-2">
                                 {expense.receiptUrl ? (
@@ -386,7 +388,7 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
                           <EntityActionsMenu
                             title="Uitgave acties"
                             description={expense.description}
-                            triggerClassName="min-h-0 h-9 px-2 py-1 text-xs"
+                            triggerClassName={COMPACT_ACTION_TRIGGER}
                           >
                             <div className="space-y-2 p-2">
                               {expense.receiptUrl ? (

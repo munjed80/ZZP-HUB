@@ -154,13 +154,13 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
       <div className="flex flex-col gap-2 rounded-xl bg-muted/70 p-3 ring-1 ring-border/60">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Snel</p>
         {shareLink ? (
-          <Link href={shareLink} className={buttonVariants("ghost", "w-full justify-start gap-2 bg-card min-h-0 h-10")}>
+          <Link href={shareLink} className={buttonVariants("ghost", "w-full justify-start gap-2 bg-card")}>
             <Eye className="h-4 w-4" aria-hidden />
             Bekijk factuur
           </Link>
         ) : null}
         {editHref ? (
-          <Link href={editHref} className={buttonVariants("ghost", "w-full justify-start gap-2 bg-card min-h-0 h-10")}>
+          <Link href={editHref} className={buttonVariants("ghost", "w-full justify-start gap-2 bg-card")}>
             <Edit3 className="h-4 w-4" aria-hidden />
             Bewerk factuur
           </Link>
@@ -168,7 +168,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
         <InvoicePdfDownloadButton
           invoice={pdfInvoice}
           label="Download PDF"
-          className="w-full justify-start min-h-0 h-10"
+          className="w-full justify-start"
           variant="secondary"
           icon={<FileDown className="h-4 w-4" aria-hidden />}
         />
@@ -176,15 +176,15 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
 
       <div className="space-y-2 rounded-xl border border-border p-3 shadow-sm">
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="secondary" onClick={handleShareEmail} className="flex-1 min-w-[140px] justify-start gap-2 min-h-0 h-10">
+          <Button type="button" variant="secondary" onClick={handleShareEmail} className="flex-1 min-w-[140px] justify-start gap-2">
             <Mail className="h-4 w-4" aria-hidden />
             Deel via e-mail
           </Button>
-          <Button type="button" variant="secondary" onClick={handleShareWhatsApp} className="flex-1 min-w-[140px] justify-start gap-2 min-h-0 h-10">
+          <Button type="button" variant="secondary" onClick={handleShareWhatsApp} className="flex-1 min-w-[140px] justify-start gap-2">
             <MessageCircle className="h-4 w-4" aria-hidden />
             Deel via WhatsApp
           </Button>
-          <Button type="button" variant="secondary" onClick={handleNativeShare} className="flex-1 min-w-[140px] justify-start gap-2 min-h-0 h-10">
+          <Button type="button" variant="secondary" onClick={handleNativeShare} className="flex-1 min-w-[140px] justify-start gap-2">
             <Copy className="h-4 w-4" aria-hidden />
             Deel of kopieer
           </Button>
@@ -197,7 +197,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
             type="button"
             onClick={handleMarkAsUnpaid}
             disabled={isPending}
-            className="w-full justify-center gap-2 min-h-0 h-11"
+            className="w-full justify-center gap-2"
             variant="secondary"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Undo2 className="h-4 w-4" />}
@@ -208,7 +208,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
             type="button"
             onClick={handleMarkAsPaid}
             disabled={isPending}
-            className="w-full justify-center gap-2 min-h-0 h-11"
+            className="w-full justify-center gap-2"
             variant="primary"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
@@ -220,7 +220,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
           type="button"
           onClick={handleDelete}
           disabled={isPending}
-          className="w-full justify-start gap-2 min-h-0 h-10"
+          className="w-full justify-start gap-2"
           variant="ghost"
         >
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
@@ -238,7 +238,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
       description={`Factuur ${pdfInvoice.invoiceNum}`}
       iconOnly
       ariaLabel="Factuur acties"
-      triggerClassName="min-h-0 h-9 w-9 border border-border text-muted-foreground shadow-none hover:text-primary"
+      triggerClassName="h-10 w-10 border border-border text-muted-foreground shadow-none hover:text-primary"
     >
       {menuContent}
     </EntityActionsMenu>

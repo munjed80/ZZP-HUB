@@ -99,85 +99,101 @@ export default async function FacturenPagina() {
             <>
               {/* Desktop Table View */}
               <div className="hidden md:block divide-y divide-border">
-                {mappedInvoices.map(({ factuur, pdfInvoice }) => (
-                  <div
-                    key={factuur.id}
-                    className="flex items-center justify-between py-3.5 first:pt-0"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 flex flex-wrap gap-3">
-                        <span>Datum {new Date(factuur.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}</span>
-                        <span className="text-warning-foreground font-semibold">
-                          Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
-                        </span>
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
-                    </div>
-                    <div className="flex items-center gap-6 ml-4">
-                      <div className="text-right">
-                        <p className="text-sm font-semibold tabular-nums text-foreground">
-                          {formatBedrag(invoiceAmount(factuur.lines))}
+                {mappedInvoices.map(({ factuur, pdfInvoice }) => {
+                  const formattedDate = new Date(factuur.date).toLocaleDateString("nl-NL", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  });
+                  const formattedDueDate = new Date(factuur.dueDate).toLocaleDateString("nl-NL", {
+                    day: "numeric",
+                    month: "short",
+                  });
+
+                  return (
+                    <div
+                      key={factuur.id}
+                      className="flex items-center justify-between py-3.5 first:pt-0"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 flex flex-wrap gap-3">
+                          <span>Datum {formattedDate}</span>
+                          <span className="text-warning-foreground font-semibold">Vervalt {formattedDueDate}</span>
                         </p>
-                         <p className="text-xs text-warning-foreground mt-0.5">
-                           Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
-                         </p>
+                        <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
                       </div>
-                       <Badge variant={statusInfo(factuur.emailStatus).variant}>
-                         {statusInfo(factuur.emailStatus).label}
-                       </Badge>
-                       <InvoiceActionsMenu
-                         pdfInvoice={pdfInvoice}
-                         invoiceId={factuur.id}
-                         recipientEmail={factuur.client.email}
-                         emailStatus={factuur.emailStatus}
-                         editHref={`/facturen/${factuur.id}/edit`}
-                         shareLink={`/facturen/${factuur.id}`}
-                       />
+                      <div className="flex items-center gap-6 ml-4">
+                        <div className="text-right">
+                          <p className="text-sm font-semibold tabular-nums text-foreground">
+                            {formatBedrag(invoiceAmount(factuur.lines))}
+                          </p>
+                          <p className="text-xs text-warning-foreground mt-0.5">Vervalt {formattedDueDate}</p>
+                        </div>
+                         <Badge variant={statusInfo(factuur.emailStatus).variant}>
+                           {statusInfo(factuur.emailStatus).label}
+                         </Badge>
+                         <InvoiceActionsMenu
+                           pdfInvoice={pdfInvoice}
+                           invoiceId={factuur.id}
+                           recipientEmail={factuur.client.email}
+                           emailStatus={factuur.emailStatus}
+                           editHref={`/facturen/${factuur.id}/edit`}
+                           shareLink={`/facturen/${factuur.id}`}
+                         />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Mobile Card View */}
               <div className="block md:hidden divide-y divide-border">
-                {mappedInvoices.map(({ factuur, pdfInvoice }) => (
-                  <div
-                    key={factuur.id}
-                    className="py-3 first:pt-0"
-                  >
-                    <div className="flex items-start justify-between mb-2.5">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          Datum {new Date(factuur.date).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
+                {mappedInvoices.map(({ factuur, pdfInvoice }) => {
+                  const formattedDate = new Date(factuur.date).toLocaleDateString("nl-NL", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  });
+                  const formattedDueDate = new Date(factuur.dueDate).toLocaleDateString("nl-NL", {
+                    day: "numeric",
+                    month: "short",
+                  });
+
+                  return (
+                    <div
+                      key={factuur.id}
+                      className="py-3 first:pt-0"
+                    >
+                      <div className="flex items-start justify-between mb-2.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground">{factuur.invoiceNum}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Datum {formattedDate}</p>
+                          <p className="text-sm text-muted-foreground mt-0.5">{factuur.client.name}</p>
+                        </div>
+                        <Badge variant={statusInfo(factuur.emailStatus).variant}>
+                          {statusInfo(factuur.emailStatus).label}
+                        </Badge>
                       </div>
-                      <Badge variant={statusInfo(factuur.emailStatus).variant}>
-                        {statusInfo(factuur.emailStatus).label}
-                      </Badge>
+                       <div className="flex items-center justify-between">
+                         <p className="text-xs text-warning-foreground font-semibold">Vervalt {formattedDueDate}</p>
+                         <p className="text-base font-semibold tabular-nums text-foreground">
+                           {formatBedrag(invoiceAmount(factuur.lines))}
+                         </p>
+                       </div>
+                       <div className="mt-3 flex items-center justify-end gap-2">
+                         <InvoiceActionsMenu
+                           pdfInvoice={pdfInvoice}
+                           invoiceId={factuur.id}
+                           recipientEmail={factuur.client.email}
+                           emailStatus={factuur.emailStatus}
+                           editHref={`/facturen/${factuur.id}/edit`}
+                           shareLink={`/facturen/${factuur.id}`}
+                         />
+                       </div>
                     </div>
-                     <div className="flex items-center justify-between">
-                       <p className="text-xs text-warning-foreground font-semibold">
-                         Vervalt {new Date(factuur.dueDate).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}
-                       </p>
-                       <p className="text-base font-semibold tabular-nums text-foreground">
-                         {formatBedrag(invoiceAmount(factuur.lines))}
-                       </p>
-                     </div>
-                     <div className="mt-3 flex items-center justify-end gap-2">
-                       <InvoiceActionsMenu
-                         pdfInvoice={pdfInvoice}
-                         invoiceId={factuur.id}
-                         recipientEmail={factuur.client.email}
-                         emailStatus={factuur.emailStatus}
-                         editHref={`/facturen/${factuur.id}/edit`}
-                         shareLink={`/facturen/${factuur.id}`}
-                       />
-                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}

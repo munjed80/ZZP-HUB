@@ -60,8 +60,8 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
   }, [fabMenuOpen]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 shadow-[0_-10px_30px_-24px_rgba(15,23,42,0.45)] backdrop-blur md:hidden pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-      <div className="relative grid grid-cols-6 items-end gap-1 px-3">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 shadow-[0_-10px_30px_-24px_rgba(var(--foreground),0.35)] backdrop-blur md:hidden pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+      <div className="relative grid grid-cols-7 items-end gap-1 px-3">
         {navItems.slice(0, 2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -87,7 +87,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
           <button
             onClick={() => setFabMenuOpen(!fabMenuOpen)}
             data-tour="fab-add"
-            className="flex h-12 w-12 -translate-y-2 items-center justify-center rounded-full border border-border bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform duration-200 hover:-translate-y-3 hover:opacity-95"
+            className="flex h-12 w-12 -translate-y-2 items-center justify-center rounded-full border border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform duration-200 hover:-translate-y-3 hover:opacity-95"
             aria-label="Toevoegen"
           >
             <Plus className={cn("h-6 w-6 transition-transform duration-200", fabMenuOpen && "rotate-45")} aria-hidden />
@@ -118,7 +118,7 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
           )}
         </div>
 
-        {navItems.slice(2, 3).map((item) => {
+        {navItems.slice(2).map((item) => {
           const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
           
