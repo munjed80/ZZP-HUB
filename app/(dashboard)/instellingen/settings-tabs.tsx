@@ -241,17 +241,37 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
 
   return (
     <Tabs defaultValue={DEFAULT_TAB} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-      <TabsList>
-        <TabsTrigger value="profiel">Account &amp; voorkeuren</TabsTrigger>
-        <TabsTrigger value="beveiliging">Beveiliging</TabsTrigger>
-        <TabsTrigger value="email">E-mail</TabsTrigger>
-        <TabsTrigger value="backup">Data &amp; Backup</TabsTrigger>
+      <TabsList className="flex-wrap gap-2 border border-border/80 bg-card/80 p-1 shadow-sm rounded-2xl">
+        <TabsTrigger
+          value="profiel"
+          className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/15 data-[state=active]:to-accent/15 data-[state=active]:text-primary data-[state=active]:shadow-md"
+        >
+          Account &amp; voorkeuren
+        </TabsTrigger>
+        <TabsTrigger
+          value="beveiliging"
+          className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/15 data-[state=active]:to-accent/15 data-[state=active]:text-primary data-[state=active]:shadow-md"
+        >
+          Beveiliging
+        </TabsTrigger>
+        <TabsTrigger
+          value="email"
+          className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/15 data-[state=active]:to-accent/15 data-[state=active]:text-primary data-[state=active]:shadow-md"
+        >
+          E-mail
+        </TabsTrigger>
+        <TabsTrigger
+          value="backup"
+          className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/15 data-[state=active]:to-accent/15 data-[state=active]:text-primary data-[state=active]:shadow-md"
+        >
+          Data &amp; Backup
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="profiel">
         <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
           <div className="space-y-4">
-            <Card className="bg-white dark:bg-slate-900">
+            <Card className="bg-card border border-border/70 shadow-sm">
               <CardHeader className="flex flex-col gap-1">
                 <CardTitle>Profiel &amp; identiteit</CardTitle>
                 <p className="text-sm text-slate-600 dark:text-slate-400">Scheiding tussen avatar, persoonlijke info en bedrijfsnaam.</p>
@@ -350,7 +370,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
               </CardContent>
             </Card>
 
-            <Card className="bg-white dark:bg-slate-900">
+            <Card className="bg-card border border-border/70 shadow-sm">
               <CardHeader className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <Bell className="h-4 w-4 text-slate-600 dark:text-slate-400" aria-hidden />
@@ -481,7 +501,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
           </div>
 
           <div className="space-y-4">
-            <Card className="bg-white dark:bg-slate-900">
+            <Card className="bg-gradient-to-br from-card to-muted/40 border border-primary/15 shadow-md">
               <CardHeader className="flex items-start justify-between">
                 <div className="space-y-1">
                   <CardTitle>Abonnement</CardTitle>
@@ -567,7 +587,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="beveiliging">
-        <Card className="bg-white dark:bg-slate-900">
+        <Card className="bg-card border border-border/70 shadow-sm">
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
@@ -622,7 +642,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="email">
-        <Card className="bg-white dark:bg-slate-900">
+        <Card className="bg-card border border-border/70 shadow-sm">
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
@@ -672,7 +692,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="backup">
-        <Card className="bg-white dark:bg-slate-900">
+        <Card className="bg-card border border-border/70 shadow-sm">
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Database className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
