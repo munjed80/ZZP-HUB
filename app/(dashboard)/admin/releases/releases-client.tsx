@@ -34,9 +34,9 @@ const categoryLabels: Record<ReleaseCategory, string> = {
   GENERAL: "Algemeen",
 };
 
-const categoryVariants: Record<ReleaseCategory, "primary" | "secondary" | "info" | "success" | "warning"> = {
+const categoryVariants: Record<ReleaseCategory, "primary" | "info" | "success" | "warning" | "muted"> = {
   BUTTONS: "primary",
-  COLORS: "secondary",
+  COLORS: "info",
   FUNCTIONS: "info",
   MOBILE_COMPATIBILITY: "success",
   GENERAL: "warning",
@@ -169,7 +169,7 @@ export function ReleasesClient({ releases }: { releases: Release[] }) {
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="secondary" className="font-bold">
+                      <Badge variant="muted" className="font-bold">
                         v{release.version}
                       </Badge>
                       <Badge variant={categoryVariants[release.category]} className="font-semibold">
