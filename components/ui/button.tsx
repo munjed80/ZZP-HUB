@@ -11,26 +11,27 @@ const baseClasses = [
 ].join(" ");
 
 const variantClasses: Record<ButtonVariant, string> = {
+  // Primary - Green base with amber accent glow (inspired by hero CTA)
   primary:
-    "bg-primary text-primary-foreground border border-primary/90 shadow-[0_14px_32px_-18px_rgba(var(--primary),0.65)] hover:bg-primary/90 hover:shadow-[0_16px_36px_-16px_rgba(var(--primary),0.7)]",
+    "group bg-primary text-primary-foreground border border-primary/90 shadow-[0_14px_32px_-18px_rgba(var(--primary),0.65)] hover:bg-primary/90 hover:shadow-[0_16px_36px_-16px_rgba(var(--primary),0.7)] overflow-hidden",
 
   // Secondary - Subtle surface with border
   secondary:
     "text-foreground bg-secondary border border-border shadow-sm hover:bg-secondary/90 hover:text-foreground",
 
-  // Outline - Neutral border
+  // Outline - Neutral border with better contrast
   outline:
-    "bg-transparent text-foreground border border-border shadow-sm hover:bg-muted",
+    "bg-transparent text-foreground border border-border shadow-sm hover:bg-muted hover:border-muted-foreground/20",
 
-  // Destructive - Fiery
+  // Destructive - Fiery red with strong contrast
   destructive:
     "bg-destructive text-destructive-foreground border border-destructive/80 hover:bg-destructive/90 shadow-sm hover:shadow-md focus-visible:ring-destructive",
 
-  // Ghost - Minimal
+  // Ghost - Minimal with stronger hover
   ghost:
-    "text-foreground border border-transparent hover:bg-muted",
+    "text-foreground border border-transparent hover:bg-muted hover:text-foreground",
 
-  // Link - Text only
+  // Link - Text only with primary color
   link:
     "text-primary border border-transparent hover:text-primary/80 underline-offset-4 hover:underline",
 };
@@ -44,8 +45,15 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { className, variant = "primary", ...props },
+  { className, variant = "primary", children, ...props },
   ref,
 ) {
-  return <button ref={ref} className={buttonVariants(variant, className)} {...props} />;
+  return (
+    <button ref={ref} className={buttonVariants(variant, className)} {...props}>
+      {variant === "primary" && (
+        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent/0 via-accent/12 to-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      )}
+      <span className="relative z-10">{children}</span>
+    </button>
+  );
 });

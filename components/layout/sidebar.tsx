@@ -163,7 +163,7 @@ export function MobileSidebar({
           aria-hidden
           onClick={() => onOpenChange?.(false)}
         />
-        <div className="absolute left-0 top-0 flex h-full w-80 max-w-[85%] flex-col gap-6 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-6 text-slate-800 dark:text-slate-100 shadow-lg animate-in slide-in-from-left duration-300">
+        <div className="absolute left-0 top-0 flex h-full w-80 max-w-[85%] flex-col gap-6 border-r border-border bg-card px-5 py-6 text-card-foreground shadow-lg animate-in slide-in-from-left duration-300">
           <div className="flex items-center justify-between">
             <SidebarBrand className="flex-1" />
             <button
@@ -207,11 +207,11 @@ export function MobileSidebar({
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",
                     actief
                       ? "bg-[rgb(var(--brand-primary))/0.08] dark:bg-[rgb(var(--brand-primary))/0.12] text-[rgb(var(--brand-primary))] dark:text-[rgb(var(--brand-primary))] border border-[rgb(var(--brand-primary))/0.35] dark:border-[rgb(var(--brand-primary))/0.35]"
-                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   <Icon
-                    className={cn("h-5 w-5", actief ? "text-[rgb(var(--brand-primary))]" : "text-slate-500 dark:text-slate-400")}
+                    className={cn("h-5 w-5", actief ? "text-[rgb(var(--brand-primary))]" : "text-muted-foreground")}
                     aria-hidden
                   />
                   <span>{item.label}</span>
@@ -219,7 +219,7 @@ export function MobileSidebar({
               );
             })}
           </nav>
-          <div className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-4">
+          <div className="space-y-3 border-t border-border pt-4">
             <button
               onClick={() => {
                 onOpenChange?.(false);
@@ -230,9 +230,9 @@ export function MobileSidebar({
               <LogOut className="h-4 w-4" aria-hidden />
               Sign Out
             </button>
-            <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2 text-center border border-slate-200 dark:border-slate-700">
-              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                Powered by <span className="font-semibold text-slate-900 dark:text-slate-100">MHM IT</span>
+            <div className="rounded-lg bg-muted px-3 py-2 text-center border border-border">
+              <p className="text-xs font-medium text-muted-foreground">
+                Powered by <span className="font-semibold text-foreground">MHM IT</span>
               </p>
             </div>
           </div>

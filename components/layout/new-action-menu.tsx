@@ -66,7 +66,7 @@ export function NewActionMenu() {
       <button
         onClick={() => setOpen(!open)}
         className={cn(
-          "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-4 py-2",
+          "group relative inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-4 py-2 overflow-hidden",
           "text-sm font-semibold transition-all duration-200",
           "bg-primary text-primary-foreground border border-primary/90",
           "shadow-[0_4px_12px_-4px_rgba(var(--primary),0.45)]",
@@ -78,8 +78,9 @@ export function NewActionMenu() {
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <Plus className="h-4 w-4" aria-hidden />
-        <span className="hidden sm:inline">Nieuw</span>
+        <span className="absolute inset-0 rounded-full bg-gradient-to-r from-accent/0 via-accent/12 to-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <Plus className="relative z-10 h-4 w-4" aria-hidden />
+        <span className="relative z-10 hidden sm:inline">Nieuw</span>
       </button>
 
       {open && (
@@ -108,7 +109,7 @@ export function NewActionMenu() {
                   )}
                   role="menuitem"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground border border-border">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20">
                     <Icon className="h-4 w-4" aria-hidden />
                   </span>
                   <span className="flex-1 text-left">{action.label}</span>

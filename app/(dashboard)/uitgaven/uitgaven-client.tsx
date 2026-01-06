@@ -258,7 +258,7 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
       <Card className="shadow-md">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CalendarClock className="h-4 w-4 text-slate-500" aria-hidden />
+            <CalendarClock className="h-4 w-4 text-muted-foreground" aria-hidden />
             <CardTitle>Recente uitgaven</CardTitle>
           </div>
           <Badge variant="info">{expenses.length} items</Badge>
