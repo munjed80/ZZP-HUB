@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 const UPDATE_TOAST_ID = "sw-update-available";
+const ACTIVATION_TIMEOUT_MS = 1500;
 
 export function ServiceWorkerRegister() {
   useEffect(() => {
@@ -22,6 +23,15 @@ export function ServiceWorkerRegister() {
     const promptUpdate = (worker?: ServiceWorker | null) => {
       if (!worker) return;
 
+      const reloadOnActivation = () => {
+        if (!refreshing && worker.state === "activated") {
+          refreshing = true;
+          window.location.reload();
+        }
+      };
+
+      worker.addEventListener("statechange", reloadOnActivation);
+
       toast("Update beschikbaar", {
         id: UPDATE_TOAST_ID,
         description: "Er is een nieuwe versie beschikbaar. Herlaad om de nieuwste UI te gebruiken.",
@@ -30,17 +40,12 @@ export function ServiceWorkerRegister() {
           label: "Nu updaten",
           onClick: () => {
             worker.postMessage({ type: "SKIP_WAITING" });
-            worker.addEventListener("statechange", () => {
-              if (worker.state === "activated") {
-                window.location.reload();
-              }
-            });
             setTimeout(() => {
               if (!refreshing) {
                 refreshing = true;
                 window.location.reload();
               }
-            }, 1500);
+            }, ACTIVATION_TIMEOUT_MS);
           },
         },
       });
@@ -64,8 +69,6 @@ export function ServiceWorkerRegister() {
             }
           });
         });
-
-        registration.update();
       } catch (error) {
         // Silently fail in production - service worker is optional enhancement
         // In development/debug mode, developers can check browser console
