@@ -7,7 +7,7 @@ const baseClasses = [
   // Enhanced mobile touch targets (min 44px recommended by Apple, 48px by Android)
   "relative inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-4 py-2.5",
   // Improved typography and spacing for mobile
-  "text-sm font-semibold transition-all duration-200",
+  "text-sm font-semibold transition-all duration-200 leading-tight",
   // Better focus visibility for accessibility
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
   // Improved disabled state and touch feedback
@@ -17,25 +17,25 @@ const baseClasses = [
 ].join(" ");
 
 const variantClasses: Record<ButtonVariant, string> = {
-  // Primary - Emerald with dark text for better contrast (WCAG AA compliant)
+  // Primary - Deep emerald gradient for premium contrast
   primary:
-    "group bg-gradient-to-r from-primary to-primary/95 text-primary-foreground border-2 border-primary/90 shadow-[0_16px_36px_-18px_rgba(var(--primary),0.75)] hover:shadow-[0_20px_42px_-16px_rgba(var(--primary),0.85)] hover:scale-[1.02] overflow-hidden",
+    "group relative overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 text-white border border-emerald-600/70 shadow-[0_14px_36px_-20px_rgba(16,185,129,0.85)] hover:shadow-[0_20px_44px_-18px_rgba(16,185,129,0.95)] hover:-translate-y-[1px] focus-visible:ring-emerald-300/80",
 
-  // Secondary - Subtle surface with border
+  // Secondary - Tinted surface with emerald accent for clarity
   secondary:
-    "text-foreground bg-gradient-to-r from-secondary to-secondary/95 border-2 border-border shadow-md hover:shadow-lg hover:border-primary/30 hover:scale-[1.02]",
+    "text-emerald-950 dark:text-emerald-50 bg-gradient-to-br from-white to-emerald-50 border border-emerald-100 shadow-[0_10px_30px_-24px_rgba(16,185,129,0.45)] hover:border-emerald-200 hover:bg-emerald-50/90 hover:-translate-y-[0.5px] dark:from-slate-800 dark:to-slate-900 dark:border-emerald-900/60 dark:hover:border-emerald-700/60",
 
-  // Outline - Neutral border with better contrast
+  // Outline - Neutral with emerald hover for alignment to HERO palette
   outline:
-    "bg-transparent text-foreground border-2 border-border shadow-md hover:bg-muted hover:border-primary/30 hover:shadow-lg hover:scale-[1.02]",
+    "bg-transparent text-foreground border border-emerald-200 dark:border-slate-700 shadow-sm hover:bg-emerald-50/70 hover:text-emerald-900 hover:border-emerald-300 hover:-translate-y-[0.5px] dark:hover:bg-slate-800/70 dark:hover:text-emerald-50",
 
-  // Destructive - Fiery red with strong contrast
+  // Destructive - Deep crimson gradient with strong focus state
   destructive:
-    "bg-gradient-to-r from-destructive to-destructive/90 text-destructive-foreground border-2 border-destructive/80 shadow-[0_16px_36px_-18px_rgba(var(--destructive),0.75)] hover:shadow-[0_20px_42px_-16px_rgba(var(--destructive),0.85)] hover:scale-[1.02] focus-visible:ring-destructive",
+    "bg-gradient-to-br from-rose-600 via-rose-600 to-rose-700 text-destructive-foreground border border-rose-500/80 shadow-[0_14px_32px_-18px_rgba(244,63,94,0.9)] hover:shadow-[0_18px_40px_-18px_rgba(244,63,94,0.95)] hover:-translate-y-[1px] focus-visible:ring-destructive",
 
-  // Ghost - Minimal with stronger hover
+  // Ghost - Minimal with emerald hover accent
   ghost:
-    "text-foreground border-2 border-transparent hover:bg-muted hover:text-foreground hover:border-border hover:scale-[1.02]",
+    "text-foreground border border-transparent hover:border-emerald-200 hover:bg-emerald-50/60 hover:text-emerald-900 hover:-translate-y-[0.5px] dark:hover:bg-slate-800/70 dark:hover:text-emerald-50",
 
   // Link - Text only with primary color
   link:
