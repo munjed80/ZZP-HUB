@@ -22,6 +22,11 @@ Moderne SaaS-omgeving voor Nederlandse ZZP’ers met een maandelijks abonnement.
    - Controleer manifest en icons in Chrome DevTools > Application > Manifest.
    - Valideer caching in Chrome DevTools > Application > Service Workers; alleen statische assets worden gecachet.
    - Installatie testen: desktop Chrome/Edge “Install app”; op iOS via Safari → Deel-icoon → “Zet op beginscherm”.
+   - Productiecheck (standalone/Coolify):
+     1. Build + start: `npm run build && npm run start`
+     2. Headers/health: `curl -I https://<host>/sw.js`, `curl -I https://<host>/manifest.webmanifest`, `curl -I https://<host>/api/health`
+     3. Update flow: open app, deploy een nieuwe versie en klik op de toast “Update beschikbaar” → “Nu updaten” om te herladen.
+     4. Offline fallback: laad een pagina online, schakel offline en navigeer opnieuw; je ziet `/offline` en de Workbox fallback `/offline.html`. Herhaal op mobiel na “Zet op beginscherm”.
 
 Authenticatie is voorbereid voor integratie met bijvoorbeeld NextAuth of een eigen SSO-provider; sessiebeveiliging wordt centraal afgehandeld in de layout. Alle UI-teksten zijn in het Nederlands en valuta wordt als € 1.250,00 getoond.
 
