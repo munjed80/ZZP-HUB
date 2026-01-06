@@ -91,17 +91,17 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-slate-900/40 px-4 py-6">
-      <div className="w-full max-w-lg rounded-lg bg-white shadow-lg border border-slate-200">
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+    <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-black/40 dark:bg-black/60 px-4 py-6">
+      <div className="w-full max-w-lg rounded-lg bg-card shadow-lg border border-border">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">Nieuwe afspraak</p>
-            <h2 className="text-lg font-bold text-slate-900">Voeg een afspraak toe aan je agenda</h2>
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">Nieuwe afspraak</p>
+            <h2 className="text-lg font-bold text-foreground">Voeg een afspraak toe aan je agenda</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-[rgb(var(--brand-primary))] transition hover:bg-[rgb(var(--brand-primary)/0.08)]"
+            className="rounded-full p-2 text-primary transition hover:bg-primary/10"
             aria-label="Sluiten"
           >
             <X className="h-5 w-5" aria-hidden="true" />
@@ -110,7 +110,7 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4 px-6 py-5">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-800" htmlFor="event-title">
+            <label className="text-sm font-medium text-foreground" htmlFor="event-title">
               Titel
             </label>
               <input
@@ -119,22 +119,22 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
                 required
                 value={form.title}
                 onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="Bijv. Intakegesprek met klant"
               />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-800" htmlFor="event-description">
+            <label className="text-sm font-medium text-foreground" htmlFor="event-description">
               Beschrijving
             </label>
             <div className="relative">
-              <AlignLeft className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
+              <AlignLeft className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
               <textarea
                 id="event-description"
                 value={form.description}
                 onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
-                className="min-h-[72px] w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
+                className="min-h-[72px] w-full rounded-lg border border-input bg-background pl-10 pr-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="Notities of locatie"
               />
             </div>
@@ -142,40 +142,40 @@ function AddEventModal({ open, onClose, onAdded }: AddEventModalProps) {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-800" htmlFor="event-start">
+              <label className="text-sm font-medium text-foreground" htmlFor="event-start">
                 Start
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
+                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <input
                   id="event-start"
                   type="datetime-local"
                   required
                   value={form.start}
                   onChange={(e) => setForm((prev) => ({ ...prev, start: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
+                  className="w-full rounded-lg border border-input bg-background pl-10 pr-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-800" htmlFor="event-end">
+              <label className="text-sm font-medium text-foreground" htmlFor="event-end">
                 Eind
               </label>
               <div className="relative">
-                <Clock3 className="absolute left-3 top-3 h-4 w-4 text-slate-400" aria-hidden="true" />
+                <Clock3 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <input
                   id="event-end"
                   type="datetime-local"
                   required
                   value={form.end}
                   onChange={(e) => setForm((prev) => ({ ...prev, end: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-200 bg-white/90 pl-10 pr-3 py-2 text-sm text-slate-900 shadow-inner shadow-white/60 focus:border-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#d7e1ea]"
+                  className="w-full rounded-lg border border-input bg-background pl-10 pr-3 py-2 text-sm text-foreground shadow-sm focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
             </div>
           </div>
 
-          {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
           <div className="flex items-center justify-end gap-2 pt-2">
             <button
@@ -254,8 +254,8 @@ export function AgendaView({ events }: AgendaViewProps) {
       <div className="space-y-8">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Agenda</h1>
-            <p className="text-sm text-slate-600 mt-1">
+            <h1 className="text-2xl font-semibold text-foreground">Agenda</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               Plan afspraken en beheer je kalender
             </p>
           </div>
@@ -274,14 +274,14 @@ export function AgendaView({ events }: AgendaViewProps) {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base font-medium text-slate-900">Kalender</CardTitle>
-                  <p className="text-sm text-slate-600 mt-0.5">{maandNaam}</p>
+                  <CardTitle className="text-base font-medium text-card-foreground">Kalender</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-0.5">{maandNaam}</p>
                 </div>
-                <CalendarDays className="h-5 w-5 text-slate-400" aria-hidden="true" />
+                <CalendarDays className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="hidden md:grid grid-cols-7 gap-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+              <div className="hidden md:grid grid-cols-7 gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"].map((dag) => (
                   <span key={dag} className="text-center">
                     {dag}
@@ -306,8 +306,8 @@ export function AgendaView({ events }: AgendaViewProps) {
                       className={cn(
                         "min-h-[110px] rounded-lg border p-3",
                         dagEvents.length > 0 
-                          ? "border-teal-200 bg-teal-50/30" 
-                          : "border-slate-200 bg-white",
+                          ? "border-primary/30 bg-primary/5" 
+                          : "border-border bg-card",
                       )}
                     >
                       <div className="flex items-center justify-between">
@@ -315,15 +315,15 @@ export function AgendaView({ events }: AgendaViewProps) {
                           className={cn(
                             "flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium",
                             isVandaag(dag) 
-                              ? "bg-teal-600 text-white" 
-                              : "text-slate-700",
+                              ? "bg-primary text-primary-foreground" 
+                              : "text-foreground",
                           )}
                           aria-label={isVandaag(dag) ? "Vandaag" : undefined}
                         >
                           {dag}
                         </span>
                         {dagEvents.length > 0 && (
-                          <span className="text-xs font-medium text-slate-600">{dagEvents.length}</span>
+                          <span className="text-xs font-medium text-muted-foreground">{dagEvents.length}</span>
                         )}
                       </div>
 
@@ -331,10 +331,10 @@ export function AgendaView({ events }: AgendaViewProps) {
                         {dagEvents.map((event) => (
                           <div
                             key={event.id}
-                            className="rounded px-2 py-1.5 bg-white border border-teal-200"
+                            className="rounded px-2 py-1.5 bg-card border border-primary/20"
                           >
-                            <p className="text-xs font-medium text-slate-900 leading-tight truncate">{event.title}</p>
-                            <p className="flex items-center gap-1 text-[11px] text-slate-600 mt-0.5">
+                            <p className="text-xs font-medium text-foreground leading-tight truncate">{event.title}</p>
+                            <p className="flex items-center gap-1 text-[11px] text-muted-foreground mt-0.5">
                               <Clock3 className="h-3 w-3" aria-hidden="true" />
                               {formatTijd(event.start)}
                             </p>
@@ -348,37 +348,37 @@ export function AgendaView({ events }: AgendaViewProps) {
 
                   <div className="md:hidden" aria-label="Afspraken lijstweergave">
                 <div className="mb-2 flex items-center justify-between">
-                  <p className="text-sm font-semibold text-slate-800">Verticale tijdlijn</p>
+                  <p className="text-sm font-semibold text-foreground">Verticale tijdlijn</p>
                   <Badge variant="primary">Mobiel</Badge>
                 </div>
                 {upcomingEvents.length === 0 ? (
-                  <p className="text-sm text-slate-600">Nog geen afspraken gepland.</p>
+                  <p className="text-sm text-muted-foreground">Nog geen afspraken gepland.</p>
                 ) : (
-                  <div className="relative space-y-4 pl-5 before:absolute before:left-[6px] before:top-0 before:h-full before:w-[2px] before:bg-teal-200">
+                  <div className="relative space-y-4 pl-5 before:absolute before:left-[6px] before:top-0 before:h-full before:w-[2px] before:bg-primary/30">
                     {upcomingEvents.map((event) => (
                       <div
                         key={event.id}
-                        className="relative overflow-hidden rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                        className="relative overflow-hidden rounded-lg border border-border bg-card p-4 shadow-sm"
                       >
                         <span
                           aria-hidden="true"
-                          className="absolute -left-[14px] top-4 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white bg-teal-600 shadow-sm"
+                          className="absolute -left-[14px] top-4 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-card bg-primary shadow-sm"
                         />
                         <div className="space-y-1">
-                          <p className="text-xs uppercase tracking-wide text-slate-500">
+                          <p className="text-xs uppercase tracking-wide text-muted-foreground">
                             {new Intl.DateTimeFormat("nl-NL", {
                               weekday: "short",
                               day: "numeric",
                               month: "short",
                             }).format(event.start)}
                           </p>
-                          <p className="text-sm font-semibold text-slate-900">{event.title}</p>
+                          <p className="text-sm font-semibold text-foreground">{event.title}</p>
                           {event.description ? (
-                            <p className="text-xs text-slate-700">{event.description}</p>
+                            <p className="text-xs text-muted-foreground">{event.description}</p>
                           ) : null}
                         </div>
-                        <div className="mt-3 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800">
-                          <Clock3 className="h-4 w-4 text-slate-600" aria-hidden="true" />
+                        <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2 text-xs font-semibold text-foreground">
+                          <Clock3 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                           {formatTijd(event.start)} - {formatTijd(event.end)}
                         </div>
                       </div>
@@ -392,18 +392,18 @@ export function AgendaView({ events }: AgendaViewProps) {
           <Card>
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-medium text-slate-900">Aankomende afspraken</CardTitle>
+                <CardTitle className="text-base font-medium text-card-foreground">Aankomende afspraken</CardTitle>
                 <Badge variant="muted">{gesorteerdeDagen.length}</Badge>
               </div>
             </CardHeader>
             <CardContent>
               {gesorteerdeDagen.length === 0 ? (
-                <p className="text-sm text-slate-600">Geen afspraken gepland</p>
+                <p className="text-sm text-muted-foreground">Geen afspraken gepland</p>
               ) : (
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-border">
                   {gesorteerdeDagen.map((dag) => (
                     <div key={dag} className="py-4 first:pt-0">
-                      <p className="text-sm font-medium text-slate-900 mb-3">
+                      <p className="text-sm font-medium text-foreground mb-3">
                         {new Intl.DateTimeFormat("nl-NL", {
                           weekday: "long",
                           day: "numeric",
@@ -414,12 +414,12 @@ export function AgendaView({ events }: AgendaViewProps) {
                         {eventsByDag[dag].map((event) => (
                           <div key={event.id} className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-slate-900 truncate">{event.title}</p>
+                              <p className="text-sm font-medium text-foreground truncate">{event.title}</p>
                               {event.description && (
-                                <p className="text-sm text-slate-600 truncate">{event.description}</p>
+                                <p className="text-sm text-muted-foreground truncate">{event.description}</p>
                               )}
                             </div>
-                            <span className="text-xs font-medium text-slate-600 tabular-nums">
+                            <span className="text-xs font-medium text-muted-foreground tabular-nums">
                               {formatTijd(event.start)}
                             </span>
                           </div>
@@ -437,7 +437,7 @@ export function AgendaView({ events }: AgendaViewProps) {
       <button
         type="button"
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-white border border-teal-700 shadow-lg transition hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-200 md:hidden"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground border border-primary/80 shadow-lg transition hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/20 md:hidden"
         aria-label="Nieuwe afspraak toevoegen"
       >
         <Plus className="h-6 w-6" aria-hidden="true" />
