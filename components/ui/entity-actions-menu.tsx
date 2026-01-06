@@ -101,13 +101,13 @@ export function EntityActionsMenu({
   };
 
   const overlayClasses =
-    "fixed inset-0 z-40 bg-foreground/45 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out";
+    "fixed inset-0 z-40 bg-[#0F2F2C]/55 backdrop-blur-[6px] data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out";
   const mobileContentBase =
-    "fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[65vh] w-full max-w-xl rounded-t-3xl border border-emerald-200/60 bg-gradient-to-b from-background to-card backdrop-blur-xl data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom";
+    "fixed inset-x-2 bottom-3 z-50 mx-auto max-h-[65vh] w-[clamp(320px,94vw,520px)] rounded-t-3xl border border-[#123C37] bg-gradient-to-b from-[#0F2F2C] via-[#123C37] to-[#0B4E48] backdrop-blur-2xl shadow-[0_24px_64px_-30px_rgba(0,0,0,0.7)] data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom";
   const desktopContentBase =
-    "fixed left-1/2 top-1/2 z-50 w-[420px] max-w-[92vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-emerald-100/60 bg-gradient-to-br from-card to-muted/60 backdrop-blur-2xl data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95";
+    "fixed right-8 bottom-8 z-50 w-[420px] max-w-[92vw] rounded-3xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#123C37] to-[#0B4E48] backdrop-blur-2xl shadow-[0_28px_72px_-36px_rgba(0,0,0,0.68)] data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom";
   const contentClasses = cn(
-    "pointer-events-auto bg-card text-card-foreground shadow-2xl focus:outline-none ring-1 ring-border/70 data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out",
+    "pointer-events-auto bg-transparent text-[#CFEDEA] shadow-2xl focus:outline-none ring-1 ring-[#123C37] data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out",
     isMobile ? mobileContentBase : desktopContentBase,
   );
 
@@ -126,14 +126,14 @@ export function EntityActionsMenu({
             {isMobile ? <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-foreground/20" /> : null}
             {(title || description) && (
               <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  {title && <Dialog.Title className="text-lg font-semibold leading-tight text-foreground">{title}</Dialog.Title>}
-                  {description && <Dialog.Description className="text-sm text-muted-foreground">{description}</Dialog.Description>}
-                </div>
+                 <div className="space-y-1">
+                   {title && <Dialog.Title className="text-lg font-semibold leading-tight text-white">{title}</Dialog.Title>}
+                   {description && <Dialog.Description className="text-sm text-[#9FCBC4]">{description}</Dialog.Description>}
+                 </div>
                 <Dialog.Close asChild>
                   <button
                     type="button"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border/80 text-muted-foreground transition hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-[#CFEDEA] transition hover:border-white/35 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                     aria-label={closeText}
                   >
                     <X className="h-5 w-5" aria-hidden />
