@@ -54,22 +54,22 @@ export function Sheet({ open, onOpenChange, children, title, description }: Shee
   };
 
   return (
-    <div className="fixed inset-0 z-50" onClick={handleBackdropClick}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={handleBackdropClick}>
       {/* Backdrop - blocks pointer events to elements behind */}
       <div
-        className="absolute inset-0 bg-foreground/40 animate-in fade-in duration-200"
+        className="absolute inset-0 bg-foreground/45 backdrop-blur-sm animate-in fade-in duration-200"
         style={{ pointerEvents: "auto" }}
         aria-hidden="true"
       />
       
       {/* Sheet - prevent click-through */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 flex flex-col bg-card rounded-t-2xl shadow-xl max-h-[90vh] animate-in slide-in-from-bottom duration-300"
+      <div
+        className="relative z-10 mb-1 w-full max-w-2xl flex flex-col rounded-t-3xl border border-emerald-100/30 bg-card/95 shadow-[0_-18px_60px_-34px_rgba(16,185,129,0.55)] backdrop-blur-md max-h-[82vh] animate-in slide-in-from-bottom duration-300"
         style={{ pointerEvents: "auto" }}
         onClick={(e) => e.stopPropagation()}
       >
         {(title || description) && (
-          <div className="flex items-start justify-between border-b border-border px-4 py-4">
+          <div className="flex items-start justify-between border-b border-border/80 px-4 py-3">
             <div className="flex-1">
               {title && (
                 <h2 className="text-lg font-semibold text-card-foreground">{title}</h2>
@@ -81,14 +81,14 @@ export function Sheet({ open, onOpenChange, children, title, description }: Shee
             <button
               type="button"
               onClick={handleCloseClick}
-              className="rounded-lg p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-primary hover:bg-primary/10 transition-colors"
+              className="rounded-xl p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-primary hover:bg-primary/10 transition-colors ring-1 ring-transparent focus-visible:ring-emerald-300/80"
               aria-label="Sluiten"
             >
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         )}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3">
           {children}
         </div>
       </div>

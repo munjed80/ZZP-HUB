@@ -86,7 +86,7 @@ export function EntityActionsMenu({
       <>
         {trigger}
         <Sheet open={resolvedOpen} onOpenChange={handleOpenChange} title={title ?? label} description={description}>
-          <div className="space-y-3">{children}</div>
+          <div className="space-y-2.5">{children}</div>
         </Sheet>
       </>
     );
