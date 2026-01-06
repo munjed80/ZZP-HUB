@@ -67,10 +67,10 @@ export function NewActionMenu() {
         onClick={() => setOpen(!open)}
         className={cn(
           "group relative inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-4 py-2 overflow-hidden",
-          "text-sm font-semibold transition-all duration-200",
-          "bg-primary text-primary-foreground border border-primary/90",
-          "shadow-[0_4px_12px_-4px_rgba(var(--primary),0.45)]",
-          "hover:bg-primary/90 hover:shadow-[0_6px_16px_-4px_rgba(var(--primary),0.6)]",
+          "text-sm font-bold transition-all duration-200",
+          "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground border-2 border-primary/90",
+          "shadow-[0_6px_16px_-4px_rgba(var(--primary),0.55)]",
+          "hover:scale-[1.05] hover:shadow-[0_8px_20px_-4px_rgba(var(--primary),0.7)]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
           "active:translate-y-[1px]"
         )}
@@ -78,21 +78,21 @@ export function NewActionMenu() {
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <span className="absolute inset-0 rounded-full bg-gradient-to-r from-accent/0 via-accent/12 to-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-        <Plus className="relative z-10 h-4 w-4" aria-hidden />
+        <span className="absolute inset-0 rounded-full bg-gradient-to-r from-accent/0 via-accent/20 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 animate-pulse" />
+        <Plus className="relative z-10 h-4 w-4 transition-transform duration-200 group-hover:rotate-90" aria-hidden />
         <span className="relative z-10 hidden sm:inline">Nieuw</span>
       </button>
 
       {open && (
         <div
           className={cn(
-            "absolute right-0 top-full mt-2 z-50 min-w-[240px] rounded-lg",
-            "border border-border bg-popover shadow-lg",
+            "absolute right-0 top-full mt-2 z-50 min-w-[240px] rounded-2xl",
+            "border-2 border-border bg-popover shadow-2xl",
             "animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200"
           )}
           role="menu"
         >
-          <div className="py-1.5">
+          <div className="py-2">
             {createActions.map((action, index) => {
               const Icon = action.icon;
               return (
@@ -102,14 +102,14 @@ export function NewActionMenu() {
                   onClick={() => handleActionClick(action.href)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3",
-                    "text-sm font-medium text-popover-foreground",
-                    "transition-colors hover:bg-accent/10",
-                    "focus-visible:outline-none focus-visible:bg-accent/10"
+                    "w-full flex items-center gap-3 px-4 py-3 mx-1.5 rounded-xl",
+                    "text-sm font-semibold text-popover-foreground",
+                    "transition-all duration-200 hover:bg-primary/10 hover:scale-[1.02]",
+                    "focus-visible:outline-none focus-visible:bg-primary/10"
                   )}
                   role="menuitem"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-primary border-2 border-primary/30 shadow-sm">
                     <Icon className="h-4 w-4" aria-hidden />
                   </span>
                   <span className="flex-1 text-left">{action.label}</span>
