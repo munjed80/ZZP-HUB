@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { UserAvatarMenu } from "@/components/layout/user-avatar-menu";
+import { NewActionMenu } from "@/components/layout/new-action-menu";
 import { DashboardClientShell } from "@/components/layout/dashboard-client-shell";
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -52,12 +53,15 @@ export default async function DashboardShell({ children }: { children: ReactNode
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-full bg-card/80 px-2 py-1 shadow-sm shadow-[0_1px_2px_rgba(var(--border),0.45)] ring-1 ring-border/60 md:gap-4 md:px-3">
-                  <div className="hidden flex-col text-right md:flex">
-                    <p className="text-sm font-semibold text-foreground">{userName}</p>
-                    <p className="text-xs text-muted-foreground">Plan: Pro (€4,99 / mnd)</p>
+                <div className="flex items-center gap-2 md:gap-3">
+                  <NewActionMenu />
+                  <div className="flex items-center gap-3 rounded-full bg-card/80 px-2 py-1 shadow-sm shadow-[0_1px_2px_rgba(var(--border),0.45)] ring-1 ring-border/60 md:gap-4 md:px-3">
+                    <div className="hidden flex-col text-right md:flex">
+                      <p className="text-sm font-semibold text-foreground">{userName}</p>
+                      <p className="text-xs text-muted-foreground">Plan: Pro (€4,99 / mnd)</p>
+                    </div>
+                    <UserAvatarMenu userName={userName} userInitials={userInitials} avatarUrl={avatarUrl} />
                   </div>
-                  <UserAvatarMenu userName={userName} userInitials={userInitials} avatarUrl={avatarUrl} />
                 </div>
               </div>
             </header>
