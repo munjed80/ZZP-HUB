@@ -51,7 +51,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   return (
     <button ref={ref} className={buttonVariants(variant, className)} {...props}>
       {variant === "primary" && (
-        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent/0 via-accent/20 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 animate-pulse" />
+        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent/0 via-accent/20 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       )}
       <span className="relative z-10 flex items-center gap-2">{children}</span>
     </button>

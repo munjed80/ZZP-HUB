@@ -99,7 +99,7 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
           <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-accent via-warning to-success"></div>
           <h1 className="text-3xl font-bold text-foreground">Urenregistratie</h1>
         </div>
-        <p className="text-sm text-muted-foreground font-medium pl-15">
+        <p className="text-sm text-muted-foreground font-medium">
           Schrijf je uren richting het 1225-criterium en houd overzicht over je voortgang.
         </p>
       </div>

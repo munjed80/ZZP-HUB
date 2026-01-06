@@ -101,7 +101,7 @@ export default async function DashboardPagina() {
           <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-primary via-accent to-success"></div>
           <h1 className="text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">Dashboard</h1>
         </div>
-        <p className="text-sm text-muted-foreground font-medium pl-15">
+        <p className="text-sm text-muted-foreground font-medium">
           Financieel overzicht {now.getFullYear()}
         </p>
       </div>

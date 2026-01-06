@@ -197,7 +197,7 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
               <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-destructive via-accent to-warning"></div>
               <h1 className="text-3xl font-bold text-foreground">Uitgaven</h1>
             </div>
-            <p className="text-sm text-muted-foreground font-medium pl-15">
+            <p className="text-sm text-muted-foreground font-medium">
               Registreer kosten, bereken BTW automatisch en bewaar een link naar je bonnetjes.
             </p>
           </div>

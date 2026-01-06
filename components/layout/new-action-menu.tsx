@@ -78,7 +78,7 @@ export function NewActionMenu() {
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <span className="absolute inset-0 rounded-full bg-gradient-to-r from-accent/0 via-accent/20 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 animate-pulse" />
+        <span className="absolute inset-0 rounded-full bg-gradient-to-r from-accent/0 via-accent/20 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
         <Plus className="relative z-10 h-4 w-4 transition-transform duration-200 group-hover:rotate-90" aria-hidden />
         <span className="relative z-10 hidden sm:inline">Nieuw</span>
       </button>

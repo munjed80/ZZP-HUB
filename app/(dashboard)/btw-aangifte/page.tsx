@@ -80,7 +80,7 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Searc
           <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-warning via-accent to-primary"></div>
           <h1 className="text-3xl font-bold text-foreground">BTW-aangifte</h1>
         </div>
-        <p className="text-sm text-muted-foreground font-medium pl-15">
+        <p className="text-sm text-muted-foreground font-medium">
           Bereken je aangifte per kwartaal met officiële rubrieken zoals bij de Belastingdienst.
         </p>
       </div>
