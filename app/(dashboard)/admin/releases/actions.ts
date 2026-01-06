@@ -62,6 +62,14 @@ export async function updateRelease(releaseId: string, data: unknown) {
     return { success: false, message: "Release niet gevonden." };
   }
 
+  // Check if version is being changed and if new version already exists
+  if (parsed.version !== release.version) {
+    const existingVersion = await prisma.release.findUnique({ where: { version: parsed.version } });
+    if (existingVersion) {
+      return { success: false, message: "Deze versie bestaat al." };
+    }
+  }
+
   await prisma.release.update({
     where: { id: releaseId },
     data: {
@@ -95,14 +103,21 @@ export async function deleteRelease(releaseId: string) {
 export async function toggleReleasePublished(releaseId: string, isPublished: boolean) {
   await assertSuperAdmin();
   
+  const release = await prisma.release.findUnique({ 
+    where: { id: releaseId }, 
+    select: { releaseDate: true } 
+  });
+  
+  if (!release) {
+    return { success: false, message: "Release niet gevonden." };
+  }
+  
   await prisma.release.update({
     where: { id: releaseId },
     data: { 
       isPublished,
-      releaseDate: isPublished && !await prisma.release.findUnique({ 
-        where: { id: releaseId }, 
-        select: { releaseDate: true } 
-      }).then(r => r?.releaseDate) ? new Date() : undefined
+      // Only set releaseDate if publishing and no date exists
+      releaseDate: isPublished && !release.releaseDate ? new Date() : release.releaseDate
     },
   });
   
