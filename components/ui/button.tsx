@@ -17,9 +17,9 @@ const baseClasses = [
 ].join(" ");
 
 const variantClasses: Record<ButtonVariant, string> = {
-  // Primary - Green base with amber accent glow (inspired by hero CTA)
+  // Primary - Emerald with dark text for better contrast (WCAG AA compliant)
   primary:
-    "group bg-gradient-to-r from-primary to-primary/90 text-primary-foreground border-2 border-primary/90 shadow-[0_16px_36px_-18px_rgba(var(--primary),0.75)] hover:shadow-[0_20px_42px_-16px_rgba(var(--primary),0.85)] hover:scale-[1.02] overflow-hidden",
+    "group bg-gradient-to-r from-primary to-primary/95 text-primary-foreground border-2 border-primary/90 shadow-[0_16px_36px_-18px_rgba(var(--primary),0.75)] hover:shadow-[0_20px_42px_-16px_rgba(var(--primary),0.85)] hover:scale-[1.02] overflow-hidden",
 
   // Secondary - Subtle surface with border
   secondary:

@@ -29,19 +29,36 @@ export function Popover({
   const popoverRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // Handle click outside to close
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    if (!open) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
-    }
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
     };
+
+    // Use capture phase to handle clicks before they propagate
+    document.addEventListener("mousedown", handleClickOutside, true);
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside, true);
+    };
+  }, [open, setOpen]);
+
+  // Handle Escape key
+  useEffect(() => {
+    if (!open) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [open, setOpen]);
 
   // Handle collision detection and positioning
@@ -133,22 +150,37 @@ export function Popover({
     }
   };
 
+  const handleContentClick = (e: React.MouseEvent) => {
+    // Stop propagation to prevent closing when clicking inside the popover
+    e.stopPropagation();
+  };
+
   return (
     <div className="relative inline-block" ref={popoverRef}>
       <div onClick={() => setOpen(!open)} className="cursor-pointer">
         {trigger}
       </div>
       {open && (
-        <div
-          ref={contentRef}
-          className={cn(
-            "absolute z-50 min-w-[200px] rounded-xl border border-border bg-popover shadow-xl",
-            getSideClasses(),
-            getAlignmentClasses()
-          )}
-        >
-          {children}
-        </div>
+        <>
+          {/* Invisible overlay to capture clicks outside - placed in portal would be better but keeping simple */}
+          <div 
+            className="fixed inset-0 z-40"
+            style={{ pointerEvents: "auto" }}
+            aria-hidden="true"
+          />
+          <div
+            ref={contentRef}
+            onClick={handleContentClick}
+            className={cn(
+              "absolute z-50 min-w-[200px] rounded-xl border border-border bg-popover shadow-xl",
+              getSideClasses(),
+              getAlignmentClasses()
+            )}
+            style={{ pointerEvents: "auto" }}
+          >
+            {children}
+          </div>
+        </>
       )}
     </div>
   );
