@@ -19,8 +19,8 @@ export const metadata: Metadata = {
 function statusInfo(status: InvoiceEmailStatus | string) {
   if (status === InvoiceEmailStatus.BETAALD) return { label: "Betaald", variant: "success" as const };
   if (status === InvoiceEmailStatus.CONCEPT) return { label: "Concept", variant: "muted" as const };
-  if (status === InvoiceEmailStatus.HERINNERING) return { label: "Herinnering", variant: "warning" as const };
-  return { label: "Onbetaald", variant: "info" as const };
+  if (status === InvoiceEmailStatus.HERINNERING) return { label: "Herinnering gestuurd", variant: "warning" as const };
+  return { label: "Openstaand", variant: "primary" as const };
 }
 
 function invoiceAmount(
@@ -62,30 +62,34 @@ export default async function FacturenPagina() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-success via-primary to-accent"></div>
-          <h1 className="text-3xl font-bold text-foreground">Facturen</h1>
+          <div className="h-1.5 w-14 rounded-full bg-gradient-to-r from-primary/90 via-accent/90 to-success/80 shadow-[0_6px_18px_-10px_rgba(16,185,129,0.55)]" />
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Facturen</h1>
         </div>
-        <p className="text-sm text-muted-foreground font-medium">
-          Beheer facturen, verstuur herinneringen en volg betalingen
+        <p className="text-sm text-muted-foreground font-medium max-w-2xl">
+          Beheer facturen, verstuur herinneringen en volg betalingen met een strak, professioneel overzicht.
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Link href="/facturen/nieuw" className={buttonVariants("primary")} data-tour="new-invoice-button">
+      <div className="flex flex-wrap items-center gap-3">
+        <Link
+          href="/facturen/nieuw"
+          className={buttonVariants("primary", "shadow-[0_18px_40px_-20px_rgba(16,185,129,0.55)]")}
+          data-tour="new-invoice-button"
+        >
           Nieuwe factuur
         </Link>
-        <Link href="/facturen/voorbeeld" className={buttonVariants("ghost")}>
+        <Link href="/facturen/voorbeeld" className={buttonVariants("ghost", "border-border/70 bg-card/60")}>
           Voorbeeld PDF
         </Link>
       </div>
 
-      <Card className="p-3 sm:p-5 shadow-lg border-2">
+      <Card className="p-4 sm:p-6 shadow-xl border border-border/80 bg-gradient-to-br from-card to-muted/30">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-bold text-card-foreground flex items-center gap-2">
-              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-success to-primary"></span>
+              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-primary via-accent to-success" />
               Alle facturen
             </CardTitle>
             <Badge variant="primary">{facturen.length}</Badge>
@@ -134,19 +138,19 @@ export default async function FacturenPagina() {
                           <p className="text-sm font-semibold tabular-nums text-foreground">
                             {formatBedrag(invoiceAmount(factuur.lines))}
                           </p>
-                          <p className="text-xs text-warning-foreground mt-0.5">Vervalt {formattedDueDate}</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-300 mt-0.5">Vervalt {formattedDueDate}</p>
                         </div>
-                         <Badge variant={statusInfo(factuur.emailStatus).variant}>
-                           {statusInfo(factuur.emailStatus).label}
-                         </Badge>
-                         <InvoiceActionsMenu
-                           pdfInvoice={pdfInvoice}
-                           invoiceId={factuur.id}
-                           recipientEmail={factuur.client.email}
-                           emailStatus={factuur.emailStatus}
-                           editHref={`/facturen/${factuur.id}/edit`}
-                           shareLink={`/facturen/${factuur.id}`}
-                         />
+                        <Badge variant={statusInfo(factuur.emailStatus).variant} className="shadow-md">
+                          {statusInfo(factuur.emailStatus).label}
+                        </Badge>
+                        <InvoiceActionsMenu
+                          pdfInvoice={pdfInvoice}
+                          invoiceId={factuur.id}
+                          recipientEmail={factuur.client.email}
+                          emailStatus={factuur.emailStatus}
+                          editHref={`/facturen/${factuur.id}/edit`}
+                          shareLink={`/facturen/${factuur.id}`}
+                        />
                       </div>
                     </div>
                   );
@@ -181,22 +185,22 @@ export default async function FacturenPagina() {
                           {statusInfo(factuur.emailStatus).label}
                         </Badge>
                       </div>
-                       <div className="flex items-center justify-between">
-                         <p className="text-xs text-warning-foreground font-semibold">Vervalt {formattedDueDate}</p>
-                         <p className="text-base font-semibold tabular-nums text-foreground">
-                           {formatBedrag(invoiceAmount(factuur.lines))}
-                         </p>
-                       </div>
-                       <div className="mt-3 flex items-center justify-end gap-2">
-                         <InvoiceActionsMenu
-                           pdfInvoice={pdfInvoice}
-                           invoiceId={factuur.id}
-                           recipientEmail={factuur.client.email}
-                           emailStatus={factuur.emailStatus}
-                           editHref={`/facturen/${factuur.id}/edit`}
-                           shareLink={`/facturen/${factuur.id}`}
-                         />
-                       </div>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-semibold text-amber-600 dark:text-amber-300">Vervalt {formattedDueDate}</p>
+                          <p className="text-base font-semibold tabular-nums text-foreground">
+                            {formatBedrag(invoiceAmount(factuur.lines))}
+                          </p>
+                        </div>
+                        <div className="mt-3 flex items-center justify-end gap-2">
+                          <InvoiceActionsMenu
+                            pdfInvoice={pdfInvoice}
+                            invoiceId={factuur.id}
+                            recipientEmail={factuur.client.email}
+                            emailStatus={factuur.emailStatus}
+                            editHref={`/facturen/${factuur.id}/edit`}
+                            shareLink={`/facturen/${factuur.id}`}
+                          />
+                        </div>
                     </div>
                   );
                 })}

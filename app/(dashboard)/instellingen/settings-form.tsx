@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { updateCompanySettings } from "./actions";
 import { companySettingsSchema, type CompanySettingsInput } from "./schema";
@@ -197,13 +198,9 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
             </div>
           </div>
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-70"
-            >
+            <Button type="submit" disabled={isPending} className="min-w-[120px] justify-center shadow-[0_14px_30px_-20px_rgba(16,185,129,0.65)]">
               {isPending ? "Opslaan..." : "Opslaan"}
-            </button>
+            </Button>
           </div>
         </form>
       </CardContent>

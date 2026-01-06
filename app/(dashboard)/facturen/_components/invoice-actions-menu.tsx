@@ -151,16 +151,28 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
 
   const menuContent = (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-2 rounded-xl bg-muted/70 p-3 ring-1 ring-border/60">
+      <div className="flex flex-col gap-2 rounded-2xl bg-gradient-to-br from-primary/10 via-card to-card p-3 ring-1 ring-primary/10 shadow-sm">
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Snel</p>
         {shareLink ? (
-          <Link href={shareLink} className={buttonVariants("ghost", "w-full justify-start gap-2 bg-card")}>
+          <Link
+            href={shareLink}
+            className={buttonVariants(
+              "ghost",
+              "w-full justify-start gap-2 bg-white/70 dark:bg-slate-900/60 border border-primary/20 text-foreground hover:border-primary/40",
+            )}
+          >
             <Eye className="h-4 w-4" aria-hidden />
             Bekijk factuur
           </Link>
         ) : null}
         {editHref ? (
-          <Link href={editHref} className={buttonVariants("ghost", "w-full justify-start gap-2 bg-card")}>
+          <Link
+            href={editHref}
+            className={buttonVariants(
+              "ghost",
+              "w-full justify-start gap-2 bg-white/70 dark:bg-slate-900/60 border border-primary/20 text-foreground hover:border-primary/40",
+            )}
+          >
             <Edit3 className="h-4 w-4" aria-hidden />
             Bewerk factuur
           </Link>
@@ -168,36 +180,51 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
         <InvoicePdfDownloadButton
           invoice={pdfInvoice}
           label="Download PDF"
-          className="w-full justify-start"
+          className="w-full justify-start border border-primary/20 bg-card/60"
           variant="secondary"
           icon={<FileDown className="h-4 w-4" aria-hidden />}
         />
       </div>
 
-      <div className="space-y-2 rounded-xl border border-border p-3 shadow-sm">
+      <div className="space-y-2 rounded-2xl border border-border/70 bg-card/80 p-3 shadow-sm">
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="secondary" onClick={handleShareEmail} className="flex-1 min-w-[140px] justify-start gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleShareEmail}
+            className="flex-1 min-w-[140px] justify-start gap-2 border border-sky-200 text-sky-800 bg-sky-50 dark:bg-sky-950/40 dark:border-sky-800 dark:text-sky-100"
+          >
             <Mail className="h-4 w-4" aria-hidden />
             Deel via e-mail
           </Button>
-          <Button type="button" variant="secondary" onClick={handleShareWhatsApp} className="flex-1 min-w-[140px] justify-start gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleShareWhatsApp}
+            className="flex-1 min-w-[140px] justify-start gap-2 border border-emerald-200 text-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-100"
+          >
             <MessageCircle className="h-4 w-4" aria-hidden />
             Deel via WhatsApp
           </Button>
-          <Button type="button" variant="secondary" onClick={handleNativeShare} className="flex-1 min-w-[140px] justify-start gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleNativeShare}
+            className="flex-1 min-w-[140px] justify-start gap-2 border border-amber-200 text-amber-800 bg-amber-50 dark:bg-amber-950/40 dark:border-amber-800 dark:text-amber-100"
+          >
             <Copy className="h-4 w-4" aria-hidden />
             Deel of kopieer
           </Button>
         </div>
       </div>
 
-      <div className="space-y-3 rounded-xl border border-border p-3 shadow-sm">
+      <div className="space-y-3 rounded-2xl border border-primary/15 bg-gradient-to-br from-card via-card to-muted/40 p-3 shadow-sm">
         {emailStatus === InvoiceEmailStatus.BETAALD ? (
           <Button
             type="button"
             onClick={handleMarkAsUnpaid}
             disabled={isPending}
-            className="w-full justify-center gap-2"
+            className="w-full justify-center gap-2 border border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-100"
             variant="secondary"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Undo2 className="h-4 w-4" />}
@@ -208,7 +235,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
             type="button"
             onClick={handleMarkAsPaid}
             disabled={isPending}
-            className="w-full justify-center gap-2"
+            className="w-full justify-center gap-2 shadow-[0_12px_30px_-18px_rgba(16,185,129,0.65)]"
             variant="primary"
           >
             {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
@@ -221,7 +248,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
           onClick={handleDelete}
           disabled={isPending}
           className="w-full justify-start gap-2"
-          variant="ghost"
+          variant="destructive"
         >
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
           {isPending ? "Verwijderen..." : "Verwijder"}
@@ -238,7 +265,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
       description={`Factuur ${pdfInvoice.invoiceNum}`}
       iconOnly
       ariaLabel="Factuur acties"
-      triggerClassName="h-10 w-10 border border-border text-muted-foreground shadow-none hover:text-primary"
+      triggerClassName="h-10 w-10 rounded-full border border-primary/30 bg-gradient-to-br from-card to-primary/10 text-muted-foreground shadow-sm hover:text-primary"
     >
       {menuContent}
     </EntityActionsMenu>
