@@ -6,6 +6,8 @@ import { MoreVertical, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./button";
 
+const SWIPE_CLOSE_THRESHOLD = 75;
+
 type EntityActionsMenuProps = {
   children: React.ReactNode;
   label?: string;
@@ -16,6 +18,7 @@ type EntityActionsMenuProps = {
   onOpenChange?: (open: boolean) => void;
   iconOnly?: boolean;
   ariaLabel?: string;
+  closeLabel?: string;
 };
 
 export function EntityActionsMenu({
@@ -28,10 +31,12 @@ export function EntityActionsMenu({
   onOpenChange,
   iconOnly = false,
   ariaLabel,
+  closeLabel,
 }: EntityActionsMenuProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const swipeStartY = useRef<number | null>(null);
+  const closeText = closeLabel ?? "Sluiten";
 
   const resolvedOpen = useMemo(() => (open === undefined ? internalOpen : open), [internalOpen, open]);
 
@@ -80,33 +85,41 @@ export function EntityActionsMenu({
   );
 
   const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    swipeStartY.current = event.touches[0]?.clientY ?? null;
+    const firstTouch = event.touches[0];
+    swipeStartY.current = firstTouch ? firstTouch.clientY : null;
   };
 
   const handleTouchMove = (event: TouchEvent<HTMLDivElement>) => {
     if (swipeStartY.current === null) return;
-    const delta = event.touches[0]?.clientY - swipeStartY.current;
-    if (delta > 75) {
+    const currentY = event.touches[0]?.clientY;
+    if (currentY === undefined) return;
+    const delta = currentY - swipeStartY.current;
+    if (delta > SWIPE_CLOSE_THRESHOLD) {
       handleOpenChange(false);
       swipeStartY.current = null;
     }
   };
 
+  const overlayClasses =
+    "fixed inset-0 z-40 bg-foreground/45 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out";
+  const mobileContentBase =
+    "fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[65vh] w-full max-w-xl rounded-t-3xl border border-emerald-200/60 bg-gradient-to-b from-background to-card backdrop-blur-xl data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom";
+  const desktopContentBase =
+    "fixed left-1/2 top-1/2 z-50 w-[420px] max-w-[92vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-emerald-100/60 bg-gradient-to-br from-card to-muted/60 backdrop-blur-2xl data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95";
   const contentClasses = cn(
     "pointer-events-auto bg-card text-card-foreground shadow-2xl focus:outline-none ring-1 ring-border/70 data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out",
-    isMobile
-      ? "fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[65vh] w-full max-w-xl rounded-t-3xl border border-emerald-200/60 bg-gradient-to-b from-background to-card backdrop-blur-xl data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom"
-      : "fixed left-1/2 top-1/2 z-50 w-[420px] max-w-[92vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-emerald-100/60 bg-gradient-to-br from-card to-muted/60 backdrop-blur-2xl data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95",
+    isMobile ? mobileContentBase : desktopContentBase,
   );
 
   return (
     <Dialog.Root open={resolvedOpen} onOpenChange={handleOpenChange}>
       {trigger}
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-foreground/45 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in data-[state=closed]:animate-out data-[state=closed]:fade-out" />
+        <Dialog.Overlay className={overlayClasses} />
         <Dialog.Content
           onTouchStart={isMobile ? handleTouchStart : undefined}
           onTouchMove={isMobile ? handleTouchMove : undefined}
+          onTouchEnd={isMobile ? () => (swipeStartY.current = null) : undefined}
           className={contentClasses}
         >
           <div className={cn("px-4", isMobile ? "pt-3 pb-2" : "pt-4 pb-3")}>
@@ -121,7 +134,7 @@ export function EntityActionsMenu({
                   <button
                     type="button"
                     className="flex h-10 w-10 items-center justify-center rounded-full border border-border/80 text-muted-foreground transition hover:border-primary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                    aria-label="Sluiten"
+                    aria-label={closeText}
                   >
                     <X className="h-5 w-5" aria-hidden />
                   </button>

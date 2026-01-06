@@ -19,7 +19,7 @@ export function Badge({ children, variant = "info", className, ...props }: Badge
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-200",
+        "inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-all duration-200 hover:scale-105 will-change-transform",
         styles[variant],
         className,
       )}

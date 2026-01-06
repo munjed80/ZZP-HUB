@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -37,23 +37,31 @@ type Props = {
 type PendingAction = "markPaid" | "markUnpaid" | "delete" | null;
 
 function buildShareLink(shareLink: string | undefined, invoiceId: string) {
-  if (typeof window === "undefined") {
-    if (shareLink && shareLink.startsWith("http")) return shareLink;
-    return shareLink ?? `/facturen/${invoiceId}`;
-  }
+  const targetPath = shareLink ?? `/facturen/${invoiceId}`;
   if (shareLink && shareLink.startsWith("http")) return shareLink;
-  return `${window.location.origin}${shareLink ?? `/facturen/${invoiceId}`}`;
+  const envOrigin = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "";
+  const origin = typeof window !== "undefined" ? window.location.origin : envOrigin;
+  if (!origin) return targetPath;
+  return `${origin}${targetPath}`;
 }
 
 export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emailStatus, editHref, shareLink }: Props) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [confirmAction, setConfirmAction] = useState<PendingAction>(null);
   const [isPending, startTransition] = useTransition();
 
   const shareTarget = useMemo(() => buildShareLink(shareLink, invoiceId), [shareLink, invoiceId]);
 
-  const runServerAction = (action: PendingAction, fn: () => Promise<{ success?: boolean; message?: string } | undefined>) => {
+  useEffect(() => {
+    if (!menuOpen && confirmAction) {
+      setConfirmAction(null);
+    }
+  }, [confirmAction, menuOpen]);
+
+  const runServerAction = (action: PendingAction, fn: () => Promise<{ success?: boolean; message?: string }>) => {
+    setConfirmAction(null);
     setPendingAction(action);
     startTransition(async () => {
       try {
@@ -65,7 +73,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
           toast.error(result?.message ?? "Er ging iets mis. Probeer opnieuw.");
         }
       } catch (error) {
-        console.error(`Actie ${action} mislukt`, error);
+        const message = error instanceof Error ? error.message : "Onbekende fout";
+        console.error(`Actie ${action} mislukt:`, message);
         toast.error("Actie mislukt. Probeer opnieuw.");
       } finally {
         setPendingAction(null);
@@ -81,8 +90,11 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
     });
 
   const handleMarkAsUnpaid = () => {
-    const confirmed = window.confirm("Weet je zeker dat je deze factuur wilt terugzetten naar onbetaald?");
-    if (!confirmed) return;
+    if (confirmAction !== "markUnpaid") {
+      setConfirmAction("markUnpaid");
+      return;
+    }
+    setConfirmAction(null);
     runServerAction("markUnpaid", async () => {
       const result = await markAsUnpaid(invoiceId);
       if (result?.success) toast.success("Factuur teruggezet naar onbetaald");
@@ -91,8 +103,11 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
   };
 
   const handleDelete = () => {
-    const confirmed = window.confirm("Weet je zeker dat je deze factuur wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.");
-    if (!confirmed) return;
+    if (confirmAction !== "delete") {
+      setConfirmAction("delete");
+      return;
+    }
+    setConfirmAction(null);
     runServerAction("delete", async () => {
       const result = await deleteInvoice(invoiceId);
       if (result?.success) toast.success("Factuur verwijderd");
@@ -241,7 +256,11 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
             variant="secondary"
           >
             {isPending && pendingAction === "markUnpaid" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Undo2 className="h-4 w-4" />}
-            {isPending && pendingAction === "markUnpaid" ? "Bezig..." : "Markeer als onbetaald"}
+            {isPending && pendingAction === "markUnpaid"
+              ? "Bezig..."
+              : confirmAction === "markUnpaid"
+                ? "Klik nogmaals om te bevestigen"
+                : "Markeer als onbetaald"}
           </Button>
         ) : (
           <Button
@@ -265,7 +284,11 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, recipientEmail, emai
             variant="destructive"
           >
             {isPending && pendingAction === "delete" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-            {isPending && pendingAction === "delete" ? "Verwijderen..." : "Verwijder"}
+            {isPending && pendingAction === "delete"
+              ? "Verwijderen..."
+              : confirmAction === "delete"
+                ? "Klik nogmaals om te verwijderen"
+                : "Verwijder"}
           </Button>
         </div>
       </div>
