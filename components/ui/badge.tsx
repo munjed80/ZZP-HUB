@@ -9,7 +9,7 @@ type BadgeProps = {
 export function Badge({ children, variant = "info", className, ...props }: BadgeProps) {
   const styles: Record<NonNullable<BadgeProps["variant"]>, string> = {
     // Info - for "Verzonden" (Sent) invoice status - amber/orange accent
-    info: "bg-accent/15 text-accent-foreground border border-accent/35",
+    info: "bg-accent/15 text-accent border border-accent/35",
     
     // Success - for "Betaald" (Paid) invoice status
     success: "bg-success/15 text-success-foreground border border-success/30",
