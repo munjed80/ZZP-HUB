@@ -165,7 +165,7 @@ const ctaColors = {
 
 const landingCtaBase = [
   "group relative isolate inline-flex min-h-[44px] items-center justify-center gap-2 overflow-hidden rounded-xl",
-  // Border: teal with slight transparency
+  // Border: green with slight transparency
   "border border-[#166534]/35",
   // Gradient: natural greens
   `bg-[linear-gradient(135deg,${ctaColors.from}_0%,${ctaColors.to}_100%)]`,
@@ -179,7 +179,7 @@ const landingCtaBase = [
   "hover:bg-[linear-gradient(135deg,#16a34a_0%,#15803d_100%)]",
   "hover:shadow-[0_16px_40px_-16px_rgba(34,197,94,0.85)]",
   "hover:brightness-110",
-  // Focus: strong teal outline ring for accessibility
+  // Focus: strong emerald outline ring for accessibility
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2",
   // Active: slight press-down transform
   "active:scale-[0.98] active:shadow-[0_8px_24px_-14px_rgba(34,197,94,0.7)]",
