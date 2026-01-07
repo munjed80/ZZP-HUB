@@ -29,14 +29,8 @@ export default function RegisterPagina() {
         return;
       }
 
-      await signIn("credentials", {
-        redirect: false,
-        email: data.email,
-        password: data.password,
-      });
-
-      router.push("/dashboard");
-      router.refresh();
+      // Redirect to check email page instead of auto-login
+      router.push("/check-email");
     });
   };
 

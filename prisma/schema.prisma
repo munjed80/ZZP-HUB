@@ -46,21 +46,39 @@ enum UserRole {
 }
 
 model User {
-  id             String          @id @default(uuid())
-  email          String          @unique
-  password       String
-  naam           String?
-  role           UserRole        @default(COMPANY_ADMIN)
-  isSuspended    Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  companyProfile CompanyProfile?
-  clients        Client[]
-  invoices       Invoice[]
-  quotations     Quotation[]
-  expenses       Expense[]
-  timeEntries    TimeEntry[]
-  events         Event[]
+  id                        String                   @id @default(uuid())
+  email                     String                   @unique
+  password                  String
+  naam                      String?
+  role                      UserRole                 @default(COMPANY_ADMIN)
+  isSuspended               Boolean                  @default(false)
+  
+  // Email verification
+  emailVerified             Boolean                  @default(false)
+  emailVerificationToken    String?
+  emailVerificationExpiry   DateTime?
+  emailVerificationSentAt   DateTime?
+  
+  // Onboarding
+  onboardingStep            Int                      @default(0)
+  onboardingCompleted       Boolean                  @default(false)
+  
+  // Two-Factor Authentication
+  twoFactorEnabled          Boolean                  @default(false)
+  twoFactorSecret           String?
+  recoveryCodes             String?
+  
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+  
+  companyProfile            CompanyProfile?
+  clients                   Client[]
+  invoices                  Invoice[]
+  quotations                Quotation[]
+  expenses                  Expense[]
+  timeEntries               TimeEntry[]
+  events                    Event[]
+  verificationTokens        EmailVerificationToken[]
 }
 
 model CompanyProfile {
@@ -183,6 +201,18 @@ model Event {
   end         DateTime
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
 }
 
 enum ReleaseCategory {

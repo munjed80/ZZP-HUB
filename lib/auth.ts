@@ -16,6 +16,8 @@ interface AuthorizeResult {
   naam: string | null;
   role: UserRole;
   isSuspended: boolean;
+  emailVerified: boolean;
+  onboardingCompleted: boolean;
 }
 
 function isAuthorizeResult(user: unknown): user is AuthorizeResult {
@@ -25,7 +27,9 @@ function isAuthorizeResult(user: unknown): user is AuthorizeResult {
     typeof candidate.id === "string" &&
     typeof candidate.email === "string" &&
     typeof candidate.role === "string" &&
-    typeof candidate.isSuspended === "boolean"
+    typeof candidate.isSuspended === "boolean" &&
+    typeof candidate.emailVerified === "boolean" &&
+    typeof candidate.onboardingCompleted === "boolean"
   );
 }
 
@@ -69,6 +73,8 @@ export async function authorize(
         naam: true,
         role: true,
         isSuspended: true,
+        emailVerified: true,
+        onboardingCompleted: true,
       },
     });
 
@@ -122,6 +128,9 @@ export async function authorize(
       naam: user.naam,
       role: user.role,
       isSuspended: user.isSuspended,
+      emailVerified: user.emailVerified,
+      onboardingCompleted: user.onboardingCompleted,
+    };
     };
   } catch (error) {
     console.error("Error during authorization:", error);
@@ -160,6 +169,8 @@ export const authOptions: NextAuthOptions = {
            name: result.naam,
            role: result.role,
            isSuspended: result.isSuspended,
+           emailVerified: result.emailVerified,
+           onboardingCompleted: result.onboardingCompleted,
          };
        }
      })
@@ -170,6 +181,8 @@ export const authOptions: NextAuthOptions = {
          token.id = user.id;
          token.role = user.role;
          token.isSuspended = user.isSuspended;
+         token.emailVerified = user.emailVerified;
+         token.onboardingCompleted = user.onboardingCompleted;
         }
         return token;
       },
@@ -178,6 +191,8 @@ export const authOptions: NextAuthOptions = {
          session.user.id = token.id as string;
          session.user.role = token.role as UserRole;
          session.user.isSuspended = Boolean(token.isSuspended);
+         session.user.emailVerified = Boolean(token.emailVerified);
+         session.user.onboardingCompleted = Boolean(token.onboardingCompleted);
         }
         return session;
       }
