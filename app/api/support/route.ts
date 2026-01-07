@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
+import { formatFromAddress, resolveFromEmail } from "@/lib/email";
 
 const supportSchema = z.object({
   name: z.string().min(2).max(120).trim(),
@@ -28,11 +29,11 @@ export async function POST(request: Request) {
 
   const { name, email, subject, message, context, screenshotUrl } = parsed.data;
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const fromEmail = process.env.RESEND_FROM_EMAIL ?? "support@zzp-hub.nl";
-  const toEmail = process.env.SUPPORT_EMAIL ?? fromEmail;
+  const baseFrom = resolveFromEmail();
+  const toEmail = process.env.SUPPORT_EMAIL ?? baseFrom;
 
   const { error } = await resend.emails.send({
-    from: `ZZP HUB Support <${fromEmail}>`,
+    from: formatFromAddress("ZZP HUB Support"),
     to: toEmail,
     replyTo: email,
     subject: `[Support] ${subject}`,

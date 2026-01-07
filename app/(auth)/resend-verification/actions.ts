@@ -73,7 +73,7 @@ export async function resendVerificationEmail() {
       console.log("Verification link (DEV):", verificationUrl);
     }
     
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: user.email,
       subject: 'Verifieer je e-mailadres - Matrixtop',
       react: VerificationEmail({
@@ -81,6 +81,15 @@ export async function resendVerificationEmail() {
         userName: user.naam || undefined,
       }),
     });
+
+    if (!emailResult.success) {
+      console.error("Verification resend failed", {
+        userId: user.id,
+        email: user.email,
+        error: emailResult.error,
+      });
+      return { success: false, message: "Het versturen van de verificatie-e-mail is mislukt. Probeer het later opnieuw." };
+    }
 
     return { success: true };
   } catch (error) {

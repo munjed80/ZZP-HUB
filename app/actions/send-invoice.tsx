@@ -6,6 +6,7 @@ import InvoiceEmail from "@/components/emails/InvoiceEmail";
 import { generateInvoicePdf, mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { formatFromAddress } from "@/lib/email";
 
 const APP_BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ??
@@ -14,7 +15,6 @@ const APP_BASE_URL =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : process.env.APP_FALLBACK_URL ?? "https://zzp-hub.nl");
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "no-reply@zzp-hub.nl";
 const ALLOWED_LOGO_HOSTS = (process.env.ALLOWED_LOGO_HOSTS ?? "")
   .split(",")
   .map((host) => host.trim().toLowerCase())
@@ -87,8 +87,9 @@ export async function sendInvoiceEmail(invoiceId: string) {
     })();
 
     const resend = new Resend(process.env.RESEND_API_KEY);
+    const fromAddress = formatFromAddress(senderName);
     const { error } = await resend.emails.send({
-      from: `${senderName} <${FROM_EMAIL}>`,
+      from: fromAddress,
       replyTo: replyToAddress || undefined,
       to: recipientEmail,
       subject: `Factuur ${pdfInvoice.invoiceNum} van ${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"}`,
@@ -112,7 +113,11 @@ export async function sendInvoiceEmail(invoiceId: string) {
     });
 
     if (error) {
-      console.error("Verzenden van factuur e-mail mislukt", error);
+      console.error("Verzenden van factuur e-mail mislukt", {
+        error,
+        invoiceId,
+        recipient: recipientEmail,
+      });
       return { success: false, message: "Het verzenden van de factuur is mislukt." };
     }
 

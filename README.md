@@ -98,16 +98,24 @@ WHERE email = 'test@example.com';
    - `DATABASE_URL`: PostgreSQL connection string
    - `NEXTAUTH_SECRET`: Random secret voor sessie-encryptie
    - `NEXTAUTH_URL`: Productie URL (bijv. https://app.example.com)
-   - `RESEND_API_KEY` (optioneel): Voor echte emails
+   - `RESEND_API_KEY`: Voor echte emails
+   - `RESEND_FROM_EMAIL` of `EMAIL_FROM` (optioneel): Afzendernaam/e-mail voor alle uitgaande mails
+   - `APP_URL` of `NEXT_PUBLIC_APP_URL`: Basis-URL voor links in e-mails
    - `KVK_API_KEY` (optioneel): Voor echte KVK integratie
 
 2. Build en start + migrations:
    ```bash
    npm run build
-   npm run deploy:prod
+   npm start
    ```
-   `deploy:prod` controleert of `_prisma_migrations` bestaat (zo niet, dan wordt de baseline gemarkeerd), draait `prisma migrate deploy`, verifieert de nieuwe kolommen en start daarna de standalone server (`node .next/standalone/server.js`).
-   Coolify start command: `npm run deploy:prod` (zorgt dat migraties vóór start draaien).
+   `npm start` gebruikt `scripts/start-prod.mjs`: valideert verplichte env vars, draait `prisma migrate deploy` + `prisma generate`, doet een DB-connectivity check (`SELECT 1`) en start vervolgens de standalone server (`node .next/standalone/server.js`) op `HOST=0.0.0.0`.
+   Coolify start command: **`npm start`** (migraties worden automatisch vóór de serverstart uitgevoerd).
+
+3. Snelle rooktest na deploy:
+   ```bash
+   SMOKE_BASE_URL="https://jouw-domein" npm run smoke:prod
+   ```
+   Controleert `/`, `/api/health`, `/sw.js` en `/manifest.webmanifest` op status 200.
 
 ## SEO & Icons Verificatie
 

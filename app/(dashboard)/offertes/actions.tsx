@@ -8,6 +8,7 @@ import QuotationEmail from "@/components/emails/QuotationEmail";
 import { InvoicePDF, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
+import { formatFromAddress } from "@/lib/email";
 import { quotationSchema, type QuotationFormValues, type QuotationLineValues } from "./schema";
 
 const APP_BASE_URL =
@@ -17,7 +18,6 @@ const APP_BASE_URL =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : process.env.APP_FALLBACK_URL ?? "https://zzp-hub.nl");
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "no-reply@zzp-hub.nl";
 const ALLOWED_LOGO_HOSTS = (process.env.ALLOWED_LOGO_HOSTS ?? "zzp-hub.nl")
   .split(",")
   .map((host) => host.trim().toLowerCase())
@@ -375,8 +375,9 @@ export async function sendQuotationEmail(quotationId: string) {
     })();
 
     const resend = new Resend(process.env.RESEND_API_KEY);
+    const fromAddress = formatFromAddress(pdfData.companyProfile?.companyName);
     const { error } = await resend.emails.send({
-      from: `${pdfData.companyProfile?.companyName ?? "ZZP HUB"} <${FROM_EMAIL}>`,
+      from: fromAddress,
       to: quotation.client.email,
       subject: `Offerte ${pdfData.invoiceNum} van ${pdfData.companyProfile?.companyName ?? "ZZP HUB"}`,
       react: (
@@ -399,7 +400,11 @@ export async function sendQuotationEmail(quotationId: string) {
     });
 
     if (error) {
-      console.error("Verzenden van offerte e-mail mislukt", error);
+      console.error("Verzenden van offerte e-mail mislukt", {
+        error,
+        quotationId,
+        recipient: quotation.client.email,
+      });
       return { success: false, message: "Het verzenden van de offerte is mislukt." };
     }
 
