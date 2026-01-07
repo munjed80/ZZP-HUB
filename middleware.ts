@@ -8,18 +8,16 @@ const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-require
 // Protected route prefixes (app area only)
 const protectedPrefixes = [
   '/dashboard',
+  '/onboarding',
   '/facturen',
-  '/uitgaven',
-  '/agenda',
-  '/btw-aangifte',
-  '/instellingen',
+  '/offertes',
   '/relaties',
   '/uren',
-  '/offertes',
-  '/support',
+  '/uitgaven',
+  '/btw-aangifte',
+  '/agenda',
+  '/instellingen',
   '/admin',
-  '/app',
-  '/onboarding',
 ];
 
 const isProtectedPath = (pathname: string) =>
@@ -64,5 +62,17 @@ export async function middleware(request: NextRequest) {
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: protectedPrefixes.map((route) => `${route}/:path*`),
+  matcher: [
+    '/dashboard/:path*',
+    '/onboarding/:path*',
+    '/facturen/:path*',
+    '/offertes/:path*',
+    '/relaties/:path*',
+    '/uren/:path*',
+    '/uitgaven/:path*',
+    '/btw-aangifte/:path*',
+    '/agenda/:path*',
+    '/instellingen/:path*',
+    '/admin/:path*',
+  ],
 };
