@@ -12,6 +12,11 @@ type PortalPopoverProps = {
   contentClassName?: string;
 };
 
+// Constants for popover dimensions
+const ESTIMATED_POPOVER_HEIGHT = 300;
+const ESTIMATED_POPOVER_WIDTH = 240;
+const VIEWPORT_PADDING = 8;
+
 export function PortalPopover({
   trigger,
   children,
@@ -31,9 +36,6 @@ export function PortalPopover({
   // Track mounted state for portal - using queueMicrotask to avoid sync setState in effect
   useEffect(() => {
     queueMicrotask(() => setMounted(true));
-    return () => {
-      setMounted(false);
-    };
   }, []);
 
   // Calculate position based on trigger element
@@ -44,11 +46,10 @@ export function PortalPopover({
       if (!triggerRef.current) return;
 
       const triggerRect = triggerRef.current.getBoundingClientRect();
-      const contentHeight = contentRef.current?.offsetHeight || 300; // estimate if not yet rendered
-      const contentWidth = contentRef.current?.offsetWidth || 240;
+      const contentHeight = contentRef.current?.offsetHeight || ESTIMATED_POPOVER_HEIGHT;
+      const contentWidth = contentRef.current?.offsetWidth || ESTIMATED_POPOVER_WIDTH;
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
-      const padding = 8;
 
       // Calculate vertical position
       let top = triggerRect.bottom + 8; // default: below trigger
@@ -58,20 +59,20 @@ export function PortalPopover({
       const spaceBelow = viewportHeight - triggerRect.bottom;
       const spaceAbove = triggerRect.top;
 
-      if (spaceBelow < contentHeight + padding && spaceAbove > spaceBelow) {
+      if (spaceBelow < contentHeight + VIEWPORT_PADDING && spaceAbove > spaceBelow) {
         // Open upward if not enough space below and more space above
         top = triggerRect.top - contentHeight - 8;
         openUpward = true;
       }
 
       // Clamp top to viewport
-      top = Math.max(padding, Math.min(top, viewportHeight - contentHeight - padding));
+      top = Math.max(VIEWPORT_PADDING, Math.min(top, viewportHeight - contentHeight - VIEWPORT_PADDING));
 
       // Calculate horizontal position (align to right of trigger)
       let left = triggerRect.right - contentWidth;
 
       // Clamp left to viewport
-      left = Math.max(padding, Math.min(left, viewportWidth - contentWidth - padding));
+      left = Math.max(VIEWPORT_PADDING, Math.min(left, viewportWidth - contentWidth - VIEWPORT_PADDING));
 
       setPosition({ top, left, openUpward });
     };
@@ -105,12 +106,13 @@ export function PortalPopover({
       }
     };
 
-    // Use capture phase and small delay to handle clicks properly
-    setTimeout(() => {
+    // Add event listener after render to avoid immediate trigger
+    const timeoutId = window.setTimeout(() => {
       document.addEventListener("mousedown", handleClickOutside, true);
     }, 0);
 
     return () => {
+      window.clearTimeout(timeoutId);
       document.removeEventListener("mousedown", handleClickOutside, true);
     };
   }, [open, setOpen]);
