@@ -166,6 +166,32 @@ Then restart the application.
 
 ## Verification
 
+### Automated Pre-Deployment Check
+
+Before deploying, run the comprehensive pre-deployment check:
+
+```bash
+npm run pre-deploy
+```
+
+This checks:
+- Environment variables
+- Dependencies and build files
+- Configuration files
+- Package.json scripts
+- Middleware configuration
+- Prisma schema
+
+### Automated Middleware Tests
+
+```bash
+npm run test:middleware
+```
+
+This validates that all public routes are correctly configured.
+
+### Manual Verification
+
 ### 1. Check Application Health
 
 ```bash
