@@ -240,7 +240,12 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
   };
 
   return (
-    <Tabs defaultValue={DEFAULT_TAB} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+    <Tabs
+      defaultValue={DEFAULT_TAB}
+      value={activeTab}
+      onValueChange={setActiveTab}
+      className="space-y-6 pb-[calc(88px+env(safe-area-inset-bottom))]"
+    >
       <TabsList className="flex-wrap gap-2 border border-border/80 bg-card/80 p-1 shadow-sm rounded-2xl">
         <TabsTrigger
           value="profiel"
@@ -268,7 +273,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="profiel" className="pb-[calc(88px+env(safe-area-inset-bottom))]">
+      <TabsContent value="profiel">
         <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
           <div className="space-y-4">
             <Card className="bg-card border border-border/70 shadow-sm">
@@ -540,7 +545,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     <p className="mt-1">Volledige toegang tot alle functies</p>
                   </div>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-3 md:grid-cols-3">
                   <Button
                     type="button"
                     onClick={() => setSubscriptionModal("manage")}
