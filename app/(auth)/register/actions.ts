@@ -50,7 +50,7 @@ export async function registerCompany(values: RegisterInput) {
     });
 
     // Send verification email
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`;
     
     if (shouldLogAuth) {
@@ -59,7 +59,7 @@ export async function registerCompany(values: RegisterInput) {
     
     await sendEmail({
       to: data.email,
-      subject: 'Verifieer je e-mailadres - ZZP-HUB',
+      subject: 'Verifieer je e-mailadres - Matrixtop',
       react: VerificationEmail({
         verificationUrl,
         userName: data.bedrijfsnaam,
