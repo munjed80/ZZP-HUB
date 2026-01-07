@@ -94,10 +94,59 @@ WHERE email = 'test@example.com';
 - [ ] Client record bestaat
 
 ### Productie Deployment
+
+#### Coolify (Standalone Mode)
+
+Voor volledige deployment instructies, zie **[docs/DEPLOY_COOLIFY.md](docs/DEPLOY_COOLIFY.md)**.
+
+**Quick Start:**
+
+1. Environment variables instellen:
+   - `DATABASE_URL`: PostgreSQL connection string
+   - `NEXTAUTH_SECRET`: Random secret (`openssl rand -base64 32`)
+   - `NEXTAUTH_URL` of `APP_BASE_URL`: Productie URL (bijv. https://app.zzp-hub.nl)
+   - `RESEND_API_KEY`: Voor email verificatie
+   - `EMAIL_FROM`: Afzender email adres
+
+2. Build command:
+   ```bash
+   npm install && npm run build
+   ```
+
+3. Start command:
+   ```bash
+   ./scripts/migrate-and-start.sh
+   ```
+   
+   Of handmatig:
+   ```bash
+   npx prisma migrate deploy && npx prisma generate && node .next/standalone/server.js
+   ```
+
+4. Database migraties uitvoeren (eerste keer of bij update):
+   ```bash
+   npm run db:migrate
+   ```
+
+5. Deployment verifiëren:
+   ```bash
+   npm run verify:endpoints
+   # Of handmatig:
+   npm run db:status
+   ```
+
+**Belangrijke opmerkingen:**
+- Gebruik NIET `next start` met standalone output - gebruik `node .next/standalone/server.js`
+- Prisma schema en migrations worden automatisch gekopieerd naar `.next/standalone/` tijdens build
+- Landing page (/) is altijd publiek toegankelijk
+- PWA assets (sw.js, manifest.webmanifest) zijn publiek toegankelijk
+
+#### Andere Deployment Platforms
+
 1. Zorg voor environment variables:
    - `DATABASE_URL`: PostgreSQL connection string
    - `NEXTAUTH_SECRET`: Random secret voor sessie-encryptie
-   - `NEXTAUTH_URL`: Productie URL (bijv. https://app.example.com)
+   - `NEXTAUTH_URL` of `APP_BASE_URL`: Productie URL (bijv. https://app.example.com)
    - `RESEND_API_KEY` (optioneel): Voor echte emails
    - `KVK_API_KEY` (optioneel): Voor echte KVK integratie
 

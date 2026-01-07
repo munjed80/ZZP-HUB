@@ -3,10 +3,10 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/login', '/register', '/check-email', '/verify-email', '/verify-required', '/resend-verification', '/offline'];
+const publicRoutes = ['/', '/login', '/register', '/check-email', '/verify-email', '/verify-required', '/resend-verification', '/offline', '/pricing', '/about'];
 
 // Define public assets that should be accessible without authentication
-const publicAssets = ['/sw.js', '/manifest.webmanifest', '/offline.html', '/robots.txt', '/sitemap.xml'];
+const publicAssets = ['/sw.js', '/manifest.webmanifest', '/offline.html', '/robots.txt', '/sitemap.xml', '/favicon.ico'];
 
 // Define routes that should be accessible even without email verification
 const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-required', '/resend-verification'];

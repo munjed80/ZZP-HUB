@@ -5,11 +5,16 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
+    "start:dev": "next start",
     "lint": "npx eslint .",
     "postbuild": "node scripts/postbuild.js",
+    "db:migrate": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:status": "prisma migrate status",
     "verify:prod": "node scripts/verify-production.mjs",
-    "verify:urls": "node scripts/verify-production.mjs"
+    "verify:urls": "node scripts/verify-production.mjs",
+    "verify:endpoints": "bash scripts/verify-endpoints.sh"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
