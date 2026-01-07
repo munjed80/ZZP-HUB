@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   const toEmail = process.env.SUPPORT_EMAIL ?? baseFrom;
 
   const { error } = await resend.emails.send({
-    from: formatFromAddress("ZZP HUB Support") || baseFrom,
+    from: formatFromAddress("ZZP HUB Support"),
     to: toEmail,
     replyTo: email,
     subject: `[Support] ${subject}`,

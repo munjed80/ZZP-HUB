@@ -10,6 +10,8 @@ const REQUIRED_ENV = [
   "NEXTAUTH_URL",
   "RESEND_API_KEY",
 ];
+const DEFAULT_HOST = "0.0.0.0";
+const DEFAULT_PORT = "3000";
 
 function validateEnv() {
   const missing = REQUIRED_ENV.filter(
@@ -39,19 +41,34 @@ function validateEnv() {
 
 async function runCommand(command, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { stdio: "inherit", shell: false });
+    let stderr = "";
+    const child = spawn(command, args, {
+      stdio: ["inherit", "inherit", "pipe"],
+      shell: false,
+    });
+
+    child.stderr?.on("data", (chunk) => {
+      stderr += chunk.toString();
+      process.stderr.write(chunk);
+    });
     child.on("exit", (code) => {
       if (code === 0) return resolve(undefined);
-      reject(new Error(`${command} ${args.join(" ")} exited with code ${code}`));
+      reject(
+        new Error(
+          `${command} ${args.join(" ")} exited with code ${code}. ${stderr ? `Error: ${stderr.trim()}` : ""}`,
+        ),
+      );
     });
-    child.on("error", reject);
+    child.on("error", (error) => {
+      reject(new Error(`Failed to start ${command}: ${error.message}`));
+    });
   });
 }
 
 async function verifyDatabase() {
   const prisma = new PrismaClient();
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await prisma.$queryRawUnsafe("SELECT 1 as ok");
     console.log("[start-prod] Database connectivity check: OK");
   } catch (error) {
     console.error("[start-prod] Database connectivity check failed:", error);
@@ -70,8 +87,8 @@ async function startServer() {
     process.exit(1);
   }
 
-  const host = process.env.HOST || "0.0.0.0";
-  const port = process.env.PORT || "3000";
+  const host = process.env.HOST || DEFAULT_HOST;
+  const port = process.env.PORT || DEFAULT_PORT;
 
   console.log(`[start-prod] Starting server on ${host}:${port}`);
 

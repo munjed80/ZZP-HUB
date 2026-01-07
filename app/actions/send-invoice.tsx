@@ -6,7 +6,7 @@ import InvoiceEmail from "@/components/emails/InvoiceEmail";
 import { generateInvoicePdf, mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { formatFromAddress, resolveFromEmail } from "@/lib/email";
+import { formatFromAddress } from "@/lib/email";
 
 const APP_BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ??
@@ -87,7 +87,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
     })();
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const fromAddress = formatFromAddress(senderName) || resolveFromEmail();
+    const fromAddress = formatFromAddress(senderName);
     const { error } = await resend.emails.send({
       from: fromAddress,
       replyTo: replyToAddress || undefined,

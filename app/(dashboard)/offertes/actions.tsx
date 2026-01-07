@@ -8,7 +8,7 @@ import QuotationEmail from "@/components/emails/QuotationEmail";
 import { InvoicePDF, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUserId } from "@/lib/auth";
-import { formatFromAddress, resolveFromEmail } from "@/lib/email";
+import { formatFromAddress } from "@/lib/email";
 import { quotationSchema, type QuotationFormValues, type QuotationLineValues } from "./schema";
 
 const APP_BASE_URL =
@@ -375,7 +375,7 @@ export async function sendQuotationEmail(quotationId: string) {
     })();
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const fromAddress = formatFromAddress(pdfData.companyProfile?.companyName) || resolveFromEmail();
+    const fromAddress = formatFromAddress(pdfData.companyProfile?.companyName);
     const { error } = await resend.emails.send({
       from: fromAddress,
       to: quotation.client.email,

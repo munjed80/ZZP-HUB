@@ -3,6 +3,9 @@ import { render } from "@react-email/render";
 import type { ReactElement } from "react";
 
 const DEFAULT_FROM = "Matrixtop <no-reply@matrixtop.com>";
+const DEFAULT_FROM_EMAIL = DEFAULT_FROM.match(/<([^>]+)>/)?.[1] || "no-reply@matrixtop.com";
+const EMAIL_PATTERN = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+let resendClient: Resend | null = null;
 
 export function resolveFromEmail() {
   return (
@@ -16,9 +19,23 @@ export function formatFromAddress(senderName?: string) {
   const base = resolveFromEmail();
   if (!senderName) return base;
 
-  const match = base.match(/<([^>]+)>/);
-  const email = match ? match[1] : base;
+  const normalizedBase =
+    EMAIL_PATTERN.test(base) || base.includes("<") ? base : DEFAULT_FROM_EMAIL;
+  const match = normalizedBase.match(/<([^>]+)>/);
+  const candidateEmail = match ? match[1] : normalizedBase;
+  const email = EMAIL_PATTERN.test(candidateEmail)
+    ? candidateEmail
+    : DEFAULT_FROM_EMAIL;
+
   return `${senderName} <${email}>`;
+}
+
+function getResendClient() {
+  if (!resendClient && process.env.RESEND_API_KEY) {
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+
+  return resendClient;
 }
 
 interface SendEmailOptions {
@@ -56,7 +73,10 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
       return { success: true, messageId: "dev-mode" };
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = getResendClient();
+    if (!resend) {
+      return { success: false, error: new Error("RESEND client unavailable") };
+    }
 
     const result = await resend.emails.send({
       from,

@@ -7,10 +7,19 @@ const baseUrl =
   `http://localhost:${process.env.PORT || 3000}`;
 
 const routes = ["/", "/api/health", "/sw.js", "/manifest.webmanifest"];
+const parsedTimeout = Number.parseInt(process.env.SMOKE_TIMEOUT_MS ?? "", 10);
+const TIMEOUT_MS = Number.isFinite(parsedTimeout) ? parsedTimeout : 10000;
 
 async function check(url) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, {
+      cache: "no-store",
+      signal: controller.signal,
+      headers: { "User-Agent": "smoke-test/1.0" },
+    });
     if (!res.ok) {
       throw new Error(`Status ${res.status}`);
     }
@@ -18,6 +27,8 @@ async function check(url) {
   } catch (error) {
     console.error(`[smoke] FAIL ${url}:`, error.message);
     process.exitCode = 1;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
