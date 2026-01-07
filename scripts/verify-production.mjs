@@ -17,6 +17,26 @@
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
+// HTTP status code constants
+const HTTP_STATUS = {
+  OK: 200,
+  MOVED_PERMANENTLY: 301,
+  FOUND: 302,
+  SEE_OTHER: 303,
+  TEMPORARY_REDIRECT: 307,
+  PERMANENT_REDIRECT: 308,
+  UNAUTHORIZED: 401,
+  NOT_FOUND: 404,
+};
+
+// Redirect status codes
+const REDIRECT_CODES = [
+  HTTP_STATUS.FOUND,
+  HTTP_STATUS.SEE_OTHER,
+  HTTP_STATUS.TEMPORARY_REDIRECT,
+  HTTP_STATUS.PERMANENT_REDIRECT,
+];
+
 // ANSI color codes for terminal output
 const colors = {
   reset: '\x1b[0m',
@@ -75,7 +95,7 @@ async function testHealthCheck() {
     const response = await fetchWithTimeout(`${BASE_URL}/api/health`);
     const data = await response.json();
     
-    if (response.status === 200 && data.status === 'ok') {
+    if (response.status === HTTP_STATUS.OK && data.status === 'ok') {
       addResult('Health Check', 'PASS', 'API is responding');
       return true;
     } else {
@@ -95,7 +115,7 @@ async function testServiceWorker() {
   try {
     const response = await fetchWithTimeout(`${BASE_URL}/sw.js`);
     
-    if (response.status === 200) {
+    if (response.status === HTTP_STATUS.OK) {
       const contentType = response.headers.get('content-type');
       
       if (contentType && contentType.includes('javascript')) {
@@ -105,7 +125,7 @@ async function testServiceWorker() {
         addResult('Service Worker', 'FAIL', `Wrong content-type: ${contentType}`);
         return false;
       }
-    } else if (response.status === 404) {
+    } else if (response.status === HTTP_STATUS.NOT_FOUND) {
       addResult('Service Worker', 'SKIP', 'sw.js not found (may be development mode)');
       return true; // Don't fail in dev mode
     } else {
@@ -125,7 +145,7 @@ async function testWebManifest() {
   try {
     const response = await fetchWithTimeout(`${BASE_URL}/manifest.webmanifest`);
     
-    if (response.status === 200) {
+    if (response.status === HTTP_STATUS.OK) {
       const data = await response.json();
       
       if (data.name && data.icons && Array.isArray(data.icons)) {
@@ -152,13 +172,17 @@ async function testOfflineFallback() {
   try {
     const response = await fetchWithTimeout(`${BASE_URL}/offline`);
     
-    if (response.status === 200) {
+    if (response.status === HTTP_STATUS.OK) {
       const html = await response.text();
-      if (html.includes('offline') || html.includes('Offline')) {
-        addResult('Offline Fallback', 'PASS', '/offline page is accessible');
+      // Check for specific offline page elements
+      const hasOfflineHeading = html.includes('offline') || html.includes('Offline');
+      const hasRetryLink = html.includes('proberen') || html.includes('retry');
+      
+      if (hasOfflineHeading && hasRetryLink) {
+        addResult('Offline Fallback', 'PASS', '/offline page is accessible with expected content');
         return true;
       } else {
-        addResult('Offline Fallback', 'FAIL', 'Page does not contain offline content');
+        addResult('Offline Fallback', 'FAIL', 'Page missing expected offline content or retry link');
         return false;
       }
     } else {
@@ -179,7 +203,7 @@ async function testKVKSearchUnauth() {
     const response = await fetchWithTimeout(`${BASE_URL}/api/kvk/search?q=test`);
     
     // Should return 401 Unauthorized when not logged in
-    if (response.status === 401) {
+    if (response.status === HTTP_STATUS.UNAUTHORIZED) {
       addResult('KVK Search (Unauth)', 'PASS', 'Correctly returns 401 for unauthenticated requests');
       return true;
     } else {
@@ -200,7 +224,7 @@ async function testKVKDetailsUnauth() {
     const response = await fetchWithTimeout(`${BASE_URL}/api/kvk/details?kvk=12345678`);
     
     // Should return 401 Unauthorized when not logged in
-    if (response.status === 401) {
+    if (response.status === HTTP_STATUS.UNAUTHORIZED) {
       addResult('KVK Details (Unauth)', 'PASS', 'Correctly returns 401 for unauthenticated requests');
       return true;
     } else {
@@ -222,8 +246,8 @@ async function testDashboardRedirect() {
       redirect: 'manual', // Don't follow redirects
     });
     
-    // Should redirect to login (302, 303, or 307)
-    if ([302, 303, 307, 308].includes(response.status)) {
+    // Should redirect to login
+    if (REDIRECT_CODES.includes(response.status)) {
       const location = response.headers.get('location');
       if (location && location.includes('/login')) {
         addResult('Dashboard Redirect', 'PASS', 'Unauthenticated users redirected to /login');
@@ -232,7 +256,7 @@ async function testDashboardRedirect() {
         addResult('Dashboard Redirect', 'FAIL', `Redirected to: ${location}`);
         return false;
       }
-    } else if (response.status === 200) {
+    } else if (response.status === HTTP_STATUS.OK) {
       addResult('Dashboard Redirect', 'FAIL', 'Dashboard accessible without auth (security issue!)');
       return false;
     } else {
@@ -256,7 +280,7 @@ async function testPublicRoutes() {
     try {
       const response = await fetchWithTimeout(`${BASE_URL}${route}`);
       
-      if (response.status === 200) {
+      if (response.status === HTTP_STATUS.OK) {
         addResult(`Public Route ${route}`, 'PASS', 'Accessible without auth');
       } else {
         addResult(`Public Route ${route}`, 'FAIL', `HTTP ${response.status}`);
@@ -278,13 +302,17 @@ async function testCheckEmailPage() {
   try {
     const response = await fetchWithTimeout(`${BASE_URL}/check-email`);
     
-    if (response.status === 200) {
+    if (response.status === HTTP_STATUS.OK) {
       const html = await response.text();
-      if (html.includes('email') || html.includes('verific')) {
-        addResult('Check Email Page', 'PASS', '/check-email is accessible');
+      // Check for specific check-email page elements
+      const hasEmailContent = html.includes('email') || html.includes('Email');
+      const hasVerificationContent = html.includes('verific') || html.includes('Verific');
+      
+      if (hasEmailContent || hasVerificationContent) {
+        addResult('Check Email Page', 'PASS', '/check-email is accessible with expected content');
         return true;
       } else {
-        addResult('Check Email Page', 'FAIL', 'Page does not contain expected content');
+        addResult('Check Email Page', 'FAIL', 'Page missing expected email/verification content');
         return false;
       }
     } else {
@@ -367,8 +395,8 @@ async function main() {
   process.exit(exitCode);
 }
 
-// Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Run if called directly (check if this module is the main entry point)
+if (import.meta.url.endsWith('verify-production.mjs') && process.argv[1]?.endsWith('verify-production.mjs')) {
   main().catch((error) => {
     console.error(colors.red + '\n  Fatal error:' + colors.reset, error);
     process.exit(1);
