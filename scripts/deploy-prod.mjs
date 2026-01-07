@@ -9,6 +9,13 @@ const prisma = new PrismaClient();
 const log = (message) => console.log(`[deploy] ${message}`);
 const logStep = (message) => console.log(`\n[deploy] === ${message} ===`);
 
+const requiredEnv = [
+  "DATABASE_URL",
+  "NEXTAUTH_SECRET",
+  "RESEND_API_KEY",
+  "NEXTAUTH_URL",
+];
+
 function runCommand(command, args = []) {
   log(`RUN ${[command, ...args].join(" ")}`);
   const result = spawnSync(command, args, {
@@ -48,6 +55,28 @@ function assertSafeIdentifier(value, label) {
 function assertSafeMigrationName(value) {
   if (!safeMigrationPattern.test(value)) {
     throw new Error(`Invalid migration folder name: ${value}`);
+  }
+}
+
+function validateRuntimeEnvironment() {
+  const missing = requiredEnv.filter(
+    (name) => typeof process.env[name] !== "string" || process.env[name] === "",
+  );
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required environment variables: ${missing.join(", ")}`,
+    );
+  }
+
+  const expectedNextAuthUrl = "https://matrixtop.com";
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.NEXTAUTH_URL !== expectedNextAuthUrl
+  ) {
+    throw new Error(
+      `NEXTAUTH_URL must be set to ${expectedNextAuthUrl} (current: ${process.env.NEXTAUTH_URL})`,
+    );
   }
 }
 
@@ -158,6 +187,9 @@ async function deployMigrations(migrationFolders) {
 }
 
 async function main() {
+  logStep("Validating runtime environment");
+  validateRuntimeEnvironment();
+
   logStep("Prisma generate");
   runCommand("npx", ["prisma", "generate"]);
 
@@ -170,6 +202,9 @@ async function main() {
 
   logStep("Starting Next.js standalone server");
   await prisma.$disconnect();
+  const port = process.env.PORT || "3000";
+  process.env.PORT = port;
+  log(`Using PORT=${port}`);
   const serverPath = path.join(
     process.cwd(),
     ".next",
