@@ -57,7 +57,7 @@ export async function registerCompany(values: RegisterInput) {
       console.log("Verification link (DEV):", verificationUrl);
     }
     
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: data.email,
       subject: 'Verifieer je e-mailadres - Matrixtop',
       react: VerificationEmail({
@@ -65,6 +65,14 @@ export async function registerCompany(values: RegisterInput) {
         userName: data.bedrijfsnaam,
       }),
     });
+
+    if (!emailResult.success) {
+      console.error("Verification email send failed", {
+        email: data.email,
+        error: emailResult.error,
+      });
+      return { success: false, message: "Verificatie-e-mail kon niet worden verzonden. Probeer het later opnieuw." };
+    }
 
     if (shouldLogAuth) {
       console.log("Register success - verification email sent", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });

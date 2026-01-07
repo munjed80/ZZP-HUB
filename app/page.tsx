@@ -9,7 +9,14 @@ export const metadata: Metadata = {
 };
 
 export default async function LandingPagina() {
-  const session = await getServerAuthSession();
+  let isLoggedIn = false;
 
-  return <LandingContent isLoggedIn={!!session?.user} />;
+  try {
+    const session = await getServerAuthSession();
+    isLoggedIn = !!session?.user;
+  } catch (error) {
+    console.error("[landing] Failed to load session, rendering logged-out view:", error);
+  }
+
+  return <LandingContent isLoggedIn={isLoggedIn} />;
 }
