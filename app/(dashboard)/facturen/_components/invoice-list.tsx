@@ -34,6 +34,7 @@ const statusOptions = [
 export function InvoiceList({ invoices }: InvoiceListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [status, setStatus] = useState<(typeof statusOptions)[number]["value"]>("all");
+  const [openInvoiceId, setOpenInvoiceId] = useState<string | null>(null);
 
   const filteredInvoices = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -112,6 +113,8 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                       invoiceId={invoice.id}
                       editHref={`/facturen/${invoice.id}/edit`}
                       shareLink={`/facturen/${invoice.id}`}
+                      isOpen={openInvoiceId === invoice.id}
+                      onOpenChange={(open) => setOpenInvoiceId(open ? invoice.id : null)}
                     />
                   </div>
                   <div className="flex flex-wrap gap-3 text-xs text-[#9FCBC4]">

@@ -9,7 +9,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
 import { deleteInvoice } from "@/app/actions/invoice-actions";
 import { type mapInvoiceToPdfData } from "@/lib/pdf-generator";
-import { Popover } from "@/components/ui/popover";
+import { PortalPopover } from "@/components/ui/portal-popover";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -17,6 +17,8 @@ type Props = {
   invoiceId: string;
   editHref?: string;
   shareLink?: string;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 type PendingAction = "delete" | null;
@@ -30,9 +32,11 @@ function buildShareLink(shareLink: string | undefined, invoiceId: string) {
   return `${origin}${targetPath}`;
 }
 
-export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink }: Props) {
+export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink, isOpen, onOpenChange }: Props) {
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const menuOpen = isOpen !== undefined ? isOpen : internalOpen;
+  const setMenuOpen = onOpenChange || setInternalOpen;
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -183,7 +187,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
   );
 
   return (
-    <Popover
+    <PortalPopover
       trigger={
         <button
           type="button"
@@ -199,9 +203,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
       }
       open={menuOpen}
       onOpenChange={setMenuOpen}
-      contentClassName="origin-top-right"
     >
       {menuContent}
-    </Popover>
+    </PortalPopover>
   );
 }
