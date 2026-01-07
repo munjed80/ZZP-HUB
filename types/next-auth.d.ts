@@ -7,6 +7,8 @@ declare module "next-auth" {
     id: string;
     role: UserRole;
     isSuspended: boolean;
+    emailVerified: boolean;
+    onboardingCompleted: boolean;
   }
 
   interface Session {
@@ -17,6 +19,8 @@ declare module "next-auth" {
       image?: string | null;
       role: UserRole;
       isSuspended: boolean;
+      emailVerified: boolean;
+      onboardingCompleted: boolean;
     };
   }
 }
@@ -26,5 +30,7 @@ declare module "next-auth/jwt" {
     id: string;
     role: UserRole;
     isSuspended: boolean;
+    emailVerified: boolean;
+    onboardingCompleted: boolean;
   }
 }
