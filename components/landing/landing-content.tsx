@@ -153,54 +153,54 @@ const tiltEffect = {
   style: { transformStyle: "preserve-3d" as const },
 };
 
-// CTA color variables - natural green to turquoise with premium glossy/mossy glow
+// CTA color variables - natural green gradient with premium glossy glow
 const ctaColors = {
-  from: "#10b981", // natural emerald green (not pale)
-  to: "#14b8a6", // turquoise/teal
-  text: "#f0fdfa", // near-white with subtle teal tint for readability
-  border: "#0d9488", // teal with transparency applied in class
-  glow: "#14b8a6", // teal glow
-  spark: "#f59e0b", // warm amber micro-highlight
+  from: "#15803d", // rich natural green
+  to: "#16a34a", // fresh mid-green
+  text: "#f7fee7", // soft off-white for contrast
+  border: "#166534", // deep green border
+  glow: "#22c55e", // subtle green glow
+  spark: "#bbf7d0", // light moss highlight
 };
 
 const landingCtaBase = [
   "group relative isolate inline-flex min-h-[44px] items-center justify-center gap-2 overflow-hidden rounded-xl",
   // Border: teal with slight transparency
-  "border border-[#0d9488]/40",
-  // Gradient: natural green to turquoise (vivid, not pale)
+  "border border-[#166534]/35",
+  // Gradient: natural greens
   `bg-[linear-gradient(135deg,${ctaColors.from}_0%,${ctaColors.to}_100%)]`,
   // Text: near-white for AA contrast
   `text-sm font-semibold leading-tight text-[${ctaColors.text}]`,
-  // Shadow: soft teal (not heavy)
-  "shadow-[0_12px_32px_-18px_rgba(20,184,166,0.6)]",
+  // Shadow: soft green (not heavy)
+  "shadow-[0_12px_32px_-18px_rgba(34,197,94,0.6)]",
   // Transitions
   "transition-[transform,box-shadow,filter] duration-300 ease-out",
-  // Hover: slightly brighter gradient + stronger teal glow
-  "hover:bg-[linear-gradient(135deg,#14b8a6_0%,#0d9488_100%)]",
-  "hover:shadow-[0_16px_40px_-16px_rgba(20,184,166,0.85)]",
+  // Hover: slightly brighter gradient + stronger green glow
+  "hover:bg-[linear-gradient(135deg,#16a34a_0%,#15803d_100%)]",
+  "hover:shadow-[0_16px_40px_-16px_rgba(34,197,94,0.85)]",
   "hover:brightness-110",
   // Focus: strong teal outline ring for accessibility
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2",
   // Active: slight press-down transform
-  "active:scale-[0.98] active:shadow-[0_8px_24px_-14px_rgba(20,184,166,0.7)]",
+  "active:scale-[0.98] active:shadow-[0_8px_24px_-14px_rgba(34,197,94,0.7)]",
 ].join(" ");
 const landingCtaDefaultPadding = "px-5 py-3";
 
-// Glow effect: teal radial gradient
+// Glow effect: green radial gradient
 const landingCtaGlow =
-  `pointer-events-none absolute -inset-6 rounded-[18px] bg-[radial-gradient(circle_at_30%_22%,rgba(20,184,166,0.35),transparent_50%)] blur-[24px] opacity-60 transition duration-500 ease-out group-hover:scale-110 group-hover:opacity-90 group-active:opacity-50`;
+  `pointer-events-none absolute -inset-6 rounded-[18px] bg-[radial-gradient(circle_at_30%_22%,rgba(34,197,94,0.35),transparent_50%)] blur-[24px] opacity-60 transition duration-500 ease-out group-hover:scale-110 group-hover:opacity-90 group-active:opacity-50`;
 
-// Sheen effect: subtle warm spark on hover (amber micro-highlight)
+// Sheen effect: subtle green spark on hover
 const landingCtaSheen =
-  `pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_70%_30%,rgba(245,158,11,0.15),transparent_45%)] opacity-0 transition duration-500 ease-out group-hover:opacity-100`;
+  `pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_70%_30%,rgba(34,197,94,0.18),transparent_45%)] opacity-0 transition duration-500 ease-out group-hover:opacity-100`;
 
 // Highlight: subtle white gradient for glossy look
 const landingCtaHighlight =
   "pointer-events-none absolute inset-[1px] rounded-[11px] bg-[linear-gradient(180deg,rgba(255,255,255,0.25),rgba(255,255,255,0.08)_50%,rgba(255,255,255,0))] opacity-60 mix-blend-overlay";
 
-// Ring: teal border with enhanced hover state
+// Ring: emerald border with enhanced hover state
 const landingCtaRing =
-  "pointer-events-none absolute inset-0 rounded-xl ring-1 ring-teal-400/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition duration-300 ease-out group-hover:ring-teal-400/50 group-active:ring-teal-400/25";
+  "pointer-events-none absolute inset-0 rounded-xl ring-1 ring-emerald-400/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition duration-300 ease-out group-hover:ring-emerald-400/50 group-active:ring-emerald-400/25";
 
 type LandingCtaButtonProps = {
   href: string;
@@ -257,16 +257,10 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
             </nav>
             <div className="flex items-center gap-3">
               {isLoggedIn ? (
-                  <Link
-                    href="/dashboard"
-                    className={buttonVariants(
-                      "primary",
-                      "shadow-lg shadow-[0_18px_48px_-30px_rgba(var(--brand-primary),0.42)] px-5 py-2.5 text-sm tracking-tight"
-                    )}
-                  >
-                    Naar Dashboard
-                  </Link>
-                ) : (
+                <LandingCtaButton href="/dashboard" paddingClass="px-5 py-2.5" className="text-sm tracking-tight">
+                  Naar Dashboard
+                </LandingCtaButton>
+              ) : (
                 <>
                   <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-[rgb(var(--brand-on-primary))]")}>
                     Inloggen
@@ -648,16 +642,14 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   14 dagen gratis proberen. Daarna €4,99 per maand. Geen kleine lettertjes.
                 </p>
                 <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                  <Link
+                  <LandingCtaButton
                     href={isLoggedIn ? "/dashboard" : "/register"}
-                    className={buttonVariants(
-                      "primary",
-                      "w-full justify-center px-8 py-3 text-base shadow-[0_20px_70px_-35px_rgba(var(--brand-primary),0.55)]"
-                    )}
+                    paddingClass="px-8 py-3"
+                    className="w-full justify-center text-base shadow-[0_20px_70px_-35px_rgba(var(--brand-primary),0.55)]"
                   >
                     {primaryCta}
                     <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
-                  </Link>
+                  </LandingCtaButton>
                   <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-300">
                     <Infinity className="h-4 w-4" aria-hidden />
                     Altijd opzegbaar
@@ -676,16 +668,14 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 Sluit je aan bij honderden ZZP&apos;ers die al besparen op administratietijd.
               </p>
               <div className="mt-10 flex items-center justify-center gap-4">
-                  <Link
-                    href={isLoggedIn ? "/dashboard" : "/register"}
-                    className={buttonVariants(
-                      "primary",
-                      "text-base px-8 py-3 shadow-[0_22px_64px_-40px_rgba(var(--brand-primary),0.58)]"
-                    )}
-                  >
+                <LandingCtaButton
+                  href={isLoggedIn ? "/dashboard" : "/register"}
+                  paddingClass="px-8 py-3"
+                  className="text-base shadow-[0_22px_64px_-40px_rgba(var(--brand-primary),0.58)]"
+                >
                   {primaryCta}
                   <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
-                </Link>
+                </LandingCtaButton>
               </div>
             </div>
           </div>
