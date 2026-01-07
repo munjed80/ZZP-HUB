@@ -100,12 +100,8 @@ async function deployMigrations(migrationFolders) {
   const hasExistingTables = await hasUserTables();
 
   if (hasMigrationsTable) {
-    log("Found _prisma_migrations table -> running migrate deploy.");
-    runCommand("npx prisma migrate deploy");
-    return;
-  }
-
-  if (hasExistingTables) {
+    log("Found _prisma_migrations table -> continuing with migrate deploy.");
+  } else if (hasExistingTables) {
     const baselineMigration =
       migrationFolders.find((name) =>
         name.toLowerCase().includes("baseline"),
@@ -119,11 +115,11 @@ async function deployMigrations(migrationFolders) {
       `_prisma_migrations missing, but database has tables -> marking baseline ${baselineMigration} as applied.`,
     );
     runCommand(`npx prisma migrate resolve --applied ${baselineMigration}`);
-    runCommand("npx prisma migrate deploy");
-    return;
+  } else {
+    log("Database empty -> running migrate deploy from scratch.");
   }
 
-  log("Database empty -> running migrate deploy from scratch.");
+  log("Running pending migrations via prisma migrate deploy.");
   runCommand("npx prisma migrate deploy");
 }
 
@@ -152,10 +148,9 @@ async function main() {
 }
 
 main()
-  .catch(async (error) => {
+  .catch((error) => {
     console.error("[deploy] FAIL:", error);
-    await prisma.$disconnect();
-    process.exit(1);
+    process.exitCode = 1;
   })
   .finally(async () => {
     await prisma.$disconnect();
