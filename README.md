@@ -30,6 +30,88 @@ Moderne SaaS-omgeving voor Nederlandse ZZP’ers met een maandelijks abonnement.
 
 Authenticatie is voorbereid voor integratie met bijvoorbeeld NextAuth of een eigen SSO-provider; sessiebeveiliging wordt centraal afgehandeld in de layout. Alle UI-teksten zijn in het Nederlands en valuta wordt als € 1.250,00 getoond.
 
+## Onboarding Flow Verification
+
+De applicatie implementeert een complete Moneybird-achtige onboarding flow. Test deze met onderstaande checklist:
+
+### Email Verificatie
+- [ ] **Registratie**: Ga naar `/register` en maak een nieuw account aan
+- [ ] **Email verzonden**: Controleer console logs voor verificatielink (in dev mode)
+- [ ] **Check email pagina**: Wordt automatisch doorgestuurd naar `/check-email`
+- [ ] **Verificatie**: Klik op de link in console of ga naar `/verify-email?token=...`
+- [ ] **Succes**: Na verificatie wordt doorgestuurd naar `/onboarding`
+- [ ] **Resend**: Test `/resend-verification` met rate limiting (max 1x per minuut)
+
+### Route Guards
+- [ ] **Niet ingelogd**: Alle dashboard routes redirecten naar `/login`
+- [ ] **Ingelogd zonder verificatie**: Dashboard routes redirecten naar `/verify-required`
+- [ ] **Geverifieerd zonder onboarding**: Dashboard routes redirecten naar `/onboarding`
+- [ ] **Onboarding compleet**: Vrije toegang tot `/dashboard` en andere routes
+
+### Onboarding Wizard (5 stappen)
+- [ ] **Stap 1 - Welkom**: Overzicht van de setup stappen
+- [ ] **Stap 2 - Bedrijf**: 
+  - [ ] KVK zoeken werkt (mock data: "Test BV", "Demo Consultancy", etc.)
+  - [ ] Selecteren van zoekresultaat vult formulier automatisch in
+  - [ ] Handmatig invoeren werkt als fallback
+  - [ ] Alle velden worden correct opgeslagen
+- [ ] **Stap 3 - Eerste relatie**: 
+  - [ ] Klantgegevens kunnen worden ingevoerd
+  - [ ] BTW-ID is optioneel
+  - [ ] Data wordt correct opgeslagen in database
+- [ ] **Stap 4 - Beveiliging**: 
+  - [ ] "Later instellen" knop werkt
+  - [ ] Stap kan worden overgeslagen
+- [ ] **Stap 5 - Celebration**: 
+  - [ ] Confetti animatie wordt getoond
+  - [ ] "Aan de slag" knop redirect naar `/dashboard`
+  - [ ] Onboarding wordt als compleet gemarkeerd
+
+### KVK Integratie
+- [ ] **Search endpoint**: `/api/kvk/search?q=test` retourneert mock resultaten
+- [ ] **Details endpoint**: `/api/kvk/details?kvk=12345678` retourneert bedrijfsdetails
+- [ ] **Authenticatie**: Endpoints vereisen ingelogde gebruiker
+- [ ] **Mock provider**: Werkt zonder API key configuratie
+
+### Assistant Widget
+- [ ] **Onboarding**: Widget toont context-aware hints tijdens onboarding
+- [ ] **Dashboard**: Widget is beschikbaar maar niet opdringerig
+- [ ] **Dismissible**: Widget kan worden gesloten
+- [ ] **Outside click**: Sluit widget bij klikken buiten
+- [ ] **Progress**: Toont voortgang tijdens onboarding (stap x van 5)
+
+### Database Verificatie
+Na volledige flow, controleer in database:
+```sql
+SELECT email, emailVerified, onboardingStep, onboardingCompleted 
+FROM "User" 
+WHERE email = 'test@example.com';
+```
+- [ ] `emailVerified = true`
+- [ ] `onboardingStep = 5`
+- [ ] `onboardingCompleted = true`
+- [ ] CompanyProfile record bestaat
+- [ ] Client record bestaat
+
+### Productie Deployment
+1. Zorg voor environment variables:
+   - `DATABASE_URL`: PostgreSQL connection string
+   - `NEXTAUTH_SECRET`: Random secret voor sessie-encryptie
+   - `NEXTAUTH_URL`: Productie URL (bijv. https://app.example.com)
+   - `RESEND_API_KEY` (optioneel): Voor echte emails
+   - `KVK_API_KEY` (optioneel): Voor echte KVK integratie
+
+2. Run database migrations:
+   ```bash
+   npx prisma migrate deploy
+   ```
+
+3. Build en start:
+   ```bash
+   npm run build
+   npm run start
+   ```
+
 ## SEO & Icons Verificatie
 
 ### Favicon Verificatie
