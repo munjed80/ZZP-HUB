@@ -8,7 +8,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, Lock, Mail, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 const schema = z.object({
   email: z.string().email("Voer een geldig e-mailadres in"),
@@ -18,6 +18,14 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function LoginPagina() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
