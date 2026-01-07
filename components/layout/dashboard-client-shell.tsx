@@ -4,6 +4,7 @@ import { createContext, useSyncExternalStore, useState, type ReactNode } from "r
 import { Sidebar, MobileSidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { AssistantDrawer } from "@/components/assistant/assistant-drawer";
+import { AssistantWidget } from "@/components/assistant/assistant-widget";
 import { UserRole } from "@prisma/client";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -86,6 +87,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
         <Sparkles className="h-5 w-5" aria-hidden />
       </button>
       <AssistantDrawer open={assistantOpen} onOpenChange={setAssistantOpen} />
+      <AssistantWidget />
       <OnboardingTour userId={userId} />
     </AvatarContext.Provider>
   );

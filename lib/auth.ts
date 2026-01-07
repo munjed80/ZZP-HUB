@@ -131,7 +131,6 @@ export async function authorize(
       emailVerified: user.emailVerified,
       onboardingCompleted: user.onboardingCompleted,
     };
-    };
   } catch (error) {
     console.error("Error during authorization:", error);
     return null;

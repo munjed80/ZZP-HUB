@@ -8,15 +8,20 @@ import { CompanyStep } from "@/components/onboarding/company-step";
 import { ClientStep } from "@/components/onboarding/client-step";
 import { SecurityStep } from "@/components/onboarding/security-step";
 import { CelebrationStep } from "@/components/onboarding/celebration-step";
+import { AssistantWidget } from "@/components/assistant/assistant-widget";
 
 interface OnboardingPageProps {
-  searchParams: { step?: string };
+  searchParams: Promise<{ step?: string }>;
 }
 
-export default function OnboardingPage({ searchParams }: OnboardingPageProps) {
+export default async function OnboardingPage({ searchParams }: OnboardingPageProps) {
+  const params = await searchParams;
+  return <OnboardingClient initialStep={params.step} />;
+}
+
+function OnboardingClient({ initialStep }: { initialStep?: string }) {
   const router = useRouter();
-  const initialStep = parseInt(searchParams.step || "1", 10);
-  const [currentStep, setCurrentStep] = useState(Math.max(1, Math.min(5, initialStep)));
+  const [currentStep, setCurrentStep] = useState(Math.max(1, Math.min(5, parseInt(initialStep || "1", 10))));
 
   useEffect(() => {
     // Update URL when step changes
@@ -82,9 +87,11 @@ export default function OnboardingPage({ searchParams }: OnboardingPageProps) {
         <CurrentStepComponent
           onNext={() => setCurrentStep((prev) => Math.min(5, prev + 1))}
           onBack={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
-          currentStep={currentStep}
         />
       </div>
+
+      {/* Assistant Widget */}
+      <AssistantWidget currentStep={currentStep} isOnboarding={true} />
     </div>
   );
 }
