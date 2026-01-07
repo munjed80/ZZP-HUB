@@ -77,14 +77,14 @@ export default async function FacturenPagina() {
       formattedDueDate,
       isPaid,
       paidDateLabel,
-      dueToneClass: isOverdue ? "text-[#F2B705]" : "text-[#9FCBC4]",
+      dueToneClass: isOverdue ? "text-[#D8A446]" : "text-[#A8E6DB]",
       dueLabel: isOverdue ? "Te laat ·" : "Vervalt",
     };
   });
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-2 rounded-3xl border border-[#123C37] bg-gradient-to-r from-[#0F5E57] via-[#0E6F64] to-[#0B4E48] p-4 shadow-[0_28px_72px_-36px_rgba(12,94,87,0.78)]">
+      <div className="flex flex-col gap-2 rounded-3xl border border-[#124D48] bg-gradient-to-r from-[#0F7E78] via-[#0FA9A3] to-[#0B6A70] p-4 shadow-[0_28px_72px_-32px_rgba(12,140,135,0.7)]">
         <div className="flex items-center gap-3">
           <div className="h-1.5 w-14 rounded-full bg-white/35 shadow-[0_8px_20px_-12px_rgba(255,255,255,0.55)]" />
           <h1 className="text-3xl font-bold tracking-tight text-white">Facturen</h1>
@@ -116,7 +116,7 @@ export default async function FacturenPagina() {
         </Link>
       </div>
 
-      <Card className="p-4 sm:p-6 shadow-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#123C37] to-[#0B4E48] text-[#CFEDEA]">
+       <Card className="p-4 sm:p-6 shadow-2xl border border-[#124D48]/70 bg-gradient-to-br from-[#0F3E42] via-[#0F5655] to-[#0A3B40] text-[#E4F7F3]">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
@@ -146,7 +146,7 @@ export default async function FacturenPagina() {
                   ({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, dueToneClass, dueLabel }) => (
                   <div
                     key={factuur.id}
-                    className="rounded-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#10322E] to-[#0B2724] px-4 py-3.5 shadow-[0_18px_48px_-30px_rgba(0,0,0,0.65)] transition hover:-translate-y-[1px]"
+                   className="rounded-2xl border border-[#124D48]/70 bg-gradient-to-br from-[#0F4646] via-[#0E5C58] to-[#0A3C40] px-4 py-3.5 shadow-[0_18px_48px_-30px_rgba(3,56,52,0.55)] transition hover:-translate-y-[1px]"
                   >
                     <div className="flex items-start justify-between gap-6">
                       <div className="min-w-0 flex-1">
@@ -191,7 +191,7 @@ export default async function FacturenPagina() {
                   ({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, dueToneClass, dueLabel }) => (
                   <div
                     key={factuur.id}
-                    className="rounded-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#10322E] to-[#0B2724] p-3.5 shadow-[0_18px_48px_-30px_rgba(0,0,0,0.6)]"
+                   className="rounded-2xl border border-[#124D48]/70 bg-gradient-to-br from-[#0F4646] via-[#0E5C58] to-[#0A3C40] p-3.5 shadow-[0_18px_48px_-30px_rgba(3,56,52,0.55)]"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">

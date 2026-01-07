@@ -27,7 +27,7 @@ export function Popover({
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = onOpenChange || setInternalOpen;
-  
+
   const popoverRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -163,13 +163,6 @@ export function Popover({
         {trigger}
       </div>
       {open && (
-        <>
-          {/* Invisible overlay to capture clicks outside - placed in portal would be better but keeping simple */}
-          <div 
-            className="fixed inset-0 z-40"
-            style={{ pointerEvents: "auto" }}
-            aria-hidden="true"
-          />
       <div
         ref={contentRef}
         onClick={handleContentClick}
@@ -183,7 +176,6 @@ export function Popover({
       >
         {children}
       </div>
-        </>
       )}
     </div>
   );

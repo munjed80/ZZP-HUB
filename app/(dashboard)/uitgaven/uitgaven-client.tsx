@@ -474,161 +474,165 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
       </Card>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-2xl rounded-xl bg-card p-6 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">Nieuwe uitgave</h2>
-                <p className="text-sm text-muted-foreground">
-                  Vul de kosten in. Je kunt een bedrag incl. of excl. BTW invoeren, de ander wordt berekend.
-                </p>
-              </div>
-              <Button type="button" variant="ghost" className="px-3 py-2" onClick={() => setOpen(false)}>
-                Sluiten
-              </Button>
-            </div>
-
-            <form onSubmit={onSubmit} className="mt-4 grid gap-4 md:grid-cols-2">
-              <div className="space-y-1 md:col-span-2">
-                <label className="text-sm font-medium text-foreground">Omschrijving</label>
-                <input
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  placeholder="Softwarelicentie, kantoorartikelen..."
-                  {...form.register("description")}
-                />
-                {form.formState.errors.description && (
-                  <p className="text-xs text-warning-foreground">{form.formState.errors.description.message}</p>
-                )}
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/45 backdrop-blur-sm">
+          <div className="flex min-h-full items-end justify-center p-3 sm:items-center">
+            <div className="w-full max-w-2xl overflow-hidden rounded-xl border border-border/60 bg-card shadow-xl">
+              <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">Nieuwe uitgave</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Vul de kosten in. Je kunt een bedrag incl. of excl. BTW invoeren, de ander wordt berekend.
+                  </p>
+                </div>
+                <Button type="button" variant="ghost" className="px-3 py-2" onClick={() => setOpen(false)}>
+                  Sluiten
+                </Button>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">Categorie</label>
-                <select
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  {...form.register("category")}
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-                {form.formState.errors.category && (
-                  <p className="text-xs text-warning-foreground">{form.formState.errors.category.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">Datum</label>
-                <input
-                  type="date"
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  {...form.register("date")}
-                />
-                {form.formState.errors.date && (
-                  <p className="text-xs text-warning-foreground">{form.formState.errors.date.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">Bedrag excl. BTW</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  {...form.register("amountExcl", { valueAsNumber: true })}
-                />
-                {form.formState.errors.amountExcl && (
-                  <p className="text-xs text-warning-foreground">{form.formState.errors.amountExcl.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">Bedrag incl. BTW</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={amountInclDisplay}
-                  onChange={(event) => handleAmountInclChange(event.target.value)}
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  placeholder="Wordt berekend"
-                />
-                <p className="text-xs text-muted-foreground">Automatische koppeling met gekozen BTW-tarief.</p>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">BTW tarief</label>
-                <select
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  {...form.register("vatRate")}
-                >
-                  <option value="HOOG_21">21%</option>
-                  <option value="LAAG_9">9%</option>
-                  <option value="NUL_0">0%</option>
-                  <option value="VRIJGESTELD">Vrijgesteld</option>
-                  <option value="VERLEGD">Verlegd</option>
-                </select>
-                {form.formState.errors.vatRate && (
-                  <p className="text-xs text-warning-foreground">{form.formState.errors.vatRate.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-foreground">Bonnetje uploaden</label>
-                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border px-4 py-6 text-sm text-muted-foreground hover:border-primary/40">
-                  <UploadCloud className="h-5 w-5 text-muted-foreground" aria-hidden />
-                  <div className="text-center">
-                    <p className="font-semibold text-foreground">Sleep je bonnetje hierheen of kies bestand</p>
-                    <p className="text-xs text-muted-foreground">{RECEIPT_UPLOAD_NOTE}</p>
+              <form onSubmit={onSubmit} className="mt-1 flex max-h-[82vh] flex-col overflow-y-auto px-4 pb-3">
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div className="space-y-1 md:col-span-2">
+                    <label className="text-sm font-medium text-foreground">Omschrijving</label>
+                    <input
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                      placeholder="Softwarelicentie, kantoorartikelen..."
+                      {...form.register("description")}
+                    />
+                    {form.formState.errors.description && (
+                      <p className="text-xs text-warning-foreground">{form.formState.errors.description.message}</p>
+                    )}
                   </div>
-                  <input
-                    type="file"
-                    accept="image/*,application/pdf"
-                    className="sr-only"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      if (file) {
-                        setSelectedFile(file.name);
-                      }
-                    }}
-                  />
-                </label>
-                {selectedFile && <p className="text-xs text-muted-foreground">Gekozen bestand: {selectedFile}</p>}
-              </div>
 
-              <div className="space-y-1 md:col-span-2">
-                <label className="text-sm font-medium text-foreground">Link naar bonnetje (optioneel)</label>
-                <input
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  placeholder="https://..."
-                  {...form.register("receiptUrl")}
-                />
-                {form.formState.errors.receiptUrl && (
-                  <p className="text-xs text-warning-foreground">{form.formState.errors.receiptUrl.message}</p>
-                )}
-              </div>
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-foreground">Categorie</label>
+                    <select
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                      {...form.register("category")}
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                    {form.formState.errors.category && (
+                      <p className="text-xs text-warning-foreground">{form.formState.errors.category.message}</p>
+                    )}
+                  </div>
 
-              {formError && <p className="text-xs text-warning-foreground md:col-span-2">{formError}</p>}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-foreground">Datum</label>
+                    <input
+                      type="date"
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                      {...form.register("date")}
+                    />
+                    {form.formState.errors.date && (
+                      <p className="text-xs text-warning-foreground">{form.formState.errors.date.message}</p>
+                    )}
+                  </div>
 
-              <div className="flex items-center gap-3 md:col-span-2">
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Annuleren
-                </Button>
-                <Button type="submit" disabled={isPending}>
-                  {isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                      Opslaan...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="h-4 w-4" aria-hidden />
-                      Uitgave opslaan
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-foreground">Bedrag excl. BTW</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                      {...form.register("amountExcl", { valueAsNumber: true })}
+                    />
+                    {form.formState.errors.amountExcl && (
+                      <p className="text-xs text-warning-foreground">{form.formState.errors.amountExcl.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-foreground">Bedrag incl. BTW</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={amountInclDisplay}
+                      onChange={(event) => handleAmountInclChange(event.target.value)}
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                      placeholder="Wordt berekend"
+                    />
+                    <p className="text-xs text-muted-foreground">Automatische koppeling met gekozen BTW-tarief.</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-foreground">BTW tarief</label>
+                    <select
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                      {...form.register("vatRate")}
+                    >
+                      <option value="HOOG_21">21%</option>
+                      <option value="LAAG_9">9%</option>
+                      <option value="NUL_0">0%</option>
+                      <option value="VRIJGESTELD">Vrijgesteld</option>
+                      <option value="VERLEGD">Verlegd</option>
+                    </select>
+                    {form.formState.errors.vatRate && (
+                      <p className="text-xs text-warning-foreground">{form.formState.errors.vatRate.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium text-foreground">Bonnetje uploaden</label>
+                    <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border px-4 py-5 text-sm text-muted-foreground hover:border-primary/40">
+                      <UploadCloud className="h-5 w-5 text-muted-foreground" aria-hidden />
+                      <div className="text-center">
+                        <p className="font-semibold text-foreground">Sleep je bonnetje hierheen of kies bestand</p>
+                        <p className="text-xs text-muted-foreground">{RECEIPT_UPLOAD_NOTE}</p>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        className="sr-only"
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          if (file) {
+                            setSelectedFile(file.name);
+                          }
+                        }}
+                      />
+                    </label>
+                    {selectedFile && <p className="text-xs text-muted-foreground">Gekozen bestand: {selectedFile}</p>}
+                  </div>
+
+                  <div className="space-y-1 md:col-span-2">
+                    <label className="text-sm font-medium text-foreground">Link naar bonnetje (optioneel)</label>
+                    <input
+                      className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                      placeholder="https://..."
+                      {...form.register("receiptUrl")}
+                    />
+                    {form.formState.errors.receiptUrl && (
+                      <p className="text-xs text-warning-foreground">{form.formState.errors.receiptUrl.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                {formError && <p className="mt-1 text-xs text-warning-foreground">{formError}</p>}
+
+                <div className="sticky bottom-0 left-0 right-0 -mx-4 mt-3 flex items-center gap-3 border-t border-border bg-card/95 px-4 py-3 backdrop-blur">
+                  <Button type="button" variant="secondary" className="flex-1" onClick={() => setOpen(false)}>
+                    Annuleren
+                  </Button>
+                  <Button type="submit" disabled={isPending} className="flex-1">
+                    {isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                        Opslaan...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4" aria-hidden />
+                        Uitgave opslaan
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
