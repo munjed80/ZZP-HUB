@@ -5,14 +5,17 @@ import { getToken } from 'next-auth/jwt';
 // Define public routes that don't require authentication
 const publicRoutes = ['/login', '/register', '/check-email', '/verify-email', '/verify-required', '/resend-verification', '/offline'];
 
+// Define public assets that should be accessible without authentication
+const publicAssets = ['/sw.js', '/manifest.webmanifest', '/offline.html', '/robots.txt', '/sitemap.xml'];
+
 // Define routes that should be accessible even without email verification
 const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-required', '/resend-verification'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public routes and API routes
-  if (publicRoutes.includes(pathname) || pathname.startsWith('/api/') || pathname.startsWith('/_next/') || pathname.startsWith('/static/')) {
+  // Allow public routes, public assets, and API routes
+  if (publicRoutes.includes(pathname) || publicAssets.includes(pathname) || pathname.startsWith('/api/') || pathname.startsWith('/_next/') || pathname.startsWith('/static/')) {
     return NextResponse.next();
   }
 
