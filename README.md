@@ -101,16 +101,13 @@ WHERE email = 'test@example.com';
    - `RESEND_API_KEY` (optioneel): Voor echte emails
    - `KVK_API_KEY` (optioneel): Voor echte KVK integratie
 
-2. Run database migrations:
-   ```bash
-   npx prisma migrate deploy
-   ```
-
-3. Build en start:
+2. Build en start + migrations:
    ```bash
    npm run build
-   npm run start
+   npm run deploy:prod
    ```
+   `deploy:prod` controleert of `_prisma_migrations` bestaat (zo niet, dan wordt de baseline gemarkeerd), draait `prisma migrate deploy`, verifieert de nieuwe kolommen en start daarna de standalone server (`node .next/standalone/server.js`).
+   Coolify start command: `npm run deploy:prod` (zorgt dat migraties vóór start draaien).
 
 ## SEO & Icons Verificatie
 
