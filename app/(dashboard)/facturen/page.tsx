@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { formatBedrag } from "@/lib/utils";
 import { InvoiceActionsMenu } from "./_components/invoice-actions-menu";
+import { InvoicePaymentStatus } from "./_components/invoice-payment-status";
 import { InvoiceEmailStatus, Prisma, UserRole } from "@prisma/client";
 import type { Metadata } from "next";
 
@@ -15,13 +16,6 @@ export const metadata: Metadata = {
   title: "Facturen",
   description: "Beheer en verstuur facturen. Overzicht van alle openstaande en betaalde facturen.",
 };
-
-function statusInfo(status: InvoiceEmailStatus | string) {
-  if (status === InvoiceEmailStatus.BETAALD) return { label: "Betaald", variant: "success" as const };
-  if (status === InvoiceEmailStatus.CONCEPT) return { label: "Concept", variant: "muted" as const };
-  if (status === InvoiceEmailStatus.HERINNERING) return { label: "Herinnering gestuurd", variant: "warning" as const };
-  return { label: "Openstaand", variant: "primary" as const };
-}
 
 function invoiceAmount(
   lines: { amount: Prisma.Decimal | number | null; quantity: Prisma.Decimal | number; price: Prisma.Decimal | number }[],
@@ -55,10 +49,38 @@ export default async function FacturenPagina() {
     console.error("Kon facturen niet ophalen", error);
     fetchError = true;
   }
-  const mappedInvoices = facturen.map((factuur) => ({
-    factuur,
-    pdfInvoice: mapInvoiceToPdfData(factuur),
-  }));
+  const now = new Date();
+  const mappedInvoices = facturen.map((factuur) => {
+    const formattedDate = new Date(factuur.date).toLocaleDateString("nl-NL", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    const formattedDueDate = new Date(factuur.dueDate).toLocaleDateString("nl-NL", {
+      day: "numeric",
+      month: "short",
+    });
+    const isPaid = factuur.emailStatus === InvoiceEmailStatus.BETAALD;
+    const paidDateLabel = isPaid
+      ? new Date(factuur.updatedAt ?? factuur.date).toLocaleDateString("nl-NL", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : null;
+    const isOverdue = !isPaid && new Date(factuur.dueDate) < now;
+
+    return {
+      factuur,
+      pdfInvoice: mapInvoiceToPdfData(factuur),
+      formattedDate,
+      formattedDueDate,
+      isPaid,
+      paidDateLabel,
+      dueToneClass: isOverdue ? "text-[#F2B705]" : "text-[#9FCBC4]",
+      dueLabel: isOverdue ? "Te laat ·" : "Vervalt",
+    };
+  });
 
   return (
     <div className="space-y-8">
@@ -118,109 +140,85 @@ export default async function FacturenPagina() {
             )
           ) : (
             <>
-              {/* Desktop Table View */}
-              <div className="hidden md:block divide-y divide-[#123C37]">
-                {mappedInvoices.map(({ factuur, pdfInvoice }) => {
-                  const formattedDate = new Date(factuur.date).toLocaleDateString("nl-NL", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  });
-                  const formattedDueDate = new Date(factuur.dueDate).toLocaleDateString("nl-NL", {
-                    day: "numeric",
-                    month: "short",
-                  });
-
-                  return (
-                    <div
-                      key={factuur.id}
-                      className="flex items-center justify-between py-3.5 first:pt-0"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white">{factuur.invoiceNum}</p>
-                        <p className="text-xs text-[#9FCBC4] mt-0.5 flex flex-wrap gap-3">
-                          <span>Datum {formattedDate}</span>
-                          <span className="text-[#F2B705] font-semibold">Vervalt {formattedDueDate}</span>
-                        </p>
-                        <p className="text-sm text-[#CFEDEA] mt-0.5">{factuur.client.name}</p>
-                      </div>
-                      <div className="flex items-center gap-6 ml-4">
-                        <div className="text-right">
-                          <p className="text-sm font-semibold tabular-nums text-white">
-                            {formatBedrag(invoiceAmount(factuur.lines))}
-                          </p>
-                          <p className="text-xs font-medium text-[#F2B705] mt-0.5">Vervalt {formattedDueDate}</p>
+              {/* Desktop View */}
+              <div className="hidden md:flex md:flex-col gap-3">
+                {mappedInvoices.map(
+                  ({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, dueToneClass, dueLabel }) => (
+                  <div
+                    key={factuur.id}
+                    className="rounded-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#10322E] to-[#0B2724] px-4 py-3.5 shadow-[0_18px_48px_-30px_rgba(0,0,0,0.65)] transition hover:-translate-y-[1px]"
+                  >
+                    <div className="flex items-start justify-between gap-6">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-white">{factuur.invoiceNum}</p>
+                          <p className="truncate text-xs text-[#9FCBC4]">{factuur.client.name}</p>
                         </div>
-                        <Badge
-                          variant={statusInfo(factuur.emailStatus).variant}
-                          className="shadow-[0_12px_30px_-22px_rgba(0,0,0,0.6)] border-[#1FBF84]/40 bg-[#123C37] text-[#CFEDEA]"
-                        >
-                          {statusInfo(factuur.emailStatus).label}
-                        </Badge>
-                        <InvoiceActionsMenu
-                          pdfInvoice={pdfInvoice}
-                          invoiceId={factuur.id}
-                          recipientEmail={factuur.client.email}
-                          emailStatus={factuur.emailStatus}
-                          editHref={`/facturen/${factuur.id}/edit`}
-                          shareLink={`/facturen/${factuur.id}`}
-                        />
+                        <div className="mt-1 flex flex-wrap gap-3 text-xs text-[#9FCBC4]">
+                          <span>Datum {formattedDate}</span>
+                          <span className={`font-semibold ${dueToneClass}`}>
+                            {dueLabel} {formattedDueDate}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex min-w-[220px] flex-col items-end gap-2">
+                        <div className="flex items-start gap-3">
+                          <div className="text-right">
+                            <p className="text-lg font-semibold tabular-nums text-white">
+                              {formatBedrag(invoiceAmount(factuur.lines))}
+                            </p>
+                            <p className={`text-[12px] ${dueToneClass}`}>
+                              {dueLabel} {formattedDueDate}
+                            </p>
+                          </div>
+                          <InvoiceActionsMenu
+                            pdfInvoice={pdfInvoice}
+                            invoiceId={factuur.id}
+                            editHref={`/facturen/${factuur.id}/edit`}
+                            shareLink={`/facturen/${factuur.id}`}
+                          />
+                        </div>
+                        <InvoicePaymentStatus invoiceId={factuur.id} isPaid={isPaid} paidDateLabel={paidDateLabel} />
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
 
               {/* Mobile Card View */}
-              <div className="block md:hidden divide-y divide-[#123C37]">
-                {mappedInvoices.map(({ factuur, pdfInvoice }) => {
-                  const formattedDate = new Date(factuur.date).toLocaleDateString("nl-NL", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  });
-                  const formattedDueDate = new Date(factuur.dueDate).toLocaleDateString("nl-NL", {
-                    day: "numeric",
-                    month: "short",
-                  });
-
-                  return (
-                    <div
-                      key={factuur.id}
-                      className="py-3 first:pt-0"
-                    >
-                      <div className="flex items-start justify-between mb-2.5">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-white">{factuur.invoiceNum}</p>
-                          <p className="text-xs text-[#9FCBC4] mt-0.5">Datum {formattedDate}</p>
-                          <p className="text-sm text-[#CFEDEA] mt-0.5">{factuur.client.name}</p>
-                        </div>
-                        <Badge
-                          variant={statusInfo(factuur.emailStatus).variant}
-                          className="border-[#1FBF84]/40 bg-[#123C37] text-[#CFEDEA] shadow-[0_12px_30px_-22px_rgba(0,0,0,0.6)]"
-                        >
-                          {statusInfo(factuur.emailStatus).label}
-                        </Badge>
+              <div className="flex flex-col gap-3 md:hidden">
+                {mappedInvoices.map(
+                  ({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, dueToneClass, dueLabel }) => (
+                  <div
+                    key={factuur.id}
+                    className="rounded-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#10322E] to-[#0B2724] p-3.5 shadow-[0_18px_48px_-30px_rgba(0,0,0,0.6)]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-white">{factuur.invoiceNum}</p>
+                        <p className="text-xs text-[#9FCBC4] mt-0.5">Datum {formattedDate}</p>
+                        <p className="text-sm text-[#CFEDEA] mt-0.5">{factuur.client.name}</p>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-semibold text-[#F2B705]">Vervalt {formattedDueDate}</p>
-                        <p className="text-base font-semibold tabular-nums text-white">
-                          {formatBedrag(invoiceAmount(factuur.lines))}
-                        </p>
-                      </div>
-                      <div className="mt-3 flex items-center justify-end gap-2">
-                        <InvoiceActionsMenu
-                          pdfInvoice={pdfInvoice}
-                          invoiceId={factuur.id}
-                          recipientEmail={factuur.client.email}
-                          emailStatus={factuur.emailStatus}
-                          editHref={`/facturen/${factuur.id}/edit`}
-                          shareLink={`/facturen/${factuur.id}`}
-                        />
-                      </div>
+                      <InvoiceActionsMenu
+                        pdfInvoice={pdfInvoice}
+                        invoiceId={factuur.id}
+                        editHref={`/facturen/${factuur.id}/edit`}
+                        shareLink={`/facturen/${factuur.id}`}
+                      />
                     </div>
-                  );
-                })}
+                    <div className="mt-3 flex items-center justify-between">
+                      <p className={`text-xs font-semibold ${dueToneClass}`}>
+                        {dueLabel} {formattedDueDate}
+                      </p>
+                      <p className="text-base font-semibold tabular-nums text-white">
+                        {formatBedrag(invoiceAmount(factuur.lines))}
+                      </p>
+                    </div>
+                    <div className="mt-3 flex items-end justify-between gap-3">
+                      <InvoicePaymentStatus invoiceId={factuur.id} isPaid={isPaid} paidDateLabel={paidDateLabel} />
+                    </div>
+                  </div>
+                ))}
               </div>
             </>
           )}

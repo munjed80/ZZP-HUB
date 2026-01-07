@@ -240,3 +240,19 @@ select {
     background-position: 0% 50%;
   }
 }
+
+@keyframes popover-fade-scale {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-popover {
+  animation: popover-fade-scale 160ms ease-out;
+  transform-origin: top right;
+}
