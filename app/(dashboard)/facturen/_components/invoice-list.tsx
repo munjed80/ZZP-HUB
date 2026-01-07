@@ -43,7 +43,9 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
         invoice.invoiceNum.toLowerCase().includes(query) ||
         invoice.clientName.toLowerCase().includes(query);
       const matchesStatus =
-        status === "all" || (status === "paid" ? invoice.isPaid : status === "open" ? !invoice.isPaid : true);
+        status === "all" ||
+        (status === "paid" && invoice.isPaid) ||
+        (status === "open" && !invoice.isPaid);
       return matchesQuery && matchesStatus;
     });
   }, [invoices, searchQuery, status]);
@@ -63,7 +65,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
               aria-label="Zoek facturen"
             />
           </div>
-          <div className="grid w-full grid-cols-3 gap-2 sm:w-auto sm:grid-cols-3">
+          <div className="grid w-full grid-cols-3 gap-2 sm:w-auto">
             {statusOptions.map((option) => {
               const active = status === option.value;
               return (
