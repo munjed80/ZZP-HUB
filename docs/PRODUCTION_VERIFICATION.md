@@ -19,6 +19,7 @@
 - Service worker generated successfully at `/sw.js`
 - PWA manifest configured correctly
 - Middleware fixed to allow public assets (sw.js, manifest.webmanifest, offline.html)
+- Landing page `/` must remain public; middleware guards only app routes
 - All routes compile and render correctly
 
 **Verification Test Results (10/10 passed):**

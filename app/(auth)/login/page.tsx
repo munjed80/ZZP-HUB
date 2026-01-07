@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { z } from "zod";
@@ -19,6 +19,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function LoginPagina() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const form = useForm<FormData>({
@@ -41,7 +42,8 @@ export default function LoginPagina() {
       return;
     }
 
-    router.push("/dashboard");
+    const nextUrl = searchParams.get("next") ?? searchParams.get("callbackUrl") ?? "/dashboard";
+    router.push(nextUrl);
     router.refresh();
   };
 
