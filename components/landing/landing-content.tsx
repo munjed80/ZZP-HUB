@@ -153,24 +153,54 @@ const tiltEffect = {
   style: { transformStyle: "preserve-3d" as const },
 };
 
+// CTA color variables - natural green to turquoise with premium glossy/mossy glow
+const ctaColors = {
+  from: "#10b981", // natural emerald green (not pale)
+  to: "#14b8a6", // turquoise/teal
+  text: "#f0fdfa", // near-white with subtle teal tint for readability
+  border: "#0d9488", // teal with transparency applied in class
+  glow: "#14b8a6", // teal glow
+  spark: "#f59e0b", // warm amber micro-highlight
+};
+
 const landingCtaBase = [
-  "group relative isolate inline-flex min-h-[44px] items-center justify-center gap-2 overflow-hidden rounded-xl border border-white/40",
-  "bg-[linear-gradient(135deg,#d5ffd6_0%,#9cf3d5_38%,#4cd7d4_100%)] text-sm font-semibold leading-tight text-white",
-  "shadow-[0_18px_46px_-26px_rgba(64,196,176,0.78)] backdrop-blur-[2.5px] transition-[transform,box-shadow,background-position] duration-300 ease-out",
-  "hover:bg-[linear-gradient(135deg,#c8fbdf_0%,#7ae8d7_40%,#21c3d3_100%)] hover:shadow-[0_22px_58px_-26px_rgba(45,193,187,0.95)]",
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/40",
-  "active:scale-[0.99] active:shadow-[0_14px_32px_-24px_rgba(44,163,150,0.7)]",
+  "group relative isolate inline-flex min-h-[44px] items-center justify-center gap-2 overflow-hidden rounded-xl",
+  // Border: teal with slight transparency
+  "border border-[#0d9488]/40",
+  // Gradient: natural green to turquoise (vivid, not pale)
+  `bg-[linear-gradient(135deg,${ctaColors.from}_0%,${ctaColors.to}_100%)]`,
+  // Text: near-white for AA contrast
+  `text-sm font-semibold leading-tight text-[${ctaColors.text}]`,
+  // Shadow: soft teal (not heavy)
+  "shadow-[0_12px_32px_-18px_rgba(20,184,166,0.6)]",
+  // Transitions
+  "transition-[transform,box-shadow,filter] duration-300 ease-out",
+  // Hover: slightly brighter gradient + stronger teal glow
+  "hover:bg-[linear-gradient(135deg,#14b8a6_0%,#0d9488_100%)]",
+  "hover:shadow-[0_16px_40px_-16px_rgba(20,184,166,0.85)]",
+  "hover:brightness-110",
+  // Focus: strong teal outline ring for accessibility
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2",
+  // Active: slight press-down transform
+  "active:scale-[0.98] active:shadow-[0_8px_24px_-14px_rgba(20,184,166,0.7)]",
 ].join(" ");
 const landingCtaDefaultPadding = "px-5 py-3";
 
+// Glow effect: teal radial gradient
 const landingCtaGlow =
-  "pointer-events-none absolute -inset-6 rounded-[18px] bg-[radial-gradient(circle_at_30%_22%,rgba(210,255,214,0.42),transparent_45%)] blur-[28px] opacity-70 transition duration-500 ease-out group-hover:scale-105 group-hover:opacity-95 group-active:opacity-60";
+  `pointer-events-none absolute -inset-6 rounded-[18px] bg-[radial-gradient(circle_at_30%_22%,rgba(20,184,166,0.35),transparent_50%)] blur-[24px] opacity-60 transition duration-500 ease-out group-hover:scale-110 group-hover:opacity-90 group-active:opacity-50`;
+
+// Sheen effect: subtle warm spark on hover (amber micro-highlight)
 const landingCtaSheen =
-  "pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_68%_28%,rgba(120,255,230,0.2),transparent_50%)] opacity-0 transition duration-500 ease-out group-hover:opacity-100 group-hover:brightness-110";
+  `pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_70%_30%,rgba(245,158,11,0.15),transparent_45%)] opacity-0 transition duration-500 ease-out group-hover:opacity-100`;
+
+// Highlight: subtle white gradient for glossy look
 const landingCtaHighlight =
-  "pointer-events-none absolute inset-[1px] rounded-[11px] bg-[linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0.16)_42%,rgba(255,255,255,0))] opacity-80 mix-blend-screen";
+  "pointer-events-none absolute inset-[1px] rounded-[11px] bg-[linear-gradient(180deg,rgba(255,255,255,0.25),rgba(255,255,255,0.08)_50%,rgba(255,255,255,0))] opacity-60 mix-blend-overlay";
+
+// Ring: teal border with enhanced hover state
 const landingCtaRing =
-  "pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] transition duration-300 ease-out group-hover:ring-white/50 group-active:ring-white/35";
+  "pointer-events-none absolute inset-0 rounded-xl ring-1 ring-teal-400/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition duration-300 ease-out group-hover:ring-teal-400/50 group-active:ring-teal-400/25";
 
 type LandingCtaButtonProps = {
   href: string;
