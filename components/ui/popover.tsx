@@ -11,6 +11,7 @@ type PopoverProps = {
   collisionPadding?: number;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  contentClassName?: string;
 };
 
 export function Popover({
@@ -21,6 +22,7 @@ export function Popover({
   collisionPadding = 8,
   open: controlledOpen,
   onOpenChange,
+  contentClassName,
 }: PopoverProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -168,18 +170,19 @@ export function Popover({
             style={{ pointerEvents: "auto" }}
             aria-hidden="true"
           />
-          <div
-            ref={contentRef}
-            onClick={handleContentClick}
-            className={cn(
-              "absolute z-50 min-w-[200px] rounded-xl border border-border bg-popover shadow-xl",
-              getSideClasses(),
-              getAlignmentClasses()
-            )}
-            style={{ pointerEvents: "auto" }}
-          >
-            {children}
-          </div>
+      <div
+        ref={contentRef}
+        onClick={handleContentClick}
+        className={cn(
+          "absolute z-50 min-w-[200px] rounded-xl border border-border bg-popover shadow-xl animate-popover will-change-transform",
+          getSideClasses(),
+          getAlignmentClasses(),
+          contentClassName
+        )}
+        style={{ pointerEvents: "auto" }}
+      >
+        {children}
+      </div>
         </>
       )}
     </div>
