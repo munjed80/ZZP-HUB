@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { type ReactNode } from "react";
 import { motion, type MotionProps, type TargetAndTransition, type Transition } from "framer-motion";
 import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, ShieldCheck, LineChart, Infinity, LifeBuoy, MailCheck } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SupportForm } from "@/components/support/support-form";
 import { AssistantDemo } from "@/components/assistant/assistant-demo";
+import { cn } from "@/lib/utils";
 
 const BrandZ = ({ className }: { className?: string }) => (
   <svg
@@ -151,6 +153,45 @@ const tiltEffect = {
   style: { transformStyle: "preserve-3d" as const },
 };
 
+const landingCtaBase = [
+  "group relative isolate inline-flex min-h-[44px] items-center justify-center gap-2 overflow-hidden rounded-xl border border-white/40",
+  "bg-[linear-gradient(135deg,#d5ffd6_0%,#9cf3d5_38%,#4cd7d4_100%)] text-sm font-semibold leading-tight text-white",
+  "shadow-[0_18px_46px_-26px_rgba(64,196,176,0.78)] backdrop-blur-[2.5px] transition-[transform,box-shadow,background-position] duration-300 ease-out",
+  "hover:bg-[linear-gradient(135deg,#c8fbdf_0%,#7ae8d7_40%,#21c3d3_100%)] hover:shadow-[0_22px_58px_-26px_rgba(45,193,187,0.95)]",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/40",
+  "active:scale-[0.99] active:shadow-[0_14px_32px_-24px_rgba(44,163,150,0.7)]",
+].join(" ");
+const landingCtaDefaultPadding = "px-5 py-3";
+
+const landingCtaGlow =
+  "pointer-events-none absolute -inset-6 rounded-[18px] bg-[radial-gradient(circle_at_30%_22%,rgba(210,255,214,0.42),transparent_45%)] blur-[28px] opacity-70 transition duration-500 ease-out group-hover:scale-105 group-hover:opacity-95 group-active:opacity-60";
+const landingCtaSheen =
+  "pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_68%_28%,rgba(120,255,230,0.2),transparent_50%)] opacity-0 transition duration-500 ease-out group-hover:opacity-100 group-hover:brightness-110";
+const landingCtaHighlight =
+  "pointer-events-none absolute inset-[1px] rounded-[11px] bg-[linear-gradient(180deg,rgba(255,255,255,0.7),rgba(255,255,255,0.16)_42%,rgba(255,255,255,0))] opacity-80 mix-blend-screen";
+const landingCtaRing =
+  "pointer-events-none absolute inset-0 rounded-xl ring-1 ring-white/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] transition duration-300 ease-out group-hover:ring-white/50 group-active:ring-white/35";
+
+type LandingCtaButtonProps = {
+  href: string;
+  children: ReactNode;
+  className?: string;
+  paddingClass?: string;
+};
+
+// Landing-only CTA styling to avoid impacting shared dashboard buttons.
+function LandingCtaButton({ href, children, className = "", paddingClass }: LandingCtaButtonProps) {
+  return (
+    <Link href={href} className={cn(landingCtaBase, paddingClass ?? landingCtaDefaultPadding, className)}>
+      <span className={landingCtaGlow} aria-hidden="true" />
+      <span className={landingCtaSheen} aria-hidden="true" />
+      <span className={landingCtaHighlight} aria-hidden="true" />
+      <span className={landingCtaRing} aria-hidden="true" />
+      <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
+    </Link>
+  );
+}
+
 export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
   const primaryCta = isLoggedIn ? "Naar Dashboard" : "Gratis starten";
 
@@ -200,15 +241,9 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-[rgb(var(--brand-on-primary))]")}>
                     Inloggen
                   </Link>
-                  <Link
-                    href="/register"
-                    className={buttonVariants(
-                      "primary",
-                      "shadow-lg shadow-[0_18px_48px_-30px_rgba(var(--brand-primary),0.42)] px-5 py-2.5 text-sm tracking-tight"
-                    )}
-                  >
+                  <LandingCtaButton href="/register" paddingClass="px-5 py-2.5">
                     Gratis starten
-                  </Link>
+                  </LandingCtaButton>
                 </>
               )}
             </div>
@@ -259,17 +294,14 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   {...fadeUp}
                   transition={fadeUpTransition(0.15)}
                 >
-                  <Link
+                  <LandingCtaButton
                     href={isLoggedIn ? "/dashboard" : "/register"}
-                    className={buttonVariants(
-                      "primary",
-                      "group relative px-8 py-4 text-base font-semibold shadow-[0_0_44px_rgba(var(--brand-primary),0.3)] hover:shadow-[0_0_64px_rgba(var(--brand-primary),0.52)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d4f4f]"
-                    )}
+                    paddingClass="px-8 py-4"
+                    className="text-base"
                   >
-                    <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-amber-400/0 via-amber-400/12 to-amber-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     Start 14 dagen gratis
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden />
-                  </Link>
+                  </LandingCtaButton>
 
                   {/* Trust signals */}
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
