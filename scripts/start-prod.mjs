@@ -12,6 +12,7 @@ const REQUIRED_ENV = [
 ];
 const DEFAULT_HOST = "0.0.0.0";
 const DEFAULT_PORT = "3000";
+const USER_TABLE = "User";
 
 function validateEnv() {
   const missing = REQUIRED_ENV.filter(
@@ -152,7 +153,7 @@ async function verifyRequiredColumns() {
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = current_schema()
-    AND table_name = ${"User"}
+    AND table_name = ${USER_TABLE}
     AND column_name IN (${Prisma.join(requiredColumns)})
   `;
 
@@ -179,8 +180,11 @@ async function verifyDatabase() {
     await prisma.$queryRawUnsafe("SELECT 1 as ok");
     console.log("[start-prod] Database connectivity check: OK");
   } catch (error) {
-    console.error("[start-prod] Database connectivity check failed:", error);
-    process.exit(1);
+    throw new Error(
+      `[start-prod] Database connectivity check failed: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
   }
 }
 

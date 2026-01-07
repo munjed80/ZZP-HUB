@@ -33,6 +33,8 @@ function isAuthorizeResult(user: unknown): user is AuthorizeResult {
   );
 }
 
+const DEFAULT_ROLE: UserRole = "COMPANY_ADMIN";
+
 function isMissingOnboardingColumns(error: unknown) {
   if (
     error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -244,7 +246,7 @@ export const authOptions: NextAuthOptions = {
          if (typeof token.role === "string") {
            session.user.role = token.role as UserRole;
          } else {
-           session.user.role = session.user.role ?? "COMPANY_ADMIN";
+           session.user.role = session.user.role ?? DEFAULT_ROLE;
          }
          session.user.isSuspended = Boolean(token.isSuspended);
          session.user.emailVerified = Boolean(token.emailVerified);
