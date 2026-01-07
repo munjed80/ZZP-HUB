@@ -3,6 +3,7 @@ import { render } from '@react-email/render';
 import type { ReactElement } from 'react';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'demo-key');
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Matrixtop <no-reply@matrixtop.com>';
 
 interface SendEmailOptions {
   to: string;
@@ -29,7 +30,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
     }
 
     const result = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'ZZP-HUB <noreply@zzp-hub.nl>',
+      from: EMAIL_FROM,
       to,
       subject,
       html,
