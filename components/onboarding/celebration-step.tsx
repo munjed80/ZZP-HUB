@@ -14,8 +14,26 @@ export function CelebrationStep({ onNext }: CelebrationStepProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [showConfetti, setShowConfetti] = useState(false);
+  const [confettiItems, setConfettiItems] = useState<Array<{
+    left: number;
+    top: number;
+    color: string;
+    delay: number;
+    duration: number;
+  }>>([]);
 
   useEffect(() => {
+    // Generate confetti positions once
+    const colors = ['#0A2E50', '#1D4ED8', '#10B981', '#F59E0B', '#EF4444'];
+    const items = [...Array(30)].map(() => ({
+      left: Math.random() * 100,
+      top: Math.random() * 20,
+      color: colors[Math.floor(Math.random() * 5)],
+      delay: Math.random() * 0.5,
+      duration: 2 + Math.random() * 1,
+    }));
+    setConfettiItems(items);
+    
     // Trigger confetti animation
     setShowConfetti(true);
     const timer = setTimeout(() => setShowConfetti(false), 3000);
@@ -38,16 +56,16 @@ export function CelebrationStep({ onNext }: CelebrationStepProps) {
       {/* Simple confetti effect using CSS */}
       {showConfetti && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(30)].map((_, i) => (
+          {confettiItems.map((item, i) => (
             <div
               key={i}
               className="absolute w-2 h-2 rounded-full animate-confetti"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `-${Math.random() * 20}%`,
-                backgroundColor: ['#0A2E50', '#1D4ED8', '#10B981', '#F59E0B', '#EF4444'][Math.floor(Math.random() * 5)],
-                animationDelay: `${Math.random() * 0.5}s`,
-                animationDuration: `${2 + Math.random() * 1}s`,
+                left: `${item.left}%`,
+                top: `-${item.top}%`,
+                backgroundColor: item.color,
+                animationDelay: `${item.delay}s`,
+                animationDuration: `${item.duration}s`,
               }}
             />
           ))}

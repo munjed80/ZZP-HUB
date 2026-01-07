@@ -9,32 +9,38 @@ export async function verifyEmailToken(token: string) {
       return { success: false, message: "Geen token opgegeven." };
     }
 
-    // Find all verification tokens and check which one matches
+    // First, find all non-expired tokens (this reduces the search space)
+    const now = new Date();
     const tokens = await prisma.emailVerificationToken.findMany({
+      where: {
+        expiresAt: {
+          gte: now,
+        },
+      },
       include: {
         user: true,
       },
     });
 
+    if (tokens.length === 0) {
+      return { success: false, message: "Ongeldige of verlopen verificatielink." };
+    }
+
+    // Verify against all tokens in constant time to prevent timing attacks
     let matchedToken = null;
+    let hasMatch = false;
+    
     for (const dbToken of tokens) {
       const isValid = await verifyToken(token, dbToken.token);
-      if (isValid) {
+      // Always check all tokens (constant time) but only store the first match
+      if (isValid && !hasMatch) {
         matchedToken = dbToken;
-        break;
+        hasMatch = true;
       }
     }
 
     if (!matchedToken) {
       return { success: false, message: "Ongeldige of verlopen verificatielink." };
-    }
-
-    // Check if token is expired
-    if (matchedToken.expiresAt < new Date()) {
-      await prisma.emailVerificationToken.delete({
-        where: { id: matchedToken.id },
-      });
-      return { success: false, message: "Deze verificatielink is verlopen." };
     }
 
     // Update user as verified
