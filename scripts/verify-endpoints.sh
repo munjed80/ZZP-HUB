@@ -23,7 +23,7 @@ check_endpoint() {
     
     echo -n "Testing $description ($url)... "
     
-    status=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10)
+    status=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10 --fail 2>/dev/null || echo "000")
     
     if [ "$status" -eq "$expected_status" ]; then
         echo -e "${GREEN}✓ OK${NC} (HTTP $status)"
@@ -42,7 +42,7 @@ check_content() {
     
     echo -n "Checking $description... "
     
-    content=$(curl -s "$url" --max-time 10)
+    content=$(curl -s "$url" --max-time 10 --fail 2>/dev/null || echo "")
     
     if echo "$content" | grep -q "$search_text"; then
         echo -e "${GREEN}✓ OK${NC}"

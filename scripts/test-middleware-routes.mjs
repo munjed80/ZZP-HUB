@@ -4,13 +4,18 @@
  * This script tests the middleware configuration to ensure public routes
  * are correctly defined and don't require authentication.
  * 
+ * NOTE: These routes should match the routes defined in middleware.ts.
+ * If middleware.ts is updated, update these test cases accordingly.
+ * 
  * Run with: node scripts/test-middleware-routes.mjs
  */
 
 // Public routes that should be accessible without authentication
+// IMPORTANT: Keep in sync with middleware.ts publicRoutes array
 const publicRoutes = ['/', '/login', '/register', '/check-email', '/verify-email', '/verify-required', '/resend-verification', '/offline', '/pricing', '/about'];
 
 // Public assets that should be accessible without authentication
+// IMPORTANT: Keep in sync with middleware.ts publicAssets array
 const publicAssets = ['/sw.js', '/manifest.webmanifest', '/offline.html', '/robots.txt', '/sitemap.xml', '/favicon.ico'];
 
 // API routes that should pass through

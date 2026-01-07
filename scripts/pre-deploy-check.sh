@@ -101,7 +101,7 @@ echo "--------------------------------"
 check "User model has emailVerified field" "grep -q 'emailVerified' prisma/schema.prisma"
 check "User model has onboardingCompleted field" "grep -q 'onboardingCompleted' prisma/schema.prisma"
 check "EmailVerificationToken model exists" "grep -q 'model EmailVerificationToken' prisma/schema.prisma"
-check "Migration exists for email verification" "[ -d prisma/migrations/*email* ] || ls prisma/migrations/ | grep -q verification" "warning"
+check "Migration exists for email verification" "find prisma/migrations -type d -name '*email*' | grep -q . || find prisma/migrations -type d -name '*verification*' | grep -q ." "warning"
 
 echo ""
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
