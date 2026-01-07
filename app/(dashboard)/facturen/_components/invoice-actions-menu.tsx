@@ -102,7 +102,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
   };
 
   const menuContent = (
-    <div className="w-[240px] rounded-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#103833] to-[#0B2C28] p-3 text-white shadow-[0_18px_52px_-28px_rgba(0,0,0,0.6)]">
+    <div className="w-[240px] rounded-2xl border border-[#14544F] bg-gradient-to-br from-[#114C4A] via-[#0F6F68] to-[#0B4D52] p-3 text-white shadow-[0_18px_52px_-28px_rgba(8,71,66,0.6)]">
       <div className="flex items-center justify-between border-b border-white/5 pb-2">
         <div className="space-y-0.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9FCBC4]">Acties</p>
@@ -117,8 +117,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
             href={shareLink}
             className={buttonVariants(
               "ghost",
-              "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/10",
-            )}
+               "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.06] text-white hover:bg-white/10",
+             )}
             onClick={() => setMenuOpen(false)}
           >
             <Eye className="h-4 w-4" aria-hidden />
@@ -130,8 +130,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
             href={editHref}
             className={buttonVariants(
               "ghost",
-              "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/10",
-            )}
+               "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.06] text-white hover:bg-white/10",
+             )}
             onClick={() => setMenuOpen(false)}
           >
             <Edit3 className="h-4 w-4" aria-hidden />
@@ -141,7 +141,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
         <InvoicePdfDownloadButton
           invoice={pdfInvoice}
           label="Download PDF"
-          className="h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.12]"
+          className="h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.07] text-white hover:bg-white/[0.12]"
           variant="ghost"
           icon={<FileDown className="h-4 w-4" aria-hidden />}
         />
@@ -151,7 +151,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
           className={cn(
             buttonVariants(
               "ghost",
-              "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/10",
+               "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.06] text-white hover:bg-white/10",
             ),
           )}
         >
@@ -164,7 +164,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
           disabled={isPending}
           className={buttonVariants(
             "ghost",
-            "h-10 w-full justify-start gap-2 rounded-xl border border-[#E54848]/40 bg-[#1A0F11] text-[#FCA5A5] hover:border-[#E54848]/60 hover:bg-[#240F12]",
+           "h-10 w-full justify-start gap-2 rounded-xl border border-[#E54848]/40 bg-[#1D1113] text-[#FCA5A5] hover:border-[#E54848]/60 hover:bg-[#2A171A]",
           )}
         >
           {isPending && pendingAction === "delete" ? (
@@ -189,9 +189,10 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
           type="button"
           className={buttonVariants(
             "ghost",
-            "h-10 w-10 rounded-full border border-[#123C37] bg-gradient-to-br from-[#0F5E57] via-[#0E6F64] to-[#0B4E48] p-0 text-white shadow-[0_14px_34px_-22px_rgba(12,94,87,0.85)] hover:text-white",
+            "h-10 w-10 rounded-full border border-[#14544F] bg-gradient-to-br from-[#0F7E78] via-[#0FA9A3] to-[#0B6A70] p-0 text-white shadow-[0_14px_34px_-22px_rgba(12,140,135,0.75)] hover:text-white",
           )}
           aria-label="Acties"
+          aria-expanded={menuOpen}
         >
           <MoreVertical className="h-4 w-4" aria-hidden />
         </button>
