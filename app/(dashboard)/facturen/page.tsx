@@ -6,9 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { formatBedrag } from "@/lib/utils";
-import { InvoiceActionsMenu } from "./_components/invoice-actions-menu";
-import { InvoicePaymentStatus } from "./_components/invoice-payment-status";
+import { InvoiceList } from "./_components/invoice-list";
 import { InvoiceEmailStatus, Prisma, UserRole } from "@prisma/client";
 import type { Metadata } from "next";
 
@@ -71,7 +69,10 @@ export default async function FacturenPagina() {
     const isOverdue = !isPaid && new Date(factuur.dueDate) < now;
 
     return {
-      factuur,
+      id: factuur.id,
+      invoiceNum: factuur.invoiceNum,
+      clientName: factuur.client.name,
+      amount: invoiceAmount(factuur.lines),
       pdfInvoice: mapInvoiceToPdfData(factuur),
       formattedDate,
       formattedDueDate,
@@ -138,90 +139,9 @@ export default async function FacturenPagina() {
             ) : (
               <EmptyState tone="dark" />
             )
-          ) : (
-            <>
-              {/* Desktop View */}
-              <div className="hidden md:flex md:flex-col gap-3">
-                {mappedInvoices.map(
-                  ({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, dueToneClass, dueLabel }) => (
-                  <div
-                    key={factuur.id}
-                   className="rounded-2xl border border-[#124D48]/70 bg-gradient-to-br from-[#0F4646] via-[#0E5C58] to-[#0A3C40] px-4 py-3.5 shadow-[0_18px_48px_-30px_rgba(3,56,52,0.55)] transition hover:-translate-y-[1px]"
-                  >
-                    <div className="flex items-start justify-between gap-6">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold text-white">{factuur.invoiceNum}</p>
-                          <p className="truncate text-xs text-[#9FCBC4]">{factuur.client.name}</p>
-                        </div>
-                        <div className="mt-1 flex flex-wrap gap-3 text-xs text-[#9FCBC4]">
-                          <span>Datum {formattedDate}</span>
-                          <span className={`font-semibold ${dueToneClass}`}>
-                            {dueLabel} {formattedDueDate}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex min-w-[220px] flex-col items-end gap-2">
-                        <div className="flex items-start gap-3">
-                          <div className="text-right">
-                            <p className="text-lg font-semibold tabular-nums text-white">
-                              {formatBedrag(invoiceAmount(factuur.lines))}
-                            </p>
-                            <p className={`text-[12px] ${dueToneClass}`}>
-                              {dueLabel} {formattedDueDate}
-                            </p>
-                          </div>
-                          <InvoiceActionsMenu
-                            pdfInvoice={pdfInvoice}
-                            invoiceId={factuur.id}
-                            editHref={`/facturen/${factuur.id}/edit`}
-                            shareLink={`/facturen/${factuur.id}`}
-                          />
-                        </div>
-                        <InvoicePaymentStatus invoiceId={factuur.id} isPaid={isPaid} paidDateLabel={paidDateLabel} />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Mobile Card View */}
-              <div className="flex flex-col gap-3 md:hidden">
-                {mappedInvoices.map(
-                  ({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, dueToneClass, dueLabel }) => (
-                  <div
-                    key={factuur.id}
-                   className="rounded-2xl border border-[#124D48]/70 bg-gradient-to-br from-[#0F4646] via-[#0E5C58] to-[#0A3C40] p-3.5 shadow-[0_18px_48px_-30px_rgba(3,56,52,0.55)]"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-white">{factuur.invoiceNum}</p>
-                        <p className="text-xs text-[#9FCBC4] mt-0.5">Datum {formattedDate}</p>
-                        <p className="text-sm text-[#CFEDEA] mt-0.5">{factuur.client.name}</p>
-                      </div>
-                      <InvoiceActionsMenu
-                        pdfInvoice={pdfInvoice}
-                        invoiceId={factuur.id}
-                        editHref={`/facturen/${factuur.id}/edit`}
-                        shareLink={`/facturen/${factuur.id}`}
-                      />
-                    </div>
-                    <div className="mt-3 flex items-center justify-between">
-                      <p className={`text-xs font-semibold ${dueToneClass}`}>
-                        {dueLabel} {formattedDueDate}
-                      </p>
-                      <p className="text-base font-semibold tabular-nums text-white">
-                        {formatBedrag(invoiceAmount(factuur.lines))}
-                      </p>
-                    </div>
-                    <div className="mt-3 flex items-end justify-between gap-3">
-                      <InvoicePaymentStatus invoiceId={factuur.id} isPaid={isPaid} paidDateLabel={paidDateLabel} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+           ) : (
+             <InvoiceList invoices={mappedInvoices} />
+           )}
         </CardContent>
       </Card>
     </div>
