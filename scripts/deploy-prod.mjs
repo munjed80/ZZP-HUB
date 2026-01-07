@@ -15,12 +15,14 @@ const requiredEnv = [
   "RESEND_API_KEY",
   "NEXTAUTH_URL",
 ];
+const EXPECTED_NEXTAUTH_URL = process.env.EXPECTED_NEXTAUTH_URL;
+const DEFAULT_PORT = "3000";
 
-function runCommand(command, args = []) {
+function runCommand(command, args = [], options = {}) {
   log(`RUN ${[command, ...args].join(" ")}`);
   const result = spawnSync(command, args, {
     stdio: "inherit",
-    env: process.env,
+    env: options.env ?? process.env,
     shell: false,
   });
 
@@ -59,9 +61,10 @@ function assertSafeMigrationName(value) {
 }
 
 function validateRuntimeEnvironment() {
-  const missing = requiredEnv.filter(
-    (name) => typeof process.env[name] !== "string" || process.env[name] === "",
-  );
+  const missing = requiredEnv.filter((name) => {
+    const value = process.env[name];
+    return typeof value !== "string" || value.trim() === "";
+  });
 
   if (missing.length > 0) {
     throw new Error(
@@ -69,13 +72,15 @@ function validateRuntimeEnvironment() {
     );
   }
 
-  const expectedNextAuthUrl = "https://matrixtop.com";
-  if (
-    process.env.NODE_ENV === "production" &&
-    process.env.NEXTAUTH_URL !== expectedNextAuthUrl
-  ) {
+  if (!EXPECTED_NEXTAUTH_URL) {
     throw new Error(
-      `NEXTAUTH_URL must be set to ${expectedNextAuthUrl} (current: ${process.env.NEXTAUTH_URL})`,
+      "EXPECTED_NEXTAUTH_URL environment variable is required for production deployment validation. Please set this variable to the expected production URL.",
+    );
+  }
+
+  if (process.env.NEXTAUTH_URL !== EXPECTED_NEXTAUTH_URL) {
+    throw new Error(
+      `NEXTAUTH_URL must be set to ${EXPECTED_NEXTAUTH_URL}, current: ${process.env.NEXTAUTH_URL}`,
     );
   }
 }
@@ -202,8 +207,7 @@ async function main() {
 
   logStep("Starting Next.js standalone server");
   await prisma.$disconnect();
-  const port = process.env.PORT || "3000";
-  process.env.PORT = port;
+  const port = process.env.PORT || DEFAULT_PORT;
   log(`Using PORT=${port}`);
   const serverPath = path.join(
     process.cwd(),
@@ -218,7 +222,7 @@ async function main() {
     );
   }
 
-  runCommand("node", [serverPath]);
+  runCommand("node", [serverPath], { env: { ...process.env, PORT: port } });
 }
 
 main()
