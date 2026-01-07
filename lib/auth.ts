@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
-import type { UserRole } from "@prisma/client";
+import { Prisma, type UserRole } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -33,6 +33,18 @@ function isAuthorizeResult(user: unknown): user is AuthorizeResult {
   );
 }
 
+const DEFAULT_ROLE: UserRole = "COMPANY_ADMIN";
+
+function isMissingOnboardingColumns(error: unknown) {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2022"
+  ) {
+    return true;
+  }
+  return error instanceof Error && /emailVerified|onboarding/i.test(error.message);
+}
+
 /**
  * Authorize function for credentials-based authentication.
  * 
@@ -62,21 +74,54 @@ export async function authorize(
     }
 
     // Use Prisma to find the user by email
-    const user = await prisma.user.findUnique({
-      where: {
-        email: credentials.email,
-      },
-      select: {
-        id: true,
-        email: true,
-        password: true,
-        naam: true,
-        role: true,
-        isSuspended: true,
-        emailVerified: true,
-        onboardingCompleted: true,
-      },
-    });
+    let user:
+      | (AuthorizeResult & { password: string })
+      | {
+          id: string;
+          email: string;
+          password: string;
+          naam: string | null;
+          role: UserRole;
+          isSuspended: boolean;
+        }
+      | null = null;
+
+    try {
+      user = await prisma.user.findUnique({
+        where: {
+          email: credentials.email,
+        },
+        select: {
+          id: true,
+          email: true,
+          password: true,
+          naam: true,
+          role: true,
+          isSuspended: true,
+          emailVerified: true,
+          onboardingCompleted: true,
+        },
+      });
+    } catch (error) {
+      if (isMissingOnboardingColumns(error)) {
+        console.warn(
+          "[auth] Missing onboarding/email verification columns detected, continuing with safe defaults",
+        );
+        user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+          select: {
+            id: true,
+            email: true,
+            password: true,
+            naam: true,
+            role: true,
+            isSuspended: true,
+          },
+        });
+      } else {
+        throw error;
+      }
+    }
 
     if (!user) {
       if (shouldLogAuth) {
@@ -120,6 +165,11 @@ export async function authorize(
       console.log("Authorize success", { emailMasked: maskedEmail });
     }
 
+    const emailVerified =
+      "emailVerified" in user ? Boolean(user.emailVerified) : false;
+    const onboardingCompleted =
+      "onboardingCompleted" in user ? Boolean(user.onboardingCompleted) : false;
+
     // Return user with role and id from database
     // This data should be included in NextAuth session and jwt callbacks
     return {
@@ -128,8 +178,8 @@ export async function authorize(
       naam: user.naam,
       role: user.role,
       isSuspended: user.isSuspended,
-      emailVerified: user.emailVerified,
-      onboardingCompleted: user.onboardingCompleted,
+      emailVerified,
+      onboardingCompleted,
     };
   } catch (error) {
     console.error("Error during authorization:", error);
@@ -174,28 +224,37 @@ export const authOptions: NextAuthOptions = {
        }
      })
    ],
-   callbacks: {
-      async jwt({ token, user }) {
-        if (user && isAuthorizeResult(user)) {
-         token.id = user.id;
-         token.role = user.role;
+    callbacks: {
+       async jwt({ token, user }) {
+         if (user && isAuthorizeResult(user)) {
+          token.id = user.id;
+          token.role = user.role;
          token.isSuspended = user.isSuspended;
          token.emailVerified = user.emailVerified;
          token.onboardingCompleted = user.onboardingCompleted;
-        }
-        return token;
-      },
-      async session({ session, token }) {
-        if (session.user) {
-         session.user.id = token.id as string;
-         session.user.role = token.role as UserRole;
+         }
+         token.isSuspended = Boolean(token.isSuspended);
+         token.emailVerified = Boolean(token.emailVerified);
+         token.onboardingCompleted = Boolean(token.onboardingCompleted);
+         return token;
+       },
+       async session({ session, token }) {
+         if (session.user) {
+         if (typeof token.id === "string") {
+           session.user.id = token.id;
+         }
+         if (typeof token.role === "string") {
+           session.user.role = token.role as UserRole;
+         } else {
+           session.user.role = session.user.role ?? DEFAULT_ROLE;
+         }
          session.user.isSuspended = Boolean(token.isSuspended);
          session.user.emailVerified = Boolean(token.emailVerified);
          session.user.onboardingCompleted = Boolean(token.onboardingCompleted);
-        }
-        return session;
-      }
-   },
+         }
+         return session;
+       }
+    },
   pages: {
     signIn: "/login",
   }

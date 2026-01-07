@@ -109,6 +109,7 @@ WHERE email = 'test@example.com';
    npm start
    ```
    `npm start` gebruikt `scripts/start-prod.mjs`: valideert verplichte env vars, draait `prisma migrate deploy` + `prisma generate`, doet een DB-connectivity check (`SELECT 1`) en start vervolgens de standalone server (`node .next/standalone/server.js`) op `HOST=0.0.0.0`.
+   Als de database al tabellen heeft maar geen `_prisma_migrations` tabel bevat, markeert het startscript automatisch de baseline-migratie als toegepast via `prisma migrate resolve` en controleert het dat de onboarding- en emailkolommen aanwezig zijn.
    Coolify start command: **`npm start`** (migraties worden automatisch vóór de serverstart uitgevoerd).
 
 3. Snelle rooktest na deploy:

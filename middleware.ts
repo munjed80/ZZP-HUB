@@ -33,6 +33,8 @@ export async function middleware(request: NextRequest) {
 
   // Get the JWT token
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const emailVerified = Boolean(token?.emailVerified);
+  const onboardingCompleted = Boolean(token?.onboardingCompleted);
 
   // If not logged in, redirect to login
   if (!token) {
@@ -43,7 +45,7 @@ export async function middleware(request: NextRequest) {
 
   // If logged in but email not verified, redirect to verify-required
   // (except if already on a pre-verification route)
-  if (!token.emailVerified && !preVerificationRoutes.includes(pathname)) {
+  if (!emailVerified && !preVerificationRoutes.includes(pathname)) {
     const verifyUrl = new URL('/verify-required', request.url);
     verifyUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(verifyUrl);
@@ -51,7 +53,7 @@ export async function middleware(request: NextRequest) {
 
   // If email verified but onboarding not completed, redirect to onboarding
   // (except if already on onboarding route)
-  if (token.emailVerified && !token.onboardingCompleted && !pathname.startsWith('/onboarding')) {
+  if (emailVerified && !onboardingCompleted && !pathname.startsWith('/onboarding')) {
     const onboardingUrl = new URL('/onboarding', request.url);
     onboardingUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(onboardingUrl);
