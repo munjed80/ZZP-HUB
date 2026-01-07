@@ -77,7 +77,8 @@ export default async function FacturenPagina() {
       formattedDueDate,
       isPaid,
       paidDateLabel,
-      isOverdue,
+      dueToneClass: isOverdue ? "text-[#F2B705]" : "text-[#9FCBC4]",
+      dueLabel: isOverdue ? "Te laat ·" : "Vervalt",
     };
   });
 
@@ -141,7 +142,8 @@ export default async function FacturenPagina() {
             <>
               {/* Desktop View */}
               <div className="hidden md:flex md:flex-col gap-3">
-                {mappedInvoices.map(({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, isOverdue }) => (
+                {mappedInvoices.map(
+                  ({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, dueToneClass, dueLabel }) => (
                   <div
                     key={factuur.id}
                     className="rounded-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#10322E] to-[#0B2724] px-4 py-3.5 shadow-[0_18px_48px_-30px_rgba(0,0,0,0.65)] transition hover:-translate-y-[1px]"
@@ -154,8 +156,8 @@ export default async function FacturenPagina() {
                         </div>
                         <div className="mt-1 flex flex-wrap gap-3 text-xs text-[#9FCBC4]">
                           <span>Datum {formattedDate}</span>
-                          <span className={`font-semibold ${isOverdue ? "text-[#F2B705]" : "text-[#9FCBC4]"}`}>
-                            Vervalt {formattedDueDate}
+                          <span className={`font-semibold ${dueToneClass}`}>
+                            {dueLabel} {formattedDueDate}
                           </span>
                         </div>
                       </div>
@@ -165,8 +167,8 @@ export default async function FacturenPagina() {
                             <p className="text-lg font-semibold tabular-nums text-white">
                               {formatBedrag(invoiceAmount(factuur.lines))}
                             </p>
-                            <p className={`text-[12px] ${isOverdue ? "text-[#F2B705]" : "text-[#9FCBC4]"}`}>
-                              {isOverdue ? "Te laat ·" : "Vervalt"} {formattedDueDate}
+                            <p className={`text-[12px] ${dueToneClass}`}>
+                              {dueLabel} {formattedDueDate}
                             </p>
                           </div>
                           <InvoiceActionsMenu
@@ -185,7 +187,8 @@ export default async function FacturenPagina() {
 
               {/* Mobile Card View */}
               <div className="flex flex-col gap-3 md:hidden">
-                {mappedInvoices.map(({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, isOverdue }) => (
+                {mappedInvoices.map(
+                  ({ factuur, pdfInvoice, formattedDate, formattedDueDate, isPaid, paidDateLabel, dueToneClass, dueLabel }) => (
                   <div
                     key={factuur.id}
                     className="rounded-2xl border border-[#123C37] bg-gradient-to-br from-[#0F2F2C] via-[#10322E] to-[#0B2724] p-3.5 shadow-[0_18px_48px_-30px_rgba(0,0,0,0.6)]"
@@ -204,8 +207,8 @@ export default async function FacturenPagina() {
                       />
                     </div>
                     <div className="mt-3 flex items-center justify-between">
-                      <p className={`text-xs font-semibold ${isOverdue ? "text-[#F2B705]" : "text-[#9FCBC4]"}`}>
-                        Vervalt {formattedDueDate}
+                      <p className={`text-xs font-semibold ${dueToneClass}`}>
+                        {dueLabel} {formattedDueDate}
                       </p>
                       <p className="text-base font-semibold tabular-nums text-white">
                         {formatBedrag(invoiceAmount(factuur.lines))}

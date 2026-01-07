@@ -138,15 +138,13 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink 
             Bewerk factuur
           </Link>
         ) : null}
-        <div className="w-full">
-          <InvoicePdfDownloadButton
-            invoice={pdfInvoice}
-            label="Download PDF"
-            className="h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.12]"
-            variant="ghost"
-            icon={<FileDown className="h-4 w-4" aria-hidden />}
-          />
-        </div>
+        <InvoicePdfDownloadButton
+          invoice={pdfInvoice}
+          label="Download PDF"
+          className="h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.12]"
+          variant="ghost"
+          icon={<FileDown className="h-4 w-4" aria-hidden />}
+        />
         <button
           type="button"
           onClick={handleShare}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Check, Loader2, Undo2 } from "lucide-react";
@@ -17,17 +17,20 @@ export function InvoicePaymentStatus({ invoiceId, isPaid, paidDateLabel }: Invoi
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const runAction = (action: () => Promise<{ success?: boolean; message?: string }>, successMessage: string) => {
-    startTransition(async () => {
-      const result = await action();
-      if (result?.success) {
-        toast.success(successMessage);
-        router.refresh();
-      } else {
-        toast.error(result?.message ?? "Actie mislukt. Probeer opnieuw.");
-      }
-    });
-  };
+  const runAction = useCallback(
+    (action: () => Promise<{ success?: boolean; message?: string }>, successMessage: string) => {
+      startTransition(async () => {
+        const result = await action();
+        if (result?.success) {
+          toast.success(successMessage);
+          router.refresh();
+        } else {
+          toast.error(result?.message ?? "Actie mislukt. Probeer opnieuw.");
+        }
+      });
+    },
+    [router],
+  );
 
   const handleMarkPaid = () => runAction(() => markAsPaid(invoiceId), "Factuur gemarkeerd als betaald");
   const handleMarkUnpaid = () => runAction(() => markAsUnpaid(invoiceId), "Betaling ongedaan gemaakt");
