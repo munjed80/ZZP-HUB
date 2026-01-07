@@ -504,7 +504,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             <Card className="relative overflow-hidden bg-white/95 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]">
               <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-50 via-white/60 to-emerald-100/40 dark:from-emerald-900/30 dark:via-slate-900/60 dark:to-emerald-800/25"
-                aria-hidden
+                aria-hidden="true"
               />
               <CardHeader className="relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between pb-5">
                 <div className="space-y-2">
@@ -540,7 +540,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     <p className="mt-1">Volledige toegang tot alle functies</p>
                   </div>
                 </div>
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   <Button
                     type="button"
                     onClick={() => setSubscriptionModal("manage")}
