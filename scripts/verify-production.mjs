@@ -97,7 +97,6 @@ async function testServiceWorker() {
     
     if (response.status === 200) {
       const contentType = response.headers.get('content-type');
-      const cacheControl = response.headers.get('cache-control');
       
       if (contentType && contentType.includes('javascript')) {
         addResult('Service Worker', 'PASS', 'sw.js is accessible with correct content-type');
@@ -127,7 +126,6 @@ async function testWebManifest() {
     const response = await fetchWithTimeout(`${BASE_URL}/manifest.webmanifest`);
     
     if (response.status === 200) {
-      const contentType = response.headers.get('content-type');
       const data = await response.json();
       
       if (data.name && data.icons && Array.isArray(data.icons)) {
