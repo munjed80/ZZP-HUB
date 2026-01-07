@@ -153,30 +153,20 @@ const tiltEffect = {
   style: { transformStyle: "preserve-3d" as const },
 };
 
-// CTA color variables - natural green gradient with premium glossy glow
-const ctaColors = {
-  from: "#15803d", // rich natural green
-  to: "#16a34a", // fresh mid-green
-  text: "#f7fee7", // soft off-white for contrast
-  border: "#166534", // deep green border
-  glow: "#22c55e", // subtle green glow
-  spark: "#bbf7d0", // light moss highlight
-};
-
 const landingCtaBase = [
   "group relative isolate inline-flex min-h-[44px] items-center justify-center gap-2 overflow-hidden rounded-xl",
   // Border: green with slight transparency
-  "border border-[#166534]/35",
+  "border border-emerald-800/35",
   // Gradient: natural greens
-  `bg-[linear-gradient(135deg,${ctaColors.from}_0%,${ctaColors.to}_100%)]`,
+  "bg-gradient-to-br from-emerald-700 to-emerald-600",
   // Text: near-white for AA contrast
-  `text-sm font-semibold leading-tight text-[${ctaColors.text}]`,
+  "text-sm font-semibold leading-tight text-lime-50",
   // Shadow: soft green (not heavy)
   "shadow-[0_12px_32px_-18px_rgba(34,197,94,0.6)]",
   // Transitions
   "transition-[transform,box-shadow,filter] duration-300 ease-out",
   // Hover: slightly brighter gradient + stronger green glow
-  "hover:bg-[linear-gradient(135deg,#16a34a_0%,#15803d_100%)]",
+  "hover:from-emerald-600 hover:to-emerald-700",
   "hover:shadow-[0_16px_40px_-16px_rgba(34,197,94,0.85)]",
   "hover:brightness-110",
   // Focus: strong emerald outline ring for accessibility
