@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma } from "@prisma/client";
-import { execSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -9,9 +9,17 @@ const prisma = new PrismaClient();
 const log = (message) => console.log(`[deploy] ${message}`);
 const logStep = (message) => console.log(`\n[deploy] === ${message} ===`);
 
-function runCommand(command) {
-  log(`RUN ${command}`);
-  execSync(command, { stdio: "inherit", env: process.env });
+function runCommand(command, args = []) {
+  log(`RUN ${[command, ...args].join(" ")}`);
+  const result = spawnSync(command, args, {
+    stdio: "inherit",
+    env: process.env,
+    shell: false,
+  });
+
+  if (result.status !== 0) {
+    throw new Error(`Command failed: ${[command, ...args].join(" ")}`);
+  }
 }
 
 function getMigrationFolders() {
@@ -28,7 +36,24 @@ function getMigrationFolders() {
     .sort();
 }
 
+const safeIdentifierPattern = /^[A-Za-z0-9_]+$/;
+const safeMigrationPattern = /^[A-Za-z0-9._-]+$/;
+
+function assertSafeIdentifier(value, label) {
+  if (!safeIdentifierPattern.test(value)) {
+    throw new Error(`${label} contains invalid characters: ${value}`);
+  }
+}
+
+function assertSafeMigrationName(value) {
+  if (!safeMigrationPattern.test(value)) {
+    throw new Error(`Invalid migration folder name: ${value}`);
+  }
+}
+
 async function tableExists(tableName) {
+  assertSafeIdentifier(tableName, "Table name");
+
   const result = await prisma.$queryRaw`
     SELECT EXISTS (
       SELECT 1
@@ -53,6 +78,8 @@ async function hasUserTables() {
 }
 
 async function verifyRequiredColumns() {
+  assertSafeIdentifier("User", "User table name");
+
   const requiredColumns = [
     "emailVerified",
     "emailVerificationToken",
@@ -69,7 +96,7 @@ async function verifyRequiredColumns() {
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = current_schema()
-    AND table_name = 'User'
+    AND table_name = ${"User"}
     AND column_name IN (${Prisma.join(requiredColumns)})
   `;
 
@@ -111,21 +138,28 @@ async function deployMigrations(migrationFolders) {
       throw new Error("No migration folders found to mark as baseline.");
     }
 
+    assertSafeMigrationName(baselineMigration);
     log(
       `_prisma_migrations missing, but database has tables -> marking baseline ${baselineMigration} as applied.`,
     );
-    runCommand(`npx prisma migrate resolve --applied ${baselineMigration}`);
+    runCommand("npx", [
+      "prisma",
+      "migrate",
+      "resolve",
+      "--applied",
+      baselineMigration,
+    ]);
   } else {
     log("Database empty -> running migrate deploy from scratch.");
   }
 
   log("Running pending migrations via prisma migrate deploy.");
-  runCommand("npx prisma migrate deploy");
+  runCommand("npx", ["prisma", "migrate", "deploy"]);
 }
 
 async function main() {
   logStep("Prisma generate");
-  runCommand("npx prisma generate");
+  runCommand("npx", ["prisma", "generate"]);
 
   logStep("Inspecting migrations and database state");
   const migrationFolders = getMigrationFolders();
@@ -136,7 +170,12 @@ async function main() {
 
   logStep("Starting Next.js standalone server");
   await prisma.$disconnect();
-  const serverPath = path.join(".next", "standalone", "server.js");
+  const serverPath = path.join(
+    process.cwd(),
+    ".next",
+    "standalone",
+    "server.js",
+  );
 
   if (!fs.existsSync(serverPath)) {
     throw new Error(
@@ -144,7 +183,7 @@ async function main() {
     );
   }
 
-  runCommand(`node ${serverPath}`);
+  runCommand("node", [serverPath]);
 }
 
 main()
