@@ -268,7 +268,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="profiel">
+      <TabsContent value="profiel" className="pb-[calc(88px+env(safe-area-inset-bottom))]">
         <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
           <div className="space-y-4">
             <Card className="bg-card border border-border/70 shadow-sm">
@@ -501,37 +501,67 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
           </div>
 
           <div className="space-y-4">
-            <Card className="bg-gradient-to-br from-card to-muted/40 border border-primary/15 shadow-md">
-              <CardHeader className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <CardTitle>Abonnement</CardTitle>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{abonnement.type} lidmaatschap</p>
+            <Card className="relative overflow-hidden bg-white/95 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]">
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-50 via-white/60 to-emerald-100/40 dark:from-emerald-900/30 dark:via-slate-900/60 dark:to-emerald-800/25"
+                aria-hidden
+              />
+              <CardHeader className="relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between pb-5">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">Abonnement</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle className="text-2xl text-slate-900 dark:text-white">{abonnement.type}</CardTitle>
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 shadow-sm dark:bg-emerald-900/60 dark:text-emerald-100">
+                      Premium plan
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-700 dark:text-slate-300">{abonnement.type} lidmaatschap</p>
                 </div>
-                <Badge variant={abonnement.status.toLowerCase() === "actief" ? "success" : "muted"}>
+                <Badge
+                  variant={abonnement.status.toLowerCase() === "actief" ? "success" : "muted"}
+                  className="shadow-[0_10px_30px_-18px_rgba(16,185,129,0.85)]"
+                >
                   {abonnement.status}
                 </Badge>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-slate-900 dark:text-slate-100">{priceLabel}</span>
-                  <span className="text-sm text-slate-600 dark:text-slate-400">• {abonnement.type}</span>
+              <CardContent className="relative space-y-6 text-slate-700 dark:text-slate-200">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">{priceLabel}</span>
+                      <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{abonnement.type}</span>
+                    </div>
+                    <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                      Inclusief premium templates, BTW-hulp en prioriteitssupport. Maandelijks opzegbaar.
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200/80 bg-white/80 px-4 py-3 text-sm font-medium text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
+                    <p className="text-xs uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">Status</p>
+                    <p className="mt-1">Volledige toegang tot alle functies</p>
+                  </div>
                 </div>
-                <p className="text-sm text-slate-700 dark:text-slate-300">
-                  Inclusief premium templates, BTW-hulp en prioriteitssupport. Maandelijks opzegbaar.
-                </p>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <Button type="button" onClick={() => setSubscriptionModal("manage")}>
+                <div className="grid gap-3 md:grid-cols-3">
+                  <Button
+                    type="button"
+                    onClick={() => setSubscriptionModal("manage")}
+                    className="w-full shadow-[0_18px_40px_-22px_rgba(16,185,129,0.85)]"
+                  >
                     <CreditCard className="h-4 w-4" aria-hidden />
                     Abonnement wijzigen
                   </Button>
-                  <Button type="button" variant="secondary" onClick={() => setSubscriptionModal("payment")}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full border border-slate-800 bg-slate-900 text-white hover:-translate-y-[1px] hover:bg-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                    onClick={() => setSubscriptionModal("payment")}
+                  >
                     <RefreshCw className="h-4 w-4" aria-hidden />
                     Betaalmethode aanpassen
                   </Button>
                   <Button
                     type="button"
                     variant="ghost"
-                    className="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300"
+                    className="w-full border border-transparent font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300"
                     onClick={() => setSubscriptionModal("cancel")}
                   >
                     Abonnement annuleren
