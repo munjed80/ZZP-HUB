@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -65,16 +65,122 @@ async function runCommand(command, args) {
   });
 }
 
+const prisma = new PrismaClient();
+
+function getMigrationFolders() {
+  const migrationsDir = path.join(process.cwd(), "prisma", "migrations");
+
+  if (!fs.existsSync(migrationsDir)) {
+    throw new Error(`[start-prod] Missing migrations directory at ${migrationsDir}`);
+  }
+
+  return fs
+    .readdirSync(migrationsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+}
+
+async function tableExists(tableName) {
+  const result = await prisma.$queryRaw`
+    SELECT EXISTS (
+      SELECT 1
+      FROM information_schema.tables
+      WHERE table_schema = current_schema()
+      AND table_name = ${tableName}
+    ) AS "exists"
+  `;
+
+  return Boolean(result?.[0]?.exists);
+}
+
+async function hasExistingTables() {
+  const result = await prisma.$queryRaw`
+    SELECT COUNT(*)::int AS count
+    FROM information_schema.tables
+    WHERE table_schema = current_schema()
+    AND table_type = 'BASE TABLE'
+  `;
+
+  return Number(result?.[0]?.count ?? 0) > 0;
+}
+
+async function ensureBaselineResolved(migrationFolders) {
+  const hasMigrationsTable = await tableExists("_prisma_migrations");
+  const hasTables = await hasExistingTables();
+
+  if (hasMigrationsTable || !hasTables) {
+    return;
+  }
+
+  const baselineMigration =
+    migrationFolders.find((name) =>
+      name.toLowerCase().includes("baseline"),
+    ) ?? migrationFolders[0];
+
+  if (!baselineMigration) {
+    throw new Error("[start-prod] No migration folders found to mark as baseline.");
+  }
+
+  console.log(
+    `[start-prod] Marking existing database as baseline with migration "${baselineMigration}"`,
+  );
+
+  await runCommand("npx", [
+    "prisma",
+    "migrate",
+    "resolve",
+    "--applied",
+    baselineMigration,
+  ]);
+}
+
+async function verifyRequiredColumns() {
+  const requiredColumns = [
+    "emailVerified",
+    "emailVerificationToken",
+    "emailVerificationExpiry",
+    "emailVerificationSentAt",
+    "onboardingStep",
+    "onboardingCompleted",
+    "twoFactorEnabled",
+    "twoFactorSecret",
+    "recoveryCodes",
+  ];
+
+  const columnRows = await prisma.$queryRaw`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = current_schema()
+    AND table_name = ${"User"}
+    AND column_name IN (${Prisma.join(requiredColumns)})
+  `;
+
+  const foundColumns = new Set(columnRows.map((row) => row.column_name));
+  const missingColumns = requiredColumns.filter(
+    (column) => !foundColumns.has(column),
+  );
+
+  if (missingColumns.length > 0) {
+    throw new Error(
+      `[start-prod] Missing required columns on "User": ${missingColumns.join(", ")}`,
+    );
+  }
+
+  const hasTokenTable = await tableExists("EmailVerificationToken");
+
+  if (!hasTokenTable) {
+    throw new Error('[start-prod] Missing table "EmailVerificationToken"');
+  }
+}
+
 async function verifyDatabase() {
-  const prisma = new PrismaClient();
   try {
     await prisma.$queryRawUnsafe("SELECT 1 as ok");
     console.log("[start-prod] Database connectivity check: OK");
   } catch (error) {
     console.error("[start-prod] Database connectivity check failed:", error);
     process.exit(1);
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -110,17 +216,25 @@ async function startServer() {
 async function main() {
   validateEnv();
 
+  const migrationFolders = getMigrationFolders();
+  await ensureBaselineResolved(migrationFolders);
+
   console.log("[start-prod] Running prisma migrate deploy");
   await runCommand("npx", ["prisma", "migrate", "deploy"]);
 
   console.log("[start-prod] Running prisma generate");
   await runCommand("npx", ["prisma", "generate"]);
 
+  await verifyRequiredColumns();
   await verifyDatabase();
   await startServer();
 }
 
-main().catch((error) => {
-  console.error("[start-prod] Fatal error:", error);
-  process.exit(1);
-});
+main()
+  .catch((error) => {
+    console.error("[start-prod] Fatal error:", error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
