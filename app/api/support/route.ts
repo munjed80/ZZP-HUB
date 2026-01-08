@@ -30,7 +30,6 @@ export async function POST(request: Request) {
 
   const { name, email, subject, message, context, screenshotUrl } = parsed.data;
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const baseFrom = resolveFromEmail();
   // Use SUPPORT_EMAIL env override or default from config
   const toEmail = getSupportEmail();
 
