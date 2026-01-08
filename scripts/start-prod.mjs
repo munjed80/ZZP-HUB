@@ -4,12 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-const REQUIRED_ENV = [
-  "DATABASE_URL",
-  "NEXTAUTH_SECRET",
-  "NEXTAUTH_URL",
-  "RESEND_API_KEY",
-];
+const REQUIRED_ENV = ["DATABASE_URL", "NEXTAUTH_SECRET", "NEXTAUTH_URL"];
 const DEFAULT_HOST = "0.0.0.0";
 const DEFAULT_PORT = "3000";
 const USER_TABLE = "User";
@@ -24,6 +19,12 @@ function validateEnv() {
       `[start-prod] Missing required environment variables: ${missing.join(", ")}`,
     );
     process.exit(1);
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    console.warn(
+      "[start-prod] RESEND_API_KEY is not set. Email delivery will be disabled until configured.",
+    );
   }
 
   const baseUrl =
