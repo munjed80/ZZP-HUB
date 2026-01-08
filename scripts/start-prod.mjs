@@ -197,6 +197,7 @@ async function startServer() {
     process.exit(1);
   }
 
+  // Force binding to all interfaces for containerized deployments (e.g., Coolify).
   const host = DEFAULT_HOST;
   const port = DEFAULT_PORT;
   const serverEnv = { ...process.env, HOST: host, HOSTNAME: host, PORT: port };
