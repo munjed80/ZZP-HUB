@@ -32,6 +32,8 @@ if (!RESEND_API_KEY) {
 }
 
 // Validate FROM email format
+// Note: This validation is also in config/emails.ts validateFromEmail()
+// Keep in sync, or consider using a compiled JS version in production
 if (!FROM_EMAIL.includes('<') || !FROM_EMAIL.includes('>') || !FROM_EMAIL.includes('@')) {
   console.error(`❌ ERROR: Invalid FROM email format: "${FROM_EMAIL}"`);
   console.error('   Must be in "Name <email@domain>" format');

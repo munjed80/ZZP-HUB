@@ -34,6 +34,12 @@ interface SendEmailResult {
   error?: Error;
 }
 
+interface EmailError {
+  message: string;
+  name?: string;
+  statusCode?: number | null;
+}
+
 /**
  * Determine email type based on subject
  */
@@ -72,7 +78,7 @@ export function logEmailSuccess(messageId: string, to: string, subject: string, 
 /**
  * Log email send failure
  */
-function logEmailFailure(error: Error | { message: string; name?: string; statusCode?: number | null }, to: string, from: string, subject: string) {
+function logEmailFailure(error: Error | EmailError, to: string, from: string, subject: string) {
   const logData: Record<string, unknown> = {
     event: "email_send_failure",
     to,

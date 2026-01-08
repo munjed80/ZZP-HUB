@@ -12,8 +12,9 @@ export const FROM_EMAIL = `ZZP Hub <${NO_REPLY_EMAIL}>`;
 /**
  * Validate RFC-compliant "Name <email@domain>" format
  * Ensures from address has proper format to avoid email delivery issues
+ * @throws Error if format is invalid
  */
-function validateFromEmail(email: string): void {
+export function validateFromEmail(email: string): void {
   // Check for required pattern: "Name <email@domain>"
   if (!email.includes('<') || !email.includes('>')) {
     throw new Error(`Invalid FROM email format: "${email}". Must be "Name <email@domain>" format.`);
