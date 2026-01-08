@@ -59,6 +59,14 @@ export default async function FacturenPagina() {
       month: "short",
     });
     const isPaid = factuur.emailStatus === InvoiceEmailStatus.BETAALD;
+    let status: "paid" | "concept" | "open";
+    if (isPaid) {
+      status = "paid";
+    } else if (factuur.emailStatus === InvoiceEmailStatus.CONCEPT) {
+      status = "concept";
+    } else {
+      status = "open";
+    }
     const paidDateLabel = isPaid
       ? new Date(factuur.updatedAt ?? factuur.date).toLocaleDateString("nl-NL", {
           day: "numeric",
@@ -72,6 +80,7 @@ export default async function FacturenPagina() {
       id: factuur.id,
       invoiceNum: factuur.invoiceNum,
       clientName: factuur.client.name,
+      status,
       amount: invoiceAmount(factuur.lines),
       pdfInvoice: mapInvoiceToPdfData(factuur),
       formattedDate,
@@ -84,64 +93,51 @@ export default async function FacturenPagina() {
   });
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-2 rounded-3xl border border-[#124D48] bg-gradient-to-r from-[#0F7E78] via-[#0FA9A3] to-[#0B6A70] p-4 shadow-[0_28px_72px_-32px_rgba(12,140,135,0.7)]">
-        <div className="flex items-center gap-3">
-          <div className="h-1.5 w-14 rounded-full bg-white/35 shadow-[0_8px_20px_-12px_rgba(255,255,255,0.55)]" />
-          <h1 className="text-3xl font-bold tracking-tight text-white">Facturen</h1>
+    <div className="space-y-6 bg-[#F9FAFB] text-[#111827]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-semibold tracking-tight">Facturen</h1>
+          <p className="text-sm text-[#6B7280]">
+            Beheer facturen, volg betalingen en houd alles overzichtelijk bij.
+          </p>
         </div>
-        <p className="text-sm font-medium text-[#CFEDEA] max-w-2xl">
-          Beheer facturen, verstuur herinneringen en volg betalingen met een strak, professioneel overzicht.
-        </p>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/facturen/nieuw"
           className={buttonVariants(
             "primary",
-            "bg-gradient-to-r from-[#0F5E57] via-[#0E6F64] to-[#0B4E48] text-white shadow-[0_20px_48px_-22px_rgba(15,94,87,0.88)] ring-1 ring-[#1FBF84]/45",
+            "bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-500 text-white border-indigo-500 shadow-[0_14px_32px_-18px_rgba(79,70,229,0.35)] hover:shadow-[0_16px_40px_-18px_rgba(79,70,229,0.45)]",
           )}
           data-tour="new-invoice-button"
         >
           Nieuwe factuur
         </Link>
-        <Link
-          href="/facturen/voorbeeld"
-          className={buttonVariants(
-            "ghost",
-            "border-[#123C37] bg-[#0F2F2C] text-[#CFEDEA] hover:border-[#1FBF84]/45 hover:text-white shadow-[0_16px_44px_-28px_rgba(0,0,0,0.6)]",
-          )}
-        >
-          Voorbeeld PDF
-        </Link>
       </div>
 
-       <Card className="p-4 sm:p-6 shadow-2xl border border-[#124D48]/70 bg-gradient-to-br from-[#0F3E42] via-[#0F5655] to-[#0A3B40] text-[#E4F7F3]">
-        <CardHeader className="pb-3 sm:pb-4">
+      <Card className="border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
-              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-[#0F5E57] via-[#0E6F64] to-[#0B4E48] shadow-[0_10px_26px_-18px_rgba(12,94,87,0.85)]" />
-              Alle facturen
-            </CardTitle>
-            <Badge variant="primary" className="bg-[#0F2F2C] text-white border-[#1FBF84]/40 shadow-[0_12px_30px_-22px_rgba(0,0,0,0.6)]">
+            <CardTitle className="text-lg font-semibold text-[#111827]">Alle facturen</CardTitle>
+            <Badge
+              variant="muted"
+              className="rounded-full border border-slate-200 bg-slate-50 text-xs font-semibold text-[#111827] shadow-none"
+            >
               {facturen.length}
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="text-[15px] text-[#CFEDEA]">
+        <CardContent className="text-[15px] text-[#111827]">
           {facturen.length === 0 ? (
             fetchError ? (
-              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[#123C37] bg-[#0F2F2C]/70 px-6 py-10 text-center shadow-[0_18px_46px_-30px_rgba(0,0,0,0.6)]">
-                <p className="text-lg font-semibold text-white">Facturen konden niet worden geladen</p>
-                <p className="text-sm text-[#9FCBC4]">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
+              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-[#F9FAFB] px-6 py-10 text-center">
+                <p className="text-lg font-semibold text-[#111827]">Facturen konden niet worden geladen</p>
+                <p className="text-sm text-[#6B7280]">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
               </div>
             ) : (
-              <EmptyState tone="dark" />
+              <EmptyState />
             )
-           ) : (
-             <InvoiceList invoices={mappedInvoices} />
-           )}
+          ) : (
+            <InvoiceList invoices={mappedInvoices} />
+          )}
         </CardContent>
       </Card>
     </div>
