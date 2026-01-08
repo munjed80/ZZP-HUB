@@ -216,7 +216,9 @@ async function startServer() {
   // Force binding to all interfaces for containerized deployments (e.g., Coolify).
   const host = DEFAULT_HOST;
   const port = DEFAULT_PORT;
-  const serverEnv = { ...process.env, HOST: host, HOSTNAME: host, PORT: port };
+  const { HOSTNAME: _ignoredHostname, ...passthroughEnv } = process.env;
+  // Do not forward HOSTNAME in standalone mode or Next.js will bind to the container hostname instead of 0.0.0.0.
+  const serverEnv = { ...passthroughEnv, HOST: host, PORT: port };
 
   console.log(`[start-prod] Starting server on ${host}:${port}`);
 
