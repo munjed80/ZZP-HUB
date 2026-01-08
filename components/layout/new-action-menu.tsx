@@ -68,10 +68,10 @@ export function NewActionMenu() {
         className={cn(
           "group relative inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-4 py-2 overflow-hidden",
           "text-sm font-bold transition-all duration-200",
-          "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground border-2 border-primary/90",
-          "shadow-[0_6px_16px_-4px_rgba(var(--primary),0.55)]",
-          "hover:scale-[1.05] hover:shadow-[0_8px_20px_-4px_rgba(var(--primary),0.7)]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+          "bg-gradient-to-r from-green-700 to-green-600 text-white border-2 border-green-600",
+          "shadow-[0_6px_16px_-4px_rgba(34,197,94,0.55)]",
+          "hover:scale-[1.05] hover:shadow-[0_8px_20px_-4px_rgba(34,197,94,0.7)]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2",
           "active:translate-y-[1px]"
         )}
         aria-label="Nieuw item aanmaken"
@@ -109,7 +109,7 @@ export function NewActionMenu() {
                   )}
                   role="menuitem"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 text-primary border-2 border-primary/30 shadow-sm">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-green-600/20 to-green-600/10 text-green-700 border-2 border-green-600/30 shadow-sm">
                     <Icon className="h-4 w-4" aria-hidden />
                   </span>
                   <span className="flex-1 text-left">{action.label}</span>

@@ -63,7 +63,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
       <Sidebar userRole={userRole} onAssistantClick={() => setAssistantOpen(true)} />
       {children}
       <MobileNav
-        onAssistantClick={() => setAssistantOpen(true)}
+        onSettingsClick={() => setMobileMenuOpen(true)}
         onMenuClick={() => setMobileMenuOpen(true)}
       />
       <MobileSidebar

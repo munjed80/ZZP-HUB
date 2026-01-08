@@ -68,6 +68,11 @@ export function AssistantWidget({ currentStep, isOnboarding = false }: Assistant
     return null;
   }
 
+  // Don't render the widget button outside of onboarding
+  if (!isOnboarding) {
+    return null;
+  }
+
   return (
     <>
       {/* Widget Button */}
