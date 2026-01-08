@@ -5,6 +5,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Loader2, MessageCircle, ShieldCheck, Sparkles, X } from "lucide-react";
 import { assistantGuide } from "@/lib/assistant/guide";
+import { getPublicSupportEmail } from "@/lib/publicConfig";
+
+const SUPPORT_EMAIL = getPublicSupportEmail();
 
 const exampleQuestions = [
   "Wat doet ZZP HUB voor mijn facturen?",
@@ -159,7 +162,7 @@ export function AssistantDrawer({ open: controlledOpen, onOpenChange }: Assistan
             Extra hulp nodig?
           </p>
           <p>
-            Mail support@zzp-hub.nl of open{" "}
+            Mail {SUPPORT_EMAIL} of open{" "}
             <a href="/support" className="font-semibold text-teal-700 underline underline-offset-4">
               support
             </a>

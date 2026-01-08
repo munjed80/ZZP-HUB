@@ -71,7 +71,13 @@ export async function registerCompany(values: RegisterInput) {
         email: data.email,
         error: emailResult.error,
       });
-      return { success: false, message: "Verificatie-e-mail kon niet worden verzonden. Probeer het later opnieuw." };
+      // Import support email for user-friendly error
+      const { getPublicSupportEmail } = await import("@/lib/publicConfig");
+      const supportEmail = getPublicSupportEmail();
+      return { 
+        success: false, 
+        message: `We konden de verificatie-e-mail niet verzenden. Probeer het later opnieuw of neem contact op met support via ${supportEmail}.`
+      };
     }
 
     if (shouldLogAuth) {

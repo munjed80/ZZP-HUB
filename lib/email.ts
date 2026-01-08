@@ -1,24 +1,22 @@
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import type { ReactElement } from "react";
-
-// SINGLE SOURCE OF TRUTH: All emails MUST use this verified sender
-const FROM_EMAIL_ADDRESS = "no-reply@matrixtop.com";
-const FROM_EMAIL = `ZZP Hub <${FROM_EMAIL_ADDRESS}>`;
+import { getNoReplyEmail, getFromEmail } from "@/config/emails";
 
 let resendClient: Resend | null = null;
 
 export function resolveFromEmail() {
-  // Always return the verified sender - no fallbacks, no env overrides
-  return FROM_EMAIL;
+  // Use centralized config with optional env override
+  return getFromEmail();
 }
 
 export function formatFromAddress(senderName?: string) {
   // If no custom sender name, use default
-  if (!senderName) return FROM_EMAIL;
+  if (!senderName) return getFromEmail();
 
   // Use custom name but always with the verified email address
-  return `${senderName} <${FROM_EMAIL_ADDRESS}>`;
+  const noReplyEmail = getNoReplyEmail();
+  return `${senderName} <${noReplyEmail}>`;
 }
 
 function getResendClient() {
@@ -42,17 +40,30 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
   const hasApiKey = Boolean(process.env.RESEND_API_KEY);
   const isProd = process.env.NODE_ENV === "production";
   const from = resolveFromEmail();
+  
+  // Log send attempt
+  console.log(JSON.stringify({
+    event: "email_send_attempt",
+    type: subject.includes("Verifieer") ? "verification" : subject.includes("Factuur") ? "invoice" : "support",
+    to,
+    from,
+    subject,
+  }));
 
   try {
     const html = await render(react);
 
     if (!hasApiKey) {
       if (isProd) {
-        console.error(
-          "[email] RESEND_API_KEY missing in production. Email not sent.",
-          { to, subject }
-        );
-        return { success: false, error: new Error("RESEND_API_KEY missing") };
+        const error = new Error("RESEND_API_KEY missing in production");
+        console.error(JSON.stringify({
+          event: "email_send_failure",
+          errorMessage: error.message,
+          errorName: error.name,
+          to,
+          subject,
+        }));
+        return { success: false, error };
       }
 
       console.log("\n================== EMAIL (DEV MODE) ==================");
@@ -66,7 +77,15 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
 
     const resend = getResendClient();
     if (!resend) {
-      return { success: false, error: new Error("RESEND client unavailable") };
+      const error = new Error("RESEND client unavailable");
+      console.error(JSON.stringify({
+        event: "email_send_failure",
+        errorMessage: error.message,
+        errorName: error.name,
+        to,
+        subject,
+      }));
+      return { success: false, error };
     }
 
     const result = await resend.emails.send({
@@ -76,17 +95,24 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
       html,
     });
 
-    // Production-safe logging: Log exact sender, recipient, and Resend message ID
-    console.log("[email] Sent via Resend", {
-      from,
+    // Log success with message ID
+    console.log(JSON.stringify({
+      event: "email_send_success",
+      messageId: result.data?.id || "no-id",
       to,
       subject,
-      messageId: result.data?.id || "no-id",
-    });
+    }));
 
     return { success: true, messageId: result.data?.id };
   } catch (error) {
-    console.error("[email] Failed to send email", { to, subject, error });
+    const err = error as Error;
+    console.error(JSON.stringify({
+      event: "email_send_failure",
+      errorMessage: err.message,
+      errorName: err.name,
+      to,
+      subject,
+    }));
     return { success: false, error };
   }
 }

@@ -9,6 +9,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, Lock, Mail, Sparkles } from "lucide-react";
 import { Suspense, useState } from "react";
+import { getPublicSupportEmail } from "@/lib/publicConfig";
+
+const SUPPORT_EMAIL = getPublicSupportEmail();
 
 const schema = z.object({
   email: z.string().email("Voer een geldig e-mailadres in"),
@@ -103,7 +106,7 @@ function LoginContent() {
 
         <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
           <Link
-            href="mailto:support@zzp-hub.nl?subject=Wachtwoord%20vergeten"
+            href={`mailto:${SUPPORT_EMAIL}?subject=Wachtwoord%20vergeten`}
             className="text-primary underline-offset-4 hover:underline"
           >
             Wachtwoord vergeten?
