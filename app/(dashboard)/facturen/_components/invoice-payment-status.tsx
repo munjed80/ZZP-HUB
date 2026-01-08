@@ -58,7 +58,7 @@ export function InvoicePaymentStatus({ invoiceId, isPaid, paidDateLabel }: Invoi
       type="button"
       onClick={handleMarkPaid}
       disabled={isPending}
-      className={`${commonClasses} border-indigo-500 bg-indigo-50 text-[#312E81] hover:bg-indigo-100`}
+      className={`${commonClasses} bg-gradient-to-r from-green-700 via-green-600 to-green-700 text-white border-green-600 shadow-[0_14px_32px_-18px_rgba(34,197,94,0.35)] hover:shadow-[0_16px_40px_-18px_rgba(34,197,94,0.45)]`}
     >
       {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" aria-hidden />}
       Markeer betaald
