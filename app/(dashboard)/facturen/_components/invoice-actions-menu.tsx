@@ -105,39 +105,27 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
     });
   };
 
+  const menuItemClasses =
+    "h-10 w-full justify-start gap-2 rounded-xl border border-slate-200 bg-white text-[#111827] hover:bg-slate-50";
   const menuContent = (
-    <div className="w-[240px] rounded-2xl border border-[#14544F] bg-gradient-to-br from-[#114C4A] via-[#0F6F68] to-[#0B4D52] p-3 text-white shadow-[0_18px_52px_-28px_rgba(8,71,66,0.6)]">
-      <div className="flex items-center justify-between border-b border-white/5 pb-2">
+    <div className="w-[240px] rounded-2xl border border-slate-200 bg-white p-3 text-[#111827] shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)]">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
         <div className="space-y-0.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9FCBC4]">Acties</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6B7280]">Acties</p>
           <p className="text-sm font-semibold leading-tight">Factuur {pdfInvoice.invoiceNum}</p>
         </div>
-        <span className="rounded-full bg-white/10 px-2 py-1 text-[11px] font-semibold text-[#CFEDEA]">Snel</span>
+        <span className="rounded-full bg-[#F3F4F6] px-2 py-1 text-[11px] font-semibold text-[#4B5563]">Snel</span>
       </div>
 
       <div className="mt-2 flex flex-col gap-1.5">
         {shareLink ? (
-          <Link
-            href={shareLink}
-            className={buttonVariants(
-              "ghost",
-               "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.06] text-white hover:bg-white/10",
-             )}
-            onClick={() => setMenuOpen(false)}
-          >
+          <Link href={shareLink} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
             <Eye className="h-4 w-4" aria-hidden />
             Bekijk factuur
           </Link>
         ) : null}
         {editHref ? (
-          <Link
-            href={editHref}
-            className={buttonVariants(
-              "ghost",
-               "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.06] text-white hover:bg-white/10",
-             )}
-            onClick={() => setMenuOpen(false)}
-          >
+          <Link href={editHref} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
             <Edit3 className="h-4 w-4" aria-hidden />
             Bewerk factuur
           </Link>
@@ -145,20 +133,11 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
         <InvoicePdfDownloadButton
           invoice={pdfInvoice}
           label="Download PDF"
-          className="h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.07] text-white hover:bg-white/[0.12]"
+          className={menuItemClasses}
           variant="ghost"
           icon={<FileDown className="h-4 w-4" aria-hidden />}
         />
-        <button
-          type="button"
-          onClick={handleShare}
-          className={cn(
-            buttonVariants(
-              "ghost",
-               "h-10 w-full justify-start gap-2 rounded-xl border border-white/10 bg-white/[0.06] text-white hover:bg-white/10",
-            ),
-          )}
-        >
+        <button type="button" onClick={handleShare} className={cn(buttonVariants("ghost", menuItemClasses))}>
           <Share2 className="h-4 w-4" aria-hidden />
           Deel
         </button>
@@ -168,7 +147,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           disabled={isPending}
           className={buttonVariants(
             "ghost",
-           "h-10 w-full justify-start gap-2 rounded-xl border border-[#E54848]/40 bg-[#1D1113] text-[#FCA5A5] hover:border-[#E54848]/60 hover:bg-[#2A171A]",
+            cn(menuItemClasses, "border-rose-200 bg-rose-50 text-[#991B1B] hover:bg-rose-100"),
           )}
         >
           {isPending && pendingAction === "delete" ? (
@@ -193,7 +172,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           type="button"
           className={buttonVariants(
             "ghost",
-            "h-10 w-10 rounded-full border border-[#14544F] bg-gradient-to-br from-[#0F7E78] via-[#0FA9A3] to-[#0B6A70] p-0 text-white shadow-[0_14px_34px_-22px_rgba(12,140,135,0.75)] hover:text-white",
+            "h-9 w-9 rounded-full border border-slate-200 bg-white p-0 text-[#6B7280] shadow-sm hover:bg-slate-50 hover:text-[#111827]",
           )}
           aria-label="Acties"
           aria-expanded={menuOpen}
