@@ -2,32 +2,23 @@ import { Resend } from "resend";
 import { render } from "@react-email/render";
 import type { ReactElement } from "react";
 
-const DEFAULT_FROM = "Matrixtop <no-reply@matrixtop.com>";
-const DEFAULT_FROM_EMAIL = DEFAULT_FROM.match(/<([^>]+)>/)?.[1] || "no-reply@matrixtop.com";
-const EMAIL_PATTERN = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+// SINGLE SOURCE OF TRUTH: All emails MUST use this verified sender
+const FROM_EMAIL_ADDRESS = "no-reply@matrixtop.com";
+const FROM_EMAIL = `ZZP Hub <${FROM_EMAIL_ADDRESS}>`;
+
 let resendClient: Resend | null = null;
 
 export function resolveFromEmail() {
-  return (
-    process.env.RESEND_FROM_EMAIL?.trim() ||
-    process.env.EMAIL_FROM?.trim() ||
-    DEFAULT_FROM
-  );
+  // Always return the verified sender - no fallbacks, no env overrides
+  return FROM_EMAIL;
 }
 
 export function formatFromAddress(senderName?: string) {
-  const base = resolveFromEmail();
-  if (!senderName) return base;
+  // If no custom sender name, use default
+  if (!senderName) return FROM_EMAIL;
 
-  const normalizedBase =
-    EMAIL_PATTERN.test(base) || base.includes("<") ? base : DEFAULT_FROM_EMAIL;
-  const match = normalizedBase.match(/<([^>]+)>/);
-  const candidateEmail = match ? match[1] : normalizedBase;
-  const email = EMAIL_PATTERN.test(candidateEmail)
-    ? candidateEmail
-    : DEFAULT_FROM_EMAIL;
-
-  return `${senderName} <${email}>`;
+  // Use custom name but always with the verified email address
+  return `${senderName} <${FROM_EMAIL_ADDRESS}>`;
 }
 
 function getResendClient() {
@@ -83,6 +74,14 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
       to,
       subject,
       html,
+    });
+
+    // Production-safe logging: Log exact sender, recipient, and Resend message ID
+    console.log("[email] Sent via Resend", {
+      from,
+      to,
+      subject,
+      messageId: result.data?.id || "no-id",
     });
 
     return { success: true, messageId: result.data?.id };
