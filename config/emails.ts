@@ -10,6 +10,23 @@ export const NO_REPLY_EMAIL = "no-reply@matrixtop.com";
 export const FROM_EMAIL = `ZZP Hub <${NO_REPLY_EMAIL}>`;
 
 /**
+ * Validate RFC-compliant "Name <email@domain>" format
+ * Ensures from address has proper format to avoid email delivery issues
+ */
+function validateFromEmail(email: string): void {
+  // Check for required pattern: "Name <email@domain>"
+  if (!email.includes('<') || !email.includes('>')) {
+    throw new Error(`Invalid FROM email format: "${email}". Must be "Name <email@domain>" format.`);
+  }
+  
+  // Extract email from brackets
+  const match = email.match(/<([^>]+)>/);
+  if (!match || !match[1]?.includes('@')) {
+    throw new Error(`Invalid FROM email format: "${email}". Must contain valid email inside angle brackets.`);
+  }
+}
+
+/**
  * Get support email with optional server-side override
  * Server: Can be overridden via SUPPORT_EMAIL env var
  */
@@ -30,5 +47,8 @@ export function getFromEmail(): string {
   if (typeof window !== 'undefined') {
     throw new Error('getFromEmail() is server-side only');
   }
-  return FROM_EMAIL;
+  
+  const fromEmail = FROM_EMAIL;
+  validateFromEmail(fromEmail);
+  return fromEmail;
 }
