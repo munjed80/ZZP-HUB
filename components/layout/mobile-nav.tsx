@@ -21,12 +21,11 @@ const navItems = [
 ];
 
 type MobileNavProps = {
-  onSettingsClick?: () => void;
   onMenuClick?: () => void;
 };
 
 export function MobileNav(mobileNavProps: MobileNavProps = {}) {
-  const { onSettingsClick, onMenuClick } = mobileNavProps;
+  const { onMenuClick } = mobileNavProps;
   const pathname = usePathname();
 
   return (
