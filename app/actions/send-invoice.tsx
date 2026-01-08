@@ -6,7 +6,7 @@ import InvoiceEmail from "@/components/emails/InvoiceEmail";
 import { generateInvoicePdf, mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { formatFromAddress } from "@/lib/email";
+import { formatFromAddress, logEmailSuccess } from "@/lib/email";
 
 const APP_BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ??
@@ -64,7 +64,6 @@ export async function sendInvoiceEmail(invoiceId: string) {
     const pdfBuffer = await generateInvoicePdf(pdfInvoice);
     const viewUrl = buildInvoiceUrl(invoice.id);
     const companyDetails = buildCompanyDetails(invoice.user.companyProfile);
-    const senderName = invoice.user.companyProfile?.emailSenderName?.trim() ?? pdfInvoice.companyProfile?.companyName ?? "ZZP HUB";
     const replyToAddress = invoice.user.companyProfile?.emailReplyTo?.trim();
     const recipientEmail = invoice.client.email?.trim();
     if (!recipientEmail) {
@@ -87,12 +86,13 @@ export async function sendInvoiceEmail(invoiceId: string) {
     })();
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const fromAddress = formatFromAddress(senderName);
-    const { error } = await resend.emails.send({
+    const fromAddress = formatFromAddress();
+    const subject = `Factuur ${pdfInvoice.invoiceNum} van ${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"}`;
+    const result = await resend.emails.send({
       from: fromAddress,
       replyTo: replyToAddress || undefined,
       to: recipientEmail,
-      subject: `Factuur ${pdfInvoice.invoiceNum} van ${pdfInvoice.companyProfile?.companyName ?? "ZZP HUB"}`,
+      subject,
       react: (
         <InvoiceEmail
           clientName={invoice.client.name}
@@ -112,14 +112,16 @@ export async function sendInvoiceEmail(invoiceId: string) {
       ],
     });
 
-    if (error) {
+    if (result.error) {
       console.error("Verzenden van factuur e-mail mislukt", {
-        error,
+        error: result.error,
         invoiceId,
         recipient: recipientEmail,
       });
       return { success: false, message: "Het verzenden van de factuur is mislukt." };
     }
+
+    logEmailSuccess(result.data?.id || "no-id", recipientEmail, subject, fromAddress);
 
     await prisma.invoice.update({
       where: { id: invoice.id },
