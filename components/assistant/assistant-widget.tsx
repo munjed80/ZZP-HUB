@@ -47,6 +47,7 @@ export function AssistantWidget({ currentStep, isOnboarding = false }: Assistant
   useEffect(() => {
     // Auto-show during onboarding
     if (isOnboarding && !isDismissed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOpen(true);
     }
   }, [isOnboarding, isDismissed]);

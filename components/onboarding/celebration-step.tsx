@@ -32,6 +32,7 @@ export function CelebrationStep({ onNext }: CelebrationStepProps) {
       delay: Math.random() * 0.5,
       duration: 2 + Math.random() * 1,
     }));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setConfettiItems(items);
     
     // Trigger confetti animation
