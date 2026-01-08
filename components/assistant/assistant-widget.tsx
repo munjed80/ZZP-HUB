@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { X, HelpCircle, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getPublicSupportEmail } from "@/lib/publicConfig";
+
+const SUPPORT_EMAIL = getPublicSupportEmail();
 
 interface AssistantWidgetProps {
   currentStep?: number;
@@ -162,7 +165,7 @@ export function AssistantWidget({ currentStep, isOnboarding = false }: Assistant
                       <ArrowRight className="h-4 w-4" aria-hidden />
                     </a>
                     <a
-                      href="mailto:support@zzp-hub.nl"
+                      href={`mailto:${SUPPORT_EMAIL}`}
                       className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-sm"
                     >
                       <span className="font-medium">Contact support</span>

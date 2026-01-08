@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
 import { formatFromAddress, resolveFromEmail } from "@/lib/email";
+import { getSupportEmail } from "@/config/emails";
 
 const supportSchema = z.object({
   name: z.string().min(2).max(120).trim(),
@@ -29,8 +30,8 @@ export async function POST(request: Request) {
 
   const { name, email, subject, message, context, screenshotUrl } = parsed.data;
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const baseFrom = resolveFromEmail();
-  const toEmail = process.env.SUPPORT_EMAIL ?? baseFrom;
+  // Use SUPPORT_EMAIL env override or default from config
+  const toEmail = getSupportEmail();
 
   const { error } = await resend.emails.send({
     from: formatFromAddress("ZZP HUB Support"),

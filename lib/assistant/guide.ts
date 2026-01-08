@@ -1,3 +1,5 @@
+import { SUPPORT_EMAIL } from "@/config/emails";
+
 export const assistantGuide = {
   product: {
     name: "ZZP HUB",
@@ -34,6 +36,6 @@ export const assistantGuide = {
     { question: "Hoe verstuur ik?", answer: "Open de factuur en kies Acties → Verstuur via e-mail of Download PDF." },
     { question: "Wat kost het?", answer: "Premium/Pro, maandelijks opzegbaar." },
     { question: "Hoe houd ik 1225 uur bij?", answer: "Log uren in Uren; voortgang zie je op het dashboard." },
-    { question: "Hoe krijg ik support?", answer: "Gebruik het supportformulier of mail support@zzp-hub.nl." },
+    { question: "Hoe krijg ik support?", answer: `Gebruik het supportformulier of mail ${SUPPORT_EMAIL}.` },
   ],
 } as const;
