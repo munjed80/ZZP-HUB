@@ -64,10 +64,6 @@ export function AssistantWidget({ currentStep, isOnboarding = false }: Assistant
     ? onboardingMessages.find(m => m.step === currentStep)
     : null;
 
-  if (isDismissed && !isOnboarding) {
-    return null;
-  }
-
   // Don't render the widget button outside of onboarding
   if (!isOnboarding) {
     return null;
