@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
-import { formatFromAddress, resolveFromEmail } from "@/lib/email";
+import { formatFromAddress, logEmailSuccess } from "@/lib/email";
 import { getSupportEmail } from "@/config/emails";
 
 const supportSchema = z.object({
@@ -33,11 +33,12 @@ export async function POST(request: Request) {
   // Use SUPPORT_EMAIL env override or default from config
   const toEmail = getSupportEmail();
 
-  const { error } = await resend.emails.send({
-    from: formatFromAddress("ZZP HUB Support"),
+  const emailSubject = `[Support] ${subject}`;
+  const result = await resend.emails.send({
+    from: formatFromAddress(),
     to: toEmail,
     replyTo: email,
-    subject: `[Support] ${subject}`,
+    subject: emailSubject,
     text: [
       `Naam: ${name}`,
       `E-mail: ${email}`,
@@ -50,10 +51,12 @@ export async function POST(request: Request) {
       .join("\n"),
   });
 
-  if (error) {
-    console.error("Support e-mail verzenden mislukt", error);
+  if (result.error) {
+    console.error("Support e-mail verzenden mislukt", result.error);
     return NextResponse.json({ error: "Het verzenden is mislukt. Probeer het later opnieuw." }, { status: 500 });
   }
+
+  logEmailSuccess(result.data?.id || "no-id", toEmail, emailSubject, formatFromAddress());
 
   return NextResponse.json({ success: true });
 }

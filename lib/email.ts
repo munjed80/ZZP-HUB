@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import type { ReactElement } from "react";
-import { getNoReplyEmail, getFromEmail } from "@/config/emails";
+import { getFromEmail } from "@/config/emails";
 
 let resendClient: Resend | null = null;
 
@@ -10,13 +10,8 @@ export function resolveFromEmail() {
   return getFromEmail();
 }
 
-export function formatFromAddress(senderName?: string) {
-  // If no custom sender name, use default
-  if (!senderName) return getFromEmail();
-
-  // Use custom name but always with the verified email address
-  const noReplyEmail = getNoReplyEmail();
-  return `${senderName} <${noReplyEmail}>`;
+export function formatFromAddress() {
+  return resolveFromEmail();
 }
 
 function getResendClient() {
@@ -58,12 +53,13 @@ function logEmailAttempt(type: string, to: string, from: string, subject: string
 /**
  * Log email send success
  */
-function logEmailSuccess(messageId: string, to: string, subject: string) {
+export function logEmailSuccess(messageId: string, to: string, subject: string, from: string) {
   console.log(JSON.stringify({
     event: "email_send_success",
     messageId,
     to,
     subject,
+    from,
   }));
 }
 
@@ -108,6 +104,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
       console.log(`From: ${from}`);
       console.log("HTML Preview:", html.substring(0, 500));
       console.log("======================================================\n");
+      logEmailSuccess("dev-mode", to, subject, from);
       return { success: true, messageId: "dev-mode" };
     }
 
@@ -126,7 +123,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
     });
 
     // Log success with message ID
-    logEmailSuccess(result.data?.id || "no-id", to, subject);
+    logEmailSuccess(result.data?.id || "no-id", to, subject, from);
 
     return { success: true, messageId: result.data?.id };
   } catch (error) {

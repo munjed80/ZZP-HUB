@@ -1,10 +1,6 @@
 /**
  * Single source of truth for all email addresses used in the application.
- * 
- * Server-side components can override via environment variables:
- * - SUPPORT_EMAIL (server) or NEXT_PUBLIC_SUPPORT_EMAIL (client)
- * - NO_REPLY_EMAIL (server only)
- * 
+ *
  * Defaults are matrixtop.com - NEVER use resend.dev or zzp-hub.nl
  */
 
@@ -27,17 +23,6 @@ export function getSupportEmail(): string {
 }
 
 /**
- * Get no-reply email with optional server-side override
- * Server-only: Can be overridden via NO_REPLY_EMAIL env var
- */
-export function getNoReplyEmail(): string {
-  if (typeof window !== 'undefined') {
-    throw new Error('getNoReplyEmail() is server-side only');
-  }
-  return process.env.NO_REPLY_EMAIL || NO_REPLY_EMAIL;
-}
-
-/**
  * Get FROM email address for sending emails
  * Server-only: Uses NO_REPLY_EMAIL (with optional override)
  */
@@ -45,6 +30,5 @@ export function getFromEmail(): string {
   if (typeof window !== 'undefined') {
     throw new Error('getFromEmail() is server-side only');
   }
-  const noReply = getNoReplyEmail();
-  return `ZZP Hub <${noReply}>`;
+  return FROM_EMAIL;
 }
