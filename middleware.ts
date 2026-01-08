@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   const emailVerified = Boolean(token?.emailVerified);
   const onboardingCompleted = Boolean(token?.onboardingCompleted);
+  const role = token?.role as string | undefined;
 
   // If not logged in, redirect to login
   if (!token) {
@@ -45,7 +46,9 @@ export async function middleware(request: NextRequest) {
 
   // If logged in but email not verified, redirect to verify-required
   // (except if already on a pre-verification route)
-  if (!emailVerified && !preVerificationRoutes.includes(pathname)) {
+  // SUPERADMIN bypasses email verification to ensure immediate admin access
+  const requiresVerification = role !== 'SUPERADMIN' && !emailVerified;
+  if (requiresVerification && !preVerificationRoutes.includes(pathname)) {
     const verifyUrl = new URL('/verify-required', request.url);
     verifyUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(verifyUrl);

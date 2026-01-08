@@ -9,7 +9,9 @@ export default async function OnboardingLayout({ children }: { children: ReactNo
     redirect("/login");
   }
 
-  if (!session.user.emailVerified) {
+  // SUPERADMIN bypasses email verification to ensure immediate admin access
+  const requiresVerification = session.user.role !== 'SUPERADMIN' && !session.user.emailVerified;
+  if (requiresVerification) {
     redirect("/verify-required");
   }
 
