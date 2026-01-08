@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { registerSchema, type RegisterInput } from "./schema";
 import { generateVerificationToken, hashToken, sendEmail } from "@/lib/email";
 import VerificationEmail from "@/components/emails/VerificationEmail";
+import { getPublicSupportEmail } from "@/lib/publicConfig";
 
 export async function registerCompany(values: RegisterInput) {
   const data = registerSchema.parse(values);
@@ -71,8 +72,7 @@ export async function registerCompany(values: RegisterInput) {
         email: data.email,
         error: emailResult.error,
       });
-      // Import support email for user-friendly error
-      const { getPublicSupportEmail } = await import("@/lib/publicConfig");
+      // Use imported support email for user-friendly error
       const supportEmail = getPublicSupportEmail();
       return { 
         success: false, 

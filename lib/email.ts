@@ -34,21 +34,63 @@ interface SendEmailOptions {
 }
 
 /**
+ * Determine email type based on subject
+ */
+function getEmailType(subject: string): string {
+  if (subject.includes("Verifieer")) return "verification";
+  if (subject.includes("Factuur")) return "invoice";
+  return "support";
+}
+
+/**
+ * Log email send attempt
+ */
+function logEmailAttempt(type: string, to: string, from: string, subject: string) {
+  console.log(JSON.stringify({
+    event: "email_send_attempt",
+    type,
+    to,
+    from,
+    subject,
+  }));
+}
+
+/**
+ * Log email send success
+ */
+function logEmailSuccess(messageId: string, to: string, subject: string) {
+  console.log(JSON.stringify({
+    event: "email_send_success",
+    messageId,
+    to,
+    subject,
+  }));
+}
+
+/**
+ * Log email send failure
+ */
+function logEmailFailure(error: Error, to: string, subject: string) {
+  console.error(JSON.stringify({
+    event: "email_send_failure",
+    errorMessage: error.message,
+    errorName: error.name,
+    to,
+    subject,
+  }));
+}
+
+/**
  * Send an email using Resend or log to console in development
  */
 export async function sendEmail({ to, subject, react }: SendEmailOptions) {
   const hasApiKey = Boolean(process.env.RESEND_API_KEY);
   const isProd = process.env.NODE_ENV === "production";
   const from = resolveFromEmail();
+  const type = getEmailType(subject);
   
   // Log send attempt
-  console.log(JSON.stringify({
-    event: "email_send_attempt",
-    type: subject.includes("Verifieer") ? "verification" : subject.includes("Factuur") ? "invoice" : "support",
-    to,
-    from,
-    subject,
-  }));
+  logEmailAttempt(type, to, from, subject);
 
   try {
     const html = await render(react);
@@ -56,13 +98,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
     if (!hasApiKey) {
       if (isProd) {
         const error = new Error("RESEND_API_KEY missing in production");
-        console.error(JSON.stringify({
-          event: "email_send_failure",
-          errorMessage: error.message,
-          errorName: error.name,
-          to,
-          subject,
-        }));
+        logEmailFailure(error, to, subject);
         return { success: false, error };
       }
 
@@ -78,13 +114,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
     const resend = getResendClient();
     if (!resend) {
       const error = new Error("RESEND client unavailable");
-      console.error(JSON.stringify({
-        event: "email_send_failure",
-        errorMessage: error.message,
-        errorName: error.name,
-        to,
-        subject,
-      }));
+      logEmailFailure(error, to, subject);
       return { success: false, error };
     }
 
@@ -96,23 +126,12 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
     });
 
     // Log success with message ID
-    console.log(JSON.stringify({
-      event: "email_send_success",
-      messageId: result.data?.id || "no-id",
-      to,
-      subject,
-    }));
+    logEmailSuccess(result.data?.id || "no-id", to, subject);
 
     return { success: true, messageId: result.data?.id };
   } catch (error) {
     const err = error as Error;
-    console.error(JSON.stringify({
-      event: "email_send_failure",
-      errorMessage: err.message,
-      errorName: err.name,
-      to,
-      subject,
-    }));
+    logEmailFailure(err, to, subject);
     return { success: false, error };
   }
 }
