@@ -36,7 +36,7 @@ export function InvoicePaymentStatus({ invoiceId, isPaid, paidDateLabel }: Invoi
   const handleMarkUnpaid = () => runAction(() => markAsUnpaid(invoiceId), "Betaling ongedaan gemaakt");
 
   const commonClasses =
-    "inline-flex h-9 !min-h-0 items-center gap-2 rounded-full border px-3 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:ring-offset-2";
+    "inline-flex h-9 !min-h-0 items-center gap-2 rounded-full border px-3 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-200 focus-visible:ring-offset-2";
 
   if (isPaid) {
     return (
