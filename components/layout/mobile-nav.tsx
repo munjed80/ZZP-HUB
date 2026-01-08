@@ -27,6 +27,7 @@ type MobileNavProps = {
 export function MobileNav(mobileNavProps: MobileNavProps = {}) {
   const { onMenuClick } = mobileNavProps;
   const pathname = usePathname();
+  const isInstellingenActive = pathname === "/instellingen" || pathname?.startsWith("/instellingen/");
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 shadow-[0_-10px_28px_-20px_rgba(15,23,42,0.18)] backdrop-blur-md md:hidden pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">
@@ -56,14 +57,14 @@ export function MobileNav(mobileNavProps: MobileNavProps = {}) {
           href="/instellingen"
           className={cn(
             "flex w-full min-w-[72px] flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-[10px] font-bold leading-tight transition-all duration-200",
-            pathname === "/instellingen" || pathname?.startsWith("/instellingen/")
+            isInstellingenActive
               ? "text-primary bg-gradient-to-br from-primary/15 to-primary/10 shadow-lg border-2 border-primary/30 scale-105"
               : "text-muted-foreground hover:text-foreground hover:bg-muted hover:scale-[1.02]"
           )}
           aria-label="Instellingen"
-          aria-current={pathname === "/instellingen" || pathname?.startsWith("/instellingen/") ? "page" : undefined}
+          aria-current={isInstellingenActive ? "page" : undefined}
         >
-          <Settings className={cn("h-5 w-5 transition-transform duration-200", (pathname === "/instellingen" || pathname?.startsWith("/instellingen/")) && "stroke-[2.5] scale-110")} aria-hidden />
+          <Settings className={cn("h-5 w-5 transition-transform duration-200", isInstellingenActive && "stroke-[2.5] scale-110")} aria-hidden />
           <span>Instellingen</span>
         </Link>
         
