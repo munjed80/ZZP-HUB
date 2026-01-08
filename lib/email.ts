@@ -3,8 +3,8 @@ import { render } from "@react-email/render";
 import type { ReactElement } from "react";
 
 // SINGLE SOURCE OF TRUTH: All emails MUST use this verified sender
-const FROM_EMAIL = "ZZP Hub <no-reply@matrixtop.com>";
 const FROM_EMAIL_ADDRESS = "no-reply@matrixtop.com";
+const FROM_EMAIL = `ZZP Hub <${FROM_EMAIL_ADDRESS}>`;
 
 let resendClient: Resend | null = null;
 
