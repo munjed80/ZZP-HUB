@@ -8,6 +8,8 @@ const REQUIRED_ENV = [
   "DATABASE_URL",
   "NEXTAUTH_SECRET",
   "NEXTAUTH_URL",
+];
+const OPTIONAL_ENV = [
   "RESEND_API_KEY",
 ];
 const DEFAULT_HOST = "0.0.0.0";
@@ -24,6 +26,20 @@ function validateEnv() {
       `[start-prod] Missing required environment variables: ${missing.join(", ")}`,
     );
     process.exit(1);
+  }
+
+  // Check optional env vars and warn if missing
+  const missingOptional = OPTIONAL_ENV.filter(
+    (key) => !process.env[key] || process.env[key].trim() === "",
+  );
+
+  if (missingOptional.length > 0) {
+    console.warn(
+      `[start-prod] WARNING: Missing optional environment variables: ${missingOptional.join(", ")}`,
+    );
+    console.warn(
+      "[start-prod] Email functionality will be disabled. Email verification and notifications will not work.",
+    );
   }
 
   const baseUrl =

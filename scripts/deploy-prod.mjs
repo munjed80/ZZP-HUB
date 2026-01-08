@@ -12,8 +12,10 @@ const logStep = (message) => console.log(`\n[deploy] === ${message} ===`);
 const requiredEnv = [
   "DATABASE_URL",
   "NEXTAUTH_SECRET",
-  "RESEND_API_KEY",
   "NEXTAUTH_URL",
+];
+const optionalEnv = [
+  "RESEND_API_KEY",
 ];
 const EXPECTED_NEXTAUTH_URL = process.env.EXPECTED_NEXTAUTH_URL;
 const DEFAULT_PORT = "3000";
@@ -69,6 +71,21 @@ function validateRuntimeEnvironment() {
   if (missing.length > 0) {
     throw new Error(
       `Missing required environment variables: ${missing.join(", ")}`,
+    );
+  }
+
+  // Check optional env vars and warn if missing
+  const missingOptional = optionalEnv.filter((name) => {
+    const value = process.env[name];
+    return typeof value !== "string" || value.trim() === "";
+  });
+
+  if (missingOptional.length > 0) {
+    console.warn(
+      `[deploy] WARNING: Missing optional environment variables: ${missingOptional.join(", ")}`,
+    );
+    console.warn(
+      "[deploy] Email functionality will be disabled. Email verification and notifications will not work.",
     );
   }
 
