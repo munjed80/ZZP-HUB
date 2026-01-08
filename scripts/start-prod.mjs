@@ -204,7 +204,7 @@ async function startServer() {
 
   const child = spawn("node", [serverPath], {
     stdio: "inherit",
-    env: { ...process.env, HOST: host, PORT: port },
+    env: { ...process.env, HOST: host, HOSTNAME: host, PORT: port },
   });
 
   child.on("exit", (code) => {
