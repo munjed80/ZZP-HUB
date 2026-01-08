@@ -197,14 +197,15 @@ async function startServer() {
     process.exit(1);
   }
 
-  const host = process.env.HOST || DEFAULT_HOST;
-  const port = process.env.PORT || DEFAULT_PORT;
+  const host = DEFAULT_HOST;
+  const port = DEFAULT_PORT;
+  const serverEnv = { ...process.env, HOST: host, HOSTNAME: host, PORT: port };
 
   console.log(`[start-prod] Starting server on ${host}:${port}`);
 
   const child = spawn("node", [serverPath], {
     stdio: "inherit",
-    env: { ...process.env, HOST: host, HOSTNAME: host, PORT: port },
+    env: serverEnv,
   });
 
   child.on("exit", (code) => {
