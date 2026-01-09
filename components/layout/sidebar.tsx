@@ -118,7 +118,10 @@ export function Sidebar({
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className={buttonVariants("outline", "w-full justify-start gap-2 px-3 py-2 text-sm font-medium")}
+          className={buttonVariants(
+            "outline",
+            "w-full justify-start gap-2 px-3 py-2 text-sm font-medium text-emerald-700 border-emerald-200 hover:text-emerald-800 hover:bg-emerald-50 dark:text-emerald-200 dark:border-emerald-700/70 dark:hover:text-emerald-50 dark:hover:bg-emerald-900/40",
+          )}
         >
           <LogOut className="h-4 w-4" aria-hidden />
           Sign Out
@@ -227,7 +230,10 @@ export function MobileSidebar({
                 onOpenChange?.(false);
                 signOut({ callbackUrl: "/" });
               }}
-              className={buttonVariants("outline", "w-full justify-start gap-2 px-3 py-2.5 text-sm font-medium")}
+              className={buttonVariants(
+                "outline",
+                "w-full justify-start gap-2 px-3 py-2.5 text-sm font-medium text-emerald-700 border-emerald-200 hover:text-emerald-800 hover:bg-emerald-50 dark:text-emerald-200 dark:border-emerald-700/70 dark:hover:text-emerald-50 dark:hover:bg-emerald-900/40",
+              )}
             >
               <LogOut className="h-4 w-4" aria-hidden />
               Sign Out

@@ -105,7 +105,7 @@ export default async function FacturenPagina() {
           href="/facturen/nieuw"
           className={buttonVariants(
             "primary",
-            "bg-gradient-to-r from-green-700 via-green-600 to-green-700 text-white border-green-600 shadow-[0_14px_32px_-18px_rgba(34,197,94,0.35)] hover:shadow-[0_16px_40px_-18px_rgba(34,197,94,0.45)]",
+            "bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-700 text-white border-emerald-600 shadow-[0_14px_32px_-18px_rgba(16,185,129,0.35)] hover:shadow-[0_16px_40px_-18px_rgba(16,185,129,0.5)]",
           )}
           data-tour="new-invoice-button"
         >
