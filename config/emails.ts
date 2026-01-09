@@ -22,10 +22,10 @@ export function validateFromEmail(email: string): void {
   }
 
   const extracted = match[1].trim();
-  const hasValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(extracted);
+  const hasValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(extracted);
   if (!hasValidEmail) {
     console.error("INVALID_FROM_EMAIL", { email, reason: "invalid-email-address" });
-    throw new Error(`Invalid FROM email format: "${email}". Must contain valid email inside angle brackets.`);
+    throw new Error(`Invalid FROM email format: "${email}". Email address inside angle brackets is invalid.`);
   }
 }
 
