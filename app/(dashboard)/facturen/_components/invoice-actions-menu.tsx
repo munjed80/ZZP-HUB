@@ -106,7 +106,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
   };
 
   const menuItemClasses =
-    "h-10 w-full justify-start gap-2 rounded-xl border border-btn-border bg-btn text-btn-foreground hover:bg-btn-hover";
+    "h-10 w-full justify-start gap-2 rounded-xl border border-btn-border bg-btn text-slate-900 dark:text-slate-50 hover:bg-btn-hover hover:text-slate-900 dark:hover:text-slate-50 disabled:text-slate-400 disabled:opacity-60";
+  const menuIconClasses = "h-4 w-4 text-slate-700 dark:text-slate-200";
   const menuContent = (
     <div className="w-[240px] rounded-2xl border border-slate-200 bg-white p-3 text-btn-foreground shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)]">
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -120,13 +121,13 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
       <div className="mt-2 flex flex-col gap-1.5">
         {shareLink ? (
           <Link href={shareLink} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
-            <Eye className="h-4 w-4" aria-hidden />
+            <Eye className={menuIconClasses} aria-hidden />
             Bekijk factuur
           </Link>
         ) : null}
         {editHref ? (
           <Link href={editHref} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
-            <Edit3 className="h-4 w-4" aria-hidden />
+            <Edit3 className={menuIconClasses} aria-hidden />
             Bewerk factuur
           </Link>
         ) : null}
@@ -135,10 +136,10 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           label="Download PDF"
           className={menuItemClasses}
           variant="ghost"
-          icon={<FileDown className="h-4 w-4" aria-hidden />}
+          icon={<FileDown className={menuIconClasses} aria-hidden />}
         />
         <button type="button" onClick={handleShare} className={cn(buttonVariants("ghost", menuItemClasses))}>
-          <Share2 className="h-4 w-4" aria-hidden />
+          <Share2 className={menuIconClasses} aria-hidden />
           Deel
         </button>
         <button
