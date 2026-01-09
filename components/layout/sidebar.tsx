@@ -119,12 +119,12 @@ export function Sidebar({
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
           className={buttonVariants(
-            "outline",
-            "w-full justify-start gap-2 px-3 py-2 text-sm font-medium text-emerald-700 border-emerald-200 hover:text-emerald-800 hover:bg-emerald-50 dark:text-emerald-200 dark:border-emerald-700/70 dark:hover:text-emerald-50 dark:hover:bg-emerald-900/40",
+            "destructive",
+            "w-full justify-between gap-2 px-3 py-2 text-sm font-semibold shadow-[0_12px_48px_-16px_rgba(244,63,94,0.35)] dark:shadow-[0_12px_48px_-16px_rgba(248,113,113,0.25)]",
           )}
         >
           <LogOut className="h-4 w-4" aria-hidden />
-          Sign Out
+          Uitloggen
         </button>
         <div className="rounded-lg bg-muted/30 px-3 py-2 text-center border border-border">
           <p className="text-xs font-medium text-muted-foreground">
@@ -231,12 +231,12 @@ export function MobileSidebar({
                 signOut({ callbackUrl: "/" });
               }}
               className={buttonVariants(
-                "outline",
-                "w-full justify-start gap-2 px-3 py-2.5 text-sm font-medium text-emerald-700 border-emerald-200 hover:text-emerald-800 hover:bg-emerald-50 dark:text-emerald-200 dark:border-emerald-700/70 dark:hover:text-emerald-50 dark:hover:bg-emerald-900/40",
+                "destructive",
+                "w-full justify-between gap-2 px-3 py-2.5 text-sm font-semibold shadow-[0_12px_48px_-16px_rgba(244,63,94,0.35)] dark:shadow-[0_12px_48px_-16px_rgba(248,113,113,0.25)]",
               )}
             >
               <LogOut className="h-4 w-4" aria-hidden />
-              Sign Out
+              Uitloggen
             </button>
             <div className="rounded-lg bg-muted px-3 py-2 text-center border border-border">
               <p className="text-xs font-medium text-muted-foreground">
