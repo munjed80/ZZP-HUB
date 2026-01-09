@@ -95,18 +95,18 @@ export default async function DashboardPagina() {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <div className="flex flex-col gap-2">
+    <div className="space-y-8 sm:space-y-10">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-primary via-accent to-success"></div>
-          <h1 className="text-3xl font-bold text-foreground bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">Dashboard</h1>
+          <div className="h-1.5 w-14 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500"></div>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">Dashboard</h1>
         </div>
         <p className="text-sm text-muted-foreground font-medium">
           Financieel overzicht {now.getFullYear()}
         </p>
       </div>
 
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => {
           const Icon = item.icon;
           const trend = getTrendForKpi(item.label);
@@ -114,25 +114,24 @@ export default async function DashboardPagina() {
           return (
             <Card
               key={item.label}
-              className="group relative overflow-hidden rounded-2xl border-2 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/30"
+              className="group relative overflow-hidden transition-all duration-500 hover:-translate-y-1"
             >
-              <div className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-primary/10 via-primary/5 to-transparent blur-3xl transition-opacity duration-300 group-hover:opacity-80" />
-              <div className="pointer-events-none absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-gradient-to-tr from-accent/5 to-transparent blur-2xl" />
+              <div className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-emerald-500/8 via-emerald-500/4 to-transparent blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground group-hover:text-foreground transition-colors">
+                  <CardTitle className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground group-hover:text-foreground transition-colors duration-300">
                     {item.label}
                   </CardTitle>
-                  <div className={cn("rounded-2xl p-2.5 shadow-lg ring-2 ring-border/30 backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl group-hover:ring-primary/40", item.iconBg)}>
-                    <Icon className={cn("h-5 w-5 transition-transform duration-300 group-hover:scale-110", item.iconColor)} aria-hidden />
+                  <div className={cn("rounded-2xl p-3 shadow-md ring-1 ring-border/40 backdrop-blur-sm transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg group-hover:ring-emerald-200/50 dark:group-hover:ring-emerald-700/50", item.iconBg)}>
+                    <Icon className={cn("h-5 w-5 transition-transform duration-500 group-hover:scale-110", item.iconColor)} aria-hidden />
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 pb-5">
-                <p className="text-3xl font-bold tabular-nums text-foreground transition-all duration-300 group-hover:text-primary group-hover:scale-105">
+                <p className="text-3xl font-bold tabular-nums text-foreground transition-all duration-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
                   {formatBedrag(item.value)}
                 </p>
-                <Badge variant={trend.variant} className="inline-flex items-center gap-1.5 text-xs shadow-md font-bold">
+                <Badge variant={trend.variant} className="inline-flex items-center gap-1.5 text-xs shadow-sm font-semibold">
                   {trend.label}
                 </Badge>
               </CardContent>
@@ -141,52 +140,54 @@ export default async function DashboardPagina() {
         })}
       </div>
 
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-[1.65fr_1.05fr]">
-        <Card className="group rounded-2xl shadow-lg border-2 hover:shadow-2xl hover:border-primary/20 transition-all duration-300">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold text-card-foreground flex items-center gap-2">
-              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-primary to-accent"></span>
-              Omzet vs kosten
-            </CardTitle>
-            <p className="text-sm text-muted-foreground font-medium">Maandelijks overzicht {now.getFullYear()}</p>
+      <div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-[1.65fr_1.05fr]">
+        <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
+          <CardHeader className="pb-5">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2.5">
+                <span className="h-1 w-10 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"></span>
+                Omzet vs kosten
+              </CardTitle>
+              <p className="text-sm text-muted-foreground font-medium">Maandelijks overzicht {now.getFullYear()}</p>
+            </div>
           </CardHeader>
           <CardContent>
             <RevenueExpensesChart data={chartData} />
           </CardContent>
         </Card>
 
-        <div className="space-y-3 sm:space-y-4">
-          <Card className="group rounded-2xl shadow-lg border-2 hover:shadow-2xl hover:border-primary/20 transition-all duration-300">
+        <div className="space-y-4 sm:space-y-5">
+          <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
             <CardHeader className="pb-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 p-3 shadow-lg ring-2 ring-primary/30 group-hover:scale-105 transition-transform duration-300">
-                  <PiggyBank className="h-6 w-6 text-primary" aria-hidden />
+                <div className="rounded-2xl bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 p-3.5 shadow-md ring-1 ring-emerald-200/40 dark:ring-emerald-700/40 group-hover:scale-105 transition-transform duration-300">
+                  <PiggyBank className="h-6 w-6 text-emerald-600 dark:text-emerald-400" aria-hidden />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-lg font-bold text-card-foreground">IB reservering</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-0.5 font-medium">35% buffer voor belasting</p>
+                  <CardTitle>IB reservering</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1 font-medium">35% buffer voor belasting</p>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-2.5">
               <p className="text-2xl font-bold tabular-nums text-foreground">
                 {formatBedrag(stats.incomeTaxReservation)}
               </p>
-              <Badge variant="info" className="text-xs font-bold">
+              <Badge variant="info" className="text-xs font-semibold">
                 Op basis van winst {formatBedrag(stats.netProfit)}
               </Badge>
             </CardContent>
           </Card>
 
-          <Card className="group rounded-2xl shadow-lg border-2 hover:shadow-2xl hover:border-accent/20 transition-all duration-300">
+          <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 p-3 shadow-lg ring-2 ring-accent/30 group-hover:scale-105 transition-transform duration-300">
-                  <Gauge className="h-6 w-6 text-accent" aria-hidden />
+                <div className="rounded-2xl bg-gradient-to-br from-teal-500/15 to-teal-500/5 p-3.5 shadow-md ring-1 ring-teal-200/40 dark:ring-teal-700/40 group-hover:scale-105 transition-transform duration-300">
+                  <Gauge className="h-6 w-6 text-teal-600 dark:text-teal-400" aria-hidden />
                 </div>
                 <div>
-                  <CardTitle className="text-lg font-bold text-card-foreground">Verdeling resultaten</CardTitle>
-                  <p className="text-sm text-muted-foreground font-medium">Omzet, kosten en winst</p>
+                  <CardTitle>Verdeling resultaten</CardTitle>
+                  <p className="text-sm text-muted-foreground font-medium mt-0.5">Omzet, kosten en winst</p>
                 </div>
               </div>
             </CardHeader>
@@ -201,22 +202,24 @@ export default async function DashboardPagina() {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 lg:grid-cols-2">
-        <Card className="group rounded-2xl shadow-lg border-2 hover:shadow-2xl hover:border-success/20 transition-all duration-300">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold text-card-foreground flex items-center gap-2">
-              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-success to-primary"></span>
-              Recente facturen
-            </CardTitle>
-            <p className="text-sm text-muted-foreground font-medium">Laatste 5 definitieve facturen</p>
+      <div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-2">
+        <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
+          <CardHeader className="pb-5">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2.5">
+                <span className="h-1 w-10 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"></span>
+                Recente facturen
+              </CardTitle>
+              <p className="text-sm text-muted-foreground font-medium">Laatste 5 definitieve facturen</p>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border/60">
               {stats.recentInvoices.map((invoice) => (
-                <div key={invoice.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0 hover:bg-muted/30 px-2 rounded-lg transition-colors duration-200">
+                <div key={invoice.id} className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 px-3 -mx-3 rounded-xl transition-all duration-200">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-foreground truncate">{invoice.invoiceNum}</p>
-                    <p className="text-sm text-muted-foreground truncate font-medium">{invoice.client.name}</p>
+                    <p className="text-sm text-muted-foreground truncate font-medium mt-0.5">{invoice.client.name}</p>
                   </div>
                   <div className="text-right ml-4">
                     <p className="text-sm font-bold tabular-nums text-foreground">
@@ -228,7 +231,7 @@ export default async function DashboardPagina() {
                         ),
                       )}
                     </p>
-                    <p className="text-xs text-muted-foreground font-medium">
+                    <p className="text-xs text-muted-foreground font-medium mt-0.5">
                       {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(invoice.date)}
                     </p>
                   </div>
@@ -238,29 +241,31 @@ export default async function DashboardPagina() {
           </CardContent>
         </Card>
 
-        <Card className="group rounded-2xl shadow-lg border-2 hover:shadow-2xl hover:border-destructive/20 transition-all duration-300">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold text-card-foreground flex items-center gap-2">
-              <span className="h-1 w-8 rounded-full bg-gradient-to-r from-destructive to-accent"></span>
-              Recente uitgaven
-            </CardTitle>
-            <p className="text-sm text-muted-foreground font-medium">Laatste 5 geregistreerde uitgaven</p>
+        <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
+          <CardHeader className="pb-5">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2.5">
+                <span className="h-1 w-10 rounded-full bg-gradient-to-r from-rose-500 to-orange-500"></span>
+                Recente uitgaven
+              </CardTitle>
+              <p className="text-sm text-muted-foreground font-medium">Laatste 5 geregistreerde uitgaven</p>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border/60">
               {stats.recentExpenses.map((expense) => (
-                <div key={expense.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0 hover:bg-muted/30 px-2 rounded-lg transition-colors duration-200">
+                <div key={expense.id} className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 px-3 -mx-3 rounded-xl transition-all duration-200">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-foreground truncate">
                       {expense.description}
                     </p>
-                    <p className="text-sm text-muted-foreground font-medium">{expense.category}</p>
+                    <p className="text-sm text-muted-foreground font-medium mt-0.5">{expense.category}</p>
                   </div>
                   <div className="text-right ml-4">
                     <p className="text-sm font-bold tabular-nums text-foreground">
                       {formatBedrag(Number(expense.amountExcl))}
                     </p>
-                    <p className="text-xs text-muted-foreground font-medium">
+                    <p className="text-xs text-muted-foreground font-medium mt-0.5">
                       {new Intl.DateTimeFormat("nl-NL", { day: "numeric", month: "short" }).format(expense.date)}
                     </p>
                   </div>
