@@ -216,165 +216,193 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
   const primaryCta = isLoggedIn ? "Naar Dashboard" : "Gratis starten";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#e2e8f0] via-white to-[#e5e7eb] text-[var(--foreground)]">
-      <header className="sticky top-4 z-50 text-[rgb(var(--brand-on-primary))]">
+    <div className="min-h-screen bg-gradient-to-b from-[#e8f0f2] via-white to-[#f0f4f8] text-[var(--foreground)]">
+      <header className="sticky top-6 z-50 text-[rgb(var(--brand-on-primary))]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between rounded-full border border-[rgb(var(--brand-on-primary))/0.22] bg-[rgb(var(--brand-primary))/0.18] px-4 py-3 shadow-[0_20px_70px_-36px_rgba(var(--brand-primary),0.75)] backdrop-blur-xl">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(140deg,rgb(var(--brand-primary)),rgb(var(--brand-primary-hover)))] shadow-[0_10px_40px_-18px_rgba(var(--brand-primary),0.7)] ring-1 ring-[rgb(var(--brand-on-primary))/0.35]">
-                <BrandZ className="h-5 w-5 text-[rgb(var(--brand-on-primary))]" aria-hidden />
+          <motion.div 
+            className="flex items-center justify-between rounded-full border border-[rgb(var(--brand-on-primary))/0.15] bg-white/80 px-5 py-3.5 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] backdrop-blur-2xl transition-all duration-300 hover:shadow-[0_12px_48px_-16px_rgba(15,23,42,0.18)]"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgb(var(--brand-primary)),rgb(var(--brand-primary-hover)))] shadow-[0_8px_24px_-8px_rgba(var(--brand-primary),0.45)] ring-1 ring-white/20 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-[0_12px_32px_-8px_rgba(var(--brand-primary),0.6)]">
+                <BrandZ className="h-5 w-5 text-white transition-transform duration-300 group-hover:rotate-12" aria-hidden />
               </div>
-              <motion.span
-                className="shimmer-text text-xl font-semibold tracking-tight drop-shadow-[0_6px_28px_rgba(var(--brand-primary),0.3)]"
-                transition={{ duration: 0.6 }}
+              <span
+                className="text-xl font-bold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-slate-900"
               >
                 ZZP-HUB
-              </motion.span>
+              </span>
             </Link>
-            <nav className="hidden items-center gap-8 text-sm font-medium text-[rgb(var(--brand-on-primary))/0.9] md:flex">
-              <Link href="#features" className="transition-colors duration-200 hover:text-[rgb(var(--brand-on-primary))]">
+            <nav className="hidden items-center gap-8 text-sm font-medium text-slate-700 md:flex">
+              <Link href="#features" className="relative transition-colors duration-300 hover:text-slate-900 after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-emerald-500 after:to-teal-500 after:transition-all after:duration-300 hover:after:w-full">
                 Features
               </Link>
-              <Link href="#pricing" className="transition-colors duration-200 hover:text-[rgb(var(--brand-on-primary))]">
+              <Link href="#pricing" className="relative transition-colors duration-300 hover:text-slate-900 after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-emerald-500 after:to-teal-500 after:transition-all after:duration-300 hover:after:w-full">
                 Prijzen
               </Link>
-              <Link href="#assistant" className="transition-colors duration-200 hover:text-[rgb(var(--brand-on-primary))]">
+              <Link href="#assistant" className="relative transition-colors duration-300 hover:text-slate-900 after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-emerald-500 after:to-teal-500 after:transition-all after:duration-300 hover:after:w-full">
                 AI assistent
               </Link>
-              <Link href="#support" className="transition-colors duration-200 hover:text-[rgb(var(--brand-on-primary))]">
+              <Link href="#support" className="relative transition-colors duration-300 hover:text-slate-900 after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-emerald-500 after:to-teal-500 after:transition-all after:duration-300 hover:after:w-full">
                 Support
               </Link>
             </nav>
             <div className="flex items-center gap-3">
               {isLoggedIn ? (
-                <LandingCtaButton href="/dashboard" paddingClass="px-5 py-2.5" className="text-sm tracking-tight">
+                <LandingCtaButton href="/dashboard" paddingClass="px-6 py-2.5" className="text-sm tracking-tight">
                   Naar Dashboard
                 </LandingCtaButton>
               ) : (
                 <>
-                  <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-[rgb(var(--brand-on-primary))]")}>
+                  <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-slate-700 hover:text-slate-900 hover:bg-slate-100/80")}>
                     Inloggen
                   </Link>
-                  <LandingCtaButton href="/register" paddingClass="px-5 py-2.5">
+                  <LandingCtaButton href="/register" paddingClass="px-6 py-2.5">
                     Gratis starten
                   </LandingCtaButton>
                 </>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
       </header>
 
-      <main className="pt-16 sm:pt-20">
-        {/* Hero Section - Redesigned from scratch */}
+      <main className="pt-20 sm:pt-24">
+        {/* Hero Section - Enhanced with sophisticated depth */}
         <section
           id="hero"
-          className="relative min-h-[85vh] overflow-hidden bg-gradient-to-br from-[#0d4f4f] via-[#115e59] to-[#0891b2] pb-20 pt-16 sm:min-h-[90vh] sm:pb-24 sm:pt-20 lg:pt-24"
+          className="relative min-h-[90vh] overflow-hidden bg-gradient-to-br from-[#0a3d3d] via-[#0f5656] to-[#0d7a8c] pb-24 pt-20 sm:min-h-[95vh] sm:pb-32 sm:pt-24 lg:pt-28"
         >
-          {/* Background ambient effects */}
+          {/* Enhanced background with multiple layers */}
           <div className="absolute inset-0">
-            <div className="absolute left-1/4 top-1/4 h-[500px] w-[500px] rounded-full bg-emerald-400/10 blur-[120px]" />
-            <div className="absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-teal-400/10 blur-[100px]" />
+            <div className="absolute left-1/4 top-1/4 h-[600px] w-[600px] rounded-full bg-emerald-400/8 blur-[140px] animate-pulse" style={{ animationDuration: '8s' }} />
+            <div className="absolute right-1/4 bottom-1/4 h-[500px] w-[500px] rounded-full bg-teal-300/6 blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }} />
+            <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] rounded-full bg-cyan-400/5 blur-[100px]" />
+            {/* Subtle grid pattern overlay for depth */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]" />
           </div>
 
-          <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="flex min-h-[calc(85vh-8rem)] flex-col items-center justify-center text-center sm:min-h-[calc(90vh-10rem)]">
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex min-h-[calc(90vh-10rem)] flex-col items-center justify-center text-center sm:min-h-[calc(95vh-12rem)]">
               {/* Main content */}
-              <div className="max-w-4xl space-y-8">
-                {/* Emotional headline */}
+              <div className="max-w-5xl space-y-10">
+                {/* Elegant badge */}
+                <motion.div
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium uppercase tracking-[0.2em] text-emerald-100 shadow-[0_8px_32px_-12px_rgba(16,185,129,0.3)] backdrop-blur-sm"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <CheckCircle2 className="h-4 w-4 text-emerald-300" aria-hidden />
+                  Premium Platform voor ZZP&apos;ers
+                </motion.div>
+
+                {/* Enhanced headline with better typography */}
                 <motion.h1
-                  className="text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl"
+                  className="text-5xl font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-6xl lg:text-7xl"
                   {...fadeUp}
                 >
                   Jouw financiën onder controle.
                   <br />
-                  <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-emerald-300 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-emerald-200 via-teal-100 to-emerald-200 bg-clip-text text-transparent drop-shadow-[0_2px_24px_rgba(16,185,129,0.25)]">
                     Simpel. Professioneel.
                   </span>
                 </motion.h1>
 
-                {/* Subheadline */}
+                {/* Refined subheadline */}
                 <motion.p
-                  className="mx-auto max-w-2xl text-lg leading-relaxed text-teal-50 sm:text-xl"
+                  className="mx-auto max-w-2xl text-xl leading-relaxed text-teal-50/90 sm:text-2xl sm:leading-relaxed"
                   {...fadeUp}
                   transition={fadeUpTransition(0.1)}
                 >
                   Facturen, BTW-aangifte en uren — alles in één overzichtelijk platform voor ZZP&apos;ers in Nederland.
                 </motion.p>
 
-                {/* Primary CTA */}
+                {/* Enhanced Primary CTA */}
                 <motion.div
-                  className="flex flex-col items-center gap-4 pt-2"
+                  className="flex flex-col items-center gap-6 pt-4"
                   {...fadeUp}
                   transition={fadeUpTransition(0.15)}
                 >
                   <LandingCtaButton
                     href={isLoggedIn ? "/dashboard" : "/register"}
-                    paddingClass="px-8 py-4"
-                    className="text-base"
+                    paddingClass="px-10 py-5"
+                    className="text-lg shadow-[0_20px_60px_-20px_rgba(16,185,129,0.4)] hover:shadow-[0_24px_80px_-24px_rgba(16,185,129,0.6)]"
                   >
                     Start 14 dagen gratis
-                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden />
+                    <ArrowRight className="h-6 w-6 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
                   </LandingCtaButton>
 
-                  {/* Trust signals */}
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
-                    <div className="flex items-center justify-center gap-2 text-sm text-teal-100">
+                  {/* Enhanced trust signals */}
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+                    <div className="flex items-center justify-center gap-2.5 text-sm font-medium text-teal-100/90">
                       <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-300" aria-hidden />
-                      <span className="font-medium">14 dagen gratis</span>
+                      <span>14 dagen gratis</span>
                     </div>
-                    <div className="flex items-center justify-center gap-2 text-sm text-teal-100">
+                    <div className="flex items-center justify-center gap-2.5 text-sm font-medium text-teal-100/90">
                       <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-300" aria-hidden />
-                      <span className="font-medium">Geen creditcard</span>
+                      <span>Geen creditcard</span>
                     </div>
-                    <div className="flex items-center justify-center gap-2 text-sm text-teal-100">
+                    <div className="flex items-center justify-center gap-2.5 text-sm font-medium text-teal-100/90">
                       <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-300" aria-hidden />
-                      <span className="font-medium">Voor ZZP&apos;ers in NL</span>
+                      <span>Voor ZZP&apos;ers in NL</span>
                     </div>
                   </div>
                 </motion.div>
 
-                {/* Soft visual hint - Abstract financial flow */}
+                {/* Enhanced visual showcase with sophisticated depth */}
                 <motion.div
-                  className="mx-auto mt-12 max-w-3xl"
+                  className="mx-auto mt-16 max-w-4xl"
                   {...fadeUp}
                   transition={fadeUpTransition(0.2)}
                 >
-                  <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
-                    {/* Subtle glow overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5" />
+                  <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-transparent p-8 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:p-10">
+                    {/* Sophisticated gradient overlays */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/8 via-transparent to-teal-500/8" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.1),transparent_50%)]" />
                     
-                    <div className="relative grid grid-cols-3 gap-4 sm:gap-6">
-                      {/* Financial flow items */}
-                      <div className="space-y-3 text-left">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 backdrop-blur-sm">
-                          <FileText className="h-6 w-6 text-emerald-300" aria-hidden />
+                    <div className="relative grid grid-cols-3 gap-6 sm:gap-8">
+                      {/* Financial flow items with enhanced styling */}
+                      <motion.div 
+                        className="space-y-4 text-left"
+                        whileHover={{ y: -4, transition: { duration: 0.3 } }}
+                      >
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 backdrop-blur-sm ring-1 ring-white/10 shadow-[0_8px_24px_-8px_rgba(16,185,129,0.3)]">
+                          <FileText className="h-7 w-7 text-emerald-200" aria-hidden />
                         </div>
                         <div>
-                          <div className="text-2xl font-semibold text-white">€12.4k</div>
-                          <div className="text-sm text-teal-200">Facturen</div>
+                          <div className="text-3xl font-bold text-white">€12.4k</div>
+                          <div className="text-sm font-medium text-teal-200/80">Facturen</div>
                         </div>
-                      </div>
+                      </motion.div>
                       
-                      <div className="space-y-3 text-left">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-500/10 backdrop-blur-sm">
-                          <Calculator className="h-6 w-6 text-teal-300" aria-hidden />
+                      <motion.div 
+                        className="space-y-4 text-left"
+                        whileHover={{ y: -4, transition: { duration: 0.3 } }}
+                      >
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-500/20 to-teal-600/10 backdrop-blur-sm ring-1 ring-white/10 shadow-[0_8px_24px_-8px_rgba(20,184,166,0.3)]">
+                          <Calculator className="h-7 w-7 text-teal-200" aria-hidden />
                         </div>
                         <div>
-                          <div className="text-2xl font-semibold text-white">€2.6k</div>
-                          <div className="text-sm text-teal-200">BTW klaar</div>
+                          <div className="text-3xl font-bold text-white">€2.6k</div>
+                          <div className="text-sm font-medium text-teal-200/80">BTW klaar</div>
                         </div>
-                      </div>
+                      </motion.div>
                       
-                      <div className="space-y-3 text-left">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 backdrop-blur-sm">
-                          <Timer className="h-6 w-6 text-amber-300" aria-hidden />
+                      <motion.div 
+                        className="space-y-4 text-left"
+                        whileHover={{ y: -4, transition: { duration: 0.3 } }}
+                      >
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 backdrop-blur-sm ring-1 ring-white/10 shadow-[0_8px_24px_-8px_rgba(245,158,11,0.3)]">
+                          <Timer className="h-7 w-7 text-amber-200" aria-hidden />
                         </div>
                         <div>
-                          <div className="text-2xl font-semibold text-white">1,180</div>
-                          <div className="text-sm text-teal-200">Uren</div>
+                          <div className="text-3xl font-bold text-white">1,180</div>
+                          <div className="text-sm font-medium text-teal-200/80">Uren</div>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 </motion.div>
@@ -383,58 +411,76 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section className="bg-[#f4f6f8] py-16 sm:py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-700">Trusted by 500+ ZZP&apos;ers</p>
-                <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+        <section className="bg-gradient-to-b from-[#f8fafa] to-white py-20 sm:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
+              <div className="space-y-3">
+                <p className="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">Trusted by 500+ ZZP&apos;ers</p>
+                <h3 className="max-w-xl text-3xl font-bold tracking-tight text-slate-900">
                   Creatives, developers & consultants werken soepeler met ZZP-HUB.
                 </h3>
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#334155]/60 bg-white/90 px-3 py-2 text-sm text-slate-700 shadow-sm">
-                <BrandZ className="h-4 w-4 text-[#1e293b]" aria-hidden />
-                <span>Glasheldere premium workflow</span>
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-2.5 text-sm font-medium text-emerald-900 shadow-sm">
+                <BrandZ className="h-4 w-4 text-emerald-700" aria-hidden />
+                <span>Premium workflow</span>
               </div>
             </div>
-            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="mt-12 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
               {trustLogos.map((logo, idx) => (
                 <motion.div
                   key={logo}
-                  className="flex items-center justify-center rounded-xl border border-slate-200/70 bg-white/80 px-4 py-3 text-center text-sm font-semibold text-slate-700 shadow-[0_10px_35px_-24px_rgba(10,46,80,0.22)] transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-[0_18px_40px_-28px_rgba(27,73,101,0.16)]"
-                  {...staggeredCard(0.04 * idx)}
+                  className="group flex items-center justify-center rounded-2xl border border-slate-200/80 bg-white px-5 py-4 text-center text-sm font-semibold text-slate-700 shadow-[0_4px_20px_-8px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-2 hover:border-emerald-200/60 hover:shadow-[0_12px_40px_-12px_rgba(16,185,129,0.15)]"
+                  {...staggeredCard(0.05 * idx)}
                 >
-                  <span className="w-full truncate text-slate-700 mix-blend-multiply">{logo}</span>
+                  <span className="w-full truncate text-slate-700 transition-colors duration-300 group-hover:text-emerald-700">{logo}</span>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="features" className="bg-white py-24 sm:py-28">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section id="features" className="relative overflow-hidden bg-white py-28 sm:py-32">
+          {/* Subtle background decoration */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.03),transparent_50%)]" />
+          
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#4A5568]">Features</p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Alles wat je nodig hebt</h2>
-              <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
-                Staggered reveals, glasheldere flows en invisible inputs voor je klanten.
-              </p>
+              <motion.p 
+                className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-600"
+                {...fadeUp}
+              >
+                Features
+              </motion.p>
+              <motion.h2 
+                className="mt-3 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
+                {...fadeUp}
+                transition={fadeUpTransition(0.05)}
+              >
+                Alles wat je nodig hebt
+              </motion.h2>
+              <motion.p 
+                className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-600"
+                {...fadeUp}
+                transition={fadeUpTransition(0.1)}
+              >
+                Premium features voor een professionele workflow, met focus op gebruiksgemak en efficiency.
+              </motion.p>
             </div>
 
-            <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-20 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
-                  <motion.div key={feature.title} className="h-full" {...staggeredCard(0.05 * index)}>
-                    <Card className="h-full border-slate-200/70 bg-white/90 shadow-[0_18px_80px_-45px_rgba(10,46,80,0.32)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[0_24px_90px_-48px_rgba(27,73,101,0.24)]">
-                      <CardHeader className="space-y-4">
-                        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a2e50] to-[#4A5568] text-white shadow-lg shadow-[0_16px_40px_-24px_rgba(10,46,80,0.5)] ring-1 ring-white/40">
-                          <Icon className="h-7 w-7" aria-hidden />
+                  <motion.div key={feature.title} className="group h-full" {...staggeredCard(0.06 * index)}>
+                    <Card className="h-full border-slate-200/60 bg-white shadow-[0_8px_40px_-16px_rgba(15,23,42,0.1)] transition-all duration-500 hover:-translate-y-2 hover:border-emerald-200/60 hover:shadow-[0_20px_60px_-20px_rgba(16,185,129,0.15)]">
+                      <CardHeader className="space-y-5">
+                        <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25 ring-1 ring-white/20 transition-transform duration-500 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-emerald-500/30">
+                          <Icon className="h-8 w-8" aria-hidden />
                         </div>
-                        <CardTitle className="text-xl font-semibold tracking-tight text-slate-900">{feature.title}</CardTitle>
+                        <CardTitle className="text-xl font-bold tracking-tight text-slate-900">{feature.title}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-slate-700">{feature.description}</p>
+                        <p className="leading-relaxed text-slate-600">{feature.description}</p>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -444,35 +490,49 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section className="bg-gradient-to-br from-[#f4f7f9] via-white to-[#eef3f7] py-20 sm:py-24">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
-              <div className="space-y-4">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#4a6fa5]">Hoe het werkt</p>
-                <h2 className="text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl">
+        <section className="bg-gradient-to-br from-[#f8fafb] via-white to-[#f4f8fa] py-24 sm:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
+              <div className="space-y-6">
+                <motion.p 
+                  className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-600"
+                  {...fadeUp}
+                >
+                  Hoe het werkt
+                </motion.p>
+                <motion.h2 
+                  className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.05)}
+                >
                   In drie stappen live met facturen, offertes en BTW
-                </h2>
-                <p className="text-lg text-[var(--muted)]">
+                </motion.h2>
+                <motion.p 
+                  className="text-lg leading-relaxed text-slate-600"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.1)}
+                >
                   Geen overbodige modules. Alleen wat je nodig hebt om documenten te versturen en overzicht te houden.
-                </p>
+                </motion.p>
               </div>
-              <div className="grid gap-4">
+              <div className="grid gap-6">
                 {howItWorks.map((step, idx) => {
                   const Icon = step.icon;
                   return (
-                    <div
+                    <motion.div
                       key={step.title}
-                      className="flex items-start gap-3 rounded-2xl border border-[var(--border)] bg-white/90 p-4 shadow-md shadow-slate-200/60"
+                      className="group flex items-start gap-4 rounded-3xl border border-slate-200/60 bg-white p-6 shadow-[0_4px_24px_-8px_rgba(15,23,42,0.08)] transition-all duration-500 hover:-translate-y-1 hover:border-emerald-200/60 hover:shadow-[0_12px_48px_-16px_rgba(16,185,129,0.12)]"
+                      {...staggeredCard(0.1 * idx)}
                     >
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--background-secondary)] text-[var(--foreground)] ring-1 ring-[var(--border)]">
-                        <Icon className="h-6 w-6" aria-hidden />
+                      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 ring-1 ring-emerald-200/50 transition-all duration-500 group-hover:scale-110 group-hover:from-emerald-500/20 group-hover:to-teal-500/20">
+                        <Icon className="h-7 w-7 text-emerald-600" aria-hidden />
                       </div>
-                      <div className="space-y-1">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Stap {idx + 1}</p>
-                        <p className="text-base font-semibold text-[var(--foreground)]">{step.title}</p>
-                        <p className="text-sm text-[var(--muted)]">{step.description}</p>
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Stap {idx + 1}</p>
+                        <p className="text-lg font-bold text-slate-900">{step.title}</p>
+                        <p className="leading-relaxed text-slate-600">{step.description}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
@@ -480,168 +540,233 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section id="assistant" className="bg-gradient-to-br from-[#f7f9fb] via-white to-[#eef4fb] py-20 sm:py-24">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="space-y-4">
-                <p className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-teal-700 ring-1 ring-teal-100">
+        <section id="assistant" className="relative overflow-hidden bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/30 py-24 sm:py-28">
+          {/* Subtle background decoration */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(16,185,129,0.04),transparent_60%)]" />
+          
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+              <div className="space-y-6">
+                <motion.div
+                  className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-emerald-700 ring-1 ring-emerald-200/50 shadow-sm"
+                  {...fadeUp}
+                >
                   <ShieldCheck className="h-4 w-4" aria-hidden />
                   Guided AI
-                </p>
-                <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">AI assistent binnen veilige scope</h2>
-                <p className="text-lg text-slate-700">
+                </motion.div>
+                <motion.h2 
+                  className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.05)}
+                >
+                  AI assistent binnen veilige scope
+                </motion.h2>
+                <motion.p 
+                  className="text-lg leading-relaxed text-slate-700"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.1)}
+                >
                   Gericht op ZZP HUB: wat we doen, starten, facturen, BTW, uren en abonnement. Geen open chat, alleen gerichte antwoorden.
-                </p>
-                <div className="grid gap-2 text-sm text-slate-700">
-                  <div className="flex items-center gap-2 rounded-lg bg-white/80 px-3 py-2 ring-1 ring-slate-200">
-                    <CheckCircle2 className="h-4 w-4 text-teal-600" aria-hidden />
-                    Vraag & antwoord per onderwerp, geen vrije chat.
+                </motion.p>
+                <motion.div 
+                  className="grid gap-3 text-sm"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.15)}
+                >
+                  <div className="flex items-center gap-3 rounded-2xl border border-emerald-200/60 bg-white/80 px-4 py-3 shadow-sm">
+                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-600" aria-hidden />
+                    <span className="text-slate-700">Vraag & antwoord per onderwerp, geen vrije chat.</span>
                   </div>
-                  <div className="flex items-center gap-2 rounded-lg bg-white/80 px-3 py-2 ring-1 ring-slate-200">
-                    <CheckCircle2 className="h-4 w-4 text-teal-600" aria-hidden />
-                    Buiten scope? Automatisch doorverwijzen naar support.
+                  <div className="flex items-center gap-3 rounded-2xl border border-emerald-200/60 bg-white/80 px-4 py-3 shadow-sm">
+                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-600" aria-hidden />
+                    <span className="text-slate-700">Buiten scope? Automatisch doorverwijzen naar support.</span>
                   </div>
-                </div>
+                </motion.div>
               </div>
               <AssistantDemo className="backdrop-blur-md" />
             </div>
           </div>
         </section>
 
-        <section className="bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
-              <div className="space-y-3">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#4a6fa5]">FAQ</p>
-                <h2 className="text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl">
+        <section className="bg-white py-24 sm:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
+              <div className="space-y-5">
+                <motion.p 
+                  className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-600"
+                  {...fadeUp}
+                >
+                  FAQ
+                </motion.p>
+                <motion.h2 
+                  className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.05)}
+                >
                   Snel antwoord op de belangrijkste vragen
-                </h2>
-                <p className="text-lg text-[var(--muted)]">
+                </motion.h2>
+                <motion.p 
+                  className="text-lg leading-relaxed text-slate-600"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.1)}
+                >
                   Gericht op onboarding, betalingen en beveiliging. Alles binnen het product en zonder wachttijd.
-                </p>
+                </motion.p>
               </div>
-              <div className="grid gap-3">
-                {landingFaq.map((item) => (
-                  <div
+              <div className="grid gap-4">
+                {landingFaq.map((item, idx) => (
+                  <motion.div
                     key={item.question}
-                    className="rounded-2xl border border-[var(--border)] bg-[var(--background-secondary)] p-4 shadow-sm"
+                    className="rounded-3xl border border-slate-200/60 bg-gradient-to-br from-slate-50/50 to-white p-6 shadow-[0_4px_24px_-8px_rgba(15,23,42,0.06)] transition-all duration-300 hover:border-emerald-200/60 hover:shadow-[0_8px_32px_-12px_rgba(16,185,129,0.1)]"
+                    {...staggeredCard(0.08 * idx)}
                   >
-                    <p className="text-base font-semibold text-[var(--foreground)]">{item.question}</p>
-                    <p className="text-sm text-[var(--muted)]">{item.answer}</p>
-                  </div>
+                    <p className="text-lg font-bold text-slate-900">{item.question}</p>
+                    <p className="mt-2 leading-relaxed text-slate-600">{item.answer}</p>
+                  </motion.div>
                 ))}
               </div>
             </div>
           </div>
         </section>
 
-        <section id="support" className="bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-              <div className="space-y-4">
-                <p className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-800 ring-1 ring-slate-200">
+        <section id="support" className="bg-gradient-to-b from-slate-50 to-white py-24 sm:py-28">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+              <div className="space-y-6">
+                <motion.div
+                  className="inline-flex items-center gap-2.5 rounded-full bg-slate-100 px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-slate-700 ring-1 ring-slate-200/80 shadow-sm"
+                  {...fadeUp}
+                >
                   <LifeBuoy className="h-4 w-4" aria-hidden />
                   Support
-                </p>
-                <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Kalm, premium support</h2>
-                <p className="text-lg text-slate-700">
+                </motion.div>
+                <motion.h2 
+                  className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.05)}
+                >
+                  Premium support voor jouw gemoedsrust
+                </motion.h2>
+                <motion.p 
+                  className="text-lg leading-relaxed text-slate-700"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.1)}
+                >
                   Bereik ons direct vanuit de landing. Naam, e-mail, onderwerp en bericht zijn genoeg. We bevestigen je aanvraag en antwoorden snel.
-                </p>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
-                    <div className="flex items-center gap-2 font-semibold">
-                      <MailCheck className="h-4 w-4 text-teal-600" aria-hidden />
+                </motion.p>
+                <motion.div 
+                  className="grid gap-4 sm:grid-cols-2"
+                  {...fadeUp}
+                  transition={fadeUpTransition(0.15)}
+                >
+                  <div className="rounded-3xl border border-slate-200/60 bg-white px-5 py-4 shadow-sm">
+                    <div className="flex items-center gap-2.5 font-bold text-slate-900">
+                      <MailCheck className="h-5 w-5 text-emerald-600" aria-hidden />
                       Bevestiging per mail
                     </div>
-                    <p className="mt-1 text-slate-600">Heldere status na verzenden, zonder chat-widgets.</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">Heldere status na verzenden, zonder chat-widgets.</p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 shadow-sm">
-                    <div className="flex items-center gap-2 font-semibold">
-                      <ShieldCheck className="h-4 w-4 text-teal-600" aria-hidden />
+                  <div className="rounded-3xl border border-slate-200/60 bg-white px-5 py-4 shadow-sm">
+                    <div className="flex items-center gap-2.5 font-bold text-slate-900">
+                      <ShieldCheck className="h-5 w-5 text-emerald-600" aria-hidden />
                       Focus op product
                     </div>
-                    <p className="mt-1 text-slate-600">Facturen, BTW, uren en abonnement zijn onze prioriteit.</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">Facturen, BTW, uren en abonnement zijn onze prioriteit.</p>
                   </div>
-                </div>
+                </motion.div>
               </div>
               <SupportForm context="Landing" minimal />
             </div>
           </div>
         </section>
 
-        <section id="pricing" className="relative overflow-hidden bg-gradient-to-br from-[#0a2e50] via-[#0c3d66] to-[#0a2e50] py-24 sm:py-28 text-slate-100">
+        <section id="pricing" className="relative overflow-hidden bg-gradient-to-br from-[#0a3540] via-[#0d4a56] to-[#0a3540] py-28 sm:py-32">
+          {/* Enhanced ambient background */}
           <div className="absolute inset-0">
-            <div className="absolute left-10 top-8 h-72 w-72 rounded-full bg-[#4A5568]/40 blur-3xl" />
-            <div className="absolute right-0 bottom-0 h-96 w-96 rounded-full bg-[#0a2e50]/35 blur-[140px]" />
+            <div className="absolute left-10 top-10 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[140px] animate-pulse" style={{ animationDuration: '8s' }} />
+            <div className="absolute right-0 bottom-0 h-[600px] w-[600px] rounded-full bg-teal-500/8 blur-[160px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:80px_80px] opacity-30" />
           </div>
-          <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <motion.div
-                className="mx-auto inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#1e293b] via-[#334155] to-[#0f172a] px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-white shadow-[0_12px_40px_-18px_rgba(15,23,42,0.55)]"
+                className="mx-auto inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.25em] text-emerald-200 shadow-[0_8px_32px_-12px_rgba(16,185,129,0.3)] backdrop-blur-sm ring-1 ring-emerald-400/20"
                 {...fadeUp}
               >
                 14 Dagen Gratis
                 <BrandZ className="h-4 w-4" aria-hidden />
               </motion.div>
               <motion.h2
-                className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl"
+                className="mt-8 text-5xl font-bold tracking-tight text-white sm:text-6xl"
                 {...fadeUp}
                 transition={fadeUpTransition(0.05)}
               >
                 €4,99/mnd · All-in-one Elite
               </motion.h2>
               <motion.p
-                className="mx-auto mt-4 max-w-2xl text-lg text-slate-300"
+                className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-slate-200"
                 {...fadeUp}
                 transition={fadeUpTransition(0.1)}
               >
-                Eén plan met alles erin. Inclusief Midnight Shield beveiliging, audit trails, premium support én 14 dagen gratis
-                proberen.
+                Eén plan met alles erin. Inclusief Midnight Shield beveiliging, audit trails, premium support én 14 dagen gratis proberen.
               </motion.p>
             </div>
 
-            <div className="relative mx-auto mt-16 max-w-3xl">
-              <div className="absolute inset-6 -z-10 rounded-[36px] bg-[#4A5568]/45 blur-[100px]" />
+            <div className="relative mx-auto mt-20 max-w-4xl">
+              {/* Enhanced glow effect */}
+              <div className="absolute inset-8 -z-10 rounded-[48px] bg-gradient-to-br from-emerald-500/30 via-teal-500/20 to-emerald-500/30 blur-[120px]" />
+              
               <motion.div
-                className="relative overflow-hidden rounded-[32px] border border-white/15 bg-white/5 p-8 shadow-[0_35px_120px_-70px_rgba(10,46,80,0.65)] backdrop-blur-2xl"
+                className="relative overflow-hidden rounded-[40px] border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-transparent p-10 shadow-[0_32px_128px_-48px_rgba(0,0,0,0.4)] backdrop-blur-2xl sm:p-12"
                 {...fadeUp}
                 transition={fadeUpTransition(0.15)}
               >
-                <div className="flex flex-col items-center gap-2 text-center">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#e7eef4]">
+                {/* Inner glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.1),transparent_60%)]" />
+                
+                <div className="relative flex flex-col items-center gap-3 text-center">
+                  <div className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.22em] text-emerald-100 backdrop-blur-sm">
                     Elite Plan
                   </div>
-                  <p className="text-sm text-slate-200">Ultieme focus, premium design, altijd opzegbaar.</p>
-                  <div className="mt-4 flex items-end gap-2 text-white">
-                    <span className="text-6xl font-semibold tracking-tight">€4,99</span>
-                    <span className="mb-2 text-lg font-medium text-slate-200">/ mnd</span>
+                  <p className="text-base text-slate-200">Ultieme focus, premium design, altijd opzegbaar.</p>
+                  <div className="mt-6 flex items-end gap-3 text-white">
+                    <span className="text-7xl font-bold tracking-tight">€4,99</span>
+                    <span className="mb-3 text-xl font-medium text-slate-200">/ mnd</span>
                   </div>
                 </div>
-                <div className="mt-10 grid gap-4 sm:grid-cols-2">
-                  {elitePerks.map((perk) => (
-                    <div
+                
+                <div className="relative mt-12 grid gap-5 sm:grid-cols-2">
+                  {elitePerks.map((perk, idx) => (
+                    <motion.div
                       key={perk}
-                      className="flex items-start gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-slate-100 shadow-[0_18px_50px_-40px_rgba(0,0,0,0.45)]"
+                      className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm leading-relaxed text-slate-100 shadow-[0_8px_32px_-16px_rgba(0,0,0,0.3)] backdrop-blur-sm transition-all duration-300 hover:bg-white/10"
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 * idx, duration: 0.4 }}
+                      viewport={{ once: true }}
                     >
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-300" aria-hidden />
+                      <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-300" aria-hidden />
                       <span>{perk}</span>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
-                <p className="mt-6 text-sm font-semibold text-slate-200">
+                
+                <p className="relative mt-8 text-center text-base font-semibold text-slate-200">
                   14 dagen gratis proberen. Daarna €4,99 per maand. Geen kleine lettertjes.
                 </p>
-                <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                
+                <div className="relative mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                   <LandingCtaButton
                     href={isLoggedIn ? "/dashboard" : "/register"}
-                    paddingClass="px-8 py-3"
-                    className="w-full justify-center text-base shadow-[0_20px_70px_-35px_rgba(var(--brand-primary),0.55)]"
+                    paddingClass="px-10 py-4"
+                    className="w-full justify-center text-lg shadow-[0_20px_80px_-32px_rgba(16,185,129,0.6)] sm:w-auto"
                   >
                     {primaryCta}
-                    <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
+                    <ArrowRight className="ml-2 h-6 w-6" aria-hidden />
                   </LandingCtaButton>
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-300">
-                    <Infinity className="h-4 w-4" aria-hidden />
+                  <div className="flex items-center gap-2.5 text-sm font-medium uppercase tracking-[0.2em] text-slate-300">
+                    <Infinity className="h-5 w-5" aria-hidden />
                     Altijd opzegbaar
                   </div>
                 </div>
@@ -650,48 +775,90 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section className="bg-gradient-to-r from-[#0a2e50] via-[#4A5568] to-[#0a2e50] py-16 sm:py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 py-24 sm:py-28">
+          {/* Subtle ambient glow */}
+          <div className="absolute inset-0">
+            <div className="absolute left-1/4 top-1/2 h-[400px] w-[400px] rounded-full bg-emerald-500/5 blur-[100px]" />
+            <div className="absolute right-1/4 top-1/2 h-[400px] w-[400px] rounded-full bg-teal-500/5 blur-[100px]" />
+          </div>
+          
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center text-white">
-              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Klaar om te starten?</h2>
-              <p className="mx-auto mt-4 max-w-2xl text-lg text-[#e7eef4]">
+              <motion.h2 
+                className="text-4xl font-bold tracking-tight sm:text-5xl"
+                {...fadeUp}
+              >
+                Klaar om te starten?
+              </motion.h2>
+              <motion.p 
+                className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-slate-300"
+                {...fadeUp}
+                transition={fadeUpTransition(0.05)}
+              >
                 Sluit je aan bij honderden ZZP&apos;ers die al besparen op administratietijd.
-              </p>
-              <div className="mt-10 flex items-center justify-center gap-4">
+              </motion.p>
+              <motion.div 
+                className="mt-12 flex items-center justify-center gap-4"
+                {...fadeUp}
+                transition={fadeUpTransition(0.1)}
+              >
                 <LandingCtaButton
                   href={isLoggedIn ? "/dashboard" : "/register"}
-                  paddingClass="px-8 py-3"
-                  className="text-base shadow-[0_22px_64px_-40px_rgba(var(--brand-primary),0.58)]"
+                  paddingClass="px-10 py-4"
+                  className="text-lg shadow-[0_24px_80px_-32px_rgba(16,185,129,0.5)]"
                 >
                   {primaryCta}
-                  <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
+                  <ArrowRight className="ml-2 h-6 w-6" aria-hidden />
                 </LandingCtaButton>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="bg-[#0b0c10] py-12 text-center text-slate-200">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center gap-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-200">
-              <BrandZ className="h-4 w-4 text-slate-100" aria-hidden />
+      <footer className="relative overflow-hidden bg-gradient-to-b from-slate-900 to-[#0a0d12] py-16 text-slate-300">
+        {/* Subtle background decoration */}
+        <div className="absolute inset-0">
+          <div className="absolute left-1/3 top-0 h-[300px] w-[300px] rounded-full bg-emerald-500/5 blur-[100px]" />
+          <div className="absolute right-1/3 top-0 h-[300px] w-[300px] rounded-full bg-teal-500/5 blur-[100px]" />
+        </div>
+        
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center gap-8">
+            {/* Brand */}
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25 ring-1 ring-white/10">
+                <BrandZ className="h-6 w-6 text-white" aria-hidden />
+              </div>
+              <span className="text-2xl font-bold tracking-tight text-white">ZZP-HUB</span>
+            </div>
+            
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium uppercase tracking-[0.22em] text-slate-300 backdrop-blur-sm">
+              <BrandZ className="h-4 w-4 text-emerald-400" aria-hidden />
               Signature edition
             </div>
-            <p className="text-sm font-semibold tracking-tight text-slate-200">Powered by MHM IT</p>
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
-              <Link href="/privacy" className="transition-colors duration-200 hover:text-white">
+            
+            {/* Powered by */}
+            <p className="text-sm font-semibold tracking-tight text-slate-400">Powered by MHM IT</p>
+            
+            {/* Navigation */}
+            <div className="flex flex-wrap items-center justify-center gap-8 text-sm">
+              <Link href="/privacy" className="transition-colors duration-300 hover:text-emerald-400">
                 Privacy
               </Link>
-              <Link href="/voorwaarden" className="transition-colors duration-200 hover:text-white">
+              <Link href="/voorwaarden" className="transition-colors duration-300 hover:text-emerald-400">
                 Voorwaarden
               </Link>
-              <Link href="/contact" className="transition-colors duration-200 hover:text-white">
+              <Link href="/contact" className="transition-colors duration-300 hover:text-emerald-400">
                 Contact
               </Link>
             </div>
-            <p className="text-xs text-slate-300">© 2024 ZZP-HUB. All rights reserved.</p>
+            
+            {/* Copyright */}
+            <div className="border-t border-white/5 pt-6 text-center">
+              <p className="text-xs text-slate-500">© 2024 ZZP-HUB. All rights reserved.</p>
+            </div>
           </div>
         </div>
       </footer>
