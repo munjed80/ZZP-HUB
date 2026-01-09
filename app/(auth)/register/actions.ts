@@ -74,9 +74,10 @@ export async function registerCompany(values: RegisterInput) {
       });
       // Use imported support email for user-friendly error
       const supportEmail = getPublicSupportEmail();
+      const errorMessage = emailResult.error?.message || "Unknown error";
       return { 
         success: false, 
-        message: `We konden de verificatie-e-mail niet verzenden. Probeer het later opnieuw of neem contact op met support via ${supportEmail}.`
+        message: `We konden de verificatie-e-mail niet verzenden: ${errorMessage}. Neem contact op met support via ${supportEmail}.`
       };
     }
 

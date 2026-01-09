@@ -28,6 +28,18 @@ interface SendEmailOptions {
   react: ReactElement;
 }
 
+interface SendEmailResult {
+  success: boolean;
+  messageId?: string;
+  error?: Error;
+}
+
+interface EmailError {
+  message: string;
+  name?: string;
+  statusCode?: number | null;
+}
+
 /**
  * Determine email type based on subject
  */
@@ -66,20 +78,29 @@ export function logEmailSuccess(messageId: string, to: string, subject: string, 
 /**
  * Log email send failure
  */
-function logEmailFailure(error: Error, to: string, subject: string) {
-  console.error(JSON.stringify({
+function logEmailFailure(error: Error | EmailError, to: string, from: string, subject: string) {
+  const logData: Record<string, unknown> = {
     event: "email_send_failure",
-    errorMessage: error.message,
-    errorName: error.name,
     to,
+    from,
     subject,
-  }));
+    error: error.message,
+  };
+  
+  if ('name' in error && error.name) {
+    logData.errorName = error.name;
+  }
+  if ('statusCode' in error && error.statusCode !== undefined) {
+    logData.statusCode = error.statusCode;
+  }
+  
+  console.error(JSON.stringify(logData));
 }
 
 /**
  * Send an email using Resend or log to console in development
  */
-export async function sendEmail({ to, subject, react }: SendEmailOptions) {
+export async function sendEmail({ to, subject, react }: SendEmailOptions): Promise<SendEmailResult> {
   const hasApiKey = Boolean(process.env.RESEND_API_KEY);
   const isProd = process.env.NODE_ENV === "production";
   const from = resolveFromEmail();
@@ -94,7 +115,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
     if (!hasApiKey) {
       if (isProd) {
         const error = new Error("RESEND_API_KEY missing in production");
-        logEmailFailure(error, to, subject);
+        logEmailFailure(error, to, from, subject);
         return { success: false, error };
       }
 
@@ -111,7 +132,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
     const resend = getResendClient();
     if (!resend) {
       const error = new Error("RESEND client unavailable");
-      logEmailFailure(error, to, subject);
+      logEmailFailure(error, to, from, subject);
       return { success: false, error };
     }
 
@@ -122,14 +143,30 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
       html,
     });
 
-    // Log success with message ID
-    logEmailSuccess(result.data?.id || "no-id", to, subject, from);
+    // Check for Resend API errors (result.error is set when API returns an error)
+    if (result.error) {
+      logEmailFailure(result.error, to, from, subject);
+      return { 
+        success: false, 
+        error: new Error(result.error.message || "Email send failed") 
+      };
+    }
 
-    return { success: true, messageId: result.data?.id };
+    // Verify we have a valid message ID
+    if (!result.data?.id) {
+      const error = new Error("Email send failed: no message ID returned");
+      logEmailFailure(error, to, from, subject);
+      return { success: false, error };
+    }
+
+    // Log success with real message ID
+    logEmailSuccess(result.data.id, to, subject, from);
+
+    return { success: true, messageId: result.data.id };
   } catch (error) {
-    const err = error as Error;
-    logEmailFailure(err, to, subject);
-    return { success: false, error };
+    const err = error instanceof Error ? error : new Error(String(error));
+    logEmailFailure(err, to, from, subject);
+    return { success: false, error: err };
   }
 }
 

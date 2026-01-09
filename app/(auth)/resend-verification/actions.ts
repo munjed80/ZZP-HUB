@@ -88,7 +88,11 @@ export async function resendVerificationEmail() {
         email: user.email,
         error: emailResult.error,
       });
-      return { success: false, message: "Het versturen van de verificatie-e-mail is mislukt. Probeer het later opnieuw." };
+      const errorMessage = emailResult.error?.message || "Unknown error";
+      return { 
+        success: false, 
+        message: `Het versturen van de verificatie-e-mail is mislukt: ${errorMessage}. Probeer het later opnieuw.`
+      };
     }
 
     return { success: true };
