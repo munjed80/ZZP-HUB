@@ -10,8 +10,17 @@ export function resolveFromEmail() {
   return getFromEmail();
 }
 
+function assertValidFromAddress(from: string) {
+  if (!from.includes("@")) {
+    console.error("INVALID_FROM_EMAIL", { from });
+    throw new Error("INVALID_FROM_EMAIL");
+  }
+}
+
 export function formatFromAddress() {
-  return resolveFromEmail();
+  const from = resolveFromEmail();
+  assertValidFromAddress(from);
+  return from;
 }
 
 function getResendClient() {
@@ -103,7 +112,7 @@ function logEmailFailure(error: Error | EmailError, to: string, from: string, su
 export async function sendEmail({ to, subject, react }: SendEmailOptions): Promise<SendEmailResult> {
   const hasApiKey = Boolean(process.env.RESEND_API_KEY);
   const isProd = process.env.NODE_ENV === "production";
-  const from = resolveFromEmail();
+  const from = formatFromAddress();
   const type = getEmailType(subject);
   
   // Log send attempt
