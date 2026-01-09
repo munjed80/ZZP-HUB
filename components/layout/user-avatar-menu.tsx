@@ -60,7 +60,10 @@ export function UserAvatarMenu({ userName, userInitials, avatarUrl }: UserAvatar
         Profiel
       </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} danger>
+      <DropdownMenuItem
+        onClick={() => signOut({ callbackUrl: "/" })}
+        className="text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-200 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-50 font-semibold"
+      >
         <LogOut className="h-4 w-4" aria-hidden />
         Uitloggen
       </DropdownMenuItem>
