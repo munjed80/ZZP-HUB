@@ -65,6 +65,28 @@
   --link: var(--brand);
   --link-hover: var(--brand-hover);
   
+  /* Interactive element tokens for consistent contrast */
+  --btn-fg: 17 24 39; /* Gray-900 - high contrast dark text */
+  --btn-bg: 255 255 255; /* White */
+  --btn-border: 226 232 240; /* Slate-200 */
+  --btn-hover-bg: 248 250 252; /* Slate-50 */
+  
+  --muted-fg: 51 65 85; /* Slate-700 - darker for better readability */
+  --muted-bg: 241 245 249; /* Slate-100 */
+  
+  --danger-fg: 153 27 27; /* Rose-800 - dark red */
+  --danger-bg: 254 242 242; /* Rose-50 */
+  --danger-border: 254 205 211; /* Rose-200 */
+  --danger-hover-bg: 254 226 226; /* Rose-100 */
+  
+  --chip-fg: 30 41 59; /* Slate-800 - strong contrast */
+  --chip-bg: 255 255 255; /* White */
+  --chip-border: 226 232 240; /* Slate-200 */
+  --chip-hover-bg: 248 250 252; /* Slate-50 */
+  --chip-active-fg: 67 56 202; /* Indigo-700 - strong readable indigo */
+  --chip-active-bg: 238 242 255; /* Indigo-50 */
+  --chip-active-border: 129 140 248; /* Indigo-400 */
+  
   /* Legacy support (kept for gradual migration) */
   --background-secondary: 242 244 247;
   --surface: 255 255 255;
@@ -141,6 +163,28 @@
   --link: var(--brand);
   --link-hover: var(--brand-hover);
   
+  /* Interactive element tokens for dark mode */
+  --btn-fg: 226 232 240; /* Slate-200 - light text on dark */
+  --btn-bg: 30 41 59; /* Slate-800 */
+  --btn-border: 51 65 85; /* Slate-700 */
+  --btn-hover-bg: 51 65 85; /* Slate-700 */
+  
+  --muted-fg: 203 213 225; /* Slate-300 */
+  --muted-bg: 51 65 85; /* Slate-700 */
+  
+  --danger-fg: 254 205 211; /* Rose-200 */
+  --danger-bg: 76 29 34; /* Rose-950 */
+  --danger-border: 159 18 57; /* Rose-800 */
+  --danger-hover-bg: 136 19 55; /* Rose-900 */
+  
+  --chip-fg: 226 232 240; /* Slate-200 */
+  --chip-bg: 30 41 59; /* Slate-800 */
+  --chip-border: 71 85 105; /* Slate-600 */
+  --chip-hover-bg: 51 65 85; /* Slate-700 */
+  --chip-active-fg: 199 210 254; /* Indigo-200 */
+  --chip-active-bg: 49 46 129; /* Indigo-900 */
+  --chip-active-border: 99 102 241; /* Indigo-500 */
+  
   /* Legacy support */
   --background-secondary: 26 23 32;
   --surface: 30 27 38;
@@ -180,6 +224,26 @@
   --color-warning-foreground: rgb(var(--warning-foreground));
   --color-link: rgb(var(--link));
   --color-link-hover: rgb(var(--link-hover));
+  
+  /* Interactive element utilities */
+  --color-btn-fg: rgb(var(--btn-fg));
+  --color-btn-bg: rgb(var(--btn-bg));
+  --color-btn-border: rgb(var(--btn-border));
+  --color-btn-hover-bg: rgb(var(--btn-hover-bg));
+  --color-muted-fg: rgb(var(--muted-fg));
+  --color-muted-bg: rgb(var(--muted-bg));
+  --color-danger-fg: rgb(var(--danger-fg));
+  --color-danger-bg: rgb(var(--danger-bg));
+  --color-danger-border: rgb(var(--danger-border));
+  --color-danger-hover-bg: rgb(var(--danger-hover-bg));
+  --color-chip-fg: rgb(var(--chip-fg));
+  --color-chip-bg: rgb(var(--chip-bg));
+  --color-chip-border: rgb(var(--chip-border));
+  --color-chip-hover-bg: rgb(var(--chip-hover-bg));
+  --color-chip-active-fg: rgb(var(--chip-active-fg));
+  --color-chip-active-bg: rgb(var(--chip-active-bg));
+  --color-chip-active-border: rgb(var(--chip-active-border));
+  
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

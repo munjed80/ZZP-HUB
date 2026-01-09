@@ -87,8 +87,8 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
                   onClick={() => setStatus(option.value)}
                   className={`flex items-center justify-center gap-1 rounded-full border px-3 py-2 text-xs font-semibold transition ${
                     active
-                      ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-[0_10px_24px_-18px_rgba(79,70,229,0.35)]"
-                      : "border-slate-200 bg-white text-[#4B5563] hover:bg-slate-50"
+                      ? "border-chip-active-border bg-chip-active text-chip-active-foreground shadow-[0_10px_24px_-18px_rgba(67,56,202,0.35)]"
+                      : "border-chip-border bg-chip text-chip-foreground hover:bg-chip-hover"
                   }`}
                   aria-pressed={active}
                 >
