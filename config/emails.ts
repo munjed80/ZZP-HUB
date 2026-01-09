@@ -15,18 +15,18 @@ export const FROM_EMAIL = `ZZP Hub <${NO_REPLY_EMAIL}>`;
  * @throws Error if format is invalid
  */
 export function validateFromEmail(email: string): void {
-  if (!email.includes('@')) {
-    console.error("INVALID_FROM_EMAIL", { email });
-    throw new Error(`Invalid FROM email format: "${email}". Must contain a valid email address.`);
-  }
   // Check for required pattern: "Name <email@domain>"
   if (!email.includes('<') || !email.includes('>')) {
+    if (!email.includes('@')) {
+      console.error("INVALID_FROM_EMAIL", { email });
+    }
     throw new Error(`Invalid FROM email format: "${email}". Must be "Name <email@domain>" format.`);
   }
   
   // Extract email from brackets
   const match = email.match(/<([^>]+)>/);
   if (!match || !match[1]?.includes('@')) {
+    console.error("INVALID_FROM_EMAIL", { email });
     throw new Error(`Invalid FROM email format: "${email}". Must contain valid email inside angle brackets.`);
   }
 }

@@ -10,17 +10,8 @@ export function resolveFromEmail() {
   return getFromEmail();
 }
 
-function assertValidFromAddress(from: string) {
-  if (!from.includes("@")) {
-    console.error("INVALID_FROM_EMAIL", { from });
-    throw new Error("INVALID_FROM_EMAIL");
-  }
-}
-
 export function formatFromAddress() {
-  const from = resolveFromEmail();
-  assertValidFromAddress(from);
-  return from;
+  return resolveFromEmail();
 }
 
 function getResendClient() {
