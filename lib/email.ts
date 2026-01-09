@@ -103,7 +103,7 @@ function logEmailFailure(error: Error | EmailError, to: string, from: string, su
 export async function sendEmail({ to, subject, react }: SendEmailOptions): Promise<SendEmailResult> {
   const hasApiKey = Boolean(process.env.RESEND_API_KEY);
   const isProd = process.env.NODE_ENV === "production";
-  const from = formatFromAddress();
+  const from = resolveFromEmail();
   const type = getEmailType(subject);
   
   // Log send attempt
