@@ -8,6 +8,7 @@
 export const SUPPORT_EMAIL = "support@matrixtop.com";
 export const NO_REPLY_EMAIL = "no-reply@matrixtop.com";
 export const FROM_EMAIL = `ZZP Hub <${NO_REPLY_EMAIL}>`;
+const FROM_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * Validate RFC-compliant "Name <email@domain>" format
@@ -15,15 +16,17 @@ export const FROM_EMAIL = `ZZP Hub <${NO_REPLY_EMAIL}>`;
  * @throws Error if format is invalid
  */
 export function validateFromEmail(email: string): void {
-  // Check for required pattern: "Name <email@domain>"
-  if (!email.includes('<') || !email.includes('>')) {
-    throw new Error(`Invalid FROM email format: "${email}". Must be "Name <email@domain>" format.`);
-  }
-  
-  // Extract email from brackets
   const match = email.match(/<([^>]+)>/);
-  if (!match || !match[1]?.includes('@')) {
-    throw new Error(`Invalid FROM email format: "${email}". Must contain valid email inside angle brackets.`);
+  if (!match) {
+    console.error("INVALID_FROM_EMAIL", { reason: "missing-bracketed-address" });
+    throw new Error("Invalid FROM email format. Must contain valid email inside angle brackets.");
+  }
+
+  const extracted = match[1].trim();
+  const hasValidEmail = FROM_EMAIL_PATTERN.test(extracted);
+  if (!hasValidEmail) {
+    console.error("INVALID_FROM_EMAIL", { reason: "invalid-email-address" });
+    throw new Error("Invalid FROM email format. Email address inside angle brackets is invalid.");
   }
 }
 
