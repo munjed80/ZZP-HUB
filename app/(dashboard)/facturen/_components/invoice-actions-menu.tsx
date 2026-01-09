@@ -106,7 +106,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
   };
 
   const menuItemClasses =
-    "h-10 w-full justify-start gap-2 rounded-xl border-btn-border bg-btn text-btn-foreground hover:bg-btn-hover";
+    "h-10 w-full justify-start gap-2 rounded-xl border border-btn-border bg-btn text-btn-foreground hover:bg-btn-hover";
   const menuContent = (
     <div className="w-[240px] rounded-2xl border border-slate-200 bg-white p-3 text-btn-foreground shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)]">
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -147,7 +147,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           disabled={isPending}
           className={buttonVariants(
             "ghost",
-            cn(menuItemClasses, "border-danger-border bg-danger text-danger-foreground hover:bg-danger-hover"),
+            cn(menuItemClasses, "border border-danger-border bg-danger text-danger-foreground hover:bg-danger-hover"),
           )}
         >
           {isPending && pendingAction === "delete" ? (
