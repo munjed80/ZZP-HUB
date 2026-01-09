@@ -28,8 +28,10 @@ export function validateFromEmail(email: string): void {
     throw new Error(`Invalid FROM email format: "${email}". Must contain valid email inside angle brackets.`);
   }
 
-  if (!match[1].includes('@')) {
-    console.error("INVALID_FROM_EMAIL", { email, reason: "missing-@-in-address" });
+  const extracted = (match[1] || "").trim();
+  const hasValidEmail = /^[^<>\s@]+@[^<>\s@]+$/.test(extracted);
+  if (!hasValidEmail) {
+    console.error("INVALID_FROM_EMAIL", { email, reason: "invalid-email-address" });
     throw new Error(`Invalid FROM email format: "${email}". Must contain valid email inside angle brackets.`);
   }
 }
