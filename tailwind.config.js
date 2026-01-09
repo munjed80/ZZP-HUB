@@ -49,6 +49,29 @@ const config = {
           DEFAULT: "rgb(var(--link) / <alpha-value>)",
           hover: "rgb(var(--link-hover) / <alpha-value>)",
         },
+        btn: {
+          DEFAULT: "rgb(var(--btn-bg) / <alpha-value>)",
+          foreground: "rgb(var(--btn-fg) / <alpha-value>)",
+          border: "rgb(var(--btn-border) / <alpha-value>)",
+          hover: "rgb(var(--btn-hover-bg) / <alpha-value>)",
+        },
+        danger: {
+          DEFAULT: "rgb(var(--danger-bg) / <alpha-value>)",
+          foreground: "rgb(var(--danger-fg) / <alpha-value>)",
+          border: "rgb(var(--danger-border) / <alpha-value>)",
+          hover: "rgb(var(--danger-hover-bg) / <alpha-value>)",
+        },
+        chip: {
+          DEFAULT: "rgb(var(--chip-bg) / <alpha-value>)",
+          foreground: "rgb(var(--chip-fg) / <alpha-value>)",
+          border: "rgb(var(--chip-border) / <alpha-value>)",
+          hover: "rgb(var(--chip-hover-bg) / <alpha-value>)",
+          active: {
+            DEFAULT: "rgb(var(--chip-active-bg) / <alpha-value>)",
+            foreground: "rgb(var(--chip-active-fg) / <alpha-value>)",
+            border: "rgb(var(--chip-active-border) / <alpha-value>)",
+          },
+        },
       },
       borderRadius: {
         'sm': '0.375rem', // 6px
