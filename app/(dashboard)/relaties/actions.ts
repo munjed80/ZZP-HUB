@@ -12,7 +12,7 @@ export async function getClients() {
   try {
     return await prisma.client.findMany({
       where: role === UserRole.SUPERADMIN ? {} : { userId },
-      orderBy: { name: "asc" },
+      orderBy: { createdAt: "desc" },
     });
   } catch (error) {
     console.error("Kon klanten niet ophalen", error);

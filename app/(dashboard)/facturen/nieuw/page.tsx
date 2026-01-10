@@ -2,6 +2,8 @@ import { getClients } from "../../relaties/actions";
 import { InvoiceForm } from "./invoice-form";
 import { fetchCompanyProfile } from "../../instellingen/actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function NieuweFactuurPagina() {
   const [clients, profile] = await Promise.all([getClients(), fetchCompanyProfile()]);
 
