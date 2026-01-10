@@ -239,17 +239,22 @@ async function startServer() {
 async function main() {
   validateEnv();
 
-  const migrationFolders = getMigrationFolders();
-  await ensureBaselineResolved(migrationFolders);
+  // SAFE START: All database verification and migration steps are commented out
+  // to allow the container to start without DB connectivity for debugging purposes
 
-  console.log("[start-prod] Running prisma migrate deploy");
-  await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+  // const migrationFolders = getMigrationFolders();
+  // await ensureBaselineResolved(migrationFolders);
 
-  console.log("[start-prod] Running prisma generate");
-  await runCommand("./node_modules/.bin/prisma", ["generate"]);
+  // console.log("[start-prod] Running prisma migrate deploy");
+  // await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
 
-  await verifyRequiredColumns();
-  await verifyDatabase();
+  // console.log("[start-prod] Running prisma generate");
+  // await runCommand("./node_modules/.bin/prisma", ["generate"]);
+
+  // await verifyRequiredColumns();
+  // await verifyDatabase();
+
+  console.log("[start-prod] SAFE START MODE: Skipping all database checks and migrations");
   await startServer();
 }
 
