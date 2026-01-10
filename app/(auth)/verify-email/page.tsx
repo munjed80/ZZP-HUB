@@ -26,9 +26,9 @@ function VerifyEmailContent() {
       
       if (result.success) {
         setStatus("success");
-        // Redirect to onboarding after a short delay
+        // Redirect to setup after a short delay
         setTimeout(() => {
-          router.push("/onboarding");
+          router.push("/setup");
         }, 2000);
       } else {
         setStatus("error");
@@ -83,7 +83,7 @@ function VerifyEmailContent() {
               Je e-mailadres is succesvol geverifieerd!
             </p>
             <p className="text-xs text-muted-foreground">
-              Je wordt doorgestuurd naar de onboarding...
+              Je wordt doorgestuurd naar de setup...
             </p>
           </>
         )}

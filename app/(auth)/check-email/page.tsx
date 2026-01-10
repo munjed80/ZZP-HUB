@@ -27,7 +27,7 @@ export default function CheckEmailPage() {
       <div className="space-y-4">
         <p className="text-sm text-card-foreground">
           Klik op de link in de e-mail om je account te activeren en verder te
-          gaan met de onboarding.
+          gaan met de setup.
         </p>
         <p className="text-xs text-muted-foreground">
           De verificatielink is 24 uur geldig. Als je geen e-mail hebt ontvangen,
