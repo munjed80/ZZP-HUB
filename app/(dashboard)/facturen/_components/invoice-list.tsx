@@ -2,10 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { Filter, Search } from "lucide-react";
-import { formatBedrag } from "@/lib/utils";
 import { type mapInvoiceToPdfData } from "@/lib/pdf-generator";
-import { InvoiceActionsMenu } from "./invoice-actions-menu";
-import { InvoicePaymentStatus } from "./invoice-payment-status";
+import { InvoiceCard } from "./invoice-card";
 
 export type InvoiceListItem = {
   id: string;
@@ -31,16 +29,6 @@ const statusOptions = [
   { value: "open", label: "Open" },
   { value: "paid", label: "Betaald" },
 ] as const;
-const statusClasses: Record<InvoiceListItem["status"], string> = {
-  paid: "bg-[#ECFDF3] text-[#166534]",
-  concept: "bg-[#F3F4F6] text-[#4B5563]",
-  open: "bg-[#FFF7ED] text-black font-bold",
-};
-const statusLabels: Record<InvoiceListItem["status"], string> = {
-  paid: "Betaald",
-  concept: "Concept",
-  open: "Open",
-};
 
 export function InvoiceList({ invoices }: InvoiceListProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -108,59 +96,22 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
       ) : (
         <div className="space-y-4">
           {filteredInvoices.map((invoice) => (
-            <div
+            <InvoiceCard
               key={invoice.id}
-              className="rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-[0_18px_44px_-32px_rgba(15,23,42,0.25)] transition hover:-translate-y-[1px]"
-            >
-              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <div className="min-w-0 flex-1 space-y-2">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 space-y-1">
-                      <p className="truncate text-lg font-semibold text-[#111827]">{invoice.clientName}</p>
-                      <p className="truncate text-sm text-[#6B7280]">
-                        #{invoice.invoiceNum} • {invoice.formattedDate}
-                      </p>
-                    </div>
-                    <InvoiceActionsMenu
-                      pdfInvoice={invoice.pdfInvoice}
-                      invoiceId={invoice.id}
-                      editHref={`/facturen/${invoice.id}/edit`}
-                      shareLink={`/facturen/${invoice.id}`}
-                      isOpen={openInvoiceId === invoice.id}
-                      onOpenChange={(open) => setOpenInvoiceId(open ? invoice.id : null)}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-3 text-xs text-[#6B7280]">
-                    <span className="rounded-full bg-[#F3F4F6] px-3 py-1 text-[11px] font-medium text-[#4B5563]">
-                      {invoice.dueLabel} {invoice.formattedDueDate}
-                    </span>
-                    {invoice.paidDateLabel ? (
-                      <span className="rounded-full bg-[#ECFDF3] px-3 py-1 text-[11px] font-medium text-[#166534]">
-                        Betaald op {invoice.paidDateLabel}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-end gap-3">
-                  <div className="text-right">
-                    <p className="text-xl font-semibold tabular-nums text-[#111827]">{formatBedrag(invoice.amount)}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[invoice.status]}`}
-                    >
-                      {statusLabels[invoice.status]}
-                    </span>
-                    <InvoicePaymentStatus
-                      invoiceId={invoice.id}
-                      isPaid={invoice.isPaid}
-                      paidDateLabel={invoice.paidDateLabel}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+              id={invoice.id}
+              invoiceNum={invoice.invoiceNum}
+              clientName={invoice.clientName}
+              status={invoice.status}
+              formattedDate={invoice.formattedDate}
+              formattedDueDate={invoice.formattedDueDate}
+              isPaid={invoice.isPaid}
+              paidDateLabel={invoice.paidDateLabel}
+              dueLabel={invoice.dueLabel}
+              amount={invoice.amount}
+              pdfInvoice={invoice.pdfInvoice}
+              isOpen={openInvoiceId === invoice.id}
+              onOpenChange={(open) => setOpenInvoiceId(open ? invoice.id : null)}
+            />
           ))}
         </div>
       )}
