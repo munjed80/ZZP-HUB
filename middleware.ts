@@ -9,6 +9,7 @@ const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-require
 const protectedPrefixes = [
   '/dashboard',
   '/onboarding',
+  '/setup',
   '/facturen',
   '/offertes',
   '/relaties',
@@ -34,8 +35,10 @@ export async function middleware(request: NextRequest) {
   // Get the JWT token
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   const emailVerified = Boolean(token?.emailVerified);
-  const onboardingCompleted = Boolean(token?.onboardingCompleted);
+  const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';
+  const onboardingCompleted = onboardingCookie || Boolean(token?.onboardingCompleted);
   const role = token?.role as string | undefined;
+  const setupRoutes = ['/setup', '/onboarding'];
 
   // If not logged in, redirect to login
   if (!token) {
@@ -54,12 +57,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(verifyUrl);
   }
 
-  // If email verified but onboarding not completed, redirect to onboarding
-  // (except if already on onboarding route)
-  if (emailVerified && !onboardingCompleted && !pathname.startsWith('/onboarding')) {
-    const onboardingUrl = new URL('/onboarding', request.url);
-    onboardingUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
-    return NextResponse.redirect(onboardingUrl);
+  // If email verified but onboarding not completed, redirect to setup
+  // (except if already on setup/onboarding route)
+  const onSetupRoute = setupRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  if (emailVerified && !onboardingCompleted && !onSetupRoute) {
+    const setupUrl = new URL('/setup', request.url);
+    setupUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
+    return NextResponse.redirect(setupUrl);
   }
 
   return NextResponse.next();
@@ -70,6 +74,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/onboarding/:path*',
+    '/setup/:path*',
     '/facturen/:path*',
     '/offertes/:path*',
     '/relaties/:path*',
