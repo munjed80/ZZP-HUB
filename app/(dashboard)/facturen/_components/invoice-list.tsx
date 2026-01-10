@@ -34,7 +34,7 @@ const statusOptions = [
 const statusClasses: Record<InvoiceListItem["status"], string> = {
   paid: "bg-[#ECFDF3] text-[#166534]",
   concept: "bg-[#F3F4F6] text-[#4B5563]",
-  open: "bg-[#FFF7ED] text-[#C2410C]",
+  open: "bg-[#FFF7ED] text-black font-bold",
 };
 const statusLabels: Record<InvoiceListItem["status"], string> = {
   paid: "Betaald",
