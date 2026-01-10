@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { pdf } from "@react-pdf/renderer";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Edit3, Eye, FileDown, Loader2, MoreVertical, Share2, Trash2 } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
-import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
+import { InvoicePDF } from "@/components/pdf/InvoicePDF";
 import { deleteInvoice } from "@/app/actions/invoice-actions";
 import { type mapInvoiceToPdfData } from "@/lib/pdf-generator";
-import { PortalPopover } from "@/components/ui/portal-popover";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -34,28 +32,67 @@ function buildShareLink(shareLink: string | undefined, invoiceId: string) {
 
 export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink, isOpen, onOpenChange }: Props) {
   const router = useRouter();
-  const [internalOpen, setInternalOpen] = useState(false);
-  const menuOpen = isOpen !== undefined ? isOpen : internalOpen;
-  const setMenuOpen = onOpenChange || setInternalOpen;
+  const [showMenu, setShowMenu] = useState(isOpen ?? false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const shareTarget = useMemo(() => buildShareLink(shareLink, invoiceId), [shareLink, invoiceId]);
   const viewHref = shareTarget;
   const editTarget = editHref ?? `/facturen/${invoiceId}/edit`;
   const hasPdfData = Boolean(pdfInvoice);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    if (!menuOpen && confirmDelete) {
+    if (isOpen !== undefined) {
+      setShowMenu(isOpen);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!showMenu && confirmDelete) {
       setConfirmDelete(false);
     }
-  }, [confirmDelete, menuOpen]);
+  }, [confirmDelete, showMenu]);
+
+  useEffect(() => {
+    if (!showMenu) return;
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+        onOpenChange?.(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [onOpenChange, showMenu]);
+
+  const closeMenu = () => {
+    setShowMenu(false);
+    onOpenChange?.(false);
+  };
+
+  const handleNavigate = (target: string) => {
+    if (target.startsWith("http")) {
+      window.location.href = target;
+    } else {
+      router.push(target);
+    }
+    closeMenu();
+  };
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareTarget);
       toast.success("Link gekopieerd");
-      setMenuOpen(false);
+      closeMenu();
     } catch (error) {
       console.error("copy link", error);
       toast.error("Kopiëren mislukt");
@@ -73,7 +110,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           url: shareTarget,
         });
         toast.success("Factuur gedeeld");
-        setMenuOpen(false);
+        closeMenu();
         return;
       } catch (error) {
         console.error("Failed to share invoice via native API", error);
@@ -95,7 +132,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
         const result = await deleteInvoice(invoiceId);
         if (result?.success) {
           toast.success("Factuur verwijderd");
-          setMenuOpen(false);
+          closeMenu();
           router.refresh();
         } else {
           toast.error(result?.message ?? "Verwijderen mislukt");
@@ -110,87 +147,125 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
     });
   };
 
-  const menuItemClasses =
-    "group h-10 w-full justify-start gap-2 rounded-xl border border-transparent bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 disabled:text-gray-400 disabled:opacity-60 disabled:hover:text-gray-400 disabled:hover:bg-white";
-  const menuIconClasses = "h-4 w-4 text-gray-700";
-  const menuContent = (
-    <div className="w-[240px] rounded-2xl border border-gray-200 bg-white p-3 text-gray-900 shadow-lg z-50">
-      <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-        <div className="space-y-0.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">Acties</p>
-          <p className="text-sm font-semibold leading-tight text-gray-900">Factuur {pdfInvoice.invoiceNum}</p>
-        </div>
-        <span className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-700">Snel</span>
-      </div>
+  const handleDownloadPdf = async () => {
+    if (!hasPdfData) return;
+    try {
+      setIsDownloading(true);
+      const downloadName = `factuur-${pdfInvoice.invoiceNum}.pdf`;
+      const blob = await pdf(<InvoicePDF invoice={pdfInvoice} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = downloadName;
+      anchor.rel = "noopener";
+      document.body.appendChild(anchor);
+      anchor.click();
+      setTimeout(() => {
+        anchor.remove();
+        URL.revokeObjectURL(url);
+      }, 150);
+      toast.success("PDF gedownload");
+      closeMenu();
+    } catch (error) {
+      console.error("PDF download failed", error);
+      toast.error("Download mislukt");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
-      <div className="mt-2 flex flex-col gap-1.5">
-        <Link href={viewHref} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
-          <Eye className={menuIconClasses} aria-hidden />
-          Bekijk factuur
-        </Link>
-        <Link href={editTarget} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
-          <Edit3 className={menuIconClasses} aria-hidden />
-          Bewerk factuur
-        </Link>
-        <InvoicePdfDownloadButton
-          invoice={pdfInvoice}
-          label="Download PDF"
-          className={menuItemClasses}
-          variant="ghost"
-          icon={<FileDown className={menuIconClasses} aria-hidden />}
-        />
-        <button
-          type="button"
-          onClick={handleShare}
-          disabled={!hasPdfData}
-          className={cn(buttonVariants("ghost", menuItemClasses))}
-        >
-          <Share2 className={menuIconClasses} aria-hidden />
-          Deel
-        </button>
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={isPending}
-          className={buttonVariants(
-            "ghost",
-            cn(menuItemClasses, "border-transparent text-red-600 hover:bg-gray-50 hover:text-red-700"),
-          )}
-        >
-          {isPending && pendingAction === "delete" ? (
-            <Loader2 className="h-4 w-4 animate-spin text-red-600" aria-hidden />
-          ) : (
-            <Trash2 className="h-4 w-4 text-red-600" aria-hidden />
-          )}
-          {isPending && pendingAction === "delete"
-            ? "Verwijderen..."
-            : confirmDelete
-              ? "Klik nogmaals om te verwijderen"
-              : "Verwijder"}
-        </button>
-      </div>
-    </div>
-  );
+  const isDeleting = isPending && pendingAction === "delete";
 
   return (
-    <PortalPopover
-      trigger={
-        <button
-          type="button"
-          className={buttonVariants(
-            "ghost",
-            "h-9 w-9 rounded-full border border-gray-200 bg-white p-0 text-gray-700 shadow-sm hover:bg-gray-50 hover:text-gray-900",
-          )}
-          aria-label="Acties"
-          aria-expanded={menuOpen}
-        >
-          <MoreVertical className="h-4 w-4" aria-hidden />
-        </button>
-      }
-      open={menuOpen}
-      onOpenChange={setMenuOpen}
-    >
-      {menuContent}
-    </PortalPopover>
+    <div className="relative" ref={menuRef}>
+      <button
+        type="button"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white p-0 text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-gray-900"
+        aria-label="Acties"
+        aria-expanded={showMenu}
+        onClick={() => {
+          const next = !showMenu;
+          setShowMenu(next);
+          onOpenChange?.(next);
+        }}
+      >
+        <MoreVertical className="h-4 w-4" aria-hidden />
+      </button>
+
+      {showMenu && (
+        <div className="absolute right-0 top-8 z-50 w-56 rounded-lg border border-gray-200 bg-white text-gray-800 shadow-xl">
+          <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+            <div className="space-y-0.5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">Acties</p>
+              <p className="text-sm font-semibold leading-tight text-gray-800">Factuur {pdfInvoice.invoiceNum}</p>
+            </div>
+            <span className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-700">Snel</span>
+          </div>
+
+          <div className="flex flex-col py-1">
+            <button
+              type="button"
+              className="flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100"
+              onClick={() => handleNavigate(viewHref)}
+            >
+              <Eye className="h-4 w-4 text-gray-800" aria-hidden />
+              Bekijk factuur
+            </button>
+            <button
+              type="button"
+              className="flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100"
+              onClick={() => handleNavigate(editTarget)}
+            >
+              <Edit3 className="h-4 w-4 text-gray-800" aria-hidden />
+              Bewerk factuur
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              disabled={!hasPdfData || isDownloading}
+              className={cn(
+                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100",
+                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white",
+              )}
+            >
+              {isDownloading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-gray-800" aria-hidden />
+              ) : (
+                <FileDown className="h-4 w-4 text-gray-800" aria-hidden />
+              )}
+              {isDownloading ? "PDF genereren..." : "Download PDF"}
+            </button>
+            <button
+              type="button"
+              onClick={handleShare}
+              disabled={!hasPdfData}
+              className={cn(
+                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100",
+                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white",
+              )}
+            >
+              <Share2 className="h-4 w-4 text-gray-800" aria-hidden />
+              Deel
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isPending}
+              className={cn(
+                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50",
+                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white",
+              )}
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin text-red-600" aria-hidden />
+              ) : (
+                <Trash2 className="h-4 w-4 text-red-600" aria-hidden />
+              )}
+              {isDeleting ? "Verwijderen..." : confirmDelete ? "Klik nogmaals om te verwijderen" : "Verwijder"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
