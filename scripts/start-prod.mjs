@@ -143,8 +143,7 @@ async function ensureBaselineResolved(migrationFolders) {
     `[start-prod] Marking existing database as baseline with migration "${baselineMigration}"`,
   );
 
-  await runCommand("npx", [
-    "prisma",
+  await runCommand("./node_modules/.bin/prisma", [
     "migrate",
     "resolve",
     "--applied",
@@ -244,10 +243,10 @@ async function main() {
   await ensureBaselineResolved(migrationFolders);
 
   console.log("[start-prod] Running prisma migrate deploy");
-  await runCommand("npx", ["prisma", "migrate", "deploy"]);
+  await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
 
   console.log("[start-prod] Running prisma generate");
-  await runCommand("npx", ["prisma", "generate"]);
+  await runCommand("./node_modules/.bin/prisma", ["generate"]);
 
   await verifyRequiredColumns();
   await verifyDatabase();
