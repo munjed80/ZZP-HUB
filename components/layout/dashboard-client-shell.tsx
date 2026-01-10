@@ -16,9 +16,10 @@ type DashboardClientShellProps = {
   children: ReactNode;
   userRole?: UserRole;
   avatarUrl?: string | null;
+  userId: string;
 };
 
-export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl }: DashboardClientShellProps) {
+export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl, userId }: DashboardClientShellProps) {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const avatarUrl = useSyncExternalStore(
