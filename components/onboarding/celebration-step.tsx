@@ -13,6 +13,7 @@ interface CelebrationStepProps {
 export function CelebrationStep({ onNext }: CelebrationStepProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [hasTriggered, setHasTriggered] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiItems, setConfettiItems] = useState<Array<{
     left: number;
@@ -42,15 +43,37 @@ export function CelebrationStep({ onNext }: CelebrationStepProps) {
   }, []);
 
   const handleComplete = () => {
+    if (hasTriggered) return;
+    setHasTriggered(true);
+
     startTransition(async () => {
-      const result = await completeOnboarding();
-      
-      if (result.success) {
-        router.push("/dashboard");
+      try {
+        const result = await completeOnboarding();
+
+        if (!result?.success) {
+          console.error("Failed to complete onboarding:", result?.message);
+          setHasTriggered(false);
+          return;
+        }
+
+        try {
+          router.push("/dashboard");
+        } catch (error) {
+          console.error("Failed to redirect after onboarding:", error);
+        }
+
         router.refresh();
+      } catch (error) {
+        console.error("Unexpected error completing onboarding:", error);
+        setHasTriggered(false);
       }
     });
   };
+
+  useEffect(() => {
+    handleComplete();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-8 text-center py-8 relative">
