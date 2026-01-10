@@ -64,7 +64,7 @@ export async function completeProfileSetup(values: SetupPayload) {
   });
 
   // Help middleware pick up the updated status immediately
-  cookies().set("zzp-hub-onboarding-completed", "true", {
+  (await cookies()).set("zzp-hub-onboarding-completed", "true", {
     path: "/",
     sameSite: "lax",
     httpOnly: true,
