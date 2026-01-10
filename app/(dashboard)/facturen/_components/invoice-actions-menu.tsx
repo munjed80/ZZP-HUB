@@ -111,16 +111,16 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
   };
 
   const menuItemClasses =
-    "group h-10 w-full justify-start gap-2 rounded-xl border border-transparent bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-700 disabled:text-slate-400 disabled:opacity-60 disabled:hover:text-slate-400 disabled:hover:bg-white";
+    "group h-10 w-full justify-start gap-2 rounded-xl border border-transparent bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 disabled:text-gray-400 disabled:opacity-60 disabled:hover:text-gray-400 disabled:hover:bg-white";
   const menuIconClasses = "h-4 w-4 text-gray-700";
   const menuContent = (
-    <div className="w-[240px] rounded-2xl border border-slate-200 bg-white p-3 text-btn-foreground shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)]">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+    <div className="w-[240px] rounded-2xl border border-gray-200 bg-white p-3 text-gray-900 shadow-lg z-50">
+      <div className="flex items-center justify-between border-b border-gray-200 pb-2">
         <div className="space-y-0.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#6B7280]">Acties</p>
-          <p className="text-sm font-semibold leading-tight">Factuur {pdfInvoice.invoiceNum}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">Acties</p>
+          <p className="text-sm font-semibold leading-tight text-gray-900">Factuur {pdfInvoice.invoiceNum}</p>
         </div>
-        <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold text-muted-foreground">Snel</span>
+        <span className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-700">Snel</span>
       </div>
 
       <div className="mt-2 flex flex-col gap-1.5">
@@ -154,7 +154,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           disabled={isPending}
           className={buttonVariants(
             "ghost",
-            cn(menuItemClasses, "border-transparent text-red-600 hover:bg-gray-50"),
+            cn(menuItemClasses, "border-transparent text-red-600 hover:bg-gray-50 hover:text-red-700"),
           )}
         >
           {isPending && pendingAction === "delete" ? (
@@ -179,7 +179,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           type="button"
           className={buttonVariants(
             "ghost",
-            "h-9 w-9 rounded-full border border-slate-200 bg-white p-0 text-[#6B7280] shadow-sm hover:bg-slate-50 hover:text-[#111827]",
+            "h-9 w-9 rounded-full border border-gray-200 bg-white p-0 text-gray-700 shadow-sm hover:bg-gray-50 hover:text-gray-900",
           )}
           aria-label="Acties"
           aria-expanded={menuOpen}

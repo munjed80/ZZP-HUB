@@ -45,12 +45,12 @@ export function InvoicePaymentStatus({ invoiceId, isPaid, paidDateLabel }: Invoi
         variant="ghost"
         disabled={isPending}
         onClick={handleMarkUnpaid}
-        className={`${commonClasses} border-emerald-600 bg-emerald-50 text-emerald-700 font-bold hover:bg-emerald-100`}
+        className={`${commonClasses} border border-emerald-600 text-emerald-600 bg-transparent hover:bg-emerald-50`}
       >
         {isPending ? (
-          <Loader2 className="h-4 w-4 animate-spin text-emerald-700" />
+          <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
         ) : (
-          <Undo2 className="h-4 w-4 text-emerald-700" aria-hidden />
+          <Undo2 className="h-4 w-4 text-emerald-600" aria-hidden />
         )}
         Maak open
       </Button>
