@@ -15,6 +15,13 @@ const OPTIONAL_ENV = [
 const DEFAULT_HOST = "0.0.0.0";
 const DEFAULT_PORT = "3000";
 const USER_TABLE = "User";
+const BROKEN_MIGRATION_ID = "20260107172021_add_onboarding_and_email_verification";
+const MIGRATION_CHECK_COLUMNS = [
+  "emailVerified",
+  "emailVerificationToken",
+  "onboardingStep",
+];
+const MIGRATION_CHECK_TABLE = "EmailVerificationToken";
 
 function validateEnv() {
   const missing = REQUIRED_ENV.filter(
@@ -122,6 +129,22 @@ async function hasExistingTables() {
   return Number(result?.[0]?.count ?? 0) > 0;
 }
 
+async function getExistingColumns(tableName, columns) {
+  if (columns.length === 0) {
+    return new Set();
+  }
+
+  const columnRows = await prisma.$queryRaw`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = current_schema()
+    AND table_name = ${tableName}
+    AND column_name IN (${Prisma.join(columns)})
+  `;
+
+  return new Set(columnRows.map((row) => row.column_name));
+}
+
 async function ensureBaselineResolved(migrationFolders) {
   const hasMigrationsTable = await tableExists("_prisma_migrations");
   const hasTables = await hasExistingTables();
@@ -148,6 +171,33 @@ async function ensureBaselineResolved(migrationFolders) {
     "resolve",
     "--applied",
     baselineMigration,
+  ]);
+}
+
+async function autoResolveBrokenMigration() {
+  const existingColumns = await getExistingColumns(
+    USER_TABLE,
+    MIGRATION_CHECK_COLUMNS,
+  );
+  const hasAllColumns = MIGRATION_CHECK_COLUMNS.every((column) =>
+    existingColumns.has(column),
+  );
+  const hasTokenTable = await tableExists(MIGRATION_CHECK_TABLE);
+
+  const resolutionFlag =
+    hasAllColumns && hasTokenTable ? "--applied" : "--rolled-back";
+  const resolutionLabel =
+    resolutionFlag === "--applied"
+      ? "MIGRATION_AUTO_RESOLVED_AS_APPLIED"
+      : "MIGRATION_AUTO_RESOLVED_AS_ROLLED_BACK";
+
+  console.log(`[start-prod] ${resolutionLabel}`);
+
+  await runCommand("./node_modules/.bin/prisma", [
+    "migrate",
+    "resolve",
+    resolutionFlag,
+    BROKEN_MIGRATION_ID,
   ]);
 }
 
@@ -241,6 +291,7 @@ async function main() {
 
   const migrationFolders = getMigrationFolders();
   await ensureBaselineResolved(migrationFolders);
+  await autoResolveBrokenMigration();
 
   console.log("[start-prod] Running prisma migrate deploy");
   await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
