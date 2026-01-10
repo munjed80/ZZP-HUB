@@ -57,6 +57,7 @@ export class MockKVKProvider implements KVKProvider {
         name: item.name,
         city: item.city,
         address: item.address,
+        postalCode: item.postalCode,
       }))
       .slice(0, 5); // Return max 5 results
   }

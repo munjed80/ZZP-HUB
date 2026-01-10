@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Building2, Search, Loader2 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { saveCompanyProfile } from "@/app/onboarding/actions";
-import type { KVKSearchResult, KVKDetails } from "@/lib/kvk/interface";
+import type { KVKSearchResult } from "@/lib/kvk/interface";
 
 interface CompanyStepProps {
   onNext: () => void;
@@ -33,6 +33,20 @@ export function CompanyStep({ onNext, onBack }: CompanyStepProps) {
     bankName: "",
   });
 
+  const applyResult = (result: KVKSearchResult) => {
+    setFormData((prev) => ({
+      ...prev,
+      companyName: result.name || prev.companyName,
+      address: result.address || prev.address,
+      postalCode: result.postalCode || prev.postalCode,
+      city: result.city || prev.city,
+      kvkNumber: result.kvkNumber || prev.kvkNumber,
+    }));
+    setShowManualForm(true);
+    setSearchResults([]);
+    setError(null);
+  };
+
   const handleSearch = async () => {
     if (searchQuery.trim().length < 2) return;
 
@@ -40,44 +54,32 @@ export function CompanyStep({ onNext, onBack }: CompanyStepProps) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/kvk/search?q=${encodeURIComponent(searchQuery)}`);
+      const response = await fetch(`/api/kvk/search?query=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
+      const results: KVKSearchResult[] = data.results || [];
       
       if (response.ok) {
-        setSearchResults(data.results || []);
+        setSearchResults(results);
+        if (results.length > 0) {
+          applyResult(results[0]);
+        } else {
+          setError("Geen resultaten gevonden. Vul de gegevens handmatig in.");
+          setShowManualForm(true);
+        }
       } else {
-        setError("Zoeken mislukt. Probeer opnieuw.");
+        setError(data.error || "Zoeken mislukt. Probeer opnieuw.");
+        setShowManualForm(true);
       }
-    } catch (err) {
+    } catch {
       setError("Er ging iets mis bij het zoeken.");
+      setShowManualForm(true);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleSelectCompany = async (result: KVKSearchResult) => {
-    try {
-      const response = await fetch(`/api/kvk/details?kvk=${result.kvkNumber}`);
-      const data = await response.json();
-      
-      if (response.ok && data.details) {
-        const details: KVKDetails = data.details;
-        setFormData({
-          companyName: details.name,
-          address: details.address,
-          postalCode: details.postalCode,
-          city: details.city,
-          kvkNumber: details.kvkNumber,
-          btwNumber: details.btwNumber || "",
-          iban: "",
-          bankName: "",
-        });
-        setShowManualForm(true);
-        setSearchResults([]);
-      }
-    } catch (err) {
-      setError("Kon bedrijfsgegevens niet ophalen.");
-    }
+  const handleSelectCompany = (result: KVKSearchResult) => {
+    applyResult(result);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
