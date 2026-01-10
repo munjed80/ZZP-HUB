@@ -4,6 +4,7 @@ export interface KVKSearchResult {
   name: string;
   city: string;
   address: string;
+  postalCode?: string;
 }
 
 export interface KVKDetails {

@@ -1,5 +1,6 @@
 import type { KVKProvider } from './interface';
 import { MockKVKProvider } from './mock-provider';
+import { RealKVKProvider } from './real-provider';
 
 /**
  * Get the KVK provider based on environment configuration
@@ -10,9 +11,7 @@ export function getKVKProvider(): KVKProvider {
   const useRealAPI = process.env.KVK_API_KEY && process.env.USE_REAL_KVK_API === 'true';
 
   if (useRealAPI) {
-    // TODO: Implement real KVK provider when API key is available
-    // return new RealKVKProvider(process.env.KVK_API_KEY!);
-    console.log('Real KVK API not yet implemented, using mock');
+    return new RealKVKProvider(process.env.KVK_API_KEY!);
   }
 
   return new MockKVKProvider();
