@@ -42,6 +42,9 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
   const [isPending, startTransition] = useTransition();
 
   const shareTarget = useMemo(() => buildShareLink(shareLink, invoiceId), [shareLink, invoiceId]);
+  const viewHref = shareTarget;
+  const editTarget = editHref ?? `/facturen/${invoiceId}/edit`;
+  const hasPdfData = Boolean(pdfInvoice);
   useEffect(() => {
     if (!menuOpen && confirmDelete) {
       setConfirmDelete(false);
@@ -60,6 +63,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
   };
 
   const handleShare = async () => {
+    if (!hasPdfData) return;
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -106,8 +111,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
   };
 
   const menuItemClasses =
-    "h-10 w-full justify-start gap-2 rounded-xl border border-btn-border bg-btn text-black hover:bg-btn-hover hover:text-black disabled:text-slate-400 disabled:opacity-60";
-  const menuIconClasses = "h-4 w-4 text-black";
+    "group h-10 w-full justify-start gap-2 rounded-xl border border-btn-border bg-btn text-slate-900 hover:bg-btn-hover hover:text-slate-900 disabled:text-slate-400 disabled:opacity-60 disabled:hover:text-slate-400 disabled:hover:bg-btn";
+  const menuIconClasses = "h-4 w-4 text-current";
   const menuContent = (
     <div className="w-[240px] rounded-2xl border border-slate-200 bg-white p-3 text-btn-foreground shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)]">
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -119,18 +124,14 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
       </div>
 
       <div className="mt-2 flex flex-col gap-1.5">
-        {shareLink ? (
-          <Link href={shareLink} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
-            <Eye className={menuIconClasses} aria-hidden />
-            Bekijk factuur
-          </Link>
-        ) : null}
-        {editHref ? (
-          <Link href={editHref} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
-            <Edit3 className={menuIconClasses} aria-hidden />
-            Bewerk factuur
-          </Link>
-        ) : null}
+        <Link href={viewHref} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
+          <Eye className={menuIconClasses} aria-hidden />
+          Bekijk factuur
+        </Link>
+        <Link href={editTarget} className={buttonVariants("ghost", menuItemClasses)} onClick={() => setMenuOpen(false)}>
+          <Edit3 className={menuIconClasses} aria-hidden />
+          Bewerk factuur
+        </Link>
         <InvoicePdfDownloadButton
           invoice={pdfInvoice}
           label="Download PDF"
@@ -138,7 +139,12 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           variant="ghost"
           icon={<FileDown className={menuIconClasses} aria-hidden />}
         />
-        <button type="button" onClick={handleShare} className={cn(buttonVariants("ghost", menuItemClasses))}>
+        <button
+          type="button"
+          onClick={handleShare}
+          disabled={!hasPdfData}
+          className={cn(buttonVariants("ghost", menuItemClasses))}
+        >
           <Share2 className={menuIconClasses} aria-hidden />
           Deel
         </button>
