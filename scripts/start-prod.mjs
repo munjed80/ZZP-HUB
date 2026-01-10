@@ -15,6 +15,10 @@ const DEFAULT_HOST = "0.0.0.0";
 const DEFAULT_PORT = "3000";
 const FAILED_MIGRATION_ID = "20260107172021_add_onboarding_and_email_verification";
 
+function getErrorMessage(error, fallback = "[unknown error]") {
+  return error instanceof Error ? error.message : fallback;
+}
+
 function validateEnv() {
   const missing = REQUIRED_ENV.filter(
     (key) => !process.env[key] || process.env[key].trim() === "",
@@ -118,17 +122,17 @@ async function migrateDeployWithFallback() {
   try {
     console.log("[start-prod] Running prisma migrate deploy");
     await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+    console.log("[start-prod] Prisma migrate deploy completed");
     return;
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "[unknown migrate error]";
+    const message = getErrorMessage(error, "[unknown migrate error]");
 
     if (!message.includes("P3009")) {
       throw error;
     }
 
     console.warn(
-      `[start-prod] Prisma migrate failed with P3009. Marking ${FAILED_MIGRATION_ID} as applied and retrying.`,
+      `[start-prod] Prisma migrate failed with P3009 (migration already applied or history out of sync). Marking ${FAILED_MIGRATION_ID} as applied and retrying.`,
     );
 
     await runCommand("./node_modules/.bin/prisma", [
@@ -139,7 +143,18 @@ async function migrateDeployWithFallback() {
     ]);
 
     console.log("[start-prod] Retrying prisma migrate deploy after resolving");
-    await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+    try {
+      await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+      console.log("[start-prod] Prisma migrate deploy completed after resolve");
+    } catch (retryError) {
+      const retryMessage = getErrorMessage(
+        retryError,
+        "[unknown migrate retry error]",
+      );
+      throw new Error(
+        `[start-prod] Prisma migrate deploy failed after resolving P3009 (migration history may still be out of sync). Inspect the database_migrations table and rerun prisma migrate resolve/deploy manually. Details: ${retryMessage}`,
+      );
+    }
   }
 }
 
@@ -148,9 +163,7 @@ async function main() {
 
   await migrateDeployWithFallback();
 
-  console.log("[start-prod] Running prisma generate");
-  await runCommand("./node_modules/.bin/prisma", ["generate"]);
-
+  // Prisma client is generated during the image build (npm install/next build), so runtime only applies migrations before starting the server.
   await startServer();
 }
 
