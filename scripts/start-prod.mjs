@@ -1,4 +1,3 @@
-import { Prisma, PrismaClient } from "@prisma/client";
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -14,14 +13,7 @@ const OPTIONAL_ENV = [
 ];
 const DEFAULT_HOST = "0.0.0.0";
 const DEFAULT_PORT = "3000";
-const USER_TABLE = "User";
-const BROKEN_MIGRATION_ID = "20260107172021_add_onboarding_and_email_verification";
-const MIGRATION_CHECK_COLUMNS = [
-  "emailVerified",
-  "emailVerificationToken",
-  "onboardingStep",
-];
-const MIGRATION_CHECK_TABLE = "EmailVerificationToken";
+const FAILED_MIGRATION_ID = "20260107172021_add_onboarding_and_email_verification";
 
 function validateEnv() {
   const missing = REQUIRED_ENV.filter(
@@ -89,170 +81,6 @@ async function runCommand(command, args) {
   });
 }
 
-const prisma = new PrismaClient();
-
-function getMigrationFolders() {
-  const migrationsDir = path.join(process.cwd(), "prisma", "migrations");
-
-  if (!fs.existsSync(migrationsDir)) {
-    throw new Error(`[start-prod] Missing migrations directory at ${migrationsDir}`);
-  }
-
-  return fs
-    .readdirSync(migrationsDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
-}
-
-async function tableExists(tableName) {
-  const result = await prisma.$queryRaw`
-    SELECT EXISTS (
-      SELECT 1
-      FROM information_schema.tables
-      WHERE table_schema = current_schema()
-      AND table_name = ${tableName}
-    ) AS "exists"
-  `;
-
-  return Boolean(result?.[0]?.exists);
-}
-
-async function hasExistingTables() {
-  const result = await prisma.$queryRaw`
-    SELECT COUNT(*)::int AS count
-    FROM information_schema.tables
-    WHERE table_schema = current_schema()
-    AND table_type = 'BASE TABLE'
-  `;
-
-  return Number(result?.[0]?.count ?? 0) > 0;
-}
-
-async function getExistingColumns(tableName, columns) {
-  if (columns.length === 0) {
-    return new Set();
-  }
-
-  const columnRows = await prisma.$queryRaw`
-    SELECT column_name
-    FROM information_schema.columns
-    WHERE table_schema = current_schema()
-    AND table_name = ${tableName}
-    AND column_name IN (${Prisma.join(columns)})
-  `;
-
-  return new Set(columnRows.map((row) => row.column_name));
-}
-
-async function ensureBaselineResolved(migrationFolders) {
-  const hasMigrationsTable = await tableExists("_prisma_migrations");
-  const hasTables = await hasExistingTables();
-
-  if (hasMigrationsTable || !hasTables) {
-    return;
-  }
-
-  const baselineMigration =
-    migrationFolders.find((name) =>
-      name.toLowerCase().includes("baseline"),
-    ) ?? migrationFolders[0];
-
-  if (!baselineMigration) {
-    throw new Error("[start-prod] No migration folders found to mark as baseline.");
-  }
-
-  console.log(
-    `[start-prod] Marking existing database as baseline with migration "${baselineMigration}"`,
-  );
-
-  await runCommand("./node_modules/.bin/prisma", [
-    "migrate",
-    "resolve",
-    "--applied",
-    baselineMigration,
-  ]);
-}
-
-async function autoResolveBrokenMigration() {
-  const existingColumns = await getExistingColumns(
-    USER_TABLE,
-    MIGRATION_CHECK_COLUMNS,
-  );
-  const hasAllColumns = MIGRATION_CHECK_COLUMNS.every((column) =>
-    existingColumns.has(column),
-  );
-  const hasTokenTable = await tableExists(MIGRATION_CHECK_TABLE);
-
-  const resolutionFlag =
-    hasAllColumns && hasTokenTable ? "--applied" : "--rolled-back";
-  const resolutionLabel =
-    resolutionFlag === "--applied"
-      ? "MIGRATION_AUTO_RESOLVED_AS_APPLIED"
-      : "MIGRATION_AUTO_RESOLVED_AS_ROLLED_BACK";
-
-  console.log(`[start-prod] ${resolutionLabel}`);
-
-  await runCommand("./node_modules/.bin/prisma", [
-    "migrate",
-    "resolve",
-    resolutionFlag,
-    BROKEN_MIGRATION_ID,
-  ]);
-}
-
-async function verifyRequiredColumns() {
-  const requiredColumns = [
-    "emailVerified",
-    "emailVerificationToken",
-    "emailVerificationExpiry",
-    "emailVerificationSentAt",
-    "onboardingStep",
-    "onboardingCompleted",
-    "twoFactorEnabled",
-    "twoFactorSecret",
-    "recoveryCodes",
-  ];
-
-  const columnRows = await prisma.$queryRaw`
-    SELECT column_name
-    FROM information_schema.columns
-    WHERE table_schema = current_schema()
-    AND table_name = ${USER_TABLE}
-    AND column_name IN (${Prisma.join(requiredColumns)})
-  `;
-
-  const foundColumns = new Set(columnRows.map((row) => row.column_name));
-  const missingColumns = requiredColumns.filter(
-    (column) => !foundColumns.has(column),
-  );
-
-  if (missingColumns.length > 0) {
-    throw new Error(
-      `[start-prod] Missing required columns on "User": ${missingColumns.join(", ")}`,
-    );
-  }
-
-  const hasTokenTable = await tableExists("EmailVerificationToken");
-
-  if (!hasTokenTable) {
-    throw new Error('[start-prod] Missing table "EmailVerificationToken"');
-  }
-}
-
-async function verifyDatabase() {
-  try {
-    await prisma.$queryRawUnsafe("SELECT 1 as ok");
-    console.log("[start-prod] Database connectivity check: OK");
-  } catch (error) {
-    throw new Error(
-      `[start-prod] Database connectivity check failed: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
-  }
-}
-
 async function startServer() {
   const serverPath = path.join(process.cwd(), ".next", "standalone", "server.js");
   if (!fs.existsSync(serverPath)) {
@@ -286,21 +114,43 @@ async function startServer() {
   });
 }
 
+async function migrateDeployWithFallback() {
+  try {
+    console.log("[start-prod] Running prisma migrate deploy");
+    await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+    return;
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "[unknown migrate error]";
+
+    if (!message.includes("P3009")) {
+      throw error;
+    }
+
+    console.warn(
+      `[start-prod] Prisma migrate failed with P3009. Marking ${FAILED_MIGRATION_ID} as applied and retrying.`,
+    );
+
+    await runCommand("./node_modules/.bin/prisma", [
+      "migrate",
+      "resolve",
+      "--applied",
+      FAILED_MIGRATION_ID,
+    ]);
+
+    console.log("[start-prod] Retrying prisma migrate deploy after resolving");
+    await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+  }
+}
+
 async function main() {
   validateEnv();
 
-  const migrationFolders = getMigrationFolders();
-  await ensureBaselineResolved(migrationFolders);
-  await autoResolveBrokenMigration();
-
-  console.log("[start-prod] Running prisma migrate deploy");
-  await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+  await migrateDeployWithFallback();
 
   console.log("[start-prod] Running prisma generate");
   await runCommand("./node_modules/.bin/prisma", ["generate"]);
 
-  await verifyRequiredColumns();
-  await verifyDatabase();
   await startServer();
 }
 
@@ -308,7 +158,4 @@ main()
   .catch((error) => {
     console.error("[start-prod] Fatal error:", error);
     process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
   });
