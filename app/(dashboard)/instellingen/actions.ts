@@ -213,7 +213,6 @@ export async function downloadBackup() {
     prisma.invoice.findMany({
       where: { userId },
       include: { lines: true, client: true },
-      orderBy: { createdAt: "desc" },
     }),
     prisma.expense.findMany({ where: { userId }, orderBy: { date: "desc" } }),
   ]);
