@@ -111,8 +111,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
   };
 
   const menuItemClasses =
-    "group h-10 w-full justify-start gap-2 rounded-xl border border-btn-border bg-btn text-slate-900 hover:bg-btn-hover hover:text-slate-900 disabled:text-slate-400 disabled:opacity-60 disabled:hover:text-slate-400 disabled:hover:bg-btn";
-  const menuIconClasses = "h-4 w-4 text-current";
+    "group h-10 w-full justify-start gap-2 rounded-xl border border-transparent bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-700 disabled:text-slate-400 disabled:opacity-60 disabled:hover:text-slate-400 disabled:hover:bg-white";
+  const menuIconClasses = "h-4 w-4 text-gray-700";
   const menuContent = (
     <div className="w-[240px] rounded-2xl border border-slate-200 bg-white p-3 text-btn-foreground shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)]">
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -154,13 +154,13 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
           disabled={isPending}
           className={buttonVariants(
             "ghost",
-            cn(menuItemClasses, "border border-danger-border bg-danger text-danger-foreground hover:bg-danger-hover"),
+            cn(menuItemClasses, "border-transparent text-red-600 hover:bg-gray-50"),
           )}
         >
           {isPending && pendingAction === "delete" ? (
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+            <Loader2 className="h-4 w-4 animate-spin text-red-600" aria-hidden />
           ) : (
-            <Trash2 className="h-4 w-4" aria-hidden />
+            <Trash2 className="h-4 w-4 text-red-600" aria-hidden />
           )}
           {isPending && pendingAction === "delete"
             ? "Verwijderen..."
