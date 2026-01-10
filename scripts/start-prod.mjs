@@ -15,6 +15,7 @@ const OPTIONAL_ENV = [
 const DEFAULT_HOST = "0.0.0.0";
 const DEFAULT_PORT = "3000";
 const USER_TABLE = "User";
+const MIGRATION_FOLDER = "20260107172021_add_onboarding_and_email_verification";
 
 function validateEnv() {
   const missing = REQUIRED_ENV.filter(
@@ -154,14 +155,10 @@ async function ensureBaselineResolved(migrationFolders) {
 async function verifyRequiredColumns() {
   const requiredColumns = [
     "emailVerified",
-    "emailVerificationToken",
-    "emailVerificationExpiry",
-    "emailVerificationSentAt",
     "onboardingStep",
     "onboardingCompleted",
     "twoFactorEnabled",
     "twoFactorSecret",
-    "recoveryCodes",
   ];
 
   const columnRows = await prisma.$queryRaw`
@@ -236,14 +233,54 @@ async function startServer() {
   });
 }
 
+async function runMigrationsWithSelfHeal() {
+  console.log("[start-prod] Running prisma migrate deploy");
+  try {
+    await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+    return;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const isP3009 =
+      message.includes("P3009") && message.includes(MIGRATION_FOLDER);
+
+    if (!isP3009) {
+      throw error;
+    }
+
+    console.warn(
+      `[start-prod] Detected failed migration "${MIGRATION_FOLDER}" (P3009). Attempting auto-repair...`,
+    );
+
+    await runCommand("npx", [
+      "prisma",
+      "db",
+      "execute",
+      "--schema",
+      "prisma/schema.prisma",
+      "--file",
+      `prisma/migrations/${MIGRATION_FOLDER}/migration.sql`,
+    ]);
+
+    await runCommand("npx", [
+      "prisma",
+      "migrate",
+      "resolve",
+      "--applied",
+      MIGRATION_FOLDER,
+    ]);
+
+    console.log("[start-prod] Re-running prisma migrate deploy after repair");
+    await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+  }
+}
+
 async function main() {
   validateEnv();
 
   const migrationFolders = getMigrationFolders();
   await ensureBaselineResolved(migrationFolders);
 
-  console.log("[start-prod] Running prisma migrate deploy");
-  await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+  await runMigrationsWithSelfHeal();
 
   console.log("[start-prod] Running prisma generate");
   await runCommand("./node_modules/.bin/prisma", ["generate"]);
