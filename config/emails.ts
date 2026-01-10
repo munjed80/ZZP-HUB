@@ -4,10 +4,11 @@
  * Defaults are matrixtop.com - NEVER use resend.dev or zzp-hub.nl
  */
 
+const APP_NAME = "ZZP Hub";
 // Hard defaults - matrixtop.com addresses
 export const SUPPORT_EMAIL = "support@matrixtop.com";
 export const NO_REPLY_EMAIL = "no-reply@matrixtop.com";
-export const FROM_EMAIL = `ZZP Hub <${NO_REPLY_EMAIL}>`;
+export const FROM_EMAIL = `${APP_NAME} <${NO_REPLY_EMAIL}>`;
 const FROM_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
@@ -52,7 +53,19 @@ export function getFromEmail(): string {
     throw new Error('getFromEmail() is server-side only');
   }
   
-  const fromEmail = FROM_EMAIL;
+  const envFromEmail = process.env.RESEND_FROM_EMAIL?.trim();
+  if (!envFromEmail) {
+    const message = "RESEND_FROM_EMAIL is not configured";
+    if (process.env.NODE_ENV === "production") {
+      console.error("MISSING_RESEND_FROM_EMAIL", { reason: "missing-env" });
+      throw new Error(message);
+    }
+    console.warn("RESEND_FROM_EMAIL missing; falling back to default no-reply address");
+    validateFromEmail(FROM_EMAIL);
+    return FROM_EMAIL;
+  }
+
+  const fromEmail = `${APP_NAME} <${envFromEmail}>`;
   validateFromEmail(fromEmail);
   return fromEmail;
 }
