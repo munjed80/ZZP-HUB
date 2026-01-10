@@ -106,8 +106,8 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
   };
 
   const menuItemClasses =
-    "h-10 w-full justify-start gap-2 rounded-xl border border-btn-border bg-btn text-slate-900 dark:text-slate-50 hover:bg-btn-hover hover:text-slate-900 dark:hover:text-slate-50 disabled:text-slate-400 disabled:opacity-60";
-  const menuIconClasses = "h-4 w-4 text-slate-700 dark:text-slate-200";
+    "h-10 w-full justify-start gap-2 rounded-xl border border-btn-border bg-btn text-black hover:bg-btn-hover hover:text-black disabled:text-slate-400 disabled:opacity-60";
+  const menuIconClasses = "h-4 w-4 text-black";
   const menuContent = (
     <div className="w-[240px] rounded-2xl border border-slate-200 bg-white p-3 text-btn-foreground shadow-[0_18px_40px_-28px_rgba(15,23,42,0.18)]">
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
