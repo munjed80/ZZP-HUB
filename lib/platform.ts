@@ -3,7 +3,7 @@ export type Platform = "web" | "ios" | "android";
 function getCapacitorPlatform(): Platform | null {
   try {
     // Capacitor injects a global object at runtime; avoid hard dependency during web builds
-    const capacitorGlobal = (globalThis as unknown as {
+    const capacitorGlobal = (globalThis as {
       Capacitor?: { getPlatform?: () => string };
     }).Capacitor;
 

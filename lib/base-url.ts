@@ -22,8 +22,13 @@ export function getAppBaseUrl(): string {
 }
 
 export function buildAbsoluteUrl(path: string): string {
-  if (/^https?:\/\//i.test(path)) {
-    return path;
+  try {
+    const candidate = new URL(path);
+    if (candidate.protocol === "http:" || candidate.protocol === "https:") {
+      return candidate.toString();
+    }
+  } catch {
+    // not an absolute URL, continue
   }
 
   const baseUrl = getAppBaseUrl();
