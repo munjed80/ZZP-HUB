@@ -4,6 +4,7 @@ import { Prisma, type UserRole } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { buildAbsoluteUrl, getAppBaseUrl } from "./base-url";
 
 interface Credentials {
   email: string;
@@ -196,68 +197,89 @@ export const authOptions: NextAuthOptions = {
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        
+
         const result = await authorize({
           email: credentials.email,
-          password: credentials.password
+          password: credentials.password,
         });
-        
+
         if (!result) {
           return null;
         }
-        
-         return {
-           id: result.id,
-           email: result.email,
-           name: result.naam,
-           role: result.role,
-           isSuspended: result.isSuspended,
-           emailVerified: result.emailVerified,
-           onboardingCompleted: result.onboardingCompleted,
-         };
-       }
-     })
-   ],
-    callbacks: {
-       async jwt({ token, user }) {
-         if (user && isAuthorizeResult(user)) {
-          token.id = user.id;
-          token.role = user.role;
-         token.isSuspended = user.isSuspended;
-         token.emailVerified = user.emailVerified;
-         token.onboardingCompleted = user.onboardingCompleted;
-         }
-         token.isSuspended = Boolean(token.isSuspended);
-         token.emailVerified = Boolean(token.emailVerified);
-         token.onboardingCompleted = Boolean(token.onboardingCompleted);
-         return token;
-       },
-       async session({ session, token }) {
-         if (session.user) {
-         if (typeof token.id === "string") {
-           session.user.id = token.id;
-         }
-         if (typeof token.role === "string") {
-           session.user.role = token.role as UserRole;
-         } else {
-           session.user.role = session.user.role ?? DEFAULT_ROLE;
-         }
-         session.user.isSuspended = Boolean(token.isSuspended);
-         session.user.emailVerified = Boolean(token.emailVerified);
-         session.user.onboardingCompleted = Boolean(token.onboardingCompleted);
-         }
-         return session;
-       }
+
+        return {
+          id: result.id,
+          email: result.email,
+          name: result.naam,
+          role: result.role,
+          isSuspended: result.isSuspended,
+          emailVerified: result.emailVerified,
+          onboardingCompleted: result.onboardingCompleted,
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user && isAuthorizeResult(user)) {
+        token.id = user.id;
+        token.role = user.role;
+        token.isSuspended = user.isSuspended;
+        token.emailVerified = user.emailVerified;
+        token.onboardingCompleted = user.onboardingCompleted;
+      }
+      token.isSuspended = Boolean(token.isSuspended);
+      token.emailVerified = Boolean(token.emailVerified);
+      token.onboardingCompleted = Boolean(token.onboardingCompleted);
+      return token;
     },
+    async session({ session, token }) {
+      if (session.user) {
+        if (typeof token.id === "string") {
+          session.user.id = token.id;
+        }
+        if (typeof token.role === "string") {
+          session.user.role = token.role as UserRole;
+        } else {
+          session.user.role = session.user.role ?? DEFAULT_ROLE;
+        }
+        session.user.isSuspended = Boolean(token.isSuspended);
+        session.user.emailVerified = Boolean(token.emailVerified);
+        session.user.onboardingCompleted = Boolean(token.onboardingCompleted);
+      }
+      return session;
+    },
+    async redirect({ url, baseUrl }) {
+      const appBaseUrl = getAppBaseUrl();
+      const safeBaseUrl = appBaseUrl || baseUrl;
+
+      if (url.startsWith("/")) {
+        return buildAbsoluteUrl(url);
+      }
+
+      try {
+        const target = new URL(url);
+        const safeOrigin = new URL(safeBaseUrl).origin;
+
+        if (target.origin === safeOrigin) {
+          return target.toString();
+        }
+      } catch {
+        // Fall through to safe fallback
+      }
+
+      return safeBaseUrl;
+    },
+  },
   pages: {
     signIn: "/login",
-  }
+  },
 };
 
 export function getServerAuthSession() {

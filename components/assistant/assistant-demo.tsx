@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowRight, Loader2, Sparkles, Wand2 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildAbsoluteUrl } from "@/lib/base-url";
 
 const demoQuestions = [
   "Hoe start ik met ZZP HUB?",
@@ -22,7 +23,7 @@ export function AssistantDemo({ className }: { className?: string }) {
     setAnswer(null);
 
     try {
-      const response = await fetch("/api/ai-assistant", {
+      const response = await fetch(buildAbsoluteUrl("/api/ai-assistant"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: q }),

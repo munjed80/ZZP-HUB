@@ -4,6 +4,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { toast } from "sonner";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildAbsoluteUrl } from "@/lib/base-url";
 import { CheckCircle2, Loader2, Link as LinkIcon, Mail, MessageCircle } from "lucide-react";
 
 type SupportFormProps = {
@@ -38,7 +39,7 @@ export function SupportForm({ context, minimal, className }: SupportFormProps) {
     };
 
     try {
-      const response = await fetch("/api/support", {
+      const response = await fetch(buildAbsoluteUrl("/api/support"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

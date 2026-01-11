@@ -5,6 +5,7 @@ import { Building2, Loader2, Search, Sparkles } from "lucide-react";
 import { completeProfileSetup } from "./actions";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildAbsoluteUrl } from "@/lib/base-url";
 
 export default function SetupPage() {
   const [companyName, setCompanyName] = useState("");
@@ -19,7 +20,9 @@ export default function SetupPage() {
     setError(null);
 
     try {
-      const response = await fetch(`/api/kvk/details?kvk=${encodeURIComponent(kvkNumber.trim())}`);
+      const response = await fetch(
+        buildAbsoluteUrl(`/api/kvk/details?kvk=${encodeURIComponent(kvkNumber.trim())}`),
+      );
       const data = await response.json();
 
       if (response.ok && data.details) {
