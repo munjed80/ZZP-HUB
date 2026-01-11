@@ -30,7 +30,7 @@ Moderne SaaS-omgeving voor Nederlandse ZZP’ers met een maandelijks abonnement.
 4. Offline fallback: laad een pagina online, schakel offline en navigeer opnieuw; je ziet `/offline` en de Workbox fallback `/offline.html`. Herhaal op mobiel na “Zet op beginscherm”.
 
 ## Capacitor (Android/iOS) bundling
-1. Installeer native tooling:
+1. Installeer native tooling (alleen wanneer je de native bundel bouwt):
    ```bash
    npm install @capacitor/core @capacitor/cli
    npm install @capacitor/android @capacitor/ios

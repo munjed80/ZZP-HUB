@@ -14,7 +14,7 @@ export function getAppBaseUrl(): string {
     return sanitize(envUrl);
   }
 
-  if (typeof window !== "undefined" && window.location?.origin) {
+  if (typeof window !== "undefined" && window.location.origin) {
     return sanitize(window.location.origin);
   }
 
