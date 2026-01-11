@@ -2,6 +2,10 @@
 
 /* Light theme (default) - crisp neutral base with emerald + amber accents */
 :root {
+  --safe-area-top: env(safe-area-inset-top);
+  --safe-area-bottom: env(safe-area-inset-bottom);
+  --safe-area-left: env(safe-area-inset-left);
+  --safe-area-right: env(safe-area-inset-right);
   /* Brand tokens */
   --brand: 12 150 121; /* Emerald/teal base */
   --brand-hover: 9 132 108; /* Richer teal for hover */
@@ -253,8 +257,6 @@ body {
   color: rgb(var(--text));
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-  padding-block: env(safe-area-inset-top) env(safe-area-inset-bottom);
-  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
 }
 
 /* Light mode gradient - subtle mauve-tinted */
