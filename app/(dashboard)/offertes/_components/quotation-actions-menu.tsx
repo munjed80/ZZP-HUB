@@ -71,7 +71,7 @@ export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail
 
     if (navigator.share) {
       navigator
-        .share({ text: message, url: absoluteLink })
+        .share({ title: `Offerte ${pdfQuotation.invoiceNum}`, url: absoluteLink })
         .catch((error) => console.warn("Native share dismissed or failed", error));
       return;
     }
