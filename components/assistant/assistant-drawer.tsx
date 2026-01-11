@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ArrowRight, Loader2, MessageCircle, ShieldCheck, Sparkles, X } from "lucide-react";
 import { assistantGuide } from "@/lib/assistant/guide";
 import { getPublicSupportEmail } from "@/lib/publicConfig";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { buildAbsoluteUrl } from "@/lib/base-url";
 
 const SUPPORT_EMAIL = getPublicSupportEmail();

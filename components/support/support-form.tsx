@@ -2,10 +2,10 @@
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2, Link as LinkIcon, Mail, MessageCircle } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { buildAbsoluteUrl } from "@/lib/base-url";
+import { CheckCircle2, Loader2, Link as LinkIcon, Mail, MessageCircle } from "lucide-react";
 
 type SupportFormProps = {
   context?: string;
