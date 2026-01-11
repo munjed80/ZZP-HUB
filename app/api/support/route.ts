@@ -4,7 +4,7 @@ import { SupportMessageStatus } from "@prisma/client";
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export const supportSchema = z.object({
+const supportSchema = z.object({
   name: z.string().min(2).max(120).trim(),
   email: z.string().email().max(160),
   subject: z.string().min(3).max(160).trim(),
