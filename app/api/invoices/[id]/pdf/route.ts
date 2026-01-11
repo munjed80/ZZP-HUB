@@ -50,7 +50,10 @@ export async function GET(
     // Return PDF with proper headers
     const filename = `factuur-${pdfInvoice.invoiceNum}.pdf`;
     
-    return new NextResponse(Buffer.from(pdfBuffer), {
+    // Convert buffer to Uint8Array for NextResponse
+    const uint8Array = new Uint8Array(pdfBuffer);
+    
+    return new NextResponse(uint8Array, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

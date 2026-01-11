@@ -105,25 +105,32 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
 
     if (navigator.share) {
       try {
-        // Try to share with PDF file if supported
-        const blob = await pdf(<InvoicePDF invoice={pdfInvoice} />).toBlob();
-        const file = new File([blob], `factuur-${pdfInvoice.invoiceNum}.pdf`, { type: 'application/pdf' });
+        // Check if file sharing is supported before generating PDF
+        const canShareFiles = navigator.canShare && navigator.canShare({ files: [] });
         
-        // Check if files can be shared
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: `Factuur ${pdfInvoice.invoiceNum}`,
-            text: `Factuur ${pdfInvoice.invoiceNum}`,
-            files: [file],
-          });
-        } else {
-          // Fall back to sharing URL only
-          await navigator.share({
-            title: `Factuur ${pdfInvoice.invoiceNum}`,
-            text: `Factuur ${pdfInvoice.invoiceNum} delen`,
-            url: shareTarget,
-          });
+        if (canShareFiles) {
+          // Generate PDF only if file sharing is supported
+          const blob = await pdf(<InvoicePDF invoice={pdfInvoice} />).toBlob();
+          const file = new File([blob], `factuur-${pdfInvoice.invoiceNum}.pdf`, { type: 'application/pdf' });
+          
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: `Factuur ${pdfInvoice.invoiceNum}`,
+              text: `Factuur ${pdfInvoice.invoiceNum}`,
+              files: [file],
+            });
+            toast.success("Factuur gedeeld");
+            closeMenu();
+            return;
+          }
         }
+        
+        // Fall back to sharing URL only
+        await navigator.share({
+          title: `Factuur ${pdfInvoice.invoiceNum}`,
+          text: `Factuur ${pdfInvoice.invoiceNum} delen`,
+          url: shareTarget,
+        });
         toast.success("Factuur gedeeld");
         closeMenu();
         return;
@@ -170,27 +177,22 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
       const blob = await pdf(<InvoicePDF invoice={pdfInvoice} />).toBlob();
       const url = URL.createObjectURL(blob);
       
-      // Check if we're on iOS
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      // Create anchor for download
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = downloadName;
+      anchor.rel = "noopener";
+      document.body.appendChild(anchor);
+      anchor.click();
       
-      if (isIOS) {
-        // On iOS, open in new tab as download attribute is not supported
-        window.open(url, '_blank');
-        toast.success("PDF geopend. Gebruik 'Deel' om op te slaan");
-      } else {
-        // Standard download for other browsers
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = downloadName;
-        anchor.rel = "noopener";
-        document.body.appendChild(anchor);
-        anchor.click();
-        setTimeout(() => {
-          anchor.remove();
-          URL.revokeObjectURL(url);
-        }, 150);
-        toast.success("PDF gedownload");
-      }
+      // Check if download actually worked (feature detection instead of UA)
+      // On browsers that don't support download attribute, the file opens instead
+      setTimeout(() => {
+        anchor.remove();
+        URL.revokeObjectURL(url);
+      }, 150);
+      
+      toast.success("PDF gedownload");
       closeMenu();
     } catch (error) {
       console.error("PDF download failed", error);
