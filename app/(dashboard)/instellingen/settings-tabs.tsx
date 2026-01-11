@@ -186,6 +186,13 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
 
   const handlePasswordChange = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    // Validate minimum length
+    if (passwords.next.length < 8) {
+      toast.error("Nieuw wachtwoord moet minimaal 8 tekens zijn.");
+      return;
+    }
+    
     if (passwords.next !== passwords.confirm) {
       toast.error("Nieuwe wachtwoorden komen niet overeen.");
       return;
@@ -194,11 +201,12 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
     startPasswordTransition(async () => {
       try {
         await changePassword({ currentPassword: passwords.current, newPassword: passwords.next });
-        toast.success("Wachtwoord gewijzigd.");
+        toast.success("Wachtwoord succesvol gewijzigd.");
         setPasswords({ current: "", next: "", confirm: "" });
       } catch (error) {
         console.error(error);
-        toast.error("Kon wachtwoord niet wijzigen.");
+        const errorMessage = error instanceof Error ? error.message : "Kon wachtwoord niet wijzigen.";
+        toast.error(errorMessage);
       }
     });
   };

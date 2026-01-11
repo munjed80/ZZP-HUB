@@ -7,11 +7,8 @@ import { signIn } from "next-auth/react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { buttonVariants } from "@/components/ui/button";
-import { ArrowRight, Lock, Mail, Sparkles } from "lucide-react";
+import { ArrowRight, Lock, Mail, Sparkles, Home } from "lucide-react";
 import { Suspense, useState } from "react";
-import { getPublicSupportEmail } from "@/lib/publicConfig";
-
-const SUPPORT_EMAIL = getPublicSupportEmail();
 
 const schema = z.object({
   email: z.string().email("Voer een geldig e-mailadres in"),
@@ -106,7 +103,7 @@ function LoginContent() {
 
         <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
           <Link
-            href={`mailto:${SUPPORT_EMAIL}?subject=Wachtwoord%20vergeten`}
+            href="/forgot-password"
             className="text-primary underline-offset-4 hover:underline"
           >
             Wachtwoord vergeten?
@@ -132,6 +129,13 @@ function LoginContent() {
       </form>
 
       <div className="flex flex-col items-start gap-2 text-xs text-muted-foreground">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-primary underline-offset-4 hover:underline"
+        >
+          <Home className="h-4 w-4" aria-hidden />
+          Terug naar home
+        </Link>
         <p>Veilig inloggen met je account.</p>
         <p className="text-muted-foreground">Beveiligde sessies via NextAuth en rolgebaseerde toegang.</p>
       </div>
