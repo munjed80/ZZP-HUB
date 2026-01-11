@@ -315,7 +315,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                         {/* Upload indicator */}
                         {avatarUploading && (
                           <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
-                            <RefreshCw className="h-6 w-6 animate-spin text-white" aria-hidden />
+                            <RefreshCw className="h-6 w-6 animate-spin text-white" aria-label="Uploading profile photo" />
                           </div>
                         )}
                       </div>
@@ -610,7 +610,9 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     <span className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 via-emerald-800 to-teal-700 dark:from-white dark:via-emerald-200 dark:to-teal-300 bg-clip-text text-transparent">
                       {priceLabel}
                     </span>
-                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">/maand</span>
+                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                      {language === "nl" ? "/maand" : "/month"}
+                    </span>
                   </div>
                   <div className="rounded-xl bg-white/80 dark:bg-slate-800/60 backdrop-blur-sm border border-emerald-100 dark:border-emerald-900/40 p-4 shadow-sm">
                     <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-medium">
@@ -753,7 +755,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                 </div>
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                <Button type="submit" disabled={isPasswordPending} className="shadow-md hover:shadow-lg">
+                <Button type="submit" disabled={isPasswordPending} className="shadow-md hover:shadow-lg" aria-label="Change password">
                   <Lock className="h-4 w-4" aria-hidden />
                   {isPasswordPending ? "Wijzigen..." : "Wachtwoord wijzigen"}
                 </Button>

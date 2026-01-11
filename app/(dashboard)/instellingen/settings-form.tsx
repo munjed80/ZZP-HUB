@@ -176,7 +176,7 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
                       type="checkbox"
                       checked={field.value}
                       onChange={(event) => field.onChange(event.target.checked)}
-                      className="mt-0.5 h-5 w-5 rounded-lg border-slate-300 dark:border-slate-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600"
+                      className="mt-0.5 h-5 w-5 rounded-lg border-slate-300 dark:border-slate-600 text-emerald-700 focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600"
                       aria-label="Schakel KOR-regeling in"
                     />
                   )}
