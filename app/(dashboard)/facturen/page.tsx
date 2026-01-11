@@ -5,9 +5,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { InvoiceList } from "./_components/invoice-list";
-import { InvoiceEmailStatus, Prisma, UserRole } from "@prisma/client";
+import { InvoiceEmailStatus, Prisma } from "@prisma/client";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -27,11 +27,11 @@ function invoiceAmount(
 }
 
 async function fetchInvoices(): Promise<InvoiceWithRelations[]> {
-  const { id: userId, role } = await requireUser();
-  const scope = role === UserRole.SUPERADMIN ? {} : { userId };
+  // Facturen page is NOT an admin page - always scope by tenant
+  const { userId } = await requireTenantContext();
 
   return prisma.invoice.findMany({
-    where: scope,
+    where: { userId },
     include: { client: true, lines: true, user: { include: { companyProfile: true } } },
     orderBy: { date: "desc" },
   });

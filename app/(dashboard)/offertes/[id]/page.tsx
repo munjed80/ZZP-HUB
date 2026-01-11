@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
 import { calculateInvoiceTotals, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { prisma } from "@/lib/prisma";
 import { formatBedrag } from "@/lib/utils";
 import { ConvertQuotationButton } from "./convert-quotation-button";
@@ -28,10 +28,7 @@ function formatDate(date: Date) {
 }
 
 async function getQuotationWithRelations(id: string) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   try {
     return await prisma.quotation.findFirst({

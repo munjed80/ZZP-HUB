@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { InvoiceEmailStatus, UserRole } from "@prisma/client";
+import { InvoiceEmailStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireTenantContext, verifyTenantOwnership } from "@/lib/auth/tenant";
 
 type PdfGeneratorModule = typeof import("@/lib/pdf-generator");
 type SendInvoiceModule = typeof import("./send-invoice");
@@ -48,14 +48,17 @@ export async function markAsPaid(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { id: userId, role } = await requireUser();
+    const { userId } = await requireTenantContext();
     const invoice = await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
+      where: { id: sanitizedInvoiceId, userId },
     });
 
     if (!invoice) {
       return { success: false, message: "Factuur niet gevonden." };
     }
+
+    // Verify ownership (redundant here but good practice)
+    await verifyTenantOwnership(invoice.userId, "markAsPaid");
 
     await prisma.invoice.update({
       where: { id: invoice.id },
@@ -80,14 +83,17 @@ export async function markAsUnpaid(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { id: userId, role } = await requireUser();
+    const { userId } = await requireTenantContext();
     const invoice = await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
+      where: { id: sanitizedInvoiceId, userId },
     });
 
     if (!invoice) {
       return { success: false, message: "Factuur niet gevonden." };
     }
+
+    // Verify ownership
+    await verifyTenantOwnership(invoice.userId, "markAsUnpaid");
 
     await prisma.invoice.update({
       where: { id: invoice.id },
@@ -112,14 +118,17 @@ export async function deleteInvoice(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { id: userId, role } = await requireUser();
+    const { userId } = await requireTenantContext();
     const invoice = await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
+      where: { id: sanitizedInvoiceId, userId },
     });
 
     if (!invoice) {
       return { success: false, message: "Factuur niet gevonden." };
     }
+
+    // Verify ownership
+    await verifyTenantOwnership(invoice.userId, "deleteInvoice");
 
     await prisma.invoice.delete({ where: { id: invoice.id } });
 

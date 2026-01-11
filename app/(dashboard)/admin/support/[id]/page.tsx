@@ -26,7 +26,11 @@ function statusCopy(status: SupportMessageStatus) {
   }
 }
 
-export default async function SupportDetailPage({ params }: { params: Promise<{ id: string }> }) {
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function SupportDetailPage({ params }: PageProps) {
   const { id } = await params;
   const session = await getServerAuthSession();
   if (!session?.user) {

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { prisma } from "@/lib/prisma";
 import { getClients } from "../../../relaties/actions";
 import { fetchCompanyProfile } from "../../../instellingen/actions";
@@ -13,10 +13,7 @@ type PageProps = {
 };
 
 async function getInvoice(id: string) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   return prisma.invoice.findFirst({
     where: { id, userId },

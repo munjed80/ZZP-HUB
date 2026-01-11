@@ -5,7 +5,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireRole } from "@/lib/auth/tenant";
 
 const companySchema = z.object({
   email: z.string().email("Ongeldig e-mailadres"),
@@ -25,10 +25,7 @@ const companySchema = z.object({
 const updateCompanySchema = companySchema.partial({ password: true });
 
 async function assertSuperAdmin() {
-  const sessionUser = await requireUser();
-  if (sessionUser.role !== UserRole.SUPERADMIN) {
-    throw new Error("Alleen SuperAdmins hebben toegang tot deze actie.");
-  }
+  await requireRole(UserRole.SUPERADMIN);
 }
 
 export async function listCompanies() {

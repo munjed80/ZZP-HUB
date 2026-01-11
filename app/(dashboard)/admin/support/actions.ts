@@ -1,15 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { Prisma, SupportMessageStatus, UserRole } from "@prisma/client";
+import { Prisma, SupportMessageStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireRole } from "@/lib/auth/tenant";
+import { UserRole } from "@prisma/client";
 
 async function assertSuperAdmin() {
-  const user = await requireUser();
-  if (user.role !== UserRole.SUPERADMIN) {
-    throw new Error("Alleen SuperAdmins hebben toegang tot de support inbox.");
-  }
+  await requireRole(UserRole.SUPERADMIN);
 }
 
 export async function listSupportMessages(filters: { status?: SupportMessageStatus; query?: string }) {

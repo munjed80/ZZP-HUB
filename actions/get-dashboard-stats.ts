@@ -2,8 +2,7 @@
 
 import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
-import { UserRole } from "@prisma/client";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { DEFAULT_VAT_RATE } from "@/lib/constants";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
@@ -23,11 +22,12 @@ function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; qua
 }
 
 export async function getDashboardStats() {
-  const { id: userId, role } = await requireUser();
+  // Dashboard is NOT an admin page - always scope by tenant, even for SUPERADMIN
+  const { userId } = await requireTenantContext();
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
-  const scope = role === UserRole.SUPERADMIN ? {} : { userId };
+  const scope = { userId };
   const finalizedInvoiceFilter = {
     ...scope,
     emailStatus: InvoiceEmailStatus.BETAALD,

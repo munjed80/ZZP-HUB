@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId, requireUser } from "@/lib/auth";
+import { requireTenantContext, requireSession } from "@/lib/auth/tenant";
 import {
   companySettingsSchema,
   emailSettingsSchema,
@@ -14,10 +14,7 @@ import {
 } from "./schema";
 
 export async function fetchCompanyProfile() {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   try {
     return await prisma.companyProfile.findUnique({
       where: { userId },
@@ -31,7 +28,7 @@ export async function fetchCompanyProfile() {
 export async function updateCompanySettings(values: CompanySettingsInput) {
   "use server";
 
-  const { id: userId } = await requireUser();
+  const { userId } = await requireTenantContext();
   const data = companySettingsSchema.parse(values);
   const logoUrl = data.logoUrl?.trim();
   const paymentTerms = `${data.paymentTerms}`.trim();
@@ -82,7 +79,7 @@ export async function updateCompanySettings(values: CompanySettingsInput) {
 export async function updateEmailSettings(values: EmailSettingsInput) {
   "use server";
 
-  const { id: userId } = await requireUser();
+  const { userId } = await requireTenantContext();
   const data = emailSettingsSchema.parse(values);
   const replyTo = data.emailReplyTo?.trim();
 
@@ -103,10 +100,7 @@ export async function updateEmailSettings(values: EmailSettingsInput) {
 }
 
 export async function fetchUserAccount() {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) return null;
@@ -120,7 +114,7 @@ export async function fetchUserAccount() {
 export async function saveProfileBasics(values: ProfileBasicsInput) {
   "use server";
 
-  const { id: userId } = await requireUser();
+  const { userId } = await requireTenantContext();
   const data = profileBasicsSchema.parse(values);
 
   const trimmedName = data.name.trim();
@@ -149,7 +143,7 @@ export async function saveProfileBasics(values: ProfileBasicsInput) {
 export async function saveProfileAvatar(avatarDataUrl: string) {
   "use server";
 
-  const { id: userId } = await requireUser();
+  const { userId } = await requireTenantContext();
   const safeAvatar = avatarDataUrl.trim();
   if (!safeAvatar) {
     throw new Error("Geen afbeelding aangeleverd.");
@@ -177,10 +171,7 @@ export async function changePassword({
   newPassword: string;
 }) {
   "use server";
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
     throw new Error("Gebruiker niet gevonden.");
@@ -203,10 +194,7 @@ export async function changePassword({
 export async function downloadBackup() {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   const [clients, invoices, expenses] = await Promise.all([
     prisma.client.findMany({ where: { userId } }),
