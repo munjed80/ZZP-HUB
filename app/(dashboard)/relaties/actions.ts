@@ -41,6 +41,7 @@ export async function createClient(values: ClientFormValues) {
 
   revalidatePath("/relaties");
   revalidatePath("/facturen/nieuw");
+  revalidatePath("/facturen", "layout");
 }
 
 export async function deleteClient(clientId: string) {
@@ -54,6 +55,7 @@ export async function deleteClient(clientId: string) {
 
   revalidatePath("/relaties");
   revalidatePath("/facturen/nieuw");
+  revalidatePath("/facturen", "layout");
 }
 
 export async function updateClient(clientId: string, values: ClientFormValues) {
@@ -77,4 +79,5 @@ export async function updateClient(clientId: string, values: ClientFormValues) {
 
   revalidatePath("/relaties");
   revalidatePath("/facturen/nieuw");
+  revalidatePath("/facturen", "layout");
 }
