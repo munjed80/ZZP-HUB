@@ -21,6 +21,7 @@ import {
   X,
   LogOut,
   Rocket,
+  Inbox,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarBrand } from "@/components/sidebar/sidebar-brand";
@@ -47,6 +48,7 @@ export const navigatie: NavigatieItem[] = [
   { href: "/instellingen", label: "Instellingen", icon: Settings },
   { href: "/admin/companies", label: "Companies", icon: Building2, superAdminOnly: true },
   { href: "/admin/releases", label: "Releases", icon: Rocket, superAdminOnly: true },
+  { href: "/admin/support", label: "Support Inbox", icon: Inbox, superAdminOnly: true },
 ];
 
 export function Sidebar({
