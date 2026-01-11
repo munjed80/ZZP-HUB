@@ -1,11 +1,11 @@
 "use server";
 
 import { Resend } from "resend";
-import { InvoiceEmailStatus, UserRole } from "@prisma/client";
+import { InvoiceEmailStatus } from "@prisma/client";
 import InvoiceEmail from "@/components/emails/InvoiceEmail";
 import { generateInvoicePdf, mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
 import { requireUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { tenantPrisma } from "@/lib/prismaTenant";
 import { formatFromAddress, logEmailSuccess } from "@/lib/email";
 
 const APP_BASE_URL =
@@ -50,9 +50,9 @@ export async function sendInvoiceEmail(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { id: userId, role } = await requireUser();
-    const invoice = await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
+    await requireUser();
+    const invoice = await tenantPrisma.invoice.findUnique({
+      where: { id: sanitizedInvoiceId },
       include: { client: true, lines: true, user: { include: { companyProfile: true } } },
     });
 
@@ -123,7 +123,7 @@ export async function sendInvoiceEmail(invoiceId: string) {
 
     logEmailSuccess(result.data?.id || "no-id", recipientEmail, subject, fromAddress);
 
-    await prisma.invoice.update({
+    await tenantPrisma.invoice.update({
       where: { id: invoice.id },
       data: { emailStatus: InvoiceEmailStatus.VERZONDEN },
     });
