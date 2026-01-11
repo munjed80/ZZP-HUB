@@ -52,40 +52,41 @@ enum SupportMessageStatus {
 }
 
 model User {
-  id                        String                   @id @default(uuid())
-  email                     String                   @unique
-  password                  String
-  naam                      String?
-  role                      UserRole                 @default(COMPANY_ADMIN)
-  isSuspended               Boolean                  @default(false)
-  
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  naam        String?
+  role        UserRole @default(COMPANY_ADMIN)
+  isSuspended Boolean  @default(false)
+
   // Email verification
-  emailVerified             Boolean                  @default(false)
-  emailVerificationToken    String?
-  emailVerificationExpiry   DateTime?
-  emailVerificationSentAt   DateTime?
-  
+  emailVerified           Boolean   @default(false)
+  emailVerificationToken  String?
+  emailVerificationExpiry DateTime?
+  emailVerificationSentAt DateTime?
+
   // Onboarding
-  onboardingStep            Int                      @default(0)
-  onboardingCompleted       Boolean                  @default(false)
-  
+  onboardingStep      Int     @default(0)
+  onboardingCompleted Boolean @default(false)
+
   // Two-Factor Authentication
-  twoFactorEnabled          Boolean                  @default(false)
-  twoFactorSecret           String?
-  recoveryCodes             String?
-  
-  createdAt                 DateTime                 @default(now())
-  updatedAt                 DateTime                 @updatedAt
-  
-  companyProfile            CompanyProfile?
-  clients                   Client[]
-  invoices                  Invoice[]
-  quotations                Quotation[]
-  expenses                  Expense[]
-  timeEntries               TimeEntry[]
-  events                    Event[]
-  verificationTokens        EmailVerificationToken[]
-  supportMessages           SupportMessage[]
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
+  recoveryCodes    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companyProfile      CompanyProfile?
+  clients             Client[]
+  invoices            Invoice[]
+  quotations          Quotation[]
+  expenses            Expense[]
+  timeEntries         TimeEntry[]
+  events              Event[]
+  verificationTokens  EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+  supportMessages     SupportMessage[]
 }
 
 model CompanyProfile {
@@ -123,20 +124,20 @@ model Client {
 }
 
 model Invoice {
-  id                      String             @id @default(uuid())
-  userId                  String
-  clientId                String
-  invoiceNum              String             @unique
-  date                    DateTime
-  dueDate                 DateTime
-  emailStatus             InvoiceEmailStatus @default(CONCEPT)
-  convertedFromOfferteId  String?            @unique
-  createdAt               DateTime           @default(now())
-  updatedAt               DateTime           @updatedAt
-  user                    User               @relation(fields: [userId], references: [id])
-  client                  Client             @relation(fields: [clientId], references: [id])
-  convertedFromOfferte    Quotation?         @relation(fields: [convertedFromOfferteId], references: [id])
-  lines                   InvoiceLine[]
+  id                     String             @id @default(uuid())
+  userId                 String
+  clientId               String
+  invoiceNum             String             @unique
+  date                   DateTime
+  dueDate                DateTime
+  emailStatus            InvoiceEmailStatus @default(CONCEPT)
+  convertedFromOfferteId String?            @unique
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  user                   User               @relation(fields: [userId], references: [id])
+  client                 Client             @relation(fields: [clientId], references: [id])
+  convertedFromOfferte   Quotation?         @relation(fields: [convertedFromOfferteId], references: [id])
+  lines                  InvoiceLine[]
 }
 
 model InvoiceLine {
@@ -152,18 +153,18 @@ model InvoiceLine {
 }
 
 model Quotation {
-  id              String          @id @default(uuid())
-  userId          String
-  clientId        String
-  quoteNum        String          @unique
-  date            DateTime
-  validUntil      DateTime
-  status          QuotationStatus @default(CONCEPT)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  user            User            @relation(fields: [userId], references: [id])
-  client          Client          @relation(fields: [clientId], references: [id])
-  lines           QuotationLine[]
+  id               String          @id @default(uuid())
+  userId           String
+  clientId         String
+  quoteNum         String          @unique
+  date             DateTime
+  validUntil       DateTime
+  status           QuotationStatus @default(CONCEPT)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  user             User            @relation(fields: [userId], references: [id])
+  client           Client          @relation(fields: [clientId], references: [id])
+  lines            QuotationLine[]
   convertedInvoice Invoice?
 }
 
@@ -223,6 +224,20 @@ model EmailVerificationToken {
 
   @@index([userId])
   @@index([token])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([userId, expiresAt])
 }
 
 model SupportMessage {

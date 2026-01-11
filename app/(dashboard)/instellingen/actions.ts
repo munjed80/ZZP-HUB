@@ -172,6 +172,12 @@ export async function changePassword({
 }) {
   "use server";
   const { userId } = await requireTenantContext();
+  
+  // Validate password policy
+  if (newPassword.length < 8) {
+    throw new Error("Nieuw wachtwoord moet minimaal 8 tekens zijn.");
+  }
+  
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
     throw new Error("Gebruiker niet gevonden.");
@@ -188,6 +194,7 @@ export async function changePassword({
     data: { password },
   });
 
+  revalidatePath("/instellingen");
   return { success: true };
 }
 
