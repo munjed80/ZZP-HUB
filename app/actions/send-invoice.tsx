@@ -1,10 +1,10 @@
 "use server";
 
 import { Resend } from "resend";
-import { InvoiceEmailStatus, UserRole } from "@prisma/client";
+import { InvoiceEmailStatus } from "@prisma/client";
 import InvoiceEmail from "@/components/emails/InvoiceEmail";
 import { generateInvoicePdf, mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
-import { requireUser } from "@/lib/auth";
+import { requireTenantContext, verifyTenantOwnership } from "@/lib/auth/tenant";
 import { prisma } from "@/lib/prisma";
 import { formatFromAddress, logEmailSuccess } from "@/lib/email";
 
@@ -50,15 +50,18 @@ export async function sendInvoiceEmail(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { id: userId, role } = await requireUser();
+    const { userId } = await requireTenantContext();
     const invoice = await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
+      where: { id: sanitizedInvoiceId, userId },
       include: { client: true, lines: true, user: { include: { companyProfile: true } } },
     });
 
     if (!invoice) {
       return { success: false, message: "Factuur niet gevonden." };
     }
+
+    // Verify ownership
+    await verifyTenantOwnership(invoice.userId, "sendInvoiceEmail");
 
     const pdfInvoice = mapInvoiceToPdfData(invoice);
     const pdfBuffer = await generateInvoicePdf(pdfInvoice);

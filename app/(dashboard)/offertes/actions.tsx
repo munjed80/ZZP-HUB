@@ -7,7 +7,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import QuotationEmail from "@/components/emails/QuotationEmail";
 import { InvoicePDF, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { formatFromAddress, logEmailSuccess } from "@/lib/email";
 import { quotationSchema, type QuotationFormValues, type QuotationLineValues } from "./schema";
 
@@ -114,10 +114,7 @@ function mapQuotationToPdfData(
 }
 
 export async function getQuotations() {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   try {
     return await prisma.quotation.findMany({
@@ -134,10 +131,7 @@ export async function getQuotations() {
 export async function createQuotation(values: QuotationFormValues) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const data = quotationSchema.parse(values);
 
   const quotation = await prisma.$transaction(async (tx) => {
@@ -175,10 +169,7 @@ export async function createQuotation(values: QuotationFormValues) {
 export async function updateQuotationStatus(quotationId: string, status: "OPEN" | "GEACCEPTEERD" | "GEWEIGERD") {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const statusMap: Record<typeof status, QuotationStatus> = {
     OPEN: QuotationStatus.VERZONDEN,
     GEACCEPTEERD: QuotationStatus.GEACCEPTEERD,
@@ -197,10 +188,7 @@ export async function updateQuotationStatus(quotationId: string, status: "OPEN" 
 export async function convertOfferteToInvoice(offerteId: string) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   const quotation = await prisma.quotation.findFirst({
     where: { id: offerteId, userId },
@@ -269,13 +257,16 @@ export async function convertToInvoice(quotationId: string) {
 }
 
 export async function deleteQuotation(quotationId: string) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   try {
-    await prisma.quotationLine.deleteMany({ where: { quotationId, quotation: { userId } } });
+    // Verify ownership of quotation before deleting lines
+    await prisma.quotationLine.deleteMany({ 
+      where: { 
+        quotationId,
+        quotation: { userId }
+      } 
+    });
     const deleted = await prisma.quotation.deleteMany({ where: { id: quotationId, userId } });
 
     if (deleted.count === 0) {
@@ -291,10 +282,7 @@ export async function deleteQuotation(quotationId: string) {
 }
 
 export async function duplicateQuotation(quotationId: string) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   const original = await prisma.quotation.findFirst({
     where: { id: quotationId, userId },
@@ -353,10 +341,7 @@ export async function sendQuotationEmail(quotationId: string) {
   }
 
   try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-    }
+    const { userId } = await requireTenantContext();
     const quotation = await prisma.quotation.findFirst({
       where: { id: quotationId, userId },
       include: { client: true, lines: true, user: { include: { companyProfile: true } } },

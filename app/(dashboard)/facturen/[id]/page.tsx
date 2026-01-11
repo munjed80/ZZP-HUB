@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BtwTarief, UserRole } from "@prisma/client";
+import { BtwTarief } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InvoicePdfDownloadButton } from "@/components/pdf/InvoicePdfDownloadButton";
 import { calculateInvoiceTotals, type InvoicePdfData } from "@/components/pdf/InvoicePDF";
-import { requireUser } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { prisma } from "@/lib/prisma";
 import { formatBedrag } from "@/lib/utils";
 import { SendInvoiceEmailButton } from "./send-invoice-email-button";
@@ -27,11 +27,11 @@ function formatDate(date: Date) {
 }
 
 async function getInvoiceWithRelations(id: string) {
-  const { id: userId, role } = await requireUser();
+  const { userId } = await requireTenantContext();
 
   try {
     return await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id } : { id, userId },
+      where: { id, userId },
       include: {
         client: true,
         lines: true,

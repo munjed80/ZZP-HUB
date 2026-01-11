@@ -2,15 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { Prisma } from "@prisma/client";
 
 export async function getExpenses(): Promise<ExpenseClientShape[]> {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   try {
     const expenses = await prisma.expense.findMany({
@@ -35,10 +32,7 @@ export async function getExpenses(): Promise<ExpenseClientShape[]> {
 }
 
 export async function createExpense(values: ExpenseFormValues) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const data = expenseSchema.parse(values);
 
   try {
@@ -64,10 +58,7 @@ export async function createExpense(values: ExpenseFormValues) {
 }
 
 export async function deleteExpense(expenseId: string) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   try {
     const deleted = await prisma.expense.deleteMany({
@@ -85,10 +76,7 @@ export async function deleteExpense(expenseId: string) {
 }
 
 export async function duplicateExpense(expenseId: string) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   const expense = await prisma.expense.findFirst({ where: { id: expenseId, userId } });
   if (!expense) {

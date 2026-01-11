@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { ReleaseCategory, UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireRole } from "@/lib/auth/tenant";
 
 const releaseSchema = z.object({
   version: z.string().min(1, "Versie is verplicht"),
@@ -16,10 +16,7 @@ const releaseSchema = z.object({
 });
 
 async function assertSuperAdmin() {
-  const sessionUser = await requireUser();
-  if (sessionUser.role !== UserRole.SUPERADMIN) {
-    throw new Error("Alleen SuperAdmins hebben toegang tot deze actie.");
-  }
+  await requireRole(UserRole.SUPERADMIN);
 }
 
 export async function listReleases() {

@@ -2,16 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId, requireUser } from "@/lib/auth";
-import { UserRole } from "@prisma/client";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { clientSchema, type ClientFormValues } from "./schema";
 
 export async function getClients() {
-  const { id: userId, role } = await requireUser();
+  // Non-admin page: always scope by tenant
+  const { userId } = await requireTenantContext();
 
   try {
     return await prisma.client.findMany({
-      where: role === UserRole.SUPERADMIN ? {} : { userId },
+      where: { userId },
     });
   } catch (error) {
     console.error("Kon klanten niet ophalen", error);
@@ -22,10 +22,7 @@ export async function getClients() {
 export async function createClient(values: ClientFormValues) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const data = clientSchema.parse(values);
 
   await prisma.client.create({
@@ -48,10 +45,7 @@ export async function createClient(values: ClientFormValues) {
 export async function deleteClient(clientId: string) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   await prisma.client.deleteMany({
     where: { id: clientId, userId },
@@ -64,10 +58,7 @@ export async function deleteClient(clientId: string) {
 export async function updateClient(clientId: string, values: ClientFormValues) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const data = clientSchema.parse(values);
 
   await prisma.client.updateMany({

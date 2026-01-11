@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 
 export type VatReport = {
@@ -42,10 +42,7 @@ function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; qua
 }
 
 export async function getVatReport(year: number, quarter: number): Promise<VatReport> {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const { start, end } = quarterRange(year, quarter);
 
   let invoices: InvoiceWithLines[] = [];

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 
 const eventSchema = z.object({
   title: z.string().min(1, "Titel is verplicht"),
@@ -15,10 +15,7 @@ const eventSchema = z.object({
 export type EventFormValues = z.infer<typeof eventSchema>;
 
 export async function getEvents() {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   try {
     return await prisma.event.findMany({
@@ -32,10 +29,7 @@ export async function getEvents() {
 }
 
 export async function createEvent(values: EventFormValues) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   const data = eventSchema.parse(values);
   const startDate = new Date(data.start);

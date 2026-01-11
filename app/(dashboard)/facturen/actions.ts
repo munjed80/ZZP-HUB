@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireTenantContext } from "@/lib/auth/tenant";
 import { invoiceSchema, type InvoiceFormValues, type InvoiceLineValues } from "./schema";
 import { BtwTarief, Eenheid, Prisma } from "@prisma/client";
 
@@ -32,10 +32,7 @@ function mapUnit(unit: InvoiceLineValues["unit"]) {
 export async function createInvoice(values: InvoiceFormValues) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const data = invoiceSchema.parse(values);
 
   const invoice = await prisma.$transaction(async (tx) => {
@@ -72,14 +69,12 @@ export async function createInvoice(values: InvoiceFormValues) {
 export async function updateInvoice(invoiceId: string, values: InvoiceFormValues) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const data = invoiceSchema.parse(values);
 
   await prisma.$transaction(async (tx) => {
-    await tx.invoice.updateMany({
+    // Verify ownership before update
+    const updated = await tx.invoice.updateMany({
       where: { id: invoiceId, userId },
       data: {
         clientId: data.clientId,
@@ -88,8 +83,18 @@ export async function updateInvoice(invoiceId: string, values: InvoiceFormValues
         dueDate: new Date(data.dueDate),
       },
     });
+    
+    if (updated.count === 0) {
+      throw new Error("Factuur niet gevonden of geen toegang.");
+    }
 
-    await tx.invoiceLine.deleteMany({ where: { invoiceId } });
+    // Delete lines - scoped by parent invoice ownership
+    await tx.invoiceLine.deleteMany({ 
+      where: { 
+        invoiceId,
+        invoice: { userId }
+      } 
+    });
 
     await tx.invoiceLine.createMany({
       data: data.lines.map((line) => ({
