@@ -29,12 +29,11 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <div className="space-y-5">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#e7eef4] ring-1 ring-white/10">
                 <Sparkles className="h-4 w-4" aria-hidden />
-                Cinematic login
+                ZZP-HUB Dashboard
               </p>
-              <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">Stap in de premium flow.</h1>
+              <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">Beheer je ZZP-bedrijf eenvoudig.</h1>
               <p className="max-w-xl text-base text-[#e7eef4]/90">
-                Mesh gradients, beveiligde sessies en een invisible interface. Beheer facturen, uren en BTW alsof je in
-                een filmset van Apple zit.
+                Met ZZP-HUB regel je al je administratie op één plek: facturen, offertes, klanten, uitgaven en BTW — snel, duidelijk en professioneel.
               </p>
             </div>
             <div className="space-y-4 text-sm text-[#e7eef4]/90">
@@ -42,34 +41,34 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                 <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15 text-[10px] font-semibold">
                   01
                 </span>
-                <span>Laag voor laag glasdesign, met live timers en facturen.</span>
+                <span>Facturen en offertes maken in seconden.</span>
               </div>
               <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-sm backdrop-blur-xl">
                 <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15 text-[10px] font-semibold">
                   02
                 </span>
-                <span>Deep-dark mesh met veilige opslag en audit trails.</span>
+                <span>Klanten en relaties overzichtelijk beheren.</span>
               </div>
               <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-sm backdrop-blur-xl">
                 <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15 text-[10px] font-semibold">
                   03
                 </span>
-                <span>Framer Motion reveals: elke stap voelt choreografeerd.</span>
+                <span>Inzicht in omzet, uitgaven en BTW.</span>
               </div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/10 p-4 shadow-sm backdrop-blur-xl">
               <div className="flex items-start gap-3 text-[#e7eef4]">
                 <Quote className="mt-0.5 h-5 w-5 text-[#c7d4de]" aria-hidden />
                 <p className="text-sm">
-                  “Login voelt eindelijk premium. Invisible inputs, mesh glow en een flow die je laat doorwerken.”
+                  “Een dashboard dat werkt zoals een ZZP&apos;er denkt.”
                 </p>
               </div>
               <div className="mt-3 flex items-center gap-3 text-xs text-[#e7eef4]/90">
                 <ShieldCheck className="h-4 w-4" aria-hidden />
-                <span>End-to-end beveiligd, powered by MHM IT.</span>
+                <span>Veilig, simpel en gebouwd voor zelfstandigen.</span>
               </div>
               <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-white ring-1 ring-white/10">
-                Volgende stap in <span className="inline-flex items-center gap-1">je flow <ArrowRight className="h-3.5 w-3.5" aria-hidden /></span>
+                <span className="inline-flex items-center gap-1">Ga naar je dashboard <ArrowRight className="h-3.5 w-3.5" aria-hidden /></span>
               </div>
             </div>
           </div>
