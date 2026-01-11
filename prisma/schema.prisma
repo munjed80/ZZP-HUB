@@ -116,18 +116,20 @@ model Client {
 }
 
 model Invoice {
-  id          String             @id @default(uuid())
-  userId      String
-  clientId    String
-  invoiceNum  String             @unique
-  date        DateTime
-  dueDate     DateTime
-  emailStatus InvoiceEmailStatus @default(CONCEPT)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  user        User               @relation(fields: [userId], references: [id])
-  client      Client             @relation(fields: [clientId], references: [id])
-  lines       InvoiceLine[]
+  id                      String             @id @default(uuid())
+  userId                  String
+  clientId                String
+  invoiceNum              String             @unique
+  date                    DateTime
+  dueDate                 DateTime
+  emailStatus             InvoiceEmailStatus @default(CONCEPT)
+  convertedFromOfferteId  String?            @unique
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  user                    User               @relation(fields: [userId], references: [id])
+  client                  Client             @relation(fields: [clientId], references: [id])
+  convertedFromOfferte    Quotation?         @relation(fields: [convertedFromOfferteId], references: [id])
+  lines                   InvoiceLine[]
 }
 
 model InvoiceLine {
@@ -143,18 +145,19 @@ model InvoiceLine {
 }
 
 model Quotation {
-  id         String          @id @default(uuid())
-  userId     String
-  clientId   String
-  quoteNum   String          @unique
-  date       DateTime
-  validUntil DateTime
-  status     QuotationStatus @default(CONCEPT)
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-  user       User            @relation(fields: [userId], references: [id])
-  client     Client          @relation(fields: [clientId], references: [id])
-  lines      QuotationLine[]
+  id              String          @id @default(uuid())
+  userId          String
+  clientId        String
+  quoteNum        String          @unique
+  date            DateTime
+  validUntil      DateTime
+  status          QuotationStatus @default(CONCEPT)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  user            User            @relation(fields: [userId], references: [id])
+  client          Client          @relation(fields: [clientId], references: [id])
+  lines           QuotationLine[]
+  convertedInvoice Invoice?
 }
 
 model QuotationLine {
