@@ -57,6 +57,9 @@ export function calculateInvoiceTotals(lines: InvoicePdfLine[]) {
 }
 
 const primaryColor = "#111827";
+const DEFAULT_BRAND_INITIAL = "Z";
+const LABEL_SENDER = "Verzender";
+const LABEL_RECIPIENT = "Ontvanger";
 
 function generateBrandInitials(companyName?: string | null) {
   const initials =
@@ -69,7 +72,7 @@ function generateBrandInitials(companyName?: string | null) {
       .join("")
       .slice(0, 2)
       .toUpperCase() || "";
-  return initials || "Z";
+  return initials || DEFAULT_BRAND_INITIAL;
 }
 
 const styles = StyleSheet.create({
@@ -402,7 +405,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
                   {/* eslint-disable-next-line jsx-a11y/alt-text */}
                   <Image src={logoUrl} style={styles.logo} />
                   <View>
-                    <Text style={styles.brandLabel}>Verzender</Text>
+                    <Text style={styles.brandLabel}>{LABEL_SENDER}</Text>
                     <Text style={styles.brandName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
                   </View>
                 </View>
@@ -412,7 +415,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
                     <Text style={styles.brandBadgeText}>{brandInitials}</Text>
                   </View>
                   <View>
-                    <Text style={styles.brandLabel}>Verzender</Text>
+                    <Text style={styles.brandLabel}>{LABEL_SENDER}</Text>
                     <Text style={styles.brandName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
                   </View>
                 </View>
@@ -422,7 +425,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
 
           <View style={styles.parties}>
             <View style={styles.companyBlock}>
-              <Text style={styles.label}>Verzender</Text>
+              <Text style={styles.label}>{LABEL_SENDER}</Text>
               <Text style={styles.companyName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
               <Text style={styles.mutedText}>{companyProfile?.address ?? "Adres niet ingesteld"}</Text>
               <Text style={styles.mutedText}>
@@ -443,7 +446,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
             </View>
 
             <View style={styles.clientBlock}>
-              <Text style={styles.label}>Ontvanger</Text>
+              <Text style={styles.label}>{LABEL_RECIPIENT}</Text>
               <Text style={styles.clientName}>{invoice.client.name}</Text>
               <Text style={styles.mutedText}>{invoice.client.address}</Text>
               <Text style={styles.mutedText}>
