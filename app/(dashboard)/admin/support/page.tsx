@@ -43,7 +43,8 @@ function statusVariant(status: SupportMessageStatus) {
   }
 }
 
-export default async function SupportInboxPage({ searchParams }: { searchParams?: { status?: string; q?: string } }) {
+export default async function SupportInboxPage({ searchParams }: { searchParams?: Promise<{ status?: string; q?: string }> }) {
+  const resolvedSearchParams = await searchParams;
   const session = await getServerAuthSession();
   if (!session?.user) {
     redirect("/login");
@@ -52,8 +53,8 @@ export default async function SupportInboxPage({ searchParams }: { searchParams?
     redirect("/");
   }
 
-  const searchQuery = typeof searchParams?.q === "string" ? searchParams.q : "";
-  const rawStatus = typeof searchParams?.status === "string" ? searchParams.status.toUpperCase() : "ALL";
+  const searchQuery = typeof resolvedSearchParams?.q === "string" ? resolvedSearchParams.q : "";
+  const rawStatus = typeof resolvedSearchParams?.status === "string" ? resolvedSearchParams.status.toUpperCase() : "ALL";
   const isValidStatus = Object.values(SupportMessageStatus).includes(rawStatus as SupportMessageStatus);
   const statusFilter = isValidStatus ? (rawStatus as SupportMessageStatus) : undefined;
   const activeStatus = statusFilter ?? "all";

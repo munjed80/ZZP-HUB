@@ -26,7 +26,8 @@ function statusCopy(status: SupportMessageStatus) {
   }
 }
 
-export default async function SupportDetailPage({ params }: { params: { id: string } }) {
+export default async function SupportDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerAuthSession();
   if (!session?.user) {
     redirect("/login");
@@ -35,7 +36,7 @@ export default async function SupportDetailPage({ params }: { params: { id: stri
     redirect("/");
   }
 
-  const message = await getSupportMessage(params.id);
+  const message = await getSupportMessage(id);
   if (!message) {
     notFound();
   }
@@ -44,12 +45,12 @@ export default async function SupportDetailPage({ params }: { params: { id: stri
 
   const markAsRead = async () => {
     "use server";
-    await setSupportMessageStatus(params.id, SupportMessageStatus.READ);
+    await setSupportMessageStatus(id, SupportMessageStatus.READ);
   };
 
   const closeMessage = async () => {
     "use server";
-    await setSupportMessageStatus(params.id, SupportMessageStatus.CLOSED);
+    await setSupportMessageStatus(id, SupportMessageStatus.CLOSED);
   };
 
   return (
