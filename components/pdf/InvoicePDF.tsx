@@ -68,11 +68,11 @@ const styles = StyleSheet.create({
     color: "#0f172a",
   },
   header: {
-    marginBottom: 28,
-    paddingBottom: 24,
+    marginBottom: 26,
+    paddingBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
-    gap: 14,
+    gap: 16,
   },
   headerTop: {
     flexDirection: "row",
@@ -80,18 +80,62 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 800,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   invoiceNumberRow: {
     marginTop: 8,
-    fontSize: 12,
-    color: "#1f2937",
+    fontSize: 11,
+    color: "#334155",
     fontWeight: 600,
   },
   invoiceNumberValue: {
     fontWeight: 800,
+  },
+  brandCard: {
+    minWidth: 180,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
+    backgroundColor: "#f8fafc",
+    alignItems: "flex-end",
+    gap: 6,
+  },
+  brandNameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  brandBadge: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#e2e8f0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  brandBadgeText: {
+    fontSize: 12,
+    fontWeight: 800,
+    color: primaryColor,
+  },
+  brandLabel: {
+    fontSize: 9,
+    textTransform: "uppercase",
+    letterSpacing: 0.7,
+    color: "#64748b",
+    textAlign: "right",
+  },
+  brandName: {
+    fontSize: 15,
+    fontWeight: 800,
+    color: primaryColor,
+  },
+  headerLeft: {
+    gap: 4,
   },
   parties: {
     flexDirection: "row",
@@ -101,21 +145,23 @@ const styles = StyleSheet.create({
   companyBlock: {
     flex: 1,
     alignItems: "flex-start",
-    gap: 4,
+    gap: 5,
   },
   clientBlock: {
     flex: 1,
     alignItems: "flex-start",
-    gap: 4,
+    gap: 5,
   },
   companyName: {
-    fontSize: 16,
-    fontWeight: 700,
-    marginBottom: 2,
+    fontSize: 14,
+    fontWeight: 800,
+    color: primaryColor,
+    marginBottom: 3,
   },
   clientName: {
-    fontSize: 14,
-    fontWeight: 700,
+    fontSize: 13,
+    fontWeight: 800,
+    color: primaryColor,
     marginBottom: 4,
   },
   documentType: {
@@ -127,44 +173,65 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
   logo: {
-    width: 140,
-    height: 50,
+    width: 132,
+    height: 46,
   },
   label: {
-    fontSize: 10,
+    fontSize: 9,
     textTransform: "uppercase",
-    color: "#475569",
-    letterSpacing: 0.6,
-    marginBottom: 4,
+    color: "#6b7280",
+    letterSpacing: 0.8,
+    marginBottom: 6,
+    fontWeight: 700,
   },
   text: {
     fontSize: 11,
+    color: "#334155",
+  },
+  mutedText: {
+    fontSize: 11,
+    color: "#475569",
+  },
+  keyValueRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 6,
+  },
+  keyValueLabel: {
+    fontSize: 10,
+    color: "#475569",
+    fontWeight: 700,
+  },
+  keyValueValue: {
+    fontSize: 10.5,
+    color: "#0f172a",
+    fontWeight: 600,
   },
   meta: {
     marginBottom: 18,
     flexDirection: "row",
-    gap: 10,
+    gap: 12,
     flexWrap: "wrap",
   },
   metaItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderWidth: 0.8,
     borderColor: "#e2e8f0",
-    borderRadius: 8,
-    minWidth: 140,
-    backgroundColor: "#f8fafc",
+    borderRadius: 10,
+    minWidth: 150,
+    backgroundColor: "#f9fafb",
   },
   metaLabel: {
     fontSize: 9,
     color: "#64748b",
-    marginBottom: 4,
+    marginBottom: 6,
     textTransform: "uppercase",
-    letterSpacing: 0.4,
+    letterSpacing: 0.6,
   },
   metaValue: {
-    fontSize: 12,
-    fontWeight: 700,
+    fontSize: 13,
+    fontWeight: 800,
     color: "#0f172a",
   },
   table: {
@@ -175,23 +242,24 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#f3f4f6",
-    borderBottomWidth: 0.5,
+    backgroundColor: "#f1f5f9",
+    borderBottomWidth: 0.8,
     borderBottomColor: "#e5e7eb",
-    paddingVertical: 9,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   headerCell: {
     fontSize: 10,
-    fontWeight: 700,
+    fontWeight: 800,
     color: primaryColor,
     textTransform: "uppercase",
+    letterSpacing: 0.4,
   },
   row: {
     flexDirection: "row",
-    paddingVertical: 9,
-    paddingHorizontal: 10,
-    borderBottomWidth: 0.5,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderBottomWidth: 0.6,
     borderBottomColor: "#e5e7eb",
   },
   lastRow: {
@@ -225,11 +293,11 @@ const styles = StyleSheet.create({
     marginTop: 18,
     alignSelf: "flex-end",
     width: "55%",
-    borderWidth: 0.5,
-    borderColor: "#e5e7eb",
-    borderRadius: 10,
+    borderWidth: 0.8,
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
     padding: 14,
-    backgroundColor: "#f9fafb",
+    backgroundColor: "#f8fafc",
   },
   totalRow: {
     flexDirection: "row",
@@ -238,7 +306,7 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 11,
-    color: "#334155",
+    color: "#475569",
   },
   totalValue: {
     fontSize: 11,
@@ -248,9 +316,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 800,
     marginTop: 8,
-    borderTopWidth: 0.5,
+    borderTopWidth: 0.8,
     borderTopColor: "#e5e7eb",
-    paddingTop: 10,
+    paddingTop: 12,
+    color: primaryColor,
+  },
+  grandTotalText: {
+    fontSize: 13.5,
+    fontWeight: 800,
     color: primaryColor,
   },
   legal: {
@@ -265,11 +338,11 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 10,
+    gap: 14,
   },
   footerColumn: {
     flex: 1,
-    gap: 2,
+    gap: 3,
   },
   footerLabel: {
     fontSize: 9,
@@ -294,43 +367,77 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
   } t.n.v. ${companyProfile?.companyName ?? "uw bedrijfsnaam"}.`;
   const logoUrl = companyProfile?.logoUrl;
   const isTrustedLogo = logoUrl?.startsWith("http");
+  const brandInitials =
+    companyProfile?.companyName
+      ?.trim()
+      .split(/\s+/)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "Z";
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <View>
+            <View style={styles.headerLeft}>
               <Text style={styles.title}>{documentType}</Text>
               <Text style={styles.invoiceNumberRow}>
                 Factuurnummer: <Text style={styles.invoiceNumberValue}>{invoice.invoiceNum}</Text>
               </Text>
             </View>
-            {isTrustedLogo && logoUrl ? (
-              /* eslint-disable-next-line jsx-a11y/alt-text */
-              <Image src={logoUrl} style={styles.logo} />
-            ) : (
-              <Text style={styles.companyName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
-            )}
+            <View style={styles.brandCard}>
+              {isTrustedLogo && logoUrl ? (
+                <View style={styles.brandNameRow}>
+                  {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                  <Image src={logoUrl} style={styles.logo} />
+                  <View>
+                    <Text style={styles.brandLabel}>Verzender</Text>
+                    <Text style={styles.brandName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
+                  </View>
+                </View>
+              ) : (
+                <View style={styles.brandNameRow}>
+                  <View style={styles.brandBadge}>
+                    <Text style={styles.brandBadgeText}>{brandInitials}</Text>
+                  </View>
+                  <View>
+                    <Text style={styles.brandLabel}>Verzender</Text>
+                    <Text style={styles.brandName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
+                  </View>
+                </View>
+              )}
+            </View>
           </View>
 
           <View style={styles.parties}>
             <View style={styles.companyBlock}>
               <Text style={styles.label}>Verzender</Text>
               <Text style={styles.companyName}>{companyProfile?.companyName ?? "Bedrijfsnaam"}</Text>
-              <Text style={styles.text}>{companyProfile?.address ?? "Adres niet ingesteld"}</Text>
-              <Text style={styles.text}>
+              <Text style={styles.mutedText}>{companyProfile?.address ?? "Adres niet ingesteld"}</Text>
+              <Text style={styles.mutedText}>
                 {companyProfile?.postalCode ?? ""} {companyProfile?.city ?? ""}
               </Text>
-              {companyProfile?.kvkNumber ? <Text style={styles.text}>KVK: {companyProfile.kvkNumber}</Text> : null}
-              {companyProfile?.iban ? <Text style={styles.text}>IBAN: {companyProfile.iban}</Text> : null}
+              {companyProfile?.kvkNumber ? (
+                <View style={styles.keyValueRow}>
+                  <Text style={styles.keyValueLabel}>KVK</Text>
+                  <Text style={styles.keyValueValue}>{companyProfile.kvkNumber}</Text>
+                </View>
+              ) : null}
+              {companyProfile?.iban ? (
+                <View style={styles.keyValueRow}>
+                  <Text style={styles.keyValueLabel}>IBAN</Text>
+                  <Text style={styles.keyValueValue}>{companyProfile.iban}</Text>
+                </View>
+              ) : null}
             </View>
 
             <View style={styles.clientBlock}>
               <Text style={styles.label}>Ontvanger</Text>
               <Text style={styles.clientName}>{invoice.client.name}</Text>
-              <Text style={styles.text}>{invoice.client.address}</Text>
-              <Text style={styles.text}>
+              <Text style={styles.mutedText}>{invoice.client.address}</Text>
+              <Text style={styles.mutedText}>
                 {invoice.client.postalCode} {invoice.client.city}
               </Text>
             </View>
@@ -388,8 +495,8 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
             <Text style={styles.totalValue}>{formatBedrag(totals.vatLow)}</Text>
           </View>
           <View style={[styles.totalRow, styles.grandTotal]}>
-            <Text style={styles.totalLabel}>Totaal</Text>
-            <Text style={styles.totalValue}>{formatBedrag(totals.total)}</Text>
+            <Text style={[styles.totalLabel, styles.grandTotalText]}>Totaal</Text>
+            <Text style={[styles.totalValue, styles.grandTotalText]}>{formatBedrag(totals.total)}</Text>
           </View>
         </View>
 
