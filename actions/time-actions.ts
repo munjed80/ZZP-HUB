@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/auth";
+import { requireTenantContext, verifyTenantOwnership } from "@/lib/auth/tenant";
 
 const timeEntrySchema = z.object({
   date: z.string().min(1, "Datum is verplicht"),
@@ -29,10 +29,7 @@ function getYearRange() {
 }
 
 export async function logTimeEntry(values: TimeEntryInput) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const data = timeEntrySchema.parse(values);
 
   try {
@@ -53,10 +50,7 @@ export async function logTimeEntry(values: TimeEntryInput) {
 }
 
 export async function getTimeEntries(): Promise<TimeEntryDto[]> {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const { startOfYear, endOfYear } = getYearRange();
 
   try {
@@ -78,10 +72,7 @@ export async function getTimeEntries(): Promise<TimeEntryDto[]> {
 }
 
 export async function deleteTimeEntry(id: string) {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
 
   try {
     const entry = await prisma.timeEntry.findUnique({ where: { id } });
@@ -89,6 +80,9 @@ export async function deleteTimeEntry(id: string) {
     if (!entry || entry.userId !== userId) {
       throw new Error("Tijdregistratie niet gevonden voor deze gebruiker.");
     }
+
+    // Verify ownership before delete
+    await verifyTenantOwnership(entry.userId, "deleteTimeEntry");
 
     await prisma.timeEntry.delete({ where: { id } });
     revalidatePath("/uren");
@@ -99,10 +93,7 @@ export async function deleteTimeEntry(id: string) {
 }
 
 export async function getYearlyHours() {
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  const { userId } = await requireTenantContext();
   const { startOfYear, endOfYear } = getYearRange();
 
   try {
