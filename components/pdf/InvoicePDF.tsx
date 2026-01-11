@@ -369,7 +369,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
       ?.trim()
       .split(/\s+/)
       .filter(Boolean)
-      .map((part) => Array.from(part)[0])
+      .map((part) => part.charAt(0))
       .filter(Boolean)
       .join("")
       .slice(0, 2)
