@@ -57,6 +57,7 @@ export function calculateInvoiceTotals(lines: InvoicePdfLine[]) {
 }
 
 const primaryColor = "#111827";
+// Keep fallback aligned with ZZP HUB initial when no brand initials are available.
 const DEFAULT_BRAND_INITIAL = "Z";
 const LABEL_SENDER = "Verzender";
 const LABEL_RECIPIENT = "Ontvanger";
