@@ -19,7 +19,11 @@ export function ConvertQuotationButton({ quotationId }: Props) {
     startTransition(async () => {
       const result = await convertOfferteToInvoice(quotationId);
       if (result?.success && result.invoiceId) {
-        toast.success("Offerte succesvol omgezet naar factuur!");
+        if (result.alreadyConverted) {
+          toast.success("Factuur al aangemaakt, wordt weergegeven");
+        } else {
+          toast.success("Factuur aangemaakt");
+        }
         router.push(`/facturen/${result.invoiceId}`);
       } else {
         toast.error(result?.message ?? "Omzetten mislukt.");
@@ -34,7 +38,7 @@ export function ConvertQuotationButton({ quotationId }: Props) {
       ) : (
         <>
           <FilePlus className="h-4 w-4" aria-hidden />
-          Zet om naar factuur
+          Maak factuur
         </>
       )}
     </Button>

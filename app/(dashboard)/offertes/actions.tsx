@@ -204,11 +204,20 @@ export async function convertOfferteToInvoice(offerteId: string) {
 
   const quotation = await prisma.quotation.findFirst({
     where: { id: offerteId, userId },
-    include: { lines: true, client: true, user: { include: { companyProfile: true } } },
+    include: { lines: true, client: true, user: { include: { companyProfile: true } }, convertedInvoice: true },
   });
 
   if (!quotation) {
     return { success: false, message: "Offerte niet gevonden." };
+  }
+
+  // Check if invoice was already created from this offerte
+  if (quotation.convertedInvoice) {
+    revalidatePath("/offertes");
+    revalidatePath(`/offertes/${offerteId}`);
+    revalidatePath("/facturen");
+    revalidatePath(`/facturen/${quotation.convertedInvoice.id}`);
+    return { success: true, invoiceId: quotation.convertedInvoice.id, alreadyConverted: true };
   }
 
   const invoice = await prisma.$transaction(async (tx) => {
@@ -220,6 +229,7 @@ export async function convertOfferteToInvoice(offerteId: string) {
         date: new Date(),
         dueDate: quotation.validUntil,
         emailStatus: InvoiceEmailStatus.CONCEPT,
+        convertedFromOfferteId: offerteId,
       },
     });
 
