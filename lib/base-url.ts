@@ -27,6 +27,7 @@ export function buildAbsoluteUrl(path: string): string {
     if (candidate.protocol === "http:" || candidate.protocol === "https:") {
       return candidate.toString();
     }
+    return path;
   } catch {
     // not an absolute URL, continue
   }
