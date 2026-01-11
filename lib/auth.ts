@@ -257,6 +257,7 @@ export const authOptions: NextAuthOptions = {
        },
        async redirect({ url, baseUrl }) {
          const appBaseUrl = getAppBaseUrl();
+         const safeBaseUrl = appBaseUrl || baseUrl;
 
          if (url.startsWith("/")) {
            return buildAbsoluteUrl(url);
@@ -266,7 +267,7 @@ export const authOptions: NextAuthOptions = {
            const target = new URL(url);
            const allowedOrigins = new Set([
              new URL(baseUrl).origin,
-             new URL(appBaseUrl).origin,
+             new URL(safeBaseUrl).origin,
            ]);
 
            if (allowedOrigins.has(target.origin)) {
@@ -276,7 +277,7 @@ export const authOptions: NextAuthOptions = {
            // Fall through to safe fallback
          }
 
-         return appBaseUrl || baseUrl;
+         return safeBaseUrl;
        }
     },
   pages: {
