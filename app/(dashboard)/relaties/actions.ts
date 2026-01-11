@@ -12,6 +12,7 @@ export async function getClients() {
   try {
     return await prisma.client.findMany({
       where: { userId },
+      orderBy: { name: "asc" },
     });
   } catch (error) {
     console.error("Kon klanten niet ophalen", error);

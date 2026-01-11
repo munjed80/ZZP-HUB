@@ -6,6 +6,8 @@ import { fetchCompanyProfile } from "../../../instellingen/actions";
 import { InvoiceForm } from "../../nieuw/invoice-form";
 import { INVOICE_LINE_UNITS, type InvoiceFormValues } from "../../schema";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   params: Promise<{
     id: string;
