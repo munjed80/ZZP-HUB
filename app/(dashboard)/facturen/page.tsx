@@ -83,6 +83,7 @@ export default async function FacturenPagina() {
       status,
       amount: invoiceAmount(factuur.lines),
       pdfInvoice: mapInvoiceToPdfData(factuur),
+      recipientEmail: factuur.client.email,
       formattedDate,
       formattedDueDate,
       isPaid,

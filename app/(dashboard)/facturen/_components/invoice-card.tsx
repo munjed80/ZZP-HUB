@@ -17,6 +17,7 @@ export type InvoiceCardProps = {
   dueLabel: string;
   amount: number;
   pdfInvoice: ReturnType<typeof mapInvoiceToPdfData>;
+  recipientEmail?: string;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 };
@@ -45,6 +46,7 @@ export function InvoiceCard({
   dueLabel,
   amount,
   pdfInvoice,
+  recipientEmail,
   isOpen,
   onOpenChange,
 }: InvoiceCardProps) {
@@ -64,6 +66,7 @@ export function InvoiceCard({
               invoiceId={id}
               editHref={`/facturen/${id}/edit`}
               shareLink={`/facturen/${id}`}
+              recipientEmail={recipientEmail}
               isOpen={isOpen}
               onOpenChange={onOpenChange}
             />
