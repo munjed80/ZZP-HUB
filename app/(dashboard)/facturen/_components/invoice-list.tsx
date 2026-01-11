@@ -18,6 +18,7 @@ export type InvoiceListItem = {
   dueLabel: string;
   amount: number;
   pdfInvoice: ReturnType<typeof mapInvoiceToPdfData>;
+  recipientEmail?: string;
 };
 
 type InvoiceListProps = {
@@ -109,6 +110,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
               dueLabel={invoice.dueLabel}
               amount={invoice.amount}
               pdfInvoice={invoice.pdfInvoice}
+              recipientEmail={invoice.recipientEmail}
               isOpen={openInvoiceId === invoice.id}
               onOpenChange={(open) => setOpenInvoiceId(open ? invoice.id : null)}
             />

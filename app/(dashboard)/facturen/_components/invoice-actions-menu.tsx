@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Edit3, Eye, FileDown, Loader2, MoreVertical, Share2, Trash2 } from "lucide-react";
+import { Edit3, Eye, FileDown, Loader2, Mail, MoreVertical, Share2, Trash2 } from "lucide-react";
 import { InvoicePDF } from "@/components/pdf/InvoicePDF";
-import { deleteInvoice } from "@/app/actions/invoice-actions";
+import { deleteInvoice, sendInvoiceEmail } from "@/app/actions/invoice-actions";
 import { type mapInvoiceToPdfData } from "@/lib/pdf-generator";
 import { cn } from "@/lib/utils";
 
@@ -17,9 +17,10 @@ type Props = {
   shareLink?: string;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  recipientEmail?: string;
 };
 
-type PendingAction = "delete" | null;
+type PendingAction = "delete" | "email" | null;
 
 function buildShareLink(shareLink: string | undefined, invoiceId: string) {
   const targetPath = shareLink ?? `/facturen/${invoiceId}`;
@@ -30,7 +31,7 @@ function buildShareLink(shareLink: string | undefined, invoiceId: string) {
   return `${origin}${targetPath}`;
 }
 
-export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink, isOpen, onOpenChange }: Props) {
+export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink, isOpen, onOpenChange, recipientEmail }: Props) {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(isOpen ?? false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
@@ -104,6 +105,27 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
 
     if (navigator.share) {
       try {
+        // Check if file sharing is supported before generating PDF
+        const canShareFiles = navigator.canShare && navigator.canShare({ files: [] });
+        
+        if (canShareFiles) {
+          // Generate PDF only if file sharing is supported
+          const blob = await pdf(<InvoicePDF invoice={pdfInvoice} />).toBlob();
+          const file = new File([blob], `factuur-${pdfInvoice.invoiceNum}.pdf`, { type: 'application/pdf' });
+          
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: `Factuur ${pdfInvoice.invoiceNum}`,
+              text: `Factuur ${pdfInvoice.invoiceNum}`,
+              files: [file],
+            });
+            toast.success("Factuur gedeeld");
+            closeMenu();
+            return;
+          }
+        }
+        
+        // Fall back to sharing URL only
         await navigator.share({
           title: `Factuur ${pdfInvoice.invoiceNum}`,
           text: `Factuur ${pdfInvoice.invoiceNum} delen`,
@@ -154,16 +176,22 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
       const downloadName = `factuur-${pdfInvoice.invoiceNum}.pdf`;
       const blob = await pdf(<InvoicePDF invoice={pdfInvoice} />).toBlob();
       const url = URL.createObjectURL(blob);
+      
+      // Create anchor for download
       const anchor = document.createElement("a");
       anchor.href = url;
       anchor.download = downloadName;
       anchor.rel = "noopener";
       document.body.appendChild(anchor);
       anchor.click();
+      
+      // Check if download actually worked (feature detection instead of UA)
+      // On browsers that don't support download attribute, the file opens instead
       setTimeout(() => {
         anchor.remove();
         URL.revokeObjectURL(url);
       }, 150);
+      
       toast.success("PDF gedownload");
       closeMenu();
     } catch (error) {
@@ -174,7 +202,34 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
     }
   };
 
+  const handleSendEmail = () => {
+    if (!recipientEmail) {
+      toast.error("Geen e-mailadres beschikbaar voor deze klant");
+      return;
+    }
+
+    setPendingAction("email");
+    startTransition(async () => {
+      try {
+        const result = await sendInvoiceEmail(invoiceId);
+        if (result?.success) {
+          toast.success(`Factuur verzonden naar ${result.recipient ?? recipientEmail}`);
+          closeMenu();
+          router.refresh();
+        } else {
+          toast.error(result?.message ?? "Versturen via e-mail is mislukt");
+        }
+      } catch (error) {
+        console.error("Send email failed:", error);
+        toast.error("Versturen mislukt. Probeer opnieuw.");
+      } finally {
+        setPendingAction(null);
+      }
+    });
+  };
+
   const isDeleting = isPending && pendingAction === "delete";
+  const isSendingEmail = isPending && pendingAction === "email";
 
   return (
     <div className="relative" ref={menuRef}>
@@ -246,6 +301,22 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
             >
               <Share2 className="h-4 w-4 text-gray-800" aria-hidden />
               Deel
+            </button>
+            <button
+              type="button"
+              onClick={handleSendEmail}
+              disabled={!recipientEmail || isSendingEmail}
+              className={cn(
+                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100",
+                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white",
+              )}
+            >
+              {isSendingEmail ? (
+                <Loader2 className="h-4 w-4 animate-spin text-gray-800" aria-hidden />
+              ) : (
+                <Mail className="h-4 w-4 text-gray-800" aria-hidden />
+              )}
+              {isSendingEmail ? "Verzenden..." : "Verstuur per e-mail"}
             </button>
             <button
               type="button"
