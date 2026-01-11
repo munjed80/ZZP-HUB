@@ -71,7 +71,7 @@ export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail
 
     if (navigator.share) {
       navigator
-        .share({ title: `Offerte ${pdfQuotation.invoiceNum}`, url: absoluteLink })
+        .share({ title: `Offerte ${pdfQuotation.invoiceNum}`, text: message, url: absoluteLink })
         .catch((error) => console.warn("Native share dismissed or failed", error));
       return;
     }
@@ -81,11 +81,12 @@ export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail
 
   const handleShareEmail = () => {
     const totals = calculateInvoiceTotals(pdfQuotation.lines);
+    const absoluteLink = shareLink.startsWith("http") ? shareLink : `${window.location.origin}${shareLink}`;
     const subject = encodeURIComponent(`Offerte ${pdfQuotation.invoiceNum}`);
     const body = encodeURIComponent(
       `Beste klant,\n\nHierbij de offerte ${pdfQuotation.invoiceNum} ter waarde van ${formatBedrag(
         totals.total,
-      )}.\n\nLink: ${window.location.origin}${shareLink}\n\nMet vriendelijke groet,`,
+      )}.\n\nLink: ${absoluteLink}\n\nMet vriendelijke groet,`,
     );
     window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
   };
