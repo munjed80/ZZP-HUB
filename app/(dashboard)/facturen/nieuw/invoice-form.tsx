@@ -90,7 +90,7 @@ export function InvoiceForm({
   );
 
   const [searchTerm, setSearchTerm] = useState(
-    () => initialClientName ?? clients.find((client) => client.id === defaultFormValues.clientId)?.name ?? "",
+    () => initialClientName ?? "",
   );
   const [openList, setOpenList] = useState(false);
 
