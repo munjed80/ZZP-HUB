@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const email = "media.pro80@hotmail.com";
-  const rawPassword = "M22022012h";
+  const rawPassword = "M22022012h!";
 
   const password = await bcrypt.hash(rawPassword, 10);
 
@@ -14,11 +14,13 @@ async function main() {
     update: {
       password,
       role: UserRole.SUPERADMIN,
+      emailVerified: true,
     },
     create: {
       email,
       password,
       role: UserRole.SUPERADMIN,
+      emailVerified: true,
     },
   });
 

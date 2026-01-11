@@ -62,11 +62,16 @@ function validateEnv() {
 async function runCommand(command, args) {
   return new Promise((resolve, reject) => {
     let stderr = "";
+    let stdout = "";
     const child = spawn(command, args, {
-      stdio: ["inherit", "inherit", "pipe"],
+      stdio: ["inherit", "pipe", "pipe"],
       shell: false,
     });
 
+    child.stdout?.on("data", (chunk) => {
+      stdout += chunk.toString();
+      process.stdout.write(chunk);
+    });
     child.stderr?.on("data", (chunk) => {
       stderr += chunk.toString();
       process.stderr.write(chunk);
@@ -162,6 +167,15 @@ async function main() {
   validateEnv();
 
   await migrateDeployWithFallback();
+
+  // Bootstrap SUPERADMIN user after migrations
+  console.log("[start-prod] Bootstrapping SUPERADMIN user");
+  try {
+    await runCommand("node", ["./scripts/bootstrap-superadmin.mjs"]);
+  } catch (error) {
+    console.warn("[start-prod] SUPERADMIN bootstrap failed, continuing anyway:", error.message);
+    // Don't fail the startup if bootstrap fails - the server should still start
+  }
 
   // Prisma client is generated during the image build (npm install/next build), so runtime only applies migrations before starting the server.
   await startServer();

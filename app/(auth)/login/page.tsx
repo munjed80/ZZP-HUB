@@ -63,10 +63,10 @@ function LoginContent() {
       <div className="space-y-2">
         <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
           <Sparkles className="h-4 w-4" aria-hidden />
-          ZZP-HUB • Invisible UI
+          ZZP-HUB Dashboard
         </p>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Welkom terug</h1>
-        <p className="text-sm text-muted-foreground">Cinematic login met mesh glow. Log in en ga direct premium aan het werk.</p>
+        <p className="text-sm text-muted-foreground">Log in en beheer je facturen, klanten en BTW op één overzichtelijke plek.</p>
       </div>
 
       <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)} noValidate>
@@ -132,7 +132,7 @@ function LoginContent() {
       </form>
 
       <div className="flex flex-col items-start gap-2 text-xs text-muted-foreground">
-        <p>Mesh gradient beveiligd, invisible inputs, premium flow.</p>
+        <p>Veilig inloggen met je account.</p>
         <p className="text-muted-foreground">Beveiligde sessies via NextAuth en rolgebaseerde toegang.</p>
       </div>
     </div>
