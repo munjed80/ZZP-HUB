@@ -265,10 +265,19 @@ export const authOptions: NextAuthOptions = {
 
       try {
         const target = new URL(url);
-        const allowedOrigins = new Set([
-          new URL(baseUrl).origin,
-          new URL(safeBaseUrl).origin,
-        ]);
+        const allowedOrigins = new Set<string>();
+
+        try {
+          allowedOrigins.add(new URL(baseUrl).origin);
+        } catch {
+          // ignore invalid baseUrl
+        }
+
+        try {
+          allowedOrigins.add(new URL(safeBaseUrl).origin);
+        } catch {
+          // ignore invalid safeBaseUrl
+        }
 
         if (allowedOrigins.has(target.origin)) {
           return target.toString();

@@ -27,7 +27,7 @@ Moderne SaaS-omgeving voor Nederlandse ZZP’ers met een maandelijks abonnement.
      1. Build + start: `npm run build && npm run start`
      2. Headers/health: `curl -I https://<host>/sw.js`, `curl -I https://<host>/manifest.webmanifest`, `curl -I https://<host>/api/health`
      3. Update flow: open app, deploy een nieuwe versie en klik op de toast “Update beschikbaar” → “Nu updaten” om te herladen.
-4. Offline fallback: laad een pagina online, schakel offline en navigeer opnieuw; je ziet `/offline` en de Workbox fallback `/offline.html`. Herhaal op mobiel na “Zet op beginscherm”.
+   - Offline fallback: laad een pagina online, schakel offline en navigeer opnieuw; je ziet `/offline` en de Workbox fallback `/offline.html`. Herhaal op mobiel na “Zet op beginscherm”.
 
 ## Capacitor (Android/iOS) bundling
 1. Installeer native tooling (alleen wanneer je de native bundel bouwt):
