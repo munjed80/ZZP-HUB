@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     color: primaryColor,
   },
-  grandTotalText: {
+  grandTotalStyle: {
     fontSize: 13.5,
     fontWeight: 800,
     color: primaryColor,
@@ -371,6 +371,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
     companyProfile?.companyName
       ?.trim()
       .split(/\s+/)
+      .filter(Boolean)
       .map((part) => part[0])
       .join("")
       .slice(0, 2)
@@ -495,8 +496,8 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
             <Text style={styles.totalValue}>{formatBedrag(totals.vatLow)}</Text>
           </View>
           <View style={[styles.totalRow, styles.grandTotal]}>
-            <Text style={[styles.totalLabel, styles.grandTotalText]}>Totaal</Text>
-            <Text style={[styles.totalValue, styles.grandTotalText]}>{formatBedrag(totals.total)}</Text>
+            <Text style={[styles.totalLabel, styles.grandTotalStyle]}>Totaal</Text>
+            <Text style={[styles.totalValue, styles.grandTotalStyle]}>{formatBedrag(totals.total)}</Text>
           </View>
         </View>
 
