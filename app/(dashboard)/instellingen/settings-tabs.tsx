@@ -244,69 +244,86 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       defaultValue={DEFAULT_TAB}
       value={activeTab}
       onValueChange={setActiveTab}
-      className="space-y-6 pb-[calc(88px+env(safe-area-inset-bottom))]"
+      className="space-y-6 sm:space-y-8 pb-[calc(88px+env(safe-area-inset-bottom))]"
     >
-      <TabsList className="flex-wrap gap-2 border border-border/80 bg-card/80 p-1 shadow-sm rounded-2xl">
+      <TabsList className="flex-wrap gap-2 border border-emerald-200/60 dark:border-emerald-700/40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm p-1.5 shadow-[0_4px_24px_-8px_rgba(16,185,129,0.15)] rounded-2xl">
         <TabsTrigger
           value="profiel"
-          className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/15 data-[state=active]:to-accent/15 data-[state=active]:text-primary data-[state=active]:shadow-md"
+          className="rounded-xl px-4 py-2.5 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-[0_6px_24px_-8px_rgba(16,185,129,0.5)] hover:bg-slate-50 dark:hover:bg-slate-700 data-[state=active]:scale-[1.02]"
         >
           Account &amp; voorkeuren
         </TabsTrigger>
         <TabsTrigger
           value="beveiliging"
-          className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/15 data-[state=active]:to-accent/15 data-[state=active]:text-primary data-[state=active]:shadow-md"
+          className="rounded-xl px-4 py-2.5 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-[0_6px_24px_-8px_rgba(16,185,129,0.5)] hover:bg-slate-50 dark:hover:bg-slate-700 data-[state=active]:scale-[1.02]"
         >
           Beveiliging
         </TabsTrigger>
         <TabsTrigger
           value="email"
-          className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/15 data-[state=active]:to-accent/15 data-[state=active]:text-primary data-[state=active]:shadow-md"
+          className="rounded-xl px-4 py-2.5 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-[0_6px_24px_-8px_rgba(16,185,129,0.5)] hover:bg-slate-50 dark:hover:bg-slate-700 data-[state=active]:scale-[1.02]"
         >
           E-mail
         </TabsTrigger>
         <TabsTrigger
           value="backup"
-          className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/15 data-[state=active]:to-accent/15 data-[state=active]:text-primary data-[state=active]:shadow-md"
+          className="rounded-xl px-4 py-2.5 font-semibold transition-all duration-300 data-[state=active]:bg-gradient-to-br data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-[0_6px_24px_-8px_rgba(16,185,129,0.5)] hover:bg-slate-50 dark:hover:bg-slate-700 data-[state=active]:scale-[1.02]"
         >
           Data &amp; Backup
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="profiel">
-        <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
-          <div className="space-y-4">
-            <Card className="bg-card border border-border/70 shadow-sm">
-              <CardHeader className="flex flex-col gap-1">
-                <CardTitle>Profiel &amp; identiteit</CardTitle>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Scheiding tussen avatar, persoonlijke info en bedrijfsnaam.</p>
+        <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
+          <div className="space-y-6">
+            <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] hover:shadow-[0_12px_48px_-16px_rgba(15,23,42,0.18)] transition-all duration-300">
+              <CardHeader className="flex flex-col gap-2 border-b border-slate-100 dark:border-slate-800 pb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-1 w-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" aria-hidden="true" />
+                  <CardTitle className="text-xl">Profiel &amp; identiteit</CardTitle>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                  Persoonlijke informatie en bedrijfsidentiteit met directe preview.
+                </p>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <form onSubmit={handleProfileSubmit} className="space-y-6">
-                  <div className="space-y-3">
-                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Avatar</p>
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                      <div className="relative h-16 w-16 overflow-hidden rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-                        {avatarPreview ? (
-                          <Image
-                            src={avatarPreview}
-                            alt="Profielfoto"
-                            fill
-                            sizes="64px"
-                            className="object-cover"
-                            unoptimized={avatarPreview.startsWith("data:")}
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center text-xs text-slate-500 dark:text-slate-400">
-                            Geen foto
+              <CardContent className="space-y-8 pt-6">
+                <form onSubmit={handleProfileSubmit} className="space-y-8">
+                  {/* Avatar Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1 w-6 rounded-full bg-emerald-500" aria-hidden="true" />
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Profielfoto</p>
+                    </div>
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-center p-5 rounded-xl bg-gradient-to-br from-slate-50/80 to-slate-100/40 dark:from-slate-800/60 dark:to-slate-800/40 border border-slate-200/60 dark:border-slate-700/60">
+                      <div className="relative group">
+                        <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl">
+                          {avatarPreview ? (
+                            <Image
+                              src={avatarPreview}
+                              alt="Profielfoto"
+                              fill
+                              sizes="80px"
+                              className="object-cover"
+                              unoptimized={avatarPreview.startsWith("data:")}
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+                              Geen foto
+                            </div>
+                          )}
+                        </div>
+                        {/* Upload indicator */}
+                        {avatarUploading && (
+                          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
+                            <RefreshCw className="h-6 w-6 animate-spin text-white" aria-label="Uploading profile photo" />
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col gap-2">
+                      <div className="flex-1 space-y-3">
                         <Button
                           type="button"
                           variant="secondary"
-                          className="w-fit"
+                          className="w-full sm:w-auto shadow-sm hover:shadow-md"
                           onClick={() => avatarInputRef.current?.click()}
                           disabled={avatarUploading}
                           aria-label={avatarUploading ? "Bezig met uploaden van je profielfoto" : "Upload nieuwe profielfoto"}
@@ -323,51 +340,62 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                           ref={avatarInputRef}
                           onChange={handleAvatarUpload}
                         />
-                        <p className="text-xs text-slate-500 dark:text-slate-400">PNG of JPG, direct zichtbaar in header en menu.</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                          PNG of JPG, max 3MB. Wordt direct zichtbaar in header en menu.
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid gap-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/50 p-3 md:grid-cols-2">
-                    <div className="space-y-1 md:col-span-1">
-                      <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Naam (persoonlijk)</label>
-                      <input
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
-                        value={profileName}
-                        onChange={(event) => setProfileName(event.target.value)}
-                        placeholder="Jouw naam"
-                        required
-                      />
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Weergegeven in header en documenten.</p>
+                  {/* Personal & Company Info */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1 w-6 rounded-full bg-teal-500" aria-hidden="true" />
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Persoonlijke gegevens</p>
                     </div>
-                    <div className="space-y-1 md:col-span-1">
-                      <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Bedrijfsnaam</label>
-                      <input
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
-                        value={profileCompany}
-                        onChange={(event) => setProfileCompany(event.target.value)}
-                        placeholder="Naam van je bedrijf"
-                      />
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Wordt gebruikt als afzender in facturen/offertes.</p>
-                    </div>
-                    <div className="space-y-1 md:col-span-2">
-                      <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Login e-mail (alleen-lezen)</label>
-                      <input
-                        className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-300"
-                        value={profileEmail}
-                        readOnly
-                        aria-readonly
-                        placeholder="E-mailadres gekoppeld aan je account"
-                      />
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Dit is je inlog e-mailadres. Aanpassen gebeurt via support; factuur-afzender stel je apart in.
-                      </p>
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Naam (persoonlijk)</label>
+                        <input
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
+                          value={profileName}
+                          onChange={(event) => setProfileName(event.target.value)}
+                          placeholder="Jouw naam"
+                          required
+                        />
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Weergegeven in header en documenten.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Bedrijfsnaam</label>
+                        <input
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
+                          value={profileCompany}
+                          onChange={(event) => setProfileCompany(event.target.value)}
+                          placeholder="Naam van je bedrijf"
+                        />
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Wordt gebruikt als afzender in facturen/offertes.</p>
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Login e-mail (alleen-lezen)</label>
+                        <input
+                          className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300"
+                          value={profileEmail}
+                          readOnly
+                          aria-readonly
+                          placeholder="E-mailadres gekoppeld aan je account"
+                        />
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Dit is je inlog e-mailadres. Aanpassen gebeurt via support; factuur-afzender stel je apart in.
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Wijzigingen worden direct toegepast op dashboard en menu.</p>
-                    <Button type="submit" disabled={isProfilePending}>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                      Wijzigingen worden direct toegepast op dashboard en menu.
+                    </p>
+                    <Button type="submit" disabled={isProfilePending} className="w-full sm:w-auto shadow-md hover:shadow-lg">
                       {isProfilePending ? "Opslaan..." : "Profiel opslaan"}
                     </Button>
                   </div>
@@ -375,21 +403,31 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
               </CardContent>
             </Card>
 
-            <Card className="bg-card border border-border/70 shadow-sm">
-              <CardHeader className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4 text-slate-600 dark:text-slate-400" aria-hidden />
-                  <CardTitle>Voorkeuren</CardTitle>
+            <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] hover:shadow-[0_12px_48px_-16px_rgba(15,23,42,0.18)] transition-all duration-300">
+              <CardHeader className="flex flex-col gap-2 border-b border-slate-100 dark:border-slate-800 pb-5">
+                <div className="flex items-center gap-2.5">
+                  <Bell className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden />
+                  <CardTitle className="text-xl">Voorkeuren</CardTitle>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">Taal en thema worden direct opgeslagen in je instellingen.</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                  Taal en thema worden automatisch opgeslagen in uw instellingen.
+                </p>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Taal</p>
-                  <div className="flex flex-wrap gap-2">
+              <CardContent className="space-y-6 pt-6">
+                {/* Language Settings */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1 w-6 rounded-full bg-emerald-500" aria-hidden="true" />
+                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Taal</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
                     <Button
                       type="button"
                       variant={language === "nl" ? "primary" : "secondary"}
+                      className={cn(
+                        "px-6 py-2.5 shadow-sm",
+                        language === "nl" && "shadow-[0_6px_24px_-8px_rgba(16,185,129,0.4)]"
+                      )}
                       onClick={() => setLanguage("nl")}
                     >
                       Nederlands
@@ -397,6 +435,10 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     <Button
                       type="button"
                       variant={language === "en" ? "primary" : "secondary"}
+                      className={cn(
+                        "px-6 py-2.5 shadow-sm",
+                        language === "en" && "shadow-[0_6px_24px_-8px_rgba(16,185,129,0.4)]"
+                      )}
                       onClick={() => setLanguage("en")}
                     >
                       English
@@ -404,99 +446,124 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Thema</p>
-                  <div className="grid grid-cols-3 gap-2">
+                {/* Theme Settings */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1 w-6 rounded-full bg-teal-500" aria-hidden="true" />
+                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Thema</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
                     <button
                       type="button"
                       onClick={() => setTheme("light")}
                       className={cn(
-                        "flex flex-col items-center gap-2 rounded-lg border p-3 transition-all",
+                        "group flex flex-col items-center gap-3 rounded-2xl border-2 p-5 transition-all duration-300 hover:scale-[1.02]",
                         themePreference === "light"
-                          ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
-                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
+                          ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 shadow-[0_6px_24px_-8px_rgba(16,185,129,0.4)]"
+                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-200 dark:hover:border-emerald-700 shadow-sm hover:shadow-md"
                       )}
                     >
-                      <Sun
-                        className={cn(
-                          "h-5 w-5",
-                          themePreference === "light" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"
+                      <div className={cn(
+                        "rounded-xl p-3 transition-all duration-300",
+                        themePreference === "light"
+                          ? "bg-emerald-100 dark:bg-emerald-900/60 shadow-md"
+                          : "bg-slate-100 dark:bg-slate-700 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950"
+                      )}>
+                        <Sun
+                          className={cn(
+                            "h-6 w-6 transition-colors duration-300",
+                            themePreference === "light" ? "text-emerald-600 dark:text-emerald-400" : "text-slate-600 dark:text-slate-400"
+                          )}
+                          aria-hidden
+                        />
+                      </div>
+                      <div className="text-center">
+                        <span className={cn(
+                          "text-sm font-bold transition-colors duration-300",
+                          themePreference === "light" ? "text-emerald-700 dark:text-emerald-300" : "text-slate-700 dark:text-slate-300"
+                        )}>
+                          Licht
+                        </span>
+                        {themePreference === "light" && (
+                          <div className="mt-2 h-1.5 w-1.5 mx-auto rounded-full bg-emerald-600" />
                         )}
-                        aria-hidden
-                      />
-                      <span
-                        className={cn(
-                          "text-xs font-semibold",
-                          themePreference === "light" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"
-                        )}
-                      >
-                        Licht
-                      </span>
-                      {themePreference === "light" && (
-                        <div className="h-2 w-2 rounded-full bg-teal-600" />
-                      )}
+                      </div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setTheme("dark")}
                       className={cn(
-                        "flex flex-col items-center gap-2 rounded-lg border p-3 transition-all",
+                        "group flex flex-col items-center gap-3 rounded-2xl border-2 p-5 transition-all duration-300 hover:scale-[1.02]",
                         themePreference === "dark"
-                          ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
-                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
+                          ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 shadow-[0_6px_24px_-8px_rgba(16,185,129,0.4)]"
+                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-200 dark:hover:border-emerald-700 shadow-sm hover:shadow-md"
                       )}
                     >
-                      <Moon
-                        className={cn(
-                          "h-5 w-5",
-                          themePreference === "dark" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"
+                      <div className={cn(
+                        "rounded-xl p-3 transition-all duration-300",
+                        themePreference === "dark"
+                          ? "bg-emerald-100 dark:bg-emerald-900/60 shadow-md"
+                          : "bg-slate-100 dark:bg-slate-700 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950"
+                      )}>
+                        <Moon
+                          className={cn(
+                            "h-6 w-6 transition-colors duration-300",
+                            themePreference === "dark" ? "text-emerald-600 dark:text-emerald-400" : "text-slate-600 dark:text-slate-400"
+                          )}
+                          aria-hidden
+                        />
+                      </div>
+                      <div className="text-center">
+                        <span className={cn(
+                          "text-sm font-bold transition-colors duration-300",
+                          themePreference === "dark" ? "text-emerald-700 dark:text-emerald-300" : "text-slate-700 dark:text-slate-300"
+                        )}>
+                          Donker
+                        </span>
+                        {themePreference === "dark" && (
+                          <div className="mt-2 h-1.5 w-1.5 mx-auto rounded-full bg-emerald-600" />
                         )}
-                        aria-hidden
-                      />
-                      <span
-                        className={cn(
-                          "text-xs font-semibold",
-                          themePreference === "dark" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"
-                        )}
-                      >
-                        Donker
-                      </span>
-                      {themePreference === "dark" && (
-                        <div className="h-2 w-2 rounded-full bg-teal-600" />
-                      )}
+                      </div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setTheme("system")}
                       className={cn(
-                        "flex flex-col items-center gap-2 rounded-lg border p-3 transition-all",
+                        "group flex flex-col items-center gap-3 rounded-2xl border-2 p-5 transition-all duration-300 hover:scale-[1.02]",
                         themePreference === "system"
-                          ? "border-teal-600 bg-teal-50 dark:bg-teal-950"
-                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600"
+                          ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 shadow-[0_6px_24px_-8px_rgba(16,185,129,0.4)]"
+                          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-200 dark:hover:border-emerald-700 shadow-sm hover:shadow-md"
                       )}
                     >
-                      <Monitor
-                        className={cn(
-                          "h-5 w-5",
-                          themePreference === "system" ? "text-teal-600" : "text-slate-600 dark:text-slate-400"
+                      <div className={cn(
+                        "rounded-xl p-3 transition-all duration-300",
+                        themePreference === "system"
+                          ? "bg-emerald-100 dark:bg-emerald-900/60 shadow-md"
+                          : "bg-slate-100 dark:bg-slate-700 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950"
+                      )}>
+                        <Monitor
+                          className={cn(
+                            "h-6 w-6 transition-colors duration-300",
+                            themePreference === "system" ? "text-emerald-600 dark:text-emerald-400" : "text-slate-600 dark:text-slate-400"
+                          )}
+                          aria-hidden
+                        />
+                      </div>
+                      <div className="text-center">
+                        <span className={cn(
+                          "text-sm font-bold transition-colors duration-300",
+                          themePreference === "system" ? "text-emerald-700 dark:text-emerald-300" : "text-slate-700 dark:text-slate-300"
+                        )}>
+                          Systeem
+                        </span>
+                        {themePreference === "system" && (
+                          <div className="mt-2 h-1.5 w-1.5 mx-auto rounded-full bg-emerald-600" />
                         )}
-                        aria-hidden
-                      />
-                      <span
-                        className={cn(
-                          "text-xs font-semibold",
-                          themePreference === "system" ? "text-teal-700 dark:text-teal-400" : "text-slate-700 dark:text-slate-300"
-                        )}
-                      >
-                        Systeem
-                      </span>
-                      {themePreference === "system" && (
-                        <div className="h-2 w-2 rounded-full bg-teal-600" />
-                      )}
+                      </div>
                     </button>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Kies je voorkeur of gebruik systeeminstellingen voor automatische aanpassing.
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Kies uw voorkeur of gebruik systeeminstellingen voor automatische aanpassing.
                   </p>
                 </div>
               </CardContent>
@@ -505,51 +572,64 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             <SettingsForm initialProfile={initialProfile} />
           </div>
 
-          <div className="space-y-4">
-            <Card className="relative overflow-hidden bg-white/95 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)]">
-              <div
-                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-50 via-white/60 to-emerald-100/40 dark:from-emerald-900/30 dark:via-slate-900/60 dark:to-emerald-800/25"
-                aria-hidden="true"
-              />
-              <CardHeader className="relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between pb-5">
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">Abonnement</p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <CardTitle className="text-2xl text-slate-900 dark:text-white">{abonnement.type}</CardTitle>
-                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 shadow-sm dark:bg-emerald-900/60 dark:text-emerald-100">
-                      Premium plan
+          <div className="space-y-6">
+            <Card className="group relative overflow-hidden bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/40 dark:from-slate-900 dark:via-emerald-950/20 dark:to-teal-950/30 border border-emerald-200/60 dark:border-emerald-700/40 shadow-[0_12px_48px_-16px_rgba(16,185,129,0.35)] hover:shadow-[0_16px_64px_-20px_rgba(16,185,129,0.45)] transition-all duration-500">
+              {/* Decorative gradient orbs */}
+              <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-gradient-to-br from-emerald-400/20 via-teal-400/10 to-transparent blur-3xl transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true" />
+              <div className="pointer-events-none absolute -left-12 -bottom-12 h-40 w-40 rounded-full bg-gradient-to-tr from-teal-400/15 via-emerald-400/10 to-transparent blur-2xl" aria-hidden="true" />
+              
+              <CardHeader className="relative flex flex-col gap-4 border-b border-emerald-100/60 dark:border-emerald-800/40 pb-6">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1 w-10 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" aria-hidden="true" />
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">
+                        Abonnement
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <CardTitle className="text-2xl sm:text-3xl text-slate-900 dark:text-white">{abonnement.type}</CardTitle>
+                      <span className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-1.5 text-xs font-bold text-white shadow-[0_4px_16px_-6px_rgba(16,185,129,0.6)]">
+                        Premium
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{abonnement.type} lidmaatschap</p>
+                  </div>
+                  <Badge
+                    variant={abonnement.status.toLowerCase() === "actief" ? "success" : "muted"}
+                    className="shadow-[0_6px_24px_-10px_rgba(16,185,129,0.7)]"
+                  >
+                    {abonnement.status}
+                  </Badge>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="relative space-y-6 pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-br from-slate-900 via-emerald-800 to-teal-700 dark:from-white dark:via-emerald-200 dark:to-teal-300 bg-clip-text text-transparent">
+                      {priceLabel}
+                    </span>
+                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                      {language === "nl" ? "/maand" : "/month"}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-700 dark:text-slate-300">{abonnement.type} lidmaatschap</p>
-                </div>
-                <Badge
-                  variant={abonnement.status.toLowerCase() === "actief" ? "success" : "muted"}
-                  className="shadow-[0_10px_30px_-18px_rgba(16,185,129,0.85)]"
-                >
-                  {abonnement.status}
-                </Badge>
-              </CardHeader>
-              <CardContent className="relative space-y-6 text-slate-700 dark:text-slate-200">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">{priceLabel}</span>
-                      <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{abonnement.type}</span>
-                    </div>
-                    <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                      Inclusief premium templates, BTW-hulp en prioriteitssupport. Maandelijks opzegbaar.
+                  <div className="rounded-xl bg-white/80 dark:bg-slate-800/60 backdrop-blur-sm border border-emerald-100 dark:border-emerald-900/40 p-4 shadow-sm">
+                    <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-medium">
+                      Inclusief premium templates, BTW-hulp, prioriteitssupport en onbeperkte facturen.
                     </p>
                   </div>
-                  <div className="rounded-xl border border-slate-200/80 bg-white/80 px-4 py-3 text-sm font-medium text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100">
-                    <p className="text-xs uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400">Status</p>
-                    <p className="mt-1">Volledige toegang tot alle functies</p>
+                  <div className="rounded-xl border border-emerald-200/80 dark:border-emerald-700/60 bg-gradient-to-br from-emerald-50/60 to-teal-50/40 dark:from-emerald-950/40 dark:to-teal-950/30 px-4 py-3.5 shadow-sm">
+                    <p className="text-xs uppercase tracking-wider font-bold text-emerald-700 dark:text-emerald-400">Status</p>
+                    <p className="mt-1.5 text-sm font-semibold text-slate-800 dark:text-slate-100">Volledige toegang tot alle functies</p>
                   </div>
                 </div>
-                <div className="grid gap-3 md:grid-cols-3">
+                
+                <div className="grid gap-3 pt-2">
                   <Button
                     type="button"
                     onClick={() => setSubscriptionModal("manage")}
-                    className="w-full shadow-[0_18px_40px_-22px_rgba(16,185,129,0.85)]"
+                    className="w-full shadow-[0_8px_32px_-12px_rgba(16,185,129,0.6)] hover:shadow-[0_12px_40px_-14px_rgba(16,185,129,0.7)]"
                   >
                     <CreditCard className="h-4 w-4" aria-hidden />
                     Abonnement wijzigen
@@ -557,7 +637,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                   <Button
                     type="button"
                     variant="secondary"
-                    className="w-full border border-slate-800 bg-slate-900 text-white hover:-translate-y-[1px] hover:bg-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                    className="w-full shadow-sm hover:shadow-md"
                     onClick={() => setSubscriptionModal("payment")}
                   >
                     <RefreshCw className="h-4 w-4" aria-hidden />
@@ -566,7 +646,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                   <Button
                     type="button"
                     variant="ghost"
-                    className="w-full border border-transparent font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300"
+                    className="w-full border border-rose-200 dark:border-rose-800/60 font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300"
                     onClick={() => setSubscriptionModal("cancel")}
                   >
                     Abonnement annuleren
@@ -622,52 +702,61 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="beveiliging">
-        <Card className="bg-card border border-border/70 shadow-sm">
-          <CardHeader className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
-              <CardTitle>Beveiliging</CardTitle>
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] hover:shadow-[0_12px_48px_-16px_rgba(15,23,42,0.18)] transition-all duration-300">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-gradient-to-br from-emerald-500/15 to-teal-500/10 p-3 shadow-sm">
+                <ShieldCheck className="h-6 w-6 text-emerald-600 dark:text-emerald-400" aria-hidden />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Beveiliging</CardTitle>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-1">
+                  Wijzig uw wachtwoord voor accountbeveiliging
+                </p>
+              </div>
             </div>
-            <Badge variant="info">Accountbeveiliging</Badge>
+            <Badge variant="info" className="shadow-sm">Accountbeveiliging</Badge>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordChange} className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-1 md:col-span-1">
-                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Huidig wachtwoord</label>
-                <input
-                  type="password"
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
-                  value={passwords.current}
-                  onChange={(event) => setPasswords((prev) => ({ ...prev, current: event.target.value }))}
-                  placeholder="••••••••"
-                  required
-                />
+          <CardContent className="pt-6">
+            <form onSubmit={handlePasswordChange} className="space-y-6">
+              <div className="grid gap-5 md:grid-cols-3">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Huidig wachtwoord</label>
+                  <input
+                    type="password"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
+                    value={passwords.current}
+                    onChange={(event) => setPasswords((prev) => ({ ...prev, current: event.target.value }))}
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Nieuw wachtwoord</label>
+                  <input
+                    type="password"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
+                    value={passwords.next}
+                    onChange={(event) => setPasswords((prev) => ({ ...prev, next: event.target.value }))}
+                    placeholder="Nieuw wachtwoord"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Bevestig wachtwoord</label>
+                  <input
+                    type="password"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
+                    value={passwords.confirm}
+                    onChange={(event) => setPasswords((prev) => ({ ...prev, confirm: event.target.value }))}
+                    placeholder="Herhaal wachtwoord"
+                    required
+                  />
+                </div>
               </div>
-              <div className="space-y-1 md:col-span-1">
-                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Nieuw wachtwoord</label>
-                <input
-                  type="password"
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
-                  value={passwords.next}
-                  onChange={(event) => setPasswords((prev) => ({ ...prev, next: event.target.value }))}
-                  placeholder="Nieuw wachtwoord"
-                  required
-                />
-              </div>
-              <div className="space-y-1 md:col-span-1">
-                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Bevestig wachtwoord</label>
-                <input
-                  type="password"
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
-                  value={passwords.confirm}
-                  onChange={(event) => setPasswords((prev) => ({ ...prev, confirm: event.target.value }))}
-                  placeholder="Herhaal"
-                  required
-                />
-              </div>
-              <div className="md:col-span-3 flex justify-end gap-2">
-                <Button type="submit" disabled={isPasswordPending}>
-                  <Lock className="mr-2 h-4 w-4" aria-hidden />
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <Button type="submit" disabled={isPasswordPending} className="shadow-md hover:shadow-lg" aria-label="Change password">
+                  <Lock className="h-4 w-4" aria-hidden />
                   {isPasswordPending ? "Wijzigen..." : "Wachtwoord wijzigen"}
                 </Button>
               </div>
@@ -677,48 +766,75 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="email">
-        <Card className="bg-card border border-border/70 shadow-sm">
-          <CardHeader className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
-              <CardTitle>E-mailinstellingen</CardTitle>
-            </div>
-            <Badge variant="info">Versturen</Badge>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg border border-slate-100 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/50 p-3 text-sm text-slate-700 dark:text-slate-300">
-              <p><span className="font-semibold">Login e-mail:</span> alleen voor inloggen en beveiliging (niet wijzigbaar hier).</p>
-              <p className="mt-1"><span className="font-semibold">Afzendernaam:</span> wat klanten zien in hun inbox (bijv. je bedrijfsnaam).</p>
-              <p className="mt-1"><span className="font-semibold">Reply-to:</span> antwoorden op facturen komen hier binnen.</p>
-            </div>
-            <form onSubmit={handleEmailSettingsSubmit} className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Afzendernaam (zichtbaar in inbox)</label>
-                <input
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
-                  placeholder="Naam die ontvangers zien"
-                  value={emailSettings.emailSenderName}
-                  onChange={(event) => setEmailSettings((prev) => ({ ...prev, emailSenderName: event.target.value }))}
-                  required
-                />
-                <p className="text-xs text-slate-500 dark:text-slate-400">Gebruik je handelsnaam of merk. Dit is onafhankelijk van je login e-mail.</p>
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] hover:shadow-[0_12px_48px_-16px_rgba(15,23,42,0.18)] transition-all duration-300">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-gradient-to-br from-teal-500/15 to-emerald-500/10 p-3 shadow-sm">
+                <ShieldCheck className="h-6 w-6 text-teal-600 dark:text-teal-400" aria-hidden />
               </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-800 dark:text-slate-100">Reply-to (antwoordadres)</label>
-                <input
-                  className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-600"
-                  placeholder="antwoord@example.com"
-                  value={emailSettings.emailReplyTo}
-                  onChange={(event) => setEmailSettings((prev) => ({ ...prev, emailReplyTo: event.target.value }))}
-                  type="email"
-                />
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Antwoorden op factuur-e-mails worden naar dit adres gestuurd, niet naar je login e-mail.
+              <div>
+                <CardTitle className="text-xl">E-mailinstellingen</CardTitle>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-1">
+                  Configureer afzendernaam en antwoordadres
                 </p>
               </div>
-              <div className="md:col-span-2 flex justify-end">
-                <Button type="submit" disabled={isEmailPending}>
-                  {isEmailPending ? "Opslaan..." : "Opslaan"}
+            </div>
+            <Badge variant="info" className="shadow-sm">Versturen</Badge>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-6">
+            <div className="rounded-xl border border-emerald-100 dark:border-emerald-900/40 bg-gradient-to-br from-emerald-50/60 to-teal-50/40 dark:from-emerald-950/30 dark:to-teal-950/20 p-5 shadow-sm">
+              <div className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+                <p className="flex items-start gap-2">
+                  <span className="font-bold text-emerald-700 dark:text-emerald-400 min-w-[140px]">Login e-mail:</span>
+                  <span>alleen voor inloggen en beveiliging (niet wijzigbaar hier).</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <span className="font-bold text-emerald-700 dark:text-emerald-400 min-w-[140px]">Afzendernaam:</span>
+                  <span>wat klanten zien in hun inbox (bijv. je bedrijfsnaam).</span>
+                </p>
+                <p className="flex items-start gap-2">
+                  <span className="font-bold text-emerald-700 dark:text-emerald-400 min-w-[140px]">Reply-to:</span>
+                  <span>antwoorden op facturen komen hier binnen.</span>
+                </p>
+              </div>
+            </div>
+            
+            <form onSubmit={handleEmailSettingsSubmit} className="space-y-6">
+              <div className="grid gap-5 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    Afzendernaam (zichtbaar in inbox)
+                  </label>
+                  <input
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
+                    placeholder="Naam die ontvangers zien"
+                    value={emailSettings.emailSenderName}
+                    onChange={(event) => setEmailSettings((prev) => ({ ...prev, emailSenderName: event.target.value }))}
+                    required
+                  />
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Gebruik je handelsnaam of merk. Dit is onafhankelijk van je login e-mail.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    Reply-to (antwoordadres)
+                  </label>
+                  <input
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
+                    placeholder="antwoord@example.com"
+                    value={emailSettings.emailReplyTo}
+                    onChange={(event) => setEmailSettings((prev) => ({ ...prev, emailReplyTo: event.target.value }))}
+                    type="email"
+                  />
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Antwoorden op factuur-e-mails worden naar dit adres gestuurd, niet naar je login e-mail.
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <Button type="submit" disabled={isEmailPending} className="shadow-md hover:shadow-lg">
+                  {isEmailPending ? "Opslaan..." : "E-mailinstellingen opslaan"}
                 </Button>
               </div>
             </form>
@@ -727,22 +843,46 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       </TabsContent>
 
       <TabsContent value="backup">
-        <Card className="bg-card border border-border/70 shadow-sm">
-          <CardHeader className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Database className="h-5 w-5 text-slate-600 dark:text-slate-400" aria-hidden />
-              <CardTitle>Data &amp; Backup</CardTitle>
+        <Card className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] hover:shadow-[0_12px_48px_-16px_rgba(15,23,42,0.18)] transition-all duration-300">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-gradient-to-br from-emerald-500/15 to-teal-500/10 p-3 shadow-sm">
+                <Database className="h-6 w-6 text-emerald-600 dark:text-emerald-400" aria-hidden />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Data &amp; Backup</CardTitle>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-1">
+                  Exporteer uw gegevens voor archivering of migratie
+                </p>
+              </div>
             </div>
-            <Badge variant="muted">JSON export</Badge>
+            <Badge variant="muted" className="shadow-sm">JSON export</Badge>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              Download al je gegevens (facturen, relaties, uitgaven) als JSON-backup. Veilig voor archief of migratie.
-            </p>
-            <Button type="button" onClick={handleBackupDownload} disabled={isBackupPending}>
-              <Download className="mr-2 h-4 w-4" aria-hidden />
-              {isBackupPending ? "Bezig met export..." : "Download backup"}
-            </Button>
+          <CardContent className="space-y-6 pt-6">
+            <div className="rounded-xl border border-emerald-100 dark:border-emerald-900/40 bg-gradient-to-br from-emerald-50/60 to-teal-50/40 dark:from-emerald-950/30 dark:to-teal-950/20 p-5 shadow-sm">
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+                Download al uw gegevens (facturen, relaties, uitgaven) als JSON-backup. 
+                Perfect voor veilige archivering of migratie naar andere systemen.
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between p-5 rounded-xl bg-gradient-to-br from-slate-50/80 to-slate-100/40 dark:from-slate-800/60 dark:to-slate-800/40 border border-slate-200/60 dark:border-slate-700/60">
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Volledige gegevensexport</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  Inclusief alle facturen, klanten, uitgaven en bedrijfsgegevens
+                </p>
+              </div>
+              <Button 
+                type="button" 
+                onClick={handleBackupDownload} 
+                disabled={isBackupPending}
+                className="w-full sm:w-auto shadow-md hover:shadow-lg"
+              >
+                <Download className="h-4 w-4" aria-hidden />
+                {isBackupPending ? "Bezig met export..." : "Download backup"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </TabsContent>

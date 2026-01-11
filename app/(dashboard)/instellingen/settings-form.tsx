@@ -76,14 +76,20 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
   };
 
   return (
-    <Card className="md:col-span-2 bg-white">
-      <CardHeader>
-        <CardTitle>Bedrijfsprofiel</CardTitle>
-        <Badge variant="info">Auto-fill facturen</Badge>
+    <Card className="md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700/80 shadow-[0_8px_32px_-12px_rgba(15,23,42,0.12)] hover:shadow-[0_12px_48px_-16px_rgba(15,23,42,0.18)] transition-all duration-300">
+      <CardHeader className="border-b border-slate-100 dark:border-slate-800 pb-5">
+        <div className="flex items-center gap-2.5">
+          <div className="h-1 w-8 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500" aria-hidden="true" />
+          <CardTitle className="text-xl">Bedrijfsprofiel</CardTitle>
+        </div>
+        <Badge variant="info" className="shadow-sm mt-2">Auto-fill facturen</Badge>
+        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-2">
+          Deze gegevens worden automatisch ingevuld bij het aanmaken van facturen en offertes.
+        </p>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-          <div className="grid gap-4 md:grid-cols-2">
+      <CardContent className="space-y-6 pt-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid gap-5 md:grid-cols-2">
             {[
               { name: "companyName", label: "Bedrijfsnaam", placeholder: "Naam van je bedrijf" },
               { name: "address", label: "Adres", placeholder: "Straat en huisnummer" },
@@ -95,24 +101,24 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
               { name: "bankName", label: "Banknaam", placeholder: "Naam van de bank" },
               { name: "logoUrl", label: "Logo URL (optioneel)", placeholder: "https://..." },
             ].map((veld) => (
-              <div key={veld.name} className="space-y-1">
-                <label className="text-sm font-medium text-slate-800">{veld.label}</label>
+              <div key={veld.name} className="space-y-2">
+                <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">{veld.label}</label>
                 <input
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
                   placeholder={veld.placeholder}
                   {...form.register(veld.name as keyof CompanySettingsInput)}
                 />
                 {form.formState.errors[veld.name as keyof CompanySettingsInput] && (
-                  <p className="text-xs text-amber-700">
+                  <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">
                     {form.formState.errors[veld.name as keyof CompanySettingsInput]?.message as string}
                   </p>
                 )}
               </div>
             ))}
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-800">Betaaltermijn (dagen)</label>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Betaaltermijn (dagen)</label>
               <select
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-4 py-2.5 text-sm font-medium transition-all focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600 focus:border-emerald-300 dark:focus:border-emerald-600"
                 {...form.register("paymentTerms", { valueAsNumber: true })}
               >
                 {paymentOptions.map((option) => (
@@ -122,15 +128,15 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
                 ))}
               </select>
               {form.formState.errors.paymentTerms && (
-                <p className="text-xs text-amber-700">{form.formState.errors.paymentTerms.message}</p>
+                <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">{form.formState.errors.paymentTerms.message}</p>
               )}
             </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-800">Bedrijfslogo upload</label>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Bedrijfslogo upload</label>
               <input
                 type="file"
                 accept="image/*"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-medium file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-950 dark:file:text-emerald-300 dark:hover:file:bg-emerald-900 transition-all"
                 onChange={async (event) => {
                   const file = event.target.files?.[0];
                   if (!file) return;
@@ -145,23 +151,23 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
                 }}
               />
               {logoPreview ? (
-                <div className="mt-2 flex items-center gap-3">
+                <div className="mt-3 flex items-center gap-4 p-3 rounded-xl bg-gradient-to-br from-slate-50/80 to-slate-100/40 dark:from-slate-800/60 dark:to-slate-800/40 border border-slate-200/60 dark:border-slate-700/60">
                   <Image
                     src={logoPreview}
                     alt="Logo preview"
-                    width={48}
-                    height={48}
-                    className="h-12 w-12 rounded-md border border-slate-200 object-contain"
+                    width={56}
+                    height={56}
+                    className="h-14 w-14 rounded-xl border-2 border-slate-200 dark:border-slate-700 object-contain bg-white dark:bg-slate-900 p-1 shadow-sm"
                   />
-                  <p className="text-xs text-slate-600">Voorbeeld van het opgeslagen logo.</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Voorbeeld van het opgeslagen logo.</p>
                 </div>
               ) : (
-                <p className="text-xs text-slate-500">Upload een logo (PNG/JPG). Wordt bewaard als data-URL.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Upload een logo (PNG/JPG). Wordt bewaard als data-URL.</p>
               )}
             </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-800">KOR-regeling toepassen</label>
-              <div className="flex items-center gap-3 rounded-lg border border-slate-200 px-3 py-2">
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">KOR-regeling toepassen</label>
+              <div className="flex items-start gap-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50/80 to-slate-100/40 dark:from-slate-800/60 dark:to-slate-800/40 px-4 py-4">
                 <Controller
                   name="korEnabled"
                   control={form.control}
@@ -170,36 +176,36 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
                       type="checkbox"
                       checked={field.value}
                       onChange={(event) => field.onChange(event.target.checked)}
-                      className="h-4 w-4 rounded border-slate-300 text-slate-900"
+                      className="mt-0.5 h-5 w-5 rounded-lg border-slate-300 dark:border-slate-600 text-emerald-700 focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600"
                       aria-label="Schakel KOR-regeling in"
                     />
                   )}
                 />
-                <div className="space-y-0.5">
-                  <p className="text-sm font-semibold text-slate-900">0% BTW standaard</p>
-                  <p className="text-xs text-slate-600">
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100">0% BTW standaard</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                     Wanneer ingeschakeld, staan nieuwe factuurregels standaard op 0% BTW (KOR).
                   </p>
                 </div>
               </div>
             </div>
-            <div className="space-y-1 md:col-span-2">
-              <label className="text-sm font-medium text-slate-800">Upload Algemene Voorwaarden (PDF)</label>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-semibold text-slate-800 dark:text-slate-100">Upload Algemene Voorwaarden (PDF)</label>
               <input
                 type="file"
                 accept="application/pdf"
                 disabled
-                className="w-full cursor-not-allowed rounded-lg border border-dashed border-slate-200 px-3 py-2 text-sm text-slate-500"
+                className="w-full cursor-not-allowed rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm text-slate-500 dark:text-slate-400 font-medium"
                 placeholder="Upload je voorwaarden"
                 aria-disabled
                 title="Placeholder - upload wordt binnenkort ondersteund"
               />
-              <p className="text-xs text-slate-500">Placeholder veld voor het uploaden van PDF-voorwaarden.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Placeholder veld voor het uploaden van PDF-voorwaarden.</p>
             </div>
           </div>
-          <div className="flex justify-end">
-            <Button type="submit" disabled={isPending} className="min-w-[120px] justify-center shadow-[0_14px_30px_-20px_rgba(16,185,129,0.65)]">
-              {isPending ? "Opslaan..." : "Opslaan"}
+          <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+            <Button type="submit" disabled={isPending} className="min-w-[160px] justify-center shadow-md hover:shadow-lg">
+              {isPending ? "Opslaan..." : "Bedrijfsprofiel opslaan"}
             </Button>
           </div>
         </form>
