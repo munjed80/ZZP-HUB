@@ -56,7 +56,7 @@ export function calculateInvoiceTotals(lines: InvoicePdfLine[]) {
   };
 }
 
-const primaryColor = "#4f46e5";
+const primaryColor = "#111827";
 
 const styles = StyleSheet.create({
   page: {
@@ -84,28 +84,29 @@ const styles = StyleSheet.create({
     fontWeight: 800,
     letterSpacing: 0.5,
   },
-  invoiceNumber: {
-    color: primaryColor,
-    fontWeight: 700,
+  invoiceNumberRow: {
+    marginTop: 8,
+    fontSize: 12,
+    color: "#1f2937",
+    fontWeight: 600,
+  },
+  invoiceNumberValue: {
+    fontWeight: 800,
   },
   parties: {
     flexDirection: "row",
     alignItems: "stretch",
-    gap: 12,
+    gap: 18,
   },
   companyBlock: {
     flex: 1,
     alignItems: "flex-start",
-    gap: 2,
-  },
-  divider: {
-    width: 1,
-    backgroundColor: "#e5e7eb",
+    gap: 4,
   },
   clientBlock: {
     flex: 1,
     alignItems: "flex-start",
-    gap: 2,
+    gap: 4,
   },
   companyName: {
     fontSize: 16,
@@ -301,8 +302,9 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
           <View style={styles.headerTop}>
             <View>
               <Text style={styles.title}>{documentType}</Text>
-              <Text style={[styles.metaLabel, { marginTop: 6 }]}>Factuurnummer</Text>
-              <Text style={[styles.metaValue, styles.invoiceNumber]}>{invoice.invoiceNum}</Text>
+              <Text style={styles.invoiceNumberRow}>
+                Factuurnummer: <Text style={styles.invoiceNumberValue}>{invoice.invoiceNum}</Text>
+              </Text>
             </View>
             {isTrustedLogo && logoUrl ? (
               /* eslint-disable-next-line jsx-a11y/alt-text */
@@ -323,8 +325,6 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
               {companyProfile?.kvkNumber ? <Text style={styles.text}>KVK: {companyProfile.kvkNumber}</Text> : null}
               {companyProfile?.iban ? <Text style={styles.text}>IBAN: {companyProfile.iban}</Text> : null}
             </View>
-
-            <View style={styles.divider} />
 
             <View style={styles.clientBlock}>
               <Text style={styles.label}>Ontvanger</Text>
@@ -409,8 +409,6 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
             <Text style={styles.footerValue}>{companyProfile?.btwNumber ?? "—"}</Text>
           </View>
           <View style={styles.footerColumn}>
-            <Text style={styles.footerLabel}>Website</Text>
-            <Text style={styles.footerValue}>{companyProfile?.website ?? "—"}</Text>
             <Text style={styles.footerLabel}>Email</Text>
             <Text style={styles.footerValue}>{companyProfile?.email ?? "—"}</Text>
           </View>
