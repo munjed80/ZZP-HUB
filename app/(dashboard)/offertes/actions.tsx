@@ -211,6 +211,26 @@ export async function convertOfferteToInvoice(offerteId: string) {
     return { success: false, message: "Offerte niet gevonden." };
   }
 
+  // Check if invoice already exists for this quotation (duplicate prevention)
+  const existingInvoice = await prisma.invoice.findUnique({
+    where: { convertedFromQuotationId: offerteId },
+  });
+
+  if (existingInvoice) {
+    // Invoice already exists, return it instead of creating a duplicate
+    revalidatePath("/offertes");
+    revalidatePath(`/offertes/${offerteId}`);
+    revalidatePath("/facturen");
+    revalidatePath(`/facturen/${existingInvoice.id}`);
+
+    return { 
+      success: true, 
+      invoiceId: existingInvoice.id,
+      alreadyConverted: true,
+      message: "Deze offerte is al eerder omgezet naar een factuur."
+    };
+  }
+
   const invoice = await prisma.$transaction(async (tx) => {
     const createdInvoice = await tx.invoice.create({
       data: {
@@ -220,6 +240,7 @@ export async function convertOfferteToInvoice(offerteId: string) {
         date: new Date(),
         dueDate: quotation.validUntil,
         emailStatus: InvoiceEmailStatus.CONCEPT,
+        convertedFromQuotationId: offerteId,
       },
     });
 
@@ -248,7 +269,7 @@ export async function convertOfferteToInvoice(offerteId: string) {
   revalidatePath("/facturen");
   revalidatePath(`/facturen/${invoice.id}`);
 
-  return { success: true, invoiceId: invoice.id };
+  return { success: true, invoiceId: invoice.id, alreadyConverted: false };
 }
 
 export async function convertToInvoice(quotationId: string) {
