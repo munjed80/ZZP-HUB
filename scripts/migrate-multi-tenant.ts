@@ -41,21 +41,33 @@ async function migrateToMultiTenant() {
 
       const profile = user.companyProfile;
       
-      // Create or find company
-      const company = await prisma.company.create({
-        data: {
-          name: profile.companyName,
-          kvkNumber: profile.kvkNumber,
-          btwNumber: profile.btwNumber,
-          address: profile.address,
-          postalCode: profile.postalCode,
-          city: profile.city,
-          isActive: true,
-        },
-      });
+      // Check if company already exists for this KVK number to avoid duplicates
+      let company;
+      if (profile.kvkNumber) {
+        company = await prisma.company.findFirst({
+          where: { kvkNumber: profile.kvkNumber },
+        });
+      }
+      
+      // Create company only if it doesn't exist
+      if (!company) {
+        company = await prisma.company.create({
+          data: {
+            name: profile.companyName,
+            kvkNumber: profile.kvkNumber,
+            btwNumber: profile.btwNumber,
+            address: profile.address,
+            postalCode: profile.postalCode,
+            city: profile.city,
+            isActive: true,
+          },
+        });
+        console.log(`Created Company ${company.id} for user ${user.email}`);
+      } else {
+        console.log(`Using existing Company ${company.id} for user ${user.email}`);
+      }
 
       companyMap.set(user.id, company.id);
-      console.log(`Created Company ${company.id} for user ${user.email}`);
     }
 
     // Step 2: Link Users to Companies

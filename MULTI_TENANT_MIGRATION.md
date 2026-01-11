@@ -46,6 +46,13 @@ After data migration, make companyId required:
 1. Update schema.prisma - change `companyId String?` to `companyId String` on all tenant models
 2. Run: `npx prisma migrate dev --name make_company_id_required`
 
+**Important Note on Invoice/Quote Numbering:**
+The schema now uses `@@unique([companyId, invoiceNum])` instead of a global unique constraint. This means:
+- Invoice numbers are scoped to each company
+- Company A can have invoice "2024-001" and Company B can also have "2024-001"
+- Existing invoice/quote number generators should already be user-scoped, so they will automatically become company-scoped
+- Verify that your numbering logic doesn't rely on globally unique numbers
+
 ### Step 5: Refactor Remaining Code
 Use the tenant safety checker to find remaining direct Prisma usage:
 

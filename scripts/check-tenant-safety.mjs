@@ -21,6 +21,8 @@ const __dirname = dirname(__filename);
 const PROJECT_ROOT = join(__dirname, '..');
 
 // Tenant-bound models that MUST use tenantPrisma
+// IMPORTANT: Keep this list in sync with prisma/schema.prisma
+// When adding new tenant-bound models, add them here and in lib/prismaTenant.ts
 const TENANT_MODELS = [
   'invoice',
   'client',

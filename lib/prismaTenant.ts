@@ -17,6 +17,7 @@ import { UserRole } from "@prisma/client";
 /**
  * Gets the authenticated user's company ID from session
  * @throws Error if user is not authenticated or companyId is missing
+ * @returns companyId for regular users, throws for SUPERADMIN without company
  */
 export async function getSessionCompanyId(): Promise<string> {
   const session = await getServerAuthSession();
@@ -35,11 +36,19 @@ export async function getSessionCompanyId(): Promise<string> {
     select: { companyId: true, role: true },
   });
   
-  if (!user?.companyId && user?.role !== UserRole.SUPERADMIN) {
+  if (!user) {
+    throw new Error("Gebruiker niet gevonden.");
+  }
+  
+  // SUPERADMIN may not have a company - this is an error for tenant operations
+  if (!user.companyId) {
+    if (user.role === UserRole.SUPERADMIN) {
+      throw new Error("SUPERADMIN moet adminPrisma gebruiken voor cross-tenant queries.");
+    }
     throw new Error("Geen bedrijf gekoppeld aan dit account. Neem contact op met support.");
   }
   
-  return user.companyId!;
+  return user.companyId;
 }
 
 /**
@@ -109,6 +118,8 @@ export const tenantPrisma = {
     async findUnique(args: Parameters<typeof prisma.invoice.findUnique>[0]) {
       const scope = await getTenantScope();
       
+      // Note: Using findFirst instead of findUnique because we need to add companyId filter
+      // Prisma's findUnique only works with unique constraints, and we're adding a filter
       return prisma.invoice.findFirst({
         ...args,
         where: {
