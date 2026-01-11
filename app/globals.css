@@ -253,6 +253,7 @@ body {
   color: rgb(var(--text));
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* Light mode gradient - subtle mauve-tinted */

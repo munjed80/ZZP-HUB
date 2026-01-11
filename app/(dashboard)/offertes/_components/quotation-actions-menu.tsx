@@ -65,9 +65,18 @@ export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail
 
   const handleShareWhatsApp = () => {
     const totals = calculateInvoiceTotals(pdfQuotation.lines);
-    const message = `Offerte ${pdfQuotation.invoiceNum} met totaal ${formatBedrag(totals.total)}. Bekijk: ${window.location.origin}${shareLink}`;
+    const absoluteLink = shareLink.startsWith("http") ? shareLink : `${window.location.origin}${shareLink}`;
+    const message = `Offerte ${pdfQuotation.invoiceNum} met totaal ${formatBedrag(totals.total)}. Bekijk: ${absoluteLink}`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+
+    if (navigator.share) {
+      navigator
+        .share({ text: message, url: absoluteLink })
+        .catch((error) => console.warn("Native share dismissed or failed", error));
+      return;
+    }
+
+    window.location.href = url;
   };
 
   const handleShareEmail = () => {
