@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { z } from "zod";
-import { formatFromAddress, logEmailSuccess } from "@/lib/email";
-import { getSupportEmail } from "@/config/emails";
+import { SupportMessageStatus } from "@prisma/client";
+import { getServerAuthSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-const supportSchema = z.object({
+export const supportSchema = z.object({
   name: z.string().min(2).max(120).trim(),
   email: z.string().email().max(160),
   subject: z.string().min(3).max(160).trim(),
@@ -24,39 +24,35 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!process.env.RESEND_API_KEY) {
-    return NextResponse.json({ error: "E-mailservice is niet geconfigureerd." }, { status: 500 });
-  }
-
   const { name, email, subject, message, context, screenshotUrl } = parsed.data;
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  // Use SUPPORT_EMAIL env override or default from config
-  const toEmail = getSupportEmail();
+  const session = await getServerAuthSession();
 
-  const emailSubject = `[Support] ${subject}`;
-  const result = await resend.emails.send({
-    from: formatFromAddress(),
-    to: toEmail,
-    replyTo: email,
-    subject: emailSubject,
-    text: [
-      `Naam: ${name}`,
-      `E-mail: ${email}`,
-      context ? `Context: ${context}` : null,
-      screenshotUrl ? `Screenshot: ${screenshotUrl}` : null,
-      "",
-      message,
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  });
+  const resolvedName = session?.user?.name?.trim() || name;
+  const resolvedEmail = session?.user?.email || email;
+  const composedMessage = [
+    message,
+    context ? `\n\nContext: ${context}` : null,
+    screenshotUrl ? `\n\nScreenshot: ${screenshotUrl}` : null,
+  ]
+    .filter(Boolean)
+    .join("")
+    .trim();
 
-  if (result.error) {
-    console.error("Support e-mail verzenden mislukt", result.error);
-    return NextResponse.json({ error: "Het verzenden is mislukt. Probeer het later opnieuw." }, { status: 500 });
+  try {
+    await prisma.supportMessage.create({
+      data: {
+        userId: session?.user?.id ?? null,
+        name: resolvedName,
+        email: resolvedEmail,
+        subject,
+        message: composedMessage,
+        status: SupportMessageStatus.NEW,
+      },
+    });
+  } catch (error) {
+    console.error("Supportbericht opslaan mislukt", error);
+    return NextResponse.json({ error: "Opslaan mislukt. Probeer het later opnieuw." }, { status: 500 });
   }
-
-  logEmailSuccess(result.data?.id || "no-id", toEmail, emailSubject, formatFromAddress());
 
   return NextResponse.json({ success: true });
 }

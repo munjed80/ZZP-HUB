@@ -11,6 +11,7 @@ Moderne SaaS-omgeving voor Nederlandse ZZP’ers met een maandelijks abonnement.
 - **Uren**: urenregistratie voor 1225-criterium.
 - **BTW-aangifte**: kwartaaloverzicht en stappenplan.
 - **Instellingen**: bedrijf- en abonnementformulieren, auto-fill voor facturen.
+- **Support Inbox (SuperAdmin)**: beheer supportberichten en status op `/admin/support`.
 
 ## Ontwikkelen
 1. Installeer dependencies: `npm install`

@@ -71,10 +71,8 @@ export function SupportForm({ context, minimal, className }: SupportFormProps) {
           <CheckCircle2 className="h-4 w-4" aria-hidden />
           Verzonden
         </div>
-        <p className="text-base font-semibold text-slate-900">Dankjewel! We nemen spoedig contact op.</p>
-        <p className="text-sm text-slate-700">
-          Je supportverzoek is ontvangen. Je krijgt een bevestiging in je inbox en een reactie van ons team.
-        </p>
+        <p className="text-base font-semibold text-slate-900">Message received. We will reply soon.</p>
+        <p className="text-sm text-slate-700">We hebben je bericht ontvangen en komen snel bij je terug.</p>
         <button
           type="button"
           className={cn(buttonVariants("secondary"), "mt-2 w-fit")}
