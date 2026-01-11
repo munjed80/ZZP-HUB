@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/prisma";
+import { tenantPrisma } from "@/lib/prismaTenant";
 import { getCurrentUserId } from "@/lib/auth";
 import { expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { Prisma } from "@prisma/client";
@@ -13,8 +13,7 @@ export async function getExpenses(): Promise<ExpenseClientShape[]> {
   }
 
   try {
-    const expenses = await prisma.expense.findMany({
-      where: { userId },
+    const expenses = await tenantPrisma.expense.findMany({
       orderBy: { date: "desc" },
       take: 50,
     });
@@ -44,7 +43,7 @@ export async function createExpense(values: ExpenseFormValues) {
   try {
     const trimmedUrl = data.receiptUrl?.trim() || null;
 
-    await prisma.expense.create({
+    await tenantPrisma.expense.create({
       data: {
         userId,
         description: data.description,
@@ -70,12 +69,10 @@ export async function deleteExpense(expenseId: string) {
   }
 
   try {
-    const deleted = await prisma.expense.deleteMany({
-      where: { id: expenseId, userId },
+    await tenantPrisma.expense.delete({
+      where: { id: expenseId },
     });
-    if (deleted.count === 0) {
-      return { success: false, message: "Uitgave niet gevonden." };
-    }
+    
     revalidatePath("/uitgaven");
     return { success: true };
   } catch (error) {
@@ -90,13 +87,16 @@ export async function duplicateExpense(expenseId: string) {
     throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
   }
 
-  const expense = await prisma.expense.findFirst({ where: { id: expenseId, userId } });
-  if (!expense) {
-    return { success: false, message: "Uitgave niet gevonden." };
-  }
-
   try {
-    await prisma.expense.create({
+    const expense = await tenantPrisma.expense.findUnique({
+      where: { id: expenseId },
+    });
+    
+    if (!expense) {
+      return { success: false, message: "Uitgave niet gevonden." };
+    }
+
+    await tenantPrisma.expense.create({
       data: {
         userId,
         description: `${expense.description} (kopie)`,

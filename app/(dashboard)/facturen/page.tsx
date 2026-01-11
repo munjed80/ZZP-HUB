@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
-import { prisma } from "@/lib/prisma";
+import { tenantPrisma } from "@/lib/prismaTenant";
 import { requireUser } from "@/lib/auth";
 import { InvoiceList } from "./_components/invoice-list";
-import { InvoiceEmailStatus, Prisma, UserRole } from "@prisma/client";
+import { InvoiceEmailStatus, Prisma } from "@prisma/client";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -27,11 +27,9 @@ function invoiceAmount(
 }
 
 async function fetchInvoices(): Promise<InvoiceWithRelations[]> {
-  const { id: userId, role } = await requireUser();
-  const scope = role === UserRole.SUPERADMIN ? {} : { userId };
+  await requireUser();
 
-  return prisma.invoice.findMany({
-    where: scope,
+  return tenantPrisma.invoice.findMany({
     include: { client: true, lines: true, user: { include: { companyProfile: true } } },
     orderBy: { date: "desc" },
   });

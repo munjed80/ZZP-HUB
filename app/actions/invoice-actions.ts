@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { InvoiceEmailStatus, UserRole } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { InvoiceEmailStatus } from "@prisma/client";
+import { tenantPrisma } from "@/lib/prismaTenant";
 import { requireUser } from "@/lib/auth";
 
 type PdfGeneratorModule = typeof import("@/lib/pdf-generator");
@@ -48,17 +48,11 @@ export async function markAsPaid(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { id: userId, role } = await requireUser();
-    const invoice = await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
-    });
+    await requireUser();
 
-    if (!invoice) {
-      return { success: false, message: "Factuur niet gevonden." };
-    }
-
-    await prisma.invoice.update({
-      where: { id: invoice.id },
+    // Use tenant-safe update - will automatically verify ownership
+    await tenantPrisma.invoice.update({
+      where: { id: sanitizedInvoiceId },
       data: { emailStatus: InvoiceEmailStatus.BETAALD },
     });
 
@@ -80,17 +74,11 @@ export async function markAsUnpaid(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { id: userId, role } = await requireUser();
-    const invoice = await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
-    });
+    await requireUser();
 
-    if (!invoice) {
-      return { success: false, message: "Factuur niet gevonden." };
-    }
-
-    await prisma.invoice.update({
-      where: { id: invoice.id },
+    // Use tenant-safe update - will automatically verify ownership
+    await tenantPrisma.invoice.update({
+      where: { id: sanitizedInvoiceId },
       data: { emailStatus: InvoiceEmailStatus.VERZONDEN },
     });
 
@@ -112,16 +100,12 @@ export async function deleteInvoice(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { id: userId, role } = await requireUser();
-    const invoice = await prisma.invoice.findFirst({
-      where: role === UserRole.SUPERADMIN ? { id: sanitizedInvoiceId } : { id: sanitizedInvoiceId, userId },
+    await requireUser();
+
+    // Use tenant-safe delete - will automatically verify ownership
+    await tenantPrisma.invoice.delete({
+      where: { id: sanitizedInvoiceId },
     });
-
-    if (!invoice) {
-      return { success: false, message: "Factuur niet gevonden." };
-    }
-
-    await prisma.invoice.delete({ where: { id: invoice.id } });
 
     revalidatePath("/facturen");
     revalidatePath("/");

@@ -1,18 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/prisma";
+import { tenantPrisma } from "@/lib/prismaTenant";
 import { getCurrentUserId, requireUser } from "@/lib/auth";
-import { UserRole } from "@prisma/client";
 import { clientSchema, type ClientFormValues } from "./schema";
 
 export async function getClients() {
-  const { id: userId, role } = await requireUser();
+  await requireUser();
 
   try {
-    return await prisma.client.findMany({
-      where: role === UserRole.SUPERADMIN ? {} : { userId },
-    });
+    return await tenantPrisma.client.findMany({});
   } catch (error) {
     console.error("Kon klanten niet ophalen", error);
     return [];
@@ -28,7 +25,7 @@ export async function createClient(values: ClientFormValues) {
   }
   const data = clientSchema.parse(values);
 
-  await prisma.client.create({
+  await tenantPrisma.client.create({
     data: {
       name: data.name,
       email: data.email,
@@ -48,13 +45,10 @@ export async function createClient(values: ClientFormValues) {
 export async function deleteClient(clientId: string) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  await getCurrentUserId();
 
-  await prisma.client.deleteMany({
-    where: { id: clientId, userId },
+  await tenantPrisma.client.delete({
+    where: { id: clientId },
   });
 
   revalidatePath("/relaties");
@@ -64,14 +58,11 @@ export async function deleteClient(clientId: string) {
 export async function updateClient(clientId: string, values: ClientFormValues) {
   "use server";
 
-  const userId = await getCurrentUserId();
-  if (!userId) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
-  }
+  await getCurrentUserId();
   const data = clientSchema.parse(values);
 
-  await prisma.client.updateMany({
-    where: { id: clientId, userId },
+  await tenantPrisma.client.update({
+    where: { id: clientId },
     data: {
       name: data.name,
       email: data.email,

@@ -1,9 +1,8 @@
 "use server";
 
 import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { tenantPrisma } from "@/lib/prismaTenant";
 import { requireUser } from "@/lib/auth";
-import { UserRole } from "@prisma/client";
 import { DEFAULT_VAT_RATE } from "@/lib/constants";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
@@ -23,13 +22,11 @@ function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; qua
 }
 
 export async function getDashboardStats() {
-  const { id: userId, role } = await requireUser();
+  await requireUser();
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
-  const scope = role === UserRole.SUPERADMIN ? {} : { userId };
   const finalizedInvoiceFilter = {
-    ...scope,
     emailStatus: InvoiceEmailStatus.BETAALD,
   };
 
@@ -37,12 +34,12 @@ export async function getDashboardStats() {
 
   let invoices: InvoiceWithRelations[] = [];
   let recentInvoices: InvoiceWithRelations[] = [];
-  let expenses: Awaited<ReturnType<typeof prisma.expense.findMany>> = [];
+  let expenses: Awaited<ReturnType<typeof tenantPrisma.expense.findMany>> = [];
   const sliceRecentExpenses = (list: typeof expenses) => (list ?? []).slice(0, 5);
 
   try {
     const [invoicesForYear, latestInvoices, expensesForYear] = await Promise.all([
-      prisma.invoice.findMany({
+      tenantPrisma.invoice.findMany({
         where: {
           ...finalizedInvoiceFilter,
           date: { gte: startOfYear, lt: endOfYear },
@@ -50,14 +47,14 @@ export async function getDashboardStats() {
         include: { lines: true, client: true },
         orderBy: { date: "desc" },
       }),
-      prisma.invoice.findMany({
+      tenantPrisma.invoice.findMany({
         where: finalizedInvoiceFilter,
         include: { lines: true, client: true },
         orderBy: { date: "desc" },
         take: 5,
       }),
-      prisma.expense.findMany({
-        where: { ...scope, date: { gte: startOfYear, lt: endOfYear } },
+      tenantPrisma.expense.findMany({
+        where: { date: { gte: startOfYear, lt: endOfYear } },
         orderBy: { date: "desc" },
       }),
     ]);
@@ -65,7 +62,7 @@ export async function getDashboardStats() {
     recentInvoices = latestInvoices;
     expenses = expensesForYear;
   } catch (error) {
-    console.error("Kon dashboardstatistieken niet ophalen", { error, userId });
+    console.error("Kon dashboardstatistieken niet ophalen", { error });
     return {
       yearlyRevenue: 0,
       yearlyExpenses: 0,
@@ -124,7 +121,7 @@ export async function getDashboardStats() {
       recentExpenses: sliceRecentExpenses(expenses),
     };
   } catch (error) {
-    console.error("Kon dashboardstatistieken niet berekenen", { error, userId });
+    console.error("Kon dashboardstatistieken niet berekenen", { error });
     return {
       yearlyRevenue: 0,
       yearlyExpenses: 0,
