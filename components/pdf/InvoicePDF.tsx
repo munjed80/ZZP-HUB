@@ -68,7 +68,6 @@ function generateBrandInitials(companyName?: string | null) {
       .split(/\s+/)
       .filter(Boolean)
       .map((part) => part.charAt(0))
-      .filter(Boolean)
       .join("")
       .slice(0, 2)
       .toUpperCase() || "";
