@@ -45,6 +45,8 @@ export async function POST(req: NextRequest) {
     });
 
     // Find the matching token by verifying hash
+    // Note: We fetch multiple tokens because tokenHash is hashed and cannot be queried directly
+    // This is intentional for security - tokens are stored hashed, not in plaintext
     let matchedToken = null;
     for (const resetToken of resetTokens) {
       const isValid = await verifyToken(token, resetToken.tokenHash);

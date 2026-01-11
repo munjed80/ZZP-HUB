@@ -11,10 +11,16 @@ CREATE TABLE "PasswordResetToken" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "PasswordResetToken_tokenHash_key" ON "PasswordResetToken"("tokenHash");
+
+-- CreateIndex
 CREATE INDEX "PasswordResetToken_userId_idx" ON "PasswordResetToken"("userId");
 
 -- CreateIndex
 CREATE INDEX "PasswordResetToken_expiresAt_idx" ON "PasswordResetToken"("expiresAt");
+
+-- CreateIndex
+CREATE INDEX "PasswordResetToken_userId_expiresAt_idx" ON "PasswordResetToken"("userId", "expiresAt");
 
 -- AddForeignKey
 ALTER TABLE "PasswordResetToken" ADD CONSTRAINT "PasswordResetToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

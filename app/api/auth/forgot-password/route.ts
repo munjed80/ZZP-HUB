@@ -4,6 +4,8 @@ import { sendEmail, generateVerificationToken, hashToken } from "@/lib/email";
 import PasswordResetEmail from "@/components/emails/PasswordResetEmail";
 
 // Simple in-memory rate limiting
+// Note: This is suitable for single-instance deployments or development.
+// For production with multiple instances, consider using Redis or database-backed rate limiting.
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const MAX_REQUESTS_PER_EMAIL = 3;
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes

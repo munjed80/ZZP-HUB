@@ -229,7 +229,7 @@ model EmailVerificationToken {
 model PasswordResetToken {
   id        String    @id @default(uuid())
   userId    String
-  tokenHash String
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
   createdAt DateTime  @default(now())
@@ -237,6 +237,7 @@ model PasswordResetToken {
 
   @@index([userId])
   @@index([expiresAt])
+  @@index([userId, expiresAt])
 }
 
 model SupportMessage {
