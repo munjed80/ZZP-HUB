@@ -4,6 +4,7 @@ import { Prisma, type UserRole } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { buildAbsoluteUrl, getAppBaseUrl } from "./base-url";
 
 interface Credentials {
   email: string;
@@ -223,8 +224,8 @@ export const authOptions: NextAuthOptions = {
          };
        }
      })
-   ],
-    callbacks: {
+    ],
+     callbacks: {
        async jwt({ token, user }) {
          if (user && isAuthorizeResult(user)) {
           token.id = user.id;
@@ -253,6 +254,29 @@ export const authOptions: NextAuthOptions = {
          session.user.onboardingCompleted = Boolean(token.onboardingCompleted);
          }
          return session;
+       },
+       async redirect({ url, baseUrl }) {
+         const appBaseUrl = getAppBaseUrl();
+
+         if (url.startsWith("/")) {
+           return buildAbsoluteUrl(url);
+         }
+
+         try {
+           const target = new URL(url);
+           const allowedOrigins = new Set([
+             new URL(baseUrl).origin,
+             new URL(appBaseUrl).origin,
+           ]);
+
+           if (allowedOrigins.has(target.origin)) {
+             return target.toString();
+           }
+         } catch {
+           // Fall through to safe fallback
+         }
+
+         return appBaseUrl || baseUrl;
        }
     },
   pages: {

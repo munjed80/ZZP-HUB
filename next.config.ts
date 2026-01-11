@@ -41,9 +41,20 @@ const pwaOptions: PluginOptions = {
 
 const withPWA = withPWAInit(pwaOptions);
 
+const isCapacitorBuild = process.env.IS_CAPACITOR === "true";
+
 const nextConfig: NextConfig = {
   turbopack: {},
-  output: "standalone",
+  ...(isCapacitorBuild
+    ? {
+        output: "export",
+        images: {
+          unoptimized: true,
+        },
+      }
+    : {
+        output: "standalone",
+      }),
   async headers() {
     return [
       {

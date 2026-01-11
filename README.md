@@ -27,7 +27,17 @@ Moderne SaaS-omgeving voor Nederlandse ZZP’ers met een maandelijks abonnement.
      1. Build + start: `npm run build && npm run start`
      2. Headers/health: `curl -I https://<host>/sw.js`, `curl -I https://<host>/manifest.webmanifest`, `curl -I https://<host>/api/health`
      3. Update flow: open app, deploy een nieuwe versie en klik op de toast “Update beschikbaar” → “Nu updaten” om te herladen.
-     4. Offline fallback: laad een pagina online, schakel offline en navigeer opnieuw; je ziet `/offline` en de Workbox fallback `/offline.html`. Herhaal op mobiel na “Zet op beginscherm”.
+4. Offline fallback: laad een pagina online, schakel offline en navigeer opnieuw; je ziet `/offline` en de Workbox fallback `/offline.html`. Herhaal op mobiel na “Zet op beginscherm”.
+
+## Capacitor (Android/iOS) bundling
+1. Installeer native tooling:
+   ```bash
+   npm install @capacitor/core @capacitor/cli
+   npm install @capacitor/android @capacitor/ios
+   ```
+2. Build voor native bundling: `IS_CAPACITOR=true npm run build`
+3. Sync native projecten: `npx cap sync`
+4. Web bundle output staat in `out/` (export) en wordt opgehaald door Capacitor.
 
 Authenticatie is voorbereid voor integratie met bijvoorbeeld NextAuth of een eigen SSO-provider; sessiebeveiliging wordt centraal afgehandeld in de layout. Alle UI-teksten zijn in het Nederlands en valuta wordt als € 1.250,00 getoond.
 
