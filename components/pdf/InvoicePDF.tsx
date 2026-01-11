@@ -58,6 +58,20 @@ export function calculateInvoiceTotals(lines: InvoicePdfLine[]) {
 
 const primaryColor = "#111827";
 
+function generateBrandInitials(companyName?: string | null) {
+  const initials =
+    companyName
+      ?.trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0))
+      .filter(Boolean)
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "";
+  return initials || "Z";
+}
+
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
@@ -318,7 +332,12 @@ const styles = StyleSheet.create({
     borderTopColor: "#e5e7eb",
     paddingTop: 12,
   },
-  grandTotalText: {
+  grandTotalLabel: {
+    fontSize: 13,
+    fontWeight: 800,
+    color: primaryColor,
+  },
+  grandTotalValue: {
     fontSize: 15,
     fontWeight: 800,
     color: primaryColor,
@@ -364,16 +383,7 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
   } t.n.v. ${companyProfile?.companyName ?? "uw bedrijfsnaam"}.`;
   const logoUrl = companyProfile?.logoUrl;
   const isTrustedLogo = logoUrl?.startsWith("http");
-  const brandInitials =
-    companyProfile?.companyName
-      ?.trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((part) => part.charAt(0))
-      .filter(Boolean)
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "Z";
+  const brandInitials = generateBrandInitials(companyProfile?.companyName);
 
   return (
     <Document>
@@ -494,8 +504,8 @@ export function InvoicePDF({ invoice, documentType = "FACTUUR" }: { invoice: Inv
             <Text style={styles.totalValue}>{formatBedrag(totals.vatLow)}</Text>
           </View>
           <View style={[styles.totalRow, styles.grandTotal]}>
-            <Text style={[styles.totalLabel, styles.grandTotalText]}>Totaal</Text>
-            <Text style={[styles.totalValue, styles.grandTotalText]}>{formatBedrag(totals.total)}</Text>
+            <Text style={[styles.totalLabel, styles.grandTotalLabel]}>Totaal</Text>
+            <Text style={[styles.totalValue, styles.grandTotalValue]}>{formatBedrag(totals.total)}</Text>
           </View>
         </View>
 
