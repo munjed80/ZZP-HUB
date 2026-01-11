@@ -51,6 +51,30 @@ enum SupportMessageStatus {
   CLOSED
 }
 
+model Company {
+  id              String    @id @default(uuid())
+  name            String
+  kvkNumber       String?
+  btwNumber       String?
+  address         String?
+  postalCode      String?
+  city            String?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  users           User[]
+  clients         Client[]
+  invoices        Invoice[]
+  quotations      Quotation[]
+  expenses        Expense[]
+  timeEntries     TimeEntry[]
+  events          Event[]
+  supportMessages SupportMessage[]
+  
+  @@index([createdAt])
+}
+
 model User {
   id                        String                   @id @default(uuid())
   email                     String                   @unique
@@ -58,6 +82,7 @@ model User {
   naam                      String?
   role                      UserRole                 @default(COMPANY_ADMIN)
   isSuspended               Boolean                  @default(false)
+  companyId                 String?
   
   // Email verification
   emailVerified             Boolean                  @default(false)
@@ -77,6 +102,7 @@ model User {
   createdAt                 DateTime                 @default(now())
   updatedAt                 DateTime                 @updatedAt
   
+  company                   Company?                 @relation(fields: [companyId], references: [id])
   companyProfile            CompanyProfile?
   clients                   Client[]
   invoices                  Invoice[]
@@ -86,6 +112,9 @@ model User {
   events                    Event[]
   verificationTokens        EmailVerificationToken[]
   supportMessages           SupportMessage[]
+  
+  @@index([companyId])
+  @@index([email])
 }
 
 model CompanyProfile {
@@ -110,6 +139,7 @@ model CompanyProfile {
 model Client {
   id         String      @id @default(uuid())
   userId     String
+  companyId  String
   name       String
   address    String
   postalCode String
@@ -117,26 +147,41 @@ model Client {
   email      String
   kvkNumber  String?
   btwId      String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  
   user       User        @relation(fields: [userId], references: [id])
+  company    Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
   invoices   Invoice[]
   quotations Quotation[]
+  
+  @@index([companyId, createdAt])
+  @@index([companyId, email])
 }
 
 model Invoice {
   id                      String             @id @default(uuid())
   userId                  String
+  companyId               String
   clientId                String
-  invoiceNum              String             @unique
+  invoiceNum              String
   date                    DateTime
   dueDate                 DateTime
   emailStatus             InvoiceEmailStatus @default(CONCEPT)
   convertedFromOfferteId  String?            @unique
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
+  
   user                    User               @relation(fields: [userId], references: [id])
+  company                 Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
   client                  Client             @relation(fields: [clientId], references: [id])
   convertedFromOfferte    Quotation?         @relation(fields: [convertedFromOfferteId], references: [id])
   lines                   InvoiceLine[]
+  
+  @@unique([companyId, invoiceNum])
+  @@index([companyId, createdAt])
+  @@index([companyId, emailStatus, createdAt])
+  @@index([companyId, clientId])
 }
 
 model InvoiceLine {
@@ -154,17 +199,25 @@ model InvoiceLine {
 model Quotation {
   id              String          @id @default(uuid())
   userId          String
+  companyId       String
   clientId        String
-  quoteNum        String          @unique
+  quoteNum        String
   date            DateTime
   validUntil      DateTime
   status          QuotationStatus @default(CONCEPT)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
+  
   user            User            @relation(fields: [userId], references: [id])
+  company         Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   client          Client          @relation(fields: [clientId], references: [id])
   lines           QuotationLine[]
   convertedInvoice Invoice?
+  
+  @@unique([companyId, quoteNum])
+  @@index([companyId, createdAt])
+  @@index([companyId, status, createdAt])
+  @@index([companyId, clientId])
 }
 
 model QuotationLine {
@@ -182,6 +235,7 @@ model QuotationLine {
 model Expense {
   id          String    @id @default(uuid())
   userId      String
+  companyId   String
   category    String
   description String
   amountExcl  Decimal   @db.Decimal(12, 2)
@@ -189,28 +243,48 @@ model Expense {
   date        DateTime
   receiptUrl  String?
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
   user        User      @relation(fields: [userId], references: [id])
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@index([companyId, createdAt])
+  @@index([companyId, date])
 }
 
 model TimeEntry {
   id          String   @id @default(uuid())
   userId      String
+  companyId   String
   description String
   date        DateTime
   hours       Decimal  @db.Decimal(5, 2)
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
   user        User     @relation(fields: [userId], references: [id])
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@index([companyId, createdAt])
+  @@index([companyId, date])
 }
 
 model Event {
   id          String   @id @default(uuid())
   userId      String
+  companyId   String
   title       String
   description String?
   start       DateTime
   end         DateTime
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
   user        User     @relation(fields: [userId], references: [id])
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@index([companyId, start])
+  @@index([companyId, createdAt])
 }
 
 model EmailVerificationToken {
@@ -228,6 +302,7 @@ model EmailVerificationToken {
 model SupportMessage {
   id        String               @id @default(uuid())
   userId    String?
+  companyId String?
   name      String
   email     String
   subject   String
@@ -236,8 +311,10 @@ model SupportMessage {
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
 
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
+  @@index([companyId, status, createdAt])
   @@index([status, createdAt])
 }
 
