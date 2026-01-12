@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, Mail, Sparkles, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { buildAbsoluteUrl } from "@/lib/base-url";
 
 const schema = z.object({
   email: z.string().email("Voer een geldig e-mailadres in"),
@@ -26,7 +27,7 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch(buildAbsoluteUrl("/api/auth/forgot-password"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email }),
