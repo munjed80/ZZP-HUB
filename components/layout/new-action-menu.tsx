@@ -66,21 +66,19 @@ export function NewActionMenu() {
       <button
         onClick={() => setOpen(!open)}
         className={cn(
-          "group relative inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-4 py-2 overflow-hidden",
-          "text-sm font-bold transition-all duration-200",
-          "bg-gradient-to-r from-emerald-700 to-teal-600 text-white border-2 border-emerald-600",
-          "shadow-[0_6px_16px_-4px_rgba(16,185,129,0.55)]",
-          "hover:scale-[1.05] hover:shadow-[0_8px_20px_-4px_rgba(16,185,129,0.7)]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2",
-          "active:translate-y-[1px]"
+          "flex h-11 w-11 items-center justify-center rounded-xl",
+          "bg-primary text-primary-foreground",
+          "border border-primary/80",
+          "shadow-sm hover:shadow-md",
+          "transition-all duration-200",
+          "hover:scale-[1.02] active:scale-[0.98]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         )}
         aria-label="Nieuw item aanmaken"
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <span className="absolute inset-0 rounded-full bg-gradient-to-r from-accent/0 via-accent/20 to-accent/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <Plus className="relative z-10 h-4 w-4 transition-transform duration-200 group-hover:rotate-90" aria-hidden />
-        <span className="relative z-10 hidden sm:inline">Nieuw</span>
+        <Plus className={cn("h-5 w-5 transition-transform duration-200", open && "rotate-45")} aria-hidden />
       </button>
 
       {open && (

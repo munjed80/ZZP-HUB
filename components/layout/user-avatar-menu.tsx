@@ -23,21 +23,21 @@ export function UserAvatarMenu({ userName, userInitials, avatarUrl }: UserAvatar
   return (
     <DropdownMenu
       trigger={
-        <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-teal-700/70 bg-teal-600 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-teal-700 md:h-10 md:w-10">
+        <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-muted text-sm font-semibold text-foreground shadow-sm transition-all duration-200 hover:border-border hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
           {resolvedAvatar ? (
             <>
               <Image
                 src={resolvedAvatar}
                 alt="Profielfoto"
                 fill
-                sizes="40px"
-                className="object-cover"
+                sizes="44px"
+                className="rounded-xl object-cover"
                 onLoadStart={() => setIsImageLoading(true)}
                 onLoad={() => setIsImageLoading(false)}
                 unoptimized={resolvedAvatar.startsWith("data:")}
               />
               {isImageLoading && (
-                <div className="absolute inset-0 animate-pulse bg-teal-700/20 backdrop-blur-sm" aria-hidden />
+                <div className="absolute inset-0 animate-pulse rounded-xl bg-muted/50 backdrop-blur-sm" aria-hidden />
               )}
             </>
           ) : (
