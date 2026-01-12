@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowDownRight, ArrowUpRight, Euro, Gauge, PiggyBank } from "lucide-react";
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, Euro, Gauge, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatBedrag } from "@/lib/utils";
@@ -160,8 +160,8 @@ export default async function DashboardPagina() {
           <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
             <CardHeader className="pb-4">
               <div className="flex items-start gap-3">
-                <div className="rounded-2xl bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 p-3.5 shadow-md ring-1 ring-emerald-200/40 dark:ring-emerald-700/40 group-hover:scale-105 transition-transform duration-300">
-                  <PiggyBank className="h-6 w-6 text-emerald-600 dark:text-emerald-400" aria-hidden />
+                <div className="rounded-2xl bg-gradient-to-br from-blue-500/15 to-blue-500/5 p-3.5 shadow-md ring-1 ring-blue-200/40 dark:ring-blue-700/40 group-hover:scale-105 transition-transform duration-300">
+                  <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden />
                 </div>
                 <div className="flex-1">
                   <CardTitle>IB reservering</CardTitle>

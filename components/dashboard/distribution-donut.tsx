@@ -11,10 +11,10 @@ type Props = {
 };
 
 const COLORS = {
-  revenue: "#1b6b7a",
-  expenses: "#4a6fa5",
-  profit: "#2f9e7c",
-  loss: "#e77975",
+  revenue: "#1E40AF", // Deep blue for Omzet
+  expenses: "#F97316", // Orange for Kosten
+  profit: "#059669", // Strong green for Winst
+  loss: "#DC2626", // Red for Verlies
 };
 
 export function DistributionDonut({ revenue, expenses, profit }: Props) {
