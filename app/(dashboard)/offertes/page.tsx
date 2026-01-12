@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { getQuotations } from "./actions";
-import { ConvertQuotationButton } from "./[id]/convert-quotation-button";
 import { QuotationActionsMenu } from "./_components/quotation-actions-menu";
 import { type InvoicePdfData } from "@/components/pdf/InvoicePDF";
 import { ExportButton } from "@/components/ui/export-button";

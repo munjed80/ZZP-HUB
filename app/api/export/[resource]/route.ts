@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireTenantContext, requireRole } from "@/lib/auth/tenant";
-import { UserRole, InvoiceEmailStatus } from "@prisma/client";
+import { UserRole, InvoiceEmailStatus, Prisma } from "@prisma/client";
 import {
   generateXLSX,
   generateCSV,
@@ -13,7 +13,6 @@ import {
   formatCompaniesForExport,
   type ExportFormat,
 } from "@/lib/export-helpers";
-import { pdf } from "@react-pdf/renderer";
 
 type RouteContext = {
   params: Promise<{ resource: string }>;
@@ -80,7 +79,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     // Generate file based on format
     if (format === "xlsx") {
       const buffer = generateXLSX(data.exportData, data.sheetName);
-      return new NextResponse(buffer, {
+      return new NextResponse(new Uint8Array(buffer), {
         headers: {
           "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Disposition": `attachment; filename="${filename}.xlsx"`,
@@ -97,7 +96,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     } else if (format === "pdf") {
       // For PDF, we'll generate a simple table view
       const pdfBuffer = await generateListPDF(data.exportData, data.title);
-      return new NextResponse(pdfBuffer, {
+      return new NextResponse(new Uint8Array(pdfBuffer), {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="${filename}.pdf"`,
@@ -122,7 +121,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 }
 
 async function exportInvoices(userId: string, search: string, statusFilter: string) {
-  const whereClause: any = { userId };
+  const whereClause: Prisma.InvoiceWhereInput = { userId };
 
   if (search) {
     whereClause.OR = [
@@ -165,7 +164,7 @@ async function exportInvoices(userId: string, search: string, statusFilter: stri
 }
 
 async function exportQuotations(userId: string, search: string, statusFilter: string) {
-  const whereClause: any = { userId };
+  const whereClause: Prisma.QuotationWhereInput = { userId };
 
   if (search) {
     whereClause.OR = [
@@ -175,7 +174,7 @@ async function exportQuotations(userId: string, search: string, statusFilter: st
   }
 
   if (statusFilter && statusFilter !== "all") {
-    whereClause.status = statusFilter.toUpperCase();
+    whereClause.status = statusFilter.toUpperCase() as Prisma.EnumQuotationStatusFilter;
   }
 
   const quotations = await prisma.quotation.findMany({
@@ -203,7 +202,7 @@ async function exportQuotations(userId: string, search: string, statusFilter: st
 }
 
 async function exportClients(userId: string, search: string) {
-  const whereClause: any = { userId };
+  const whereClause: Prisma.ClientWhereInput = { userId };
 
   if (search) {
     whereClause.OR = [
@@ -227,7 +226,7 @@ async function exportClients(userId: string, search: string) {
 }
 
 async function exportExpenses(userId: string, search: string) {
-  const whereClause: any = { userId };
+  const whereClause: Prisma.ExpenseWhereInput = { userId };
 
   if (search) {
     whereClause.description = { contains: search, mode: "insensitive" };
@@ -256,7 +255,7 @@ async function exportExpenses(userId: string, search: string) {
 }
 
 async function exportTimeEntries(userId: string, search: string) {
-  const whereClause: any = { userId };
+  const whereClause: Prisma.TimeEntryWhereInput = { userId };
 
   if (search) {
     whereClause.description = { contains: search, mode: "insensitive" };
@@ -309,9 +308,11 @@ async function exportCompanies() {
 /**
  * Generate a simple PDF from tabular data
  */
-async function generateListPDF(data: any[], title: string): Promise<Buffer> {
+async function generateListPDF(data: Record<string, string | number | boolean | null>[], title: string): Promise<Uint8Array> {
   // Import react-pdf components
+  const React = await import("react");
   const { Document, Page, Text, View, StyleSheet } = await import("@react-pdf/renderer");
+  const { pdf } = await import("@react-pdf/renderer");
   
   const styles = StyleSheet.create({
     page: {
@@ -349,32 +350,43 @@ async function generateListPDF(data: any[], title: string): Promise<Buffer> {
 
   const headers = data.length > 0 ? Object.keys(data[0]) : [];
 
-  const PDFDocument = (
-    <Document>
-      <Page size="A4" style={styles.page} orientation="landscape">
-        <Text style={styles.title}>{title}</Text>
-        <View style={styles.table}>
-          <View style={[styles.tableRow, styles.tableHeader]}>
-            {headers.map((header, i) => (
-              <Text key={i} style={styles.tableCell}>
-                {header}
-              </Text>
-            ))}
-          </View>
-          {data.map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.tableRow}>
-              {headers.map((header, cellIndex) => (
-                <Text key={cellIndex} style={styles.tableCell}>
-                  {String(row[header] ?? "")}
-                </Text>
-              ))}
-            </View>
-          ))}
-        </View>
-      </Page>
-    </Document>
+  const PDFDocument = React.createElement(
+    Document,
+    {},
+    React.createElement(
+      Page,
+      { size: "A4", style: styles.page, orientation: "landscape" },
+      React.createElement(Text, { style: styles.title }, title),
+      React.createElement(
+        View,
+        { style: styles.table },
+        React.createElement(
+          View,
+          { style: [styles.tableRow, styles.tableHeader] },
+          ...headers.map((header, i) =>
+            React.createElement(Text, { key: i, style: styles.tableCell }, header)
+          )
+        ),
+        ...data.map((row, rowIndex) =>
+          React.createElement(
+            View,
+            { key: rowIndex, style: styles.tableRow },
+            ...headers.map((header, cellIndex) =>
+              React.createElement(
+                Text,
+                { key: cellIndex, style: styles.tableCell },
+                String(row[header] ?? "")
+              )
+            )
+          )
+        )
+      )
+    )
   );
 
-  const buffer = await pdf(PDFDocument).toBuffer();
-  return buffer;
+  // Get blob and convert to array buffer
+  const instance = pdf(PDFDocument);
+  const blob = await instance.toBlob();
+  const arrayBuffer = await blob.arrayBuffer();
+  return new Uint8Array(arrayBuffer);
 }

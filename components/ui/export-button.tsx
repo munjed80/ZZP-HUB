@@ -3,12 +3,7 @@
 import { useState } from "react";
 import { Download, FileSpreadsheet, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
 export type ExportResource = "invoices" | "quotations" | "clients" | "expenses" | "time-entries" | "companies";
@@ -64,8 +59,8 @@ export function ExportButton({ resource, searchQuery = "", statusFilter = "", cl
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <DropdownMenu
+      trigger={
         <Button
           variant="secondary"
           disabled={isExporting}
@@ -74,21 +69,20 @@ export function ExportButton({ resource, searchQuery = "", statusFilter = "", cl
           <Download className="h-4 w-4" />
           {isExporting ? "Exporteren..." : "Exporteren"}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleExport("pdf")}>
-          <FileText className="mr-2 h-4 w-4" />
-          Exporteer als PDF
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleExport("xlsx")}>
-          <FileSpreadsheet className="mr-2 h-4 w-4" />
-          Exporteer als Excel
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleExport("csv")}>
-          <FileText className="mr-2 h-4 w-4" />
-          Exporteer als CSV
-        </DropdownMenuItem>
-      </DropdownMenuContent>
+      }
+    >
+      <DropdownMenuItem onClick={() => handleExport("pdf")}>
+        <FileText className="h-4 w-4" />
+        Exporteer als PDF
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => handleExport("xlsx")}>
+        <FileSpreadsheet className="h-4 w-4" />
+        Exporteer als Excel
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => handleExport("csv")}>
+        <FileText className="h-4 w-4" />
+        Exporteer als CSV
+      </DropdownMenuItem>
     </DropdownMenu>
   );
 }
