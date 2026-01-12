@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import type { listCompanies } from "./actions";
 import { createCompany, updateCompany, deleteCompany, setCompanySuspended } from "./actions";
+import { ExportButton } from "@/components/ui/export-button";
 
 type Company = Awaited<ReturnType<typeof listCompanies>>[number];
 
@@ -162,6 +163,7 @@ export function CompaniesClient({ companies }: { companies: Company[] }) {
           </div>
           <div className="flex gap-2 sm:gap-3 flex-wrap">
             <Badge variant="info" className="font-bold">{sortedCompanies.length} accounts</Badge>
+            <ExportButton resource="companies" />
             <Button type="button" onClick={openCreate} className="w-full sm:w-auto">
               Nieuwe company
             </Button>

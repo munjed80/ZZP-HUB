@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { deleteTimeEntry, logTimeEntry, type TimeEntryDto } from "@/actions/time-actions";
 import { CalendarDays, CheckCircle2, Clock3, Loader2, Plus, Timer, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ExportButton } from "@/components/ui/export-button";
 
 type UrenClientProps = {
   entries: TimeEntryDto[];
@@ -95,13 +96,18 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
-          <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-accent via-warning to-success"></div>
-          <h1 className="text-3xl font-bold text-foreground">Urenregistratie</h1>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-accent via-warning to-success"></div>
+              <h1 className="text-3xl font-bold text-foreground">Urenregistratie</h1>
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">
+              Schrijf je uren richting het 1225-criterium en houd overzicht over je voortgang.
+            </p>
+          </div>
+          <ExportButton resource="time-entries" />
         </div>
-        <p className="text-sm text-muted-foreground font-medium">
-          Schrijf je uren richting het 1225-criterium en houd overzicht over je voortgang.
-        </p>
       </div>
 
       <Card className="border-2 shadow-lg hover:shadow-xl hover:border-success/20 transition-all duration-300">

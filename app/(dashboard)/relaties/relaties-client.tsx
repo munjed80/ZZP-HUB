@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { clientSchema, type ClientFormValues } from "./schema";
 import { createClient, deleteClient, updateClient, type getClients } from "./actions";
 import { EntityActionsMenu } from "@/components/ui/entity-actions-menu";
+import { ExportButton } from "@/components/ui/export-button";
 
 type ClientList = Awaited<ReturnType<typeof getClients>>;
 
@@ -130,6 +131,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
               />
             </div>
             <Badge variant="success">{sortedClients.length} relaties</Badge>
+            <ExportButton resource="clients" searchQuery={searchTerm} />
             <Button
               type="button"
               onClick={() => {

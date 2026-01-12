@@ -15,6 +15,7 @@ import { type BtwTarief } from "@prisma/client";
 import { CalendarClock, Euro, Loader2, PieChart, Plus, ReceiptText, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { EntityActionsMenu } from "@/components/ui/entity-actions-menu";
+import { ExportButton } from "@/components/ui/export-button";
 
 type UitgavenClientProps = {
   expenses: ExpenseClientShape[];
@@ -201,10 +202,13 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
               Registreer kosten, bereken BTW automatisch en bewaar een link naar je bonnetjes.
             </p>
           </div>
-          <Button type="button" onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4" aria-hidden />
-            Nieuwe uitgave
-          </Button>
+          <div className="flex items-center gap-2">
+            <ExportButton resource="expenses" />
+            <Button type="button" onClick={() => setOpen(true)}>
+              <Plus className="h-4 w-4" aria-hidden />
+              Nieuwe uitgave
+            </Button>
+          </div>
         </div>
       </div>
 
