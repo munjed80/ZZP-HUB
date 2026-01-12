@@ -78,8 +78,8 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     // Generate file based on format
     if (format === "xlsx") {
-      const buffer = generateXLSX(data.exportData, data.sheetName);
-      return new NextResponse(Buffer.from(buffer), {
+      const buffer = await generateXLSX(data.exportData, data.sheetName);
+      return new NextResponse(new Uint8Array(buffer), {
         headers: {
           "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Disposition": `attachment; filename="${filename}.xlsx"`,
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     } else if (format === "pdf") {
       // For PDF, we'll generate a simple table view
       const pdfBuffer = await generateListPDF(data.exportData, data.title);
-      return new NextResponse(Buffer.from(pdfBuffer), {
+      return new NextResponse(new Uint8Array(pdfBuffer), {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="${filename}.pdf"`,

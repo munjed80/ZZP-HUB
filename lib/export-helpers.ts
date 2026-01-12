@@ -3,7 +3,7 @@
  * Provides type-safe data transformation for various resources
  */
 
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import Papa from "papaparse";
 
 export type ExportFormat = "pdf" | "xlsx" | "csv";
@@ -11,15 +11,45 @@ export type ExportFormat = "pdf" | "xlsx" | "csv";
 export type ExportData = Record<string, string | number | boolean | null>[];
 
 /**
- * Generate XLSX file from data
+ * Generate XLSX file from data using ExcelJS
  */
-export function generateXLSX(data: ExportData, sheetName = "Data"): Buffer {
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-  
-  const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
-  return Buffer.from(buffer);
+export async function generateXLSX(data: ExportData, sheetName = "Data"): Promise<Buffer> {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(sheetName);
+
+  if (data.length === 0) {
+    return Buffer.from(await workbook.xlsx.writeBuffer());
+  }
+
+  // Add headers
+  const headers = Object.keys(data[0]);
+  worksheet.addRow(headers);
+
+  // Style headers
+  worksheet.getRow(1).font = { bold: true };
+  worksheet.getRow(1).fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FFE0E0E0" },
+  };
+
+  // Add data rows
+  data.forEach((row) => {
+    const values = headers.map((header) => row[header]);
+    worksheet.addRow(values);
+  });
+
+  // Auto-fit columns
+  worksheet.columns.forEach((column) => {
+    let maxLength = 0;
+    column.eachCell?.({ includeEmpty: true }, (cell) => {
+      const cellValue = cell.value?.toString() || "";
+      maxLength = Math.max(maxLength, cellValue.length);
+    });
+    column.width = Math.min(Math.max(maxLength + 2, 10), 50);
+  });
+
+  return Buffer.from(await workbook.xlsx.writeBuffer());
 }
 
 /**
