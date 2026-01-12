@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Filter, Search } from "lucide-react";
 import { type mapInvoiceToPdfData } from "@/lib/pdf-generator";
 import { InvoiceCard } from "./invoice-card";
+import { ExportButton } from "@/components/ui/export-button";
 
 export type InvoiceListItem = {
   id: string;
@@ -66,26 +67,33 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
               aria-label="Zoek facturen"
             />
           </div>
-          <div className="grid w-full grid-cols-3 gap-2 sm:w-auto">
-            {statusOptions.map((option) => {
-              const active = status === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setStatus(option.value)}
-                  className={`flex items-center justify-center gap-1 rounded-full border px-3 py-2 text-xs font-semibold transition ${
-                    active
-                      ? "border-chip-active-border bg-chip-active text-chip-active-foreground shadow-[0_10px_24px_-18px_rgba(67,56,202,0.35)]"
-                      : "border-chip-border bg-chip text-chip-foreground hover:bg-chip-hover"
-                  }`}
-                  aria-pressed={active}
-                >
-                  <Filter className="h-3.5 w-3.5" aria-hidden />
-                  {option.label}
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-2">
+            <div className="grid w-full grid-cols-3 gap-2 sm:w-auto">
+              {statusOptions.map((option) => {
+                const active = status === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setStatus(option.value)}
+                    className={`flex items-center justify-center gap-1 rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                      active
+                        ? "border-chip-active-border bg-chip-active text-chip-active-foreground shadow-[0_10px_24px_-18px_rgba(67,56,202,0.35)]"
+                        : "border-chip-border bg-chip text-chip-foreground hover:bg-chip-hover"
+                    }`}
+                    aria-pressed={active}
+                  >
+                    <Filter className="h-3.5 w-3.5" aria-hidden />
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+            <ExportButton 
+              resource="invoices" 
+              searchQuery={searchQuery} 
+              statusFilter={status}
+            />
           </div>
         </div>
       </div>

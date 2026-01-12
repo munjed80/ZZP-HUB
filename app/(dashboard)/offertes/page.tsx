@@ -9,6 +9,7 @@ import { getQuotations } from "./actions";
 import { ConvertQuotationButton } from "./[id]/convert-quotation-button";
 import { QuotationActionsMenu } from "./_components/quotation-actions-menu";
 import { type InvoicePdfData } from "@/components/pdf/InvoicePDF";
+import { ExportButton } from "@/components/ui/export-button";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -79,7 +80,10 @@ export default async function OffertesPagina() {
             <FileSignature className="h-4 w-4 text-[#1b6b7a]" aria-hidden />
             <CardTitle>Laatste offertes</CardTitle>
           </div>
-          <Badge variant="primary">Converteren naar factuur</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="primary">Converteren naar factuur</Badge>
+            <ExportButton resource="quotations" />
+          </div>
         </CardHeader>
         <CardContent className="divide-y divide-[var(--border-subtle)]">
           {offertes.length === 0 ? (
