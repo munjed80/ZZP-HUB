@@ -11,6 +11,11 @@ export type ChartPoint = {
 };
 
 export function RevenueExpensesChart({ data }: { data: ChartPoint[] }) {
+  // Calculate max values once for performance and accurate scaling
+  const maxOmzet = Math.max(...data.map(d => d.omzet), 1);
+  const maxKosten = Math.max(...data.map(d => d.kosten), 1);
+  const maxValue = Math.max(maxOmzet, maxKosten);
+
   return (
     <div className="space-y-4">
       {/* Summary Cards */}
@@ -90,7 +95,7 @@ export function RevenueExpensesChart({ data }: { data: ChartPoint[] }) {
                         <div
                           className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
                           style={{
-                            width: `${Math.min(100, (item.omzet / Math.max(...data.map(d => d.omzet))) * 100)}%`
+                            width: `${Math.min(100, (item.omzet / maxValue) * 100)}%`
                           }}
                         />
                       </div>
@@ -108,7 +113,7 @@ export function RevenueExpensesChart({ data }: { data: ChartPoint[] }) {
                         <div
                           className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full transition-all duration-500"
                           style={{
-                            width: `${Math.min(100, (item.kosten / Math.max(...data.map(d => d.omzet))) * 100)}%`
+                            width: `${Math.min(100, (item.kosten / maxValue) * 100)}%`
                           }}
                         />
                       </div>
