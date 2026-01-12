@@ -2,7 +2,6 @@ import { AlertTriangle, ArrowDownRight, ArrowUpRight, Euro, Gauge, Shield } from
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatBedrag } from "@/lib/utils";
-import { RevenueExpensesChart } from "@/components/dashboard/revenue-expenses-chart";
 import { DistributionDonut } from "@/components/dashboard/distribution-donut";
 import { getDashboardStats } from "@/actions/get-dashboard-stats";
 import { DEFAULT_VAT_RATE } from "@/lib/constants";
@@ -41,12 +40,6 @@ export default async function DashboardPagina() {
       variant: change === 0 ? "muted" : positive ? "success" : "destructive",
     } as const;
   };
-
-  const chartData = stats.monthlyChartData.map((item) => ({
-    month: item.name,
-    omzet: item.revenue,
-    kosten: item.expenses,
-  }));
 
   const kpis = [
     {
@@ -140,66 +133,49 @@ export default async function DashboardPagina() {
         })}
       </div>
 
-      <div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-[1.65fr_1.05fr]">
+      <div className="space-y-4 sm:space-y-5">
         <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
-          <CardHeader className="pb-5">
-            <div className="space-y-1">
-              <CardTitle className="flex items-center gap-2.5">
-                <span className="h-1 w-10 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"></span>
-                Omzet vs kosten
-              </CardTitle>
-              <p className="text-sm text-muted-foreground font-medium">Maandelijks overzicht {now.getFullYear()}</p>
+          <CardHeader className="pb-4">
+            <div className="flex items-start gap-3">
+              <div className="rounded-2xl bg-gradient-to-br from-blue-500/15 to-blue-500/5 p-3.5 shadow-md ring-1 ring-blue-200/40 dark:ring-blue-700/40 group-hover:scale-105 transition-transform duration-300">
+                <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden />
+              </div>
+              <div className="flex-1">
+                <CardTitle>IB reservering</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1 font-medium">35% buffer voor belasting</p>
+              </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <RevenueExpensesChart data={chartData} />
+          <CardContent className="space-y-2.5">
+            <p className="text-2xl font-bold tabular-nums text-foreground">
+              {formatBedrag(stats.incomeTaxReservation)}
+            </p>
+            <Badge variant="info" className="text-xs font-semibold">
+              Op basis van winst {formatBedrag(stats.netProfit)}
+            </Badge>
           </CardContent>
         </Card>
 
-        <div className="space-y-4 sm:space-y-5">
-          <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
-            <CardHeader className="pb-4">
-              <div className="flex items-start gap-3">
-                <div className="rounded-2xl bg-gradient-to-br from-blue-500/15 to-blue-500/5 p-3.5 shadow-md ring-1 ring-blue-200/40 dark:ring-blue-700/40 group-hover:scale-105 transition-transform duration-300">
-                  <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden />
-                </div>
-                <div className="flex-1">
-                  <CardTitle>IB reservering</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1 font-medium">35% buffer voor belasting</p>
-                </div>
+        <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl bg-gradient-to-br from-teal-500/15 to-teal-500/5 p-3.5 shadow-md ring-1 ring-teal-200/40 dark:ring-teal-700/40 group-hover:scale-105 transition-transform duration-300">
+                <Gauge className="h-6 w-6 text-teal-600 dark:text-teal-400" aria-hidden />
               </div>
-            </CardHeader>
-            <CardContent className="space-y-2.5">
-              <p className="text-2xl font-bold tabular-nums text-foreground">
-                {formatBedrag(stats.incomeTaxReservation)}
-              </p>
-              <Badge variant="info" className="text-xs font-semibold">
-                Op basis van winst {formatBedrag(stats.netProfit)}
-              </Badge>
-            </CardContent>
-          </Card>
-
-          <Card className="group transition-all duration-300 hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.15)]">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-gradient-to-br from-teal-500/15 to-teal-500/5 p-3.5 shadow-md ring-1 ring-teal-200/40 dark:ring-teal-700/40 group-hover:scale-105 transition-transform duration-300">
-                  <Gauge className="h-6 w-6 text-teal-600 dark:text-teal-400" aria-hidden />
-                </div>
-                <div>
-                  <CardTitle>Verdeling resultaten</CardTitle>
-                  <p className="text-sm text-muted-foreground font-medium mt-0.5">Omzet, kosten en winst</p>
-                </div>
+              <div>
+                <CardTitle>Verdeling resultaten</CardTitle>
+                <p className="text-sm text-muted-foreground font-medium mt-0.5">Omzet, kosten en winst</p>
               </div>
-            </CardHeader>
-            <CardContent>
-              <DistributionDonut
-                revenue={stats.yearlyRevenue}
-                expenses={stats.yearlyExpenses}
-                profit={stats.netProfit}
-              />
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <DistributionDonut
+              revenue={stats.yearlyRevenue}
+              expenses={stats.yearlyExpenses}
+              profit={stats.netProfit}
+            />
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 sm:gap-5 grid-cols-1 lg:grid-cols-2">
