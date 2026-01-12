@@ -79,7 +79,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     // Generate file based on format
     if (format === "xlsx") {
       const buffer = generateXLSX(data.exportData, data.sheetName);
-      return new NextResponse(new Uint8Array(buffer), {
+      return new NextResponse(Buffer.from(buffer), {
         headers: {
           "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Disposition": `attachment; filename="${filename}.xlsx"`,
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     } else if (format === "pdf") {
       // For PDF, we'll generate a simple table view
       const pdfBuffer = await generateListPDF(data.exportData, data.title);
-      return new NextResponse(new Uint8Array(pdfBuffer), {
+      return new NextResponse(Buffer.from(pdfBuffer), {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="${filename}.pdf"`,
@@ -174,7 +174,12 @@ async function exportQuotations(userId: string, search: string, statusFilter: st
   }
 
   if (statusFilter && statusFilter !== "all") {
-    whereClause.status = statusFilter.toUpperCase() as Prisma.EnumQuotationStatusFilter;
+    const upperStatus = statusFilter.toUpperCase();
+    // Validate against known QuotationStatus values
+    const validStatuses = ["CONCEPT", "VERZONDEN", "GEACCEPTEERD", "AFGEWEZEN", "OMGEZET"];
+    if (validStatuses.includes(upperStatus)) {
+      whereClause.status = upperStatus as Prisma.EnumQuotationStatusFilter;
+    }
   }
 
   const quotations = await prisma.quotation.findMany({

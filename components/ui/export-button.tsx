@@ -34,9 +34,13 @@ export function ExportButton({ resource, searchQuery = "", statusFilter = "", cl
 
       // Get filename from Content-Disposition header
       const contentDisposition = response.headers.get("Content-Disposition");
-      const filename = contentDisposition
-        ? contentDisposition.split("filename=")[1]?.replace(/"/g, "")
-        : `export-${resource}.${format}`;
+      let filename = `export-${resource}.${format}`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename=["']?([^"';]+)["']?/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
 
       // Download the file
       const blob = await response.blob();
