@@ -5,6 +5,16 @@ import { Send, Loader2, FileText, Calculator, HelpCircle, AlertTriangle } from "
 import { z } from "zod";
 import React from "react";
 
+// Shared line item schema for invoices and quotations
+const LineItemSchema = z.object({
+  description: z.string(),
+  quantity: z.number(),
+  price: z.number(),
+  amount: z.number(),
+  unit: z.string(),
+  vatRate: z.string(),
+});
+
 // Zod schemas for API response data
 const InvoicePreviewSchema = z.object({
   id: z.string(),
@@ -15,14 +25,7 @@ const InvoicePreviewSchema = z.object({
   total: z.number(),
   vatAmount: z.number(),
   totalWithVat: z.number(),
-  lines: z.array(z.object({
-    description: z.string(),
-    quantity: z.number(),
-    price: z.number(),
-    amount: z.number(),
-    unit: z.string(),
-    vatRate: z.string(),
-  })).optional(),
+  lines: z.array(LineItemSchema).optional(),
 });
 
 const QuotationPreviewSchema = z.object({
@@ -34,14 +37,7 @@ const QuotationPreviewSchema = z.object({
   total: z.number(),
   vatAmount: z.number(),
   totalWithVat: z.number(),
-  lines: z.array(z.object({
-    description: z.string(),
-    quantity: z.number(),
-    price: z.number(),
-    amount: z.number(),
-    unit: z.string(),
-    vatRate: z.string(),
-  })).optional(),
+  lines: z.array(LineItemSchema).optional(),
 });
 
 const InvoiceListItemSchema = z.object({
@@ -63,6 +59,7 @@ const RevenueSummarySchema = z.object({
 });
 
 // Type-safe data payloads inferred from Zod schemas
+// (Other types are inferred directly from Zod parsing)
 type InvoiceListItem = z.infer<typeof InvoiceListItemSchema>;
 
 // Type guard for checking if a value is a record
