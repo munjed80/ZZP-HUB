@@ -240,6 +240,22 @@ model PasswordResetToken {
   @@index([userId, expiresAt])
 }
 
+model AiActionAuditLog {
+  id            String   @id @default(uuid())
+  userId        String
+  actionType    String
+  payloadHash   String
+  resultId      String?
+  resultType    String?
+  success       Boolean
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([actionType])
+}
+
 model SupportMessage {
   id        String               @id @default(uuid())
   userId    String?
