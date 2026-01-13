@@ -43,7 +43,7 @@ export const navigatie: NavigatieItem[] = [
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
   { href: "/uren", label: "Uren", icon: Clock3 },
   { href: "/btw-aangifte", label: "BTW-aangifte", icon: FileText },
-  { href: "#ai-assistant", label: "AI Assistent", icon: Sparkles },
+  { href: "/ai-assist", label: "AI Assist", icon: Sparkles },
   { href: "/support", label: "Support", icon: LifeBuoy },
   { href: "/instellingen", label: "Instellingen", icon: Settings },
   { href: "/admin/companies", label: "Companies", icon: Building2, superAdminOnly: true },
@@ -53,7 +53,6 @@ export const navigatie: NavigatieItem[] = [
 
 export function Sidebar({
   userRole,
-  onAssistantClick,
   collapsed = false,
 }: { userRole?: UserRole; onAssistantClick?: () => void; collapsed?: boolean }) {
   const pathname = usePathname();
@@ -75,19 +74,6 @@ export function Sidebar({
             pathname === item.href || pathname?.startsWith(`${item.href}/`);
           const Icon = item.icon;
           
-          // Handle AI Assistant click
-          if (item.href === "#ai-assistant") {
-            return (
-              <button
-                key={item.href}
-                onClick={onAssistantClick}
-                className={cn(buttonVariants("ghost", "w-full justify-start px-3 py-2 text-sm text-left font-medium"))}
-              >
-                <Icon className="h-4 w-4 text-muted-foreground" aria-hidden />
-                <span>{item.label}</span>
-              </button>
-            );
-          }
           
           return (
             <Link

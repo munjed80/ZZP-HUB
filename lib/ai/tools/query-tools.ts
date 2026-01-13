@@ -15,6 +15,7 @@ export async function toolListInvoices(
 ) {
   const { userId } = context;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { userId };
 
   if (action.status) {

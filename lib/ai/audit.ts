@@ -7,7 +7,7 @@ import crypto from "crypto";
 export async function logAIAction(params: {
   userId: string;
   actionType: string;
-  payload: any;
+  payload: unknown;
   resultId?: string;
   resultType?: string;
   success: boolean;

@@ -4,13 +4,10 @@ import {
   createOfferteActionSchema,
   queryInvoicesActionSchema,
   computeBTWActionSchema,
-  createClientActionSchema,
 } from "../schemas/actions";
-import { toolCreateInvoiceDraft, toolCreateInvoiceFinal } from "../tools/invoice-tools";
+import { toolCreateInvoiceDraft } from "../tools/invoice-tools";
 import { toolCreateOfferteDraft } from "../tools/offerte-tools";
-import { toolGetClientByName, toolCreateClientIfMissing } from "../tools/client-tools";
 import { toolListInvoices, toolComputeBTW } from "../tools/query-tools";
-import { prisma } from "@/lib/prisma";
 
 interface RouterContext {
   userId: string;
@@ -21,6 +18,7 @@ export type IntentType = "question" | "action" | "unknown";
 export interface RouterResult {
   intent: IntentType;
   type?: "answer" | "create_invoice" | "create_offerte" | "query_invoices" | "compute_btw" | "create_client";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
   message?: string;
   needsConfirmation?: boolean;
@@ -67,9 +65,21 @@ function detectIntent(message: string): { intent: IntentType; actionType?: strin
 /**
  * Extract action parameters from message using simple pattern matching
  */
-function extractInvoiceParams(message: string): any {
+function extractInvoiceParams(message: string): {
+  clientName?: string;
+  amount?: number;
+  vatRate?: "21" | "9" | "0";
+  dueInDays?: number;
+  description?: string;
+} {
   const normalized = message.toLowerCase();
-  const params: any = {};
+  const params: {
+    clientName?: string;
+    amount?: number;
+    vatRate?: "21" | "9" | "0";
+    dueInDays?: number;
+    description?: string;
+  } = {};
 
   // Extract client name (after "voor" or "for")
   const clientMatch = message.match(/(?:voor|for)\s+([A-Za-z\s]+?)(?:\s*,|\s+bedrag|\s+amount|\s+€|\s+\d|$)/i);
@@ -110,7 +120,7 @@ function extractInvoiceParams(message: string): any {
 /**
  * Answer question using product knowledge
  */
-async function handleQuestion(message: string, context: RouterContext): Promise<RouterResult> {
+async function handleQuestion(message: string): Promise<RouterResult> {
   const sections = await findRelevantSections(message, 3);
   
   if (sections.length === 0) {
@@ -170,12 +180,12 @@ async function handleCreateInvoice(message: string, context: RouterContext): Pro
       needsConfirmation: result.success,
       message: result.message,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       intent: "action",
       type: "create_invoice",
-      data: { success: false, error: error.message },
-      message: `Fout bij validatie: ${error.message}`,
+      data: { success: false, error: error instanceof Error ? error.message : String(error) },
+      message: `Fout bij validatie: ${error instanceof Error ? error.message : String(error)}`,
     };
   }
 }
@@ -211,12 +221,12 @@ async function handleCreateOfferte(message: string, context: RouterContext): Pro
       needsConfirmation: result.success,
       message: result.message,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       intent: "action",
       type: "create_offerte",
-      data: { success: false, error: error.message },
-      message: `Fout: ${error.message}`,
+      data: { success: false, error: error instanceof Error ? error.message : String(error) },
+      message: `Fout: ${error instanceof Error ? error.message : String(error)}`,
     };
   }
 }
@@ -226,7 +236,12 @@ async function handleCreateOfferte(message: string, context: RouterContext): Pro
  */
 async function handleQueryInvoices(message: string, context: RouterContext): Promise<RouterResult> {
   const normalized = message.toLowerCase();
-  const params: any = { limit: 10 };
+  const params: {
+    limit: number;
+    status?: "CONCEPT" | "VERZONDEN" | "BETAALD" | "HERINNERING";
+    fromDate?: string;
+    toDate?: string;
+  } = { limit: 10 };
 
   // Extract status
   if (normalized.includes("onbetaald") || normalized.includes("unpaid")) {
@@ -260,7 +275,9 @@ async function handleQueryInvoices(message: string, context: RouterContext): Pro
  */
 async function handleComputeBTW(message: string, context: RouterContext): Promise<RouterResult> {
   const normalized = message.toLowerCase();
-  const params: any = {};
+  const params: {
+    period?: "month" | "quarter" | "year";
+  } = {};
 
   if (normalized.includes("deze maand") || normalized.includes("this month")) {
     params.period = "month";
@@ -293,7 +310,7 @@ export async function routeAIRequest(
   const { intent, actionType } = detectIntent(message);
 
   if (intent === "question") {
-    return handleQuestion(message, context);
+    return handleQuestion(message);
   }
 
   if (intent === "action") {

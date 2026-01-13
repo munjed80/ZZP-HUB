@@ -43,11 +43,12 @@ export async function POST(request: Request) {
       missingFields: result.missingFields,
       citations: result.citations,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("AI chat error:", error);
 
     // Handle authentication errors
-    if (error.message?.includes("Niet geauthenticeerd")) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage?.includes("Niet geauthenticeerd")) {
       return NextResponse.json(
         { error: "Je moet ingelogd zijn om AI Assist te gebruiken." },
         { status: 401 }
