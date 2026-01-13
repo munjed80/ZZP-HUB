@@ -59,7 +59,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
 
   return (
     <AvatarContext.Provider value={avatarUrl}>
-      <Sidebar userRole={userRole} onAssistantClick={() => setAssistantOpen(true)} />
+      <Sidebar userRole={userRole} />
       {children}
       <MobileNav
         onMenuClick={() => setMobileMenuOpen(true)}

@@ -54,7 +54,7 @@ export const navigatie: NavigatieItem[] = [
 export function Sidebar({
   userRole,
   collapsed = false,
-}: { userRole?: UserRole; onAssistantClick?: () => void; collapsed?: boolean }) {
+}: { userRole?: UserRole; collapsed?: boolean }) {
   const pathname = usePathname();
 
   return (
