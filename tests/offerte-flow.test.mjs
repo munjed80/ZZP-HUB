@@ -48,11 +48,15 @@ function extractOfferteParams(message) {
   const params = {};
 
   // Remove common prefixes that might interfere with parsing
-  let cleanMessage = message.replace(/^(?:maak|create|genereer)?\s*(?:een|a)?\s*(?:offerte|quote|quotation|aanbieding)?\s*/i, "").trim();
+  const PREFIX_PATTERN = /^(?:maak|create|genereer)?\s*(?:een|a)?\s*(?:offerte|quote|quotation|aanbieding)?\s*/i;
+  const cleanMessage = message.replace(PREFIX_PATTERN, "").trim();
 
   // Pattern 1: "<client> <qty> <item> price <unitPrice>"
+  // Groups: (1)clientName (2)quantity (3)description (4)price
   // Example: "Riza 320 stops price 1.25"
-  const pattern1 = cleanMessage.match(/^([A-Za-z\s]+?)\s+(\d+)\s+([A-Za-z\s]+?)\s+(?:price|prijs|à|@)\s*€?\s*(\d+(?:[.,]\d+)?)/i);
+  // Supports client names and items with letters, spaces, numbers, hyphens, ampersands, and apostrophes
+  const PATTERN_CLIENT_QTY_ITEM_PRICE = /^([A-Za-z0-9\s\-&']+?)\s+(\d+)\s+([A-Za-z0-9\s\-&']+?)\s+(?:price|prijs|à|@)\s*€?\s*(\d+(?:[.,]\d+)?)/i;
+  const pattern1 = cleanMessage.match(PATTERN_CLIENT_QTY_ITEM_PRICE);
   if (pattern1) {
     params.clientName = pattern1[1].trim();
     const quantity = parseInt(pattern1[2]);
@@ -69,8 +73,11 @@ function extractOfferteParams(message) {
   }
 
   // Pattern 2: "<qty>x <item> @ <unitPrice> for <client>"
+  // Groups: (1)quantity (2)description (3)price (4)clientName
   // Example: "320x stops @ 1.25 for Riza"
-  const pattern2 = cleanMessage.match(/^(\d+)x?\s+([A-Za-z\s]+?)\s+(?:@|à|price|prijs)\s*€?\s*(\d+(?:[.,]\d+)?)\s+(?:for|voor)\s+([A-Za-z\s]+)/i);
+  // Supports client names and items with letters, spaces, numbers, hyphens, ampersands, and apostrophes
+  const PATTERN_QTY_ITEM_PRICE_FOR_CLIENT = /^(\d+)x?\s+([A-Za-z0-9\s\-&']+?)\s+(?:@|à|price|prijs)\s*€?\s*(\d+(?:[.,]\d+)?)\s+(?:for|voor)\s+([A-Za-z0-9\s\-&']+)/i;
+  const pattern2 = cleanMessage.match(PATTERN_QTY_ITEM_PRICE_FOR_CLIENT);
   if (pattern2 && !pattern1) {
     const quantity = parseInt(pattern2[1]);
     const description = pattern2[2].trim();
@@ -87,8 +94,11 @@ function extractOfferteParams(message) {
   }
 
   // Pattern 3: "<client> <item> <qty> stuks <unitPrice> per stuk"
+  // Groups: (1)clientName (2)description (3)quantity (4)price
   // Example: "Riza stops 320 stuks 1.25 per stuk"
-  const pattern3 = cleanMessage.match(/^([A-Za-z\s]+?)\s+([A-Za-z\s]+?)\s+(\d+)\s+(?:stuks?|pieces?|x)\s+€?\s*(\d+(?:[.,]\d+)?)\s*(?:per|each)?/i);
+  // Supports client names and items with letters, spaces, numbers, hyphens, ampersands, and apostrophes
+  const PATTERN_CLIENT_ITEM_QTY_STUKS_PRICE = /^([A-Za-z0-9\s\-&']+?)\s+([A-Za-z0-9\s\-&']+?)\s+(\d+)\s+(?:stuks?|pieces?|x)\s+€?\s*(\d+(?:[.,]\d+)?)\s*(?:per|each)?/i;
+  const pattern3 = cleanMessage.match(PATTERN_CLIENT_ITEM_QTY_STUKS_PRICE);
   if (pattern3 && !pattern1 && !pattern2) {
     params.clientName = pattern3[1].trim();
     const description = pattern3[2].trim();
@@ -285,6 +295,28 @@ test("extractOfferteParams: handles 'voor' with quantity and price separately", 
   assert.strictEqual(result.clientName, "ClientName");
   assert.strictEqual(result.items[0].quantity, 100);
   assert.strictEqual(result.items[0].price, 5);
+});
+
+test("extractOfferteParams: handles client names with special characters", () => {
+  const result = extractOfferteParams("Smith & Co 50 items price 100");
+  assert.strictEqual(result.clientName, "Smith & Co");
+  assert.strictEqual(result.items[0].quantity, 50);
+});
+
+test("extractOfferteParams: handles item descriptions with numbers", () => {
+  const result = extractOfferteParams("John 10 iPhone 15 price 999");
+  assert.strictEqual(result.clientName, "John");
+  assert.strictEqual(result.items[0].description, "iPhone 15");
+  assert.strictEqual(result.items[0].quantity, 10);
+  assert.strictEqual(result.items[0].price, 999);
+});
+
+test("extractOfferteParams: handles hyphens in client and item names", () => {
+  const result = extractOfferteParams("Jean-Pierre 5 T-shirts price 25");
+  assert.strictEqual(result.clientName, "Jean-Pierre");
+  assert.strictEqual(result.items[0].description, "T-shirts");
+  assert.strictEqual(result.items[0].quantity, 5);
+  assert.strictEqual(result.items[0].price, 25);
 });
 
 // ============== Integration Tests ==============
