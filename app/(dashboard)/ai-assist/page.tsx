@@ -1,7 +1,74 @@
 "use client";
 
 import { useState } from "react";
-import { Send, Loader2, FileText, Calculator, HelpCircle } from "lucide-react";
+import { Send, Loader2, FileText, Calculator, HelpCircle, AlertTriangle } from "lucide-react";
+import { z } from "zod";
+import React from "react";
+
+// Zod schemas for API response data
+const InvoicePreviewSchema = z.object({
+  id: z.string(),
+  invoiceNum: z.string(),
+  clientName: z.string(),
+  date: z.string(),
+  dueDate: z.string(),
+  total: z.number(),
+  vatAmount: z.number(),
+  totalWithVat: z.number(),
+  lines: z.array(z.object({
+    description: z.string(),
+    quantity: z.number(),
+    price: z.number(),
+    amount: z.number(),
+    unit: z.string(),
+    vatRate: z.string(),
+  })).optional(),
+});
+
+const QuotationPreviewSchema = z.object({
+  id: z.string(),
+  quoteNum: z.string(),
+  clientName: z.string(),
+  date: z.string(),
+  validUntil: z.string(),
+  total: z.number(),
+  vatAmount: z.number(),
+  totalWithVat: z.number(),
+  lines: z.array(z.object({
+    description: z.string(),
+    quantity: z.number(),
+    price: z.number(),
+    amount: z.number(),
+    unit: z.string(),
+    vatRate: z.string(),
+  })).optional(),
+});
+
+const InvoiceListItemSchema = z.object({
+  id: z.string(),
+  invoiceNum: z.string(),
+  clientName: z.string(),
+  total: z.number(),
+  date: z.string(),
+});
+
+const VatSummarySchema = z.object({
+  charged: z.number(),
+  deductible: z.number(),
+  netToPay: z.number(),
+});
+
+const RevenueSummarySchema = z.object({
+  total: z.number(),
+});
+
+// Type-safe data payloads inferred from Zod schemas
+type InvoiceListItem = z.infer<typeof InvoiceListItemSchema>;
+
+// Type guard for checking if a value is a record
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 interface Message {
   id: string;
@@ -11,6 +78,167 @@ interface Message {
   data?: unknown;
   type?: string;
   needsConfirmation?: boolean;
+}
+
+// Error card component for displaying parse errors
+function DataParseErrorCard({ title }: { title: string }): React.ReactElement {
+  return (
+    <div className="mt-3 rounded border border-destructive/50 bg-destructive/10 p-3">
+      <div className="flex items-center gap-2 text-xs text-destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <span>{title}: Ongeldige data ontvangen</span>
+      </div>
+    </div>
+  );
+}
+
+// Invoice Preview Card with Zod validation
+function InvoicePreviewCard({ 
+  message, 
+  onConfirm 
+}: { 
+  message: Message; 
+  onConfirm: (id: string) => void;
+}): React.ReactElement | null {
+  if (message.type !== "create_invoice" || !message.data) return null;
+  
+  // Check if it's an object with an invoice property
+  if (!isRecord(message.data) || !("invoice" in message.data)) return null;
+  
+  // Parse the invoice data with Zod for type safety
+  const parseResult = InvoicePreviewSchema.safeParse(message.data.invoice);
+  
+  if (!parseResult.success) {
+    return <DataParseErrorCard title="Factuur Preview" />;
+  }
+  
+  const invoice = parseResult.data;
+  
+  return (
+    <div className="mt-3 rounded border border-border bg-background p-3">
+      <div className="text-xs font-semibold">Factuur Preview</div>
+      <div className="mt-2 space-y-1 text-xs">
+        <div>Nummer: {invoice.invoiceNum}</div>
+        <div>Client: {invoice.clientName}</div>
+        <div>Totaal: €{invoice.totalWithVat.toFixed(2)}</div>
+      </div>
+      {message.needsConfirmation && (
+        <button
+          onClick={() => onConfirm(message.id)}
+          className="mt-2 rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
+        >
+          Bevestig & Opslaan
+        </button>
+      )}
+    </div>
+  );
+}
+
+// Quotation Preview Card with Zod validation
+function QuotationPreviewCard({ 
+  message, 
+  onConfirm 
+}: { 
+  message: Message; 
+  onConfirm: (id: string) => void;
+}): React.ReactElement | null {
+  if (message.type !== "create_offerte" || !message.data) return null;
+  
+  // Check if it's an object with a quotation property
+  if (!isRecord(message.data) || !("quotation" in message.data)) return null;
+  
+  // Parse the quotation data with Zod for type safety
+  const parseResult = QuotationPreviewSchema.safeParse(message.data.quotation);
+  
+  if (!parseResult.success) {
+    return <DataParseErrorCard title="Offerte Preview" />;
+  }
+  
+  const quotation = parseResult.data;
+  
+  return (
+    <div className="mt-3 rounded border border-border bg-background p-3">
+      <div className="text-xs font-semibold">Offerte Preview</div>
+      <div className="mt-2 space-y-1 text-xs">
+        <div>Nummer: {quotation.quoteNum}</div>
+        <div>Client: {quotation.clientName}</div>
+        <div>Totaal: €{quotation.totalWithVat.toFixed(2)}</div>
+      </div>
+      {message.needsConfirmation && (
+        <button
+          onClick={() => onConfirm(message.id)}
+          className="mt-2 rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
+        >
+          Bevestig & Opslaan
+        </button>
+      )}
+    </div>
+  );
+}
+
+// Invoice List Card with Zod validation
+function InvoiceListCard({ message }: { message: Message }): React.ReactElement | null {
+  if (message.type !== "query_invoices" || !message.data) return null;
+  
+  if (!isRecord(message.data) || !("invoices" in message.data)) return null;
+  
+  // Parse each invoice in the array
+  const invoicesData = message.data.invoices;
+  if (!Array.isArray(invoicesData)) return null;
+  
+  // Parse and filter valid invoices
+  const validInvoices: InvoiceListItem[] = [];
+  for (const inv of invoicesData.slice(0, 5)) {
+    const parsed = InvoiceListItemSchema.safeParse(inv);
+    if (parsed.success) {
+      validInvoices.push(parsed.data);
+    }
+  }
+  
+  if (validInvoices.length === 0) return null;
+  
+  return (
+    <div className="mt-3 space-y-2">
+      {validInvoices.map((inv) => (
+        <div key={inv.id} className="rounded border border-border bg-background p-2 text-xs">
+          <div className="font-semibold">{inv.invoiceNum}</div>
+          <div>{inv.clientName} - €{inv.total.toFixed(2)}</div>
+          <div className="text-muted-foreground">{new Date(inv.date).toLocaleDateString("nl-NL")}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// BTW Summary Card with Zod validation
+function BTWSummaryCard({ message }: { message: Message }): React.ReactElement | null {
+  if (message.type !== "compute_btw" || !message.data) return null;
+  
+  if (!isRecord(message.data) || !("vat" in message.data) || !("revenue" in message.data)) return null;
+  
+  const vatResult = VatSummarySchema.safeParse(message.data.vat);
+  const revenueResult = RevenueSummarySchema.safeParse(message.data.revenue);
+  
+  if (!vatResult.success || !revenueResult.success) {
+    return <DataParseErrorCard title="BTW Overzicht" />;
+  }
+  
+  const vat = vatResult.data;
+  const revenue = revenueResult.data;
+  
+  return (
+    <div className="mt-3 rounded border border-border bg-background p-3 text-xs">
+      <div className="font-semibold">BTW Overzicht</div>
+      <div className="mt-2 space-y-1">
+        <div>Omzet: €{revenue.total.toFixed(2)}</div>
+        <div>BTW verschuldigd: €{vat.charged.toFixed(2)}</div>
+        <div>Voorbelasting: €{vat.deductible.toFixed(2)}</div>
+        <div className="font-semibold text-primary">
+          Netto te betalen: €{vat.netToPay.toFixed(2)}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function AIAssistPage() {
@@ -86,10 +314,16 @@ export default function AIAssistPage() {
 
   const handleConfirm = async (messageId: string) => {
     const message = messages.find((m) => m.id === messageId);
-    if (!message || !message.data || typeof message.data !== "object") return;
+    if (!message || !message.data) return;
     
-    const data = message.data as any;
-    if (!data.invoice?.id && !data.quotation?.id) return;
+    // Use type guard to safely check data structure
+    if (!isRecord(message.data)) return;
+    
+    // Check for invoice or quotation id using type-safe access
+    const hasInvoiceId = isRecord(message.data.invoice) && typeof message.data.invoice.id === "string";
+    const hasQuotationId = isRecord(message.data.quotation) && typeof message.data.quotation.id === "string";
+    
+    if (!hasInvoiceId && !hasQuotationId) return;
 
     // TODO: Implement confirmation logic
     alert("Bevestig functionaliteit wordt binnenkort toegevoegd!");
@@ -136,77 +370,16 @@ export default function AIAssistPage() {
               <div className="whitespace-pre-wrap text-sm">{message.content}</div>
 
               {/* Invoice Preview */}
-              {message.type === "create_invoice" && message.data && typeof message.data === "object" && "invoice" in message.data && message.data.invoice ? (
-                <div className="mt-3 rounded border border-border bg-background p-3">
-                  <div className="text-xs font-semibold">Factuur Preview</div>
-                  <div className="mt-2 space-y-1 text-xs">
-                    <div>Nummer: {(message.data as any).invoice.invoiceNum}</div>
-                    <div>Client: {(message.data as any).invoice.clientName}</div>
-                    <div>Totaal: €{(message.data as any).invoice.totalWithVat.toFixed(2)}</div>
-                  </div>
-                  {message.needsConfirmation && (
-                    <button
-                      onClick={() => handleConfirm(message.id)}
-                      className="mt-2 rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
-                    >
-                      Bevestig & Opslaan
-                    </button>
-                  )}
-                </div>
-              ) : null}
+              <InvoicePreviewCard message={message} onConfirm={handleConfirm} />
 
               {/* Quotation Preview */}
-              {message.type === "create_offerte" && 
-               message.data && 
-               typeof message.data === "object" && 
-               "quotation" in message.data && 
-               message.data.quotation && 
-               typeof message.data.quotation === "object" ? (
-                <div className="mt-3 rounded border border-border bg-background p-3">
-                  <div className="text-xs font-semibold">Offerte Preview</div>
-                  <div className="mt-2 space-y-1 text-xs">
-                    <div>Nummer: {(message.data as any).quotation.quoteNum}</div>
-                    <div>Client: {(message.data as any).quotation.clientName}</div>
-                    <div>Totaal: €{(message.data as any).quotation.totalWithVat.toFixed(2)}</div>
-                  </div>
-                  {message.needsConfirmation && (
-                    <button
-                      onClick={() => handleConfirm(message.id)}
-                      className="mt-2 rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
-                    >
-                      Bevestig & Opslaan
-                    </button>
-                  )}
-                </div>
-              ) : null}
+              <QuotationPreviewCard message={message} onConfirm={handleConfirm} />
 
               {/* Invoice List */}
-              {message.type === "query_invoices" && message.data && typeof message.data === "object" && "invoices" in message.data && Array.isArray(message.data.invoices) && (
-                <div className="mt-3 space-y-2">
-                  {message.data.invoices.slice(0, 5).map((inv: { id: string; invoiceNum: string; clientName: string; total: number; date: string }) => (
-                    <div key={inv.id} className="rounded border border-border bg-background p-2 text-xs">
-                      <div className="font-semibold">{inv.invoiceNum}</div>
-                      <div>{inv.clientName} - €{inv.total.toFixed(2)}</div>
-                      <div className="text-muted-foreground">{new Date(inv.date).toLocaleDateString("nl-NL")}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <InvoiceListCard message={message} />
 
               {/* BTW Summary */}
-              {message.type === "compute_btw" && message.data && typeof message.data === "object" && "vat" in message.data && message.data.vat && (
-                <div className="mt-3 rounded border border-border bg-background p-3 text-xs">
-                  <div className="font-semibold">BTW Overzicht</div>
-                  <div className="mt-2 space-y-1">
-                    <div>Omzet: €{(message.data as any).revenue.total.toFixed(2)}</div>
-                    <div>BTW verschuldigd: €{(message.data as any).vat.charged.toFixed(2)}</div>
-                    <div>Voorbelasting: €{(message.data as any).vat.deductible.toFixed(2)}</div>
-                    <div className="font-semibold text-primary">
-                      Netto te betalen: €{(message.data as any).vat.netToPay.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-              )}
+              <BTWSummaryCard message={message} />
 
               <div className="mt-1 text-xs opacity-70">
                 {message.timestamp.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })}
