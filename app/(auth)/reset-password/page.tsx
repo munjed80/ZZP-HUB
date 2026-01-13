@@ -9,6 +9,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, Lock, Sparkles } from "lucide-react";
 import { Suspense, useState } from "react";
 import { toast } from "sonner";
+import { buildAbsoluteUrl } from "@/lib/base-url";
 
 const schema = z.object({
   password: z.string().min(8, "Wachtwoord moet minimaal 8 tekens zijn"),
@@ -46,7 +47,7 @@ function ResetPasswordContent() {
 
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/reset-password", {
+      const response = await fetch(buildAbsoluteUrl("/api/auth/reset-password"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password: data.password }),
