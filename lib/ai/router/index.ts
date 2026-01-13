@@ -156,8 +156,10 @@ function extractOfferteParams(message: string): {
   const cleanMessage = message.replace(/^(?:maak|create|genereer)?\s*(?:een|a)?\s*(?:offerte|quote|quotation|aanbieding)?\s*/i, "").trim();
 
   // Pattern 1: "<client> <qty> <item> price <unitPrice>"
+  // Groups: (1)clientName (2)quantity (3)description (4)price
   // Example: "Riza 320 stops price 1.25"
-  const pattern1 = cleanMessage.match(/^([A-Za-z\s]+?)\s+(\d+)\s+([A-Za-z\s]+?)\s+(?:price|prijs|à|@)\s*€?\s*(\d+(?:[.,]\d+)?)/i);
+  const PATTERN_CLIENT_QTY_ITEM_PRICE = /^([A-Za-z\s]+?)\s+(\d+)\s+([A-Za-z\s]+?)\s+(?:price|prijs|à|@)\s*€?\s*(\d+(?:[.,]\d+)?)/i;
+  const pattern1 = cleanMessage.match(PATTERN_CLIENT_QTY_ITEM_PRICE);
   if (pattern1) {
     params.clientName = pattern1[1].trim();
     const quantity = parseInt(pattern1[2]);
@@ -174,8 +176,10 @@ function extractOfferteParams(message: string): {
   }
 
   // Pattern 2: "<qty>x <item> @ <unitPrice> for <client>"
+  // Groups: (1)quantity (2)description (3)price (4)clientName
   // Example: "320x stops @ 1.25 for Riza"
-  const pattern2 = cleanMessage.match(/^(\d+)x?\s+([A-Za-z\s]+?)\s+(?:@|à|price|prijs)\s*€?\s*(\d+(?:[.,]\d+)?)\s+(?:for|voor)\s+([A-Za-z\s]+)/i);
+  const PATTERN_QTY_ITEM_PRICE_FOR_CLIENT = /^(\d+)x?\s+([A-Za-z\s]+?)\s+(?:@|à|price|prijs)\s*€?\s*(\d+(?:[.,]\d+)?)\s+(?:for|voor)\s+([A-Za-z\s]+)/i;
+  const pattern2 = cleanMessage.match(PATTERN_QTY_ITEM_PRICE_FOR_CLIENT);
   if (pattern2 && !pattern1) {
     const quantity = parseInt(pattern2[1]);
     const description = pattern2[2].trim();
@@ -192,8 +196,10 @@ function extractOfferteParams(message: string): {
   }
 
   // Pattern 3: "<client> <item> <qty> stuks <unitPrice> per stuk"
+  // Groups: (1)clientName (2)description (3)quantity (4)price
   // Example: "Riza stops 320 stuks 1.25 per stuk"
-  const pattern3 = cleanMessage.match(/^([A-Za-z\s]+?)\s+([A-Za-z\s]+?)\s+(\d+)\s+(?:stuks?|pieces?|x)\s+€?\s*(\d+(?:[.,]\d+)?)\s*(?:per|each)?/i);
+  const PATTERN_CLIENT_ITEM_QTY_STUKS_PRICE = /^([A-Za-z\s]+?)\s+([A-Za-z\s]+?)\s+(\d+)\s+(?:stuks?|pieces?|x)\s+€?\s*(\d+(?:[.,]\d+)?)\s*(?:per|each)?/i;
+  const pattern3 = cleanMessage.match(PATTERN_CLIENT_ITEM_QTY_STUKS_PRICE);
   if (pattern3 && !pattern1 && !pattern2) {
     params.clientName = pattern3[1].trim();
     const description = pattern3[2].trim();
@@ -365,11 +371,11 @@ async function handleCreateOfferte(message: string, context: RouterContext): Pro
     const validated = createOfferteActionSchema.parse(offerteData);
     const result = await toolCreateOfferteDraft(validated, context);
 
-    if (result.success) {
+    if (result.success && result.quotation) {
       // Return with confirmation request showing VAT rate
       const quotation = result.quotation;
       const confirmationMessage = `Offerte preview voor ${quotation.clientName}:\n\n` +
-        quotation.lines.map((line: { description: string; quantity: number; price: number }) => 
+        (quotation.lines || []).map((line: { description: string; quantity: number; price: number }) => 
           `- ${line.description}: ${line.quantity}x €${line.price.toFixed(2)}`
         ).join('\n') +
         `\n\nSubtotaal: €${quotation.total.toFixed(2)}` +
@@ -391,7 +397,7 @@ async function handleCreateOfferte(message: string, context: RouterContext): Pro
       type: "create_offerte",
       data: result,
       needsConfirmation: false,
-      message: result.message,
+      message: result.message || "Er is een fout opgetreden bij het aanmaken van de offerte.",
     };
   } catch (error: unknown) {
     return {
