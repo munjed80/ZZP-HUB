@@ -86,7 +86,10 @@ export default function AIAssistPage() {
 
   const handleConfirm = async (messageId: string) => {
     const message = messages.find((m) => m.id === messageId);
-    if (!message?.data?.invoice?.id) return;
+    if (!message || !message.data || typeof message.data !== "object") return;
+    
+    const data = message.data as any;
+    if (!data.invoice?.id && !data.quotation?.id) return;
 
     // TODO: Implement confirmation logic
     alert("Bevestig functionaliteit wordt binnenkort toegevoegd!");
@@ -133,13 +136,13 @@ export default function AIAssistPage() {
               <div className="whitespace-pre-wrap text-sm">{message.content}</div>
 
               {/* Invoice Preview */}
-              {message.type === "create_invoice" && message.data?.invoice && (
+              {message.type === "create_invoice" && message.data && typeof message.data === "object" && "invoice" in message.data && message.data.invoice ? (
                 <div className="mt-3 rounded border border-border bg-background p-3">
                   <div className="text-xs font-semibold">Factuur Preview</div>
                   <div className="mt-2 space-y-1 text-xs">
-                    <div>Nummer: {message.data.invoice.invoiceNum}</div>
-                    <div>Client: {message.data.invoice.clientName}</div>
-                    <div>Totaal: €{message.data.invoice.totalWithVat.toFixed(2)}</div>
+                    <div>Nummer: {(message.data as any).invoice.invoiceNum}</div>
+                    <div>Client: {(message.data as any).invoice.clientName}</div>
+                    <div>Totaal: €{(message.data as any).invoice.totalWithVat.toFixed(2)}</div>
                   </div>
                   {message.needsConfirmation && (
                     <button
@@ -150,16 +153,21 @@ export default function AIAssistPage() {
                     </button>
                   )}
                 </div>
-              )}
+              ) : null}
 
               {/* Quotation Preview */}
-              {message.type === "create_offerte" && message.data?.quotation && (
+              {message.type === "create_offerte" && 
+               message.data && 
+               typeof message.data === "object" && 
+               "quotation" in message.data && 
+               message.data.quotation && 
+               typeof message.data.quotation === "object" ? (
                 <div className="mt-3 rounded border border-border bg-background p-3">
                   <div className="text-xs font-semibold">Offerte Preview</div>
                   <div className="mt-2 space-y-1 text-xs">
-                    <div>Nummer: {message.data.quotation.quoteNum}</div>
-                    <div>Client: {message.data.quotation.clientName}</div>
-                    <div>Totaal: €{message.data.quotation.totalWithVat.toFixed(2)}</div>
+                    <div>Nummer: {(message.data as any).quotation.quoteNum}</div>
+                    <div>Client: {(message.data as any).quotation.clientName}</div>
+                    <div>Totaal: €{(message.data as any).quotation.totalWithVat.toFixed(2)}</div>
                   </div>
                   {message.needsConfirmation && (
                     <button
@@ -170,10 +178,10 @@ export default function AIAssistPage() {
                     </button>
                   )}
                 </div>
-              )}
+              ) : null}
 
               {/* Invoice List */}
-              {message.type === "query_invoices" && message.data?.invoices && (
+              {message.type === "query_invoices" && message.data && typeof message.data === "object" && "invoices" in message.data && Array.isArray(message.data.invoices) && (
                 <div className="mt-3 space-y-2">
                   {message.data.invoices.slice(0, 5).map((inv: { id: string; invoiceNum: string; clientName: string; total: number; date: string }) => (
                     <div key={inv.id} className="rounded border border-border bg-background p-2 text-xs">
@@ -186,15 +194,15 @@ export default function AIAssistPage() {
               )}
 
               {/* BTW Summary */}
-              {message.type === "compute_btw" && message.data?.vat && (
+              {message.type === "compute_btw" && message.data && typeof message.data === "object" && "vat" in message.data && message.data.vat && (
                 <div className="mt-3 rounded border border-border bg-background p-3 text-xs">
                   <div className="font-semibold">BTW Overzicht</div>
                   <div className="mt-2 space-y-1">
-                    <div>Omzet: €{message.data.revenue.total.toFixed(2)}</div>
-                    <div>BTW verschuldigd: €{message.data.vat.charged.toFixed(2)}</div>
-                    <div>Voorbelasting: €{message.data.vat.deductible.toFixed(2)}</div>
+                    <div>Omzet: €{(message.data as any).revenue.total.toFixed(2)}</div>
+                    <div>BTW verschuldigd: €{(message.data as any).vat.charged.toFixed(2)}</div>
+                    <div>Voorbelasting: €{(message.data as any).vat.deductible.toFixed(2)}</div>
                     <div className="font-semibold text-primary">
-                      Netto te betalen: €{message.data.vat.netToPay.toFixed(2)}
+                      Netto te betalen: €{(message.data as any).vat.netToPay.toFixed(2)}
                     </div>
                   </div>
                 </div>

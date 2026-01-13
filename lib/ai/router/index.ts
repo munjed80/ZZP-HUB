@@ -156,7 +156,7 @@ async function handleCreateInvoice(message: string, context: RouterContext): Pro
   // Check for missing required fields
   const missing: string[] = [];
   if (!params.clientName) missing.push("clientName");
-  if (!params.amount && !params.items) missing.push("amount or items");
+  if (!params.amount) missing.push("amount or items");
 
   if (missing.length > 0) {
     return {
@@ -198,7 +198,7 @@ async function handleCreateOfferte(message: string, context: RouterContext): Pro
 
   const missing: string[] = [];
   if (!params.clientName) missing.push("clientName");
-  if (!params.amount && !params.items) missing.push("amount or items");
+  if (!params.amount) missing.push("amount or items");
 
   if (missing.length > 0) {
     return {

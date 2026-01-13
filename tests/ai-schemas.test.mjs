@@ -11,7 +11,7 @@ test("createInvoiceActionSchema validates correctly", () => {
   const valid = {
     clientName: "Test Client",
     amount: 100,
-    vatRate: "21" as const,
+    vatRate: "21",
     dueInDays: 14,
   };
   
@@ -36,7 +36,7 @@ test("createOfferteActionSchema validates correctly", () => {
   const valid = {
     clientName: "Test Client",
     amount: 100,
-    vatRate: "21" as const,
+    vatRate: "21",
     validForDays: 30,
   };
   
@@ -47,7 +47,7 @@ test("createOfferteActionSchema validates correctly", () => {
 
 test("queryInvoicesActionSchema accepts optional filters", () => {
   const valid = {
-    status: "BETAALD" as const,
+    status: "BETAALD",
     limit: 5,
   };
   
@@ -63,7 +63,7 @@ test("queryInvoicesActionSchema uses default limit", () => {
 
 test("computeBTWActionSchema accepts period", () => {
   const valid = {
-    period: "month" as const,
+    period: "month",
   };
   
   const result = computeBTWActionSchema.parse(valid);
