@@ -33,11 +33,16 @@ export async function POST(request: Request) {
       errorMessage: result.intent === "unknown" ? result.message : undefined,
     });
 
+    // Ensure message is always a string
+    const responseMessage = typeof result.message === "string" 
+      ? result.message 
+      : "Uw verzoek is verwerkt.";
+
     return NextResponse.json({
       intent: result.intent,
       type: result.type,
       data: result.data,
-      message: result.message,
+      message: responseMessage,
       needsConfirmation: result.needsConfirmation,
       needsMoreInfo: result.needsMoreInfo,
       missingFields: result.missingFields,

@@ -33,21 +33,21 @@ export interface RouterResult {
 function detectIntent(message: string): { intent: IntentType; actionType?: string } {
   const normalized = message.toLowerCase();
 
-  // Action keywords
+  // Action keywords - offerte has priority to avoid generic docs
+  const createOfferteKeywords = ["offerte", "quotation", "quote", "aanbieding", "maak een offerte", "create quote"];
   const createInvoiceKeywords = ["maak", "create", "genereer", "factuur", "invoice"];
-  const createOfferteKeywords = ["offerte", "quotation", "quote", "aanbieding"];
   const queryKeywords = ["toon", "laat zien", "show", "list", "hoeveel", "welke", "wat"];
   const btwKeywords = ["btw", "vat", "belasting", "verschuldigd"];
+
+  // Check for create offerte FIRST (highest priority)
+  if (createOfferteKeywords.some((kw) => normalized.includes(kw))) {
+    return { intent: "action", actionType: "create_offerte" };
+  }
 
   // Check for create invoice
   if (createInvoiceKeywords.some((kw) => normalized.includes(kw)) && 
       !createOfferteKeywords.some((kw) => normalized.includes(kw))) {
     return { intent: "action", actionType: "create_invoice" };
-  }
-
-  // Check for create offerte
-  if (createOfferteKeywords.some((kw) => normalized.includes(kw))) {
-    return { intent: "action", actionType: "create_offerte" };
   }
 
   // Check for query
@@ -112,6 +112,153 @@ function extractInvoiceParams(message: string): {
   const descMatch = message.match(/(?:voor|omschrijving|description):\s*([^,.\n]+)/i);
   if (descMatch) {
     params.description = descMatch[1].trim();
+  }
+
+  return params;
+}
+
+/**
+ * Extract offerte-specific parameters from message with robust pattern matching
+ * Supports patterns:
+ * - "<client> <qty> <item> price <unitPrice>"  => "Riza 320 stops price 1.25"
+ * - "<qty>x <item> @ <unitPrice> for <client>" => "320x stops @ 1.25 for Riza"
+ * - "<client> <qty> <item> à <unitPrice>"      => "Riza 320 stops à €1.25"
+ */
+function extractOfferteParams(message: string): {
+  clientName?: string;
+  items?: Array<{
+    description: string;
+    quantity: number;
+    price: number;
+    unit: string;
+    vatRate: string;
+  }>;
+  vatRate?: "21" | "9" | "0";
+  notes?: string;
+  dueDate?: string;
+} {
+  const normalized = message.toLowerCase();
+  const params: {
+    clientName?: string;
+    items?: Array<{
+      description: string;
+      quantity: number;
+      price: number;
+      unit: string;
+      vatRate: string;
+    }>;
+    vatRate?: "21" | "9" | "0";
+    notes?: string;
+    dueDate?: string;
+  } = {};
+
+  // Remove common prefixes that might interfere with parsing
+  const PREFIX_PATTERN = /^(?:maak|create|genereer)?\s*(?:een|a)?\s*(?:offerte|quote|quotation|aanbieding)?\s*/i;
+  const cleanMessage = message.replace(PREFIX_PATTERN, "").trim();
+
+  // Pattern 1: "<client> <qty> <item> price <unitPrice>"
+  // Groups: (1)clientName (2)quantity (3)description (4)price
+  // Example: "Riza 320 stops price 1.25"
+  // Supports client names and items with letters, spaces, numbers, hyphens, ampersands, and apostrophes
+  const PATTERN_CLIENT_QTY_ITEM_PRICE = /^([A-Za-z0-9\s\-&']+?)\s+(\d+)\s+([A-Za-z0-9\s\-&']+?)\s+(?:price|prijs|à|@)\s*€?\s*(\d+(?:[.,]\d+)?)/i;
+  const pattern1 = cleanMessage.match(PATTERN_CLIENT_QTY_ITEM_PRICE);
+  if (pattern1) {
+    params.clientName = pattern1[1].trim();
+    const quantity = parseInt(pattern1[2]);
+    const description = pattern1[3].trim();
+    const price = parseFloat(pattern1[4].replace(",", "."));
+    
+    params.items = [{
+      description,
+      quantity,
+      price,
+      unit: "STUK",
+      vatRate: "21",
+    }];
+  }
+
+  // Pattern 2: "<qty>x <item> @ <unitPrice> for <client>"
+  // Groups: (1)quantity (2)description (3)price (4)clientName
+  // Example: "320x stops @ 1.25 for Riza"
+  // Supports client names and items with letters, spaces, numbers, hyphens, ampersands, and apostrophes
+  const PATTERN_QTY_ITEM_PRICE_FOR_CLIENT = /^(\d+)x?\s+([A-Za-z0-9\s\-&']+?)\s+(?:@|à|price|prijs)\s*€?\s*(\d+(?:[.,]\d+)?)\s+(?:for|voor)\s+([A-Za-z0-9\s\-&']+)/i;
+  const pattern2 = cleanMessage.match(PATTERN_QTY_ITEM_PRICE_FOR_CLIENT);
+  if (pattern2 && !pattern1) {
+    const quantity = parseInt(pattern2[1]);
+    const description = pattern2[2].trim();
+    const price = parseFloat(pattern2[3].replace(",", "."));
+    params.clientName = pattern2[4].trim();
+    
+    params.items = [{
+      description,
+      quantity,
+      price,
+      unit: "STUK",
+      vatRate: "21",
+    }];
+  }
+
+  // Pattern 3: "<client> <item> <qty> stuks <unitPrice> per stuk"
+  // Groups: (1)clientName (2)description (3)quantity (4)price
+  // Example: "Riza stops 320 stuks 1.25 per stuk"
+  // Supports client names and items with letters, spaces, numbers, hyphens, ampersands, and apostrophes
+  const PATTERN_CLIENT_ITEM_QTY_STUKS_PRICE = /^([A-Za-z0-9\s\-&']+?)\s+([A-Za-z0-9\s\-&']+?)\s+(\d+)\s+(?:stuks?|pieces?|x)\s+€?\s*(\d+(?:[.,]\d+)?)\s*(?:per|each)?/i;
+  const pattern3 = cleanMessage.match(PATTERN_CLIENT_ITEM_QTY_STUKS_PRICE);
+  if (pattern3 && !pattern1 && !pattern2) {
+    params.clientName = pattern3[1].trim();
+    const description = pattern3[2].trim();
+    const quantity = parseInt(pattern3[3]);
+    const price = parseFloat(pattern3[4].replace(",", "."));
+    
+    params.items = [{
+      description,
+      quantity,
+      price,
+      unit: "STUK",
+      vatRate: "21",
+    }];
+  }
+
+  // If no structured pattern matched, try fallback extraction
+  if (!params.items) {
+    // Extract client name (after "voor" or "for")
+    const clientMatch = message.match(/(?:voor|for)\s+([A-Za-z\s]+?)(?:\s*,|\s+\d|$)/i);
+    if (clientMatch) {
+      params.clientName = clientMatch[1].trim();
+    }
+
+    // Extract quantity and description
+    const qtyDescMatch = cleanMessage.match(/^(\d+)\s*x?\s+([A-Za-z\s]+?)(?:\s+(?:@|à|price|prijs|voor|for)|$)/i);
+    if (qtyDescMatch) {
+      const quantity = parseInt(qtyDescMatch[1]);
+      const description = qtyDescMatch[2].trim();
+      
+      // Extract price
+      const priceMatch = message.match(/(?:price|prijs|@|à)\s*€?\s*(\d+(?:[.,]\d+)?)/i);
+      if (priceMatch) {
+        const price = parseFloat(priceMatch[1].replace(",", "."));
+        
+        params.items = [{
+          description,
+          quantity,
+          price,
+          unit: "STUK",
+          vatRate: "21",
+        }];
+      }
+    }
+  }
+
+  // Extract VAT rate
+  if (normalized.includes("21%") || normalized.includes("21 %")) {
+    params.vatRate = "21";
+  } else if (normalized.includes("9%") || normalized.includes("9 %")) {
+    params.vatRate = "9";
+  } else if (normalized.includes("0%") || normalized.includes("0 %")) {
+    params.vatRate = "0";
+  } else {
+    // Default to 21%
+    params.vatRate = "21";
   }
 
   return params;
@@ -194,32 +341,67 @@ async function handleCreateInvoice(message: string, context: RouterContext): Pro
  * Handle create offerte action
  */
 async function handleCreateOfferte(message: string, context: RouterContext): Promise<RouterResult> {
-  const params = extractInvoiceParams(message);
+  const params = extractOfferteParams(message);
 
-  const missing: string[] = [];
-  if (!params.clientName) missing.push("clientName");
-  if (!params.amount) missing.push("amount or items");
-
-  if (missing.length > 0) {
+  // Check for missing required fields with specific Dutch messages
+  if (!params.clientName) {
     return {
       intent: "action",
       type: "create_offerte",
       needsMoreInfo: true,
-      missingFields: missing,
-      message: `Om een offerte aan te maken heb ik: ${missing.join(", ")}`,
+      missingFields: ["clientName"],
+      message: "Welke klantnaam?",
+    };
+  }
+  
+  if (!params.items || params.items.length === 0) {
+    return {
+      intent: "action",
+      type: "create_offerte",
+      needsMoreInfo: true,
+      missingFields: ["items"],
+      message: "Welke items/aantal/prijs?",
     };
   }
 
+  // Build the offerte data with explicit VAT rate (defaulting to 21%)
+  const offerteData = {
+    clientName: params.clientName,
+    items: params.items,
+    vatRate: params.vatRate || "21",
+  };
+
   try {
-    const validated = createOfferteActionSchema.parse(params);
+    const validated = createOfferteActionSchema.parse(offerteData);
     const result = await toolCreateOfferteDraft(validated, context);
+
+    if (result.success && result.quotation) {
+      // Return with confirmation request showing VAT rate
+      const quotation = result.quotation;
+      const confirmationMessage = `Offerte preview voor ${quotation.clientName}:\n\n` +
+        (quotation.lines || []).map((line: { description: string; quantity: number; price: number }) => 
+          `- ${line.description}: ${line.quantity}x €${line.price.toFixed(2)}`
+        ).join('\n') +
+        `\n\nSubtotaal: €${quotation.total.toFixed(2)}` +
+        `\nBTW (${offerteData.vatRate}%): €${quotation.vatAmount.toFixed(2)}` +
+        `\nTotaal: €${quotation.totalWithVat.toFixed(2)}` +
+        `\n\nBevestigen? (Ja/Nee)`;
+
+      return {
+        intent: "action",
+        type: "create_offerte",
+        data: result,
+        needsConfirmation: true,
+        message: confirmationMessage,
+      };
+    }
 
     return {
       intent: "action",
       type: "create_offerte",
       data: result,
-      needsConfirmation: result.success,
-      message: result.message,
+      needsConfirmation: false,
+      message: result.message || "Er is een fout opgetreden bij het aanmaken van de offerte.",
     };
   } catch (error: unknown) {
     return {
