@@ -153,7 +153,7 @@ function extractOfferteParams(message: string): {
   } = {};
 
   // Remove common prefixes that might interfere with parsing
-  let cleanMessage = message.replace(/^(?:maak|create|genereer)?\s*(?:een|a)?\s*(?:offerte|quote|quotation|aanbieding)?\s*/i, "").trim();
+  const cleanMessage = message.replace(/^(?:maak|create|genereer)?\s*(?:een|a)?\s*(?:offerte|quote|quotation|aanbieding)?\s*/i, "").trim();
 
   // Pattern 1: "<client> <qty> <item> price <unitPrice>"
   // Example: "Riza 320 stops price 1.25"
@@ -334,7 +334,6 @@ async function handleCreateOfferte(message: string, context: RouterContext): Pro
   const params = extractOfferteParams(message);
 
   // Check for missing required fields with specific Dutch messages
-  const missing: string[] = [];
   if (!params.clientName) {
     return {
       intent: "action",
