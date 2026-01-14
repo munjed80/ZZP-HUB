@@ -1,13 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Send, Loader2, FileText, Calculator, HelpCircle, AlertTriangle, Receipt, Users } from "lucide-react";
+import { Send, Loader2, FileText, Calculator, HelpCircle, AlertTriangle } from "lucide-react";
 import { z } from "zod";
 import React from "react";
-import { ExpensePreviewCard } from "./components/ExpensePreviewCard";
-import { ClientPreviewCard } from "./components/ClientPreviewCard";
-import { DebugPanel, DebugToggle, type DebugInfo } from "./components/DebugPanel";
-import { SuccessBanner } from "./components/SuccessBanner";
 
 // Shared line item schema for invoices and quotations
 const LineItemSchema = z.object({
@@ -63,6 +59,7 @@ const RevenueSummarySchema = z.object({
 });
 
 // Type-safe data payloads inferred from Zod schemas
+// (Other types are inferred directly from Zod parsing)
 type InvoiceListItem = z.infer<typeof InvoiceListItemSchema>;
 
 // Type guard for checking if a value is a record
@@ -78,9 +75,6 @@ interface Message {
   data?: unknown;
   type?: string;
   needsConfirmation?: boolean;
-  requestId?: string;
-  intent?: string;
-  missingFields?: string[];
 }
 
 // Error card component for displaying parse errors
@@ -105,8 +99,10 @@ function InvoicePreviewCard({
 }): React.ReactElement | null {
   if (message.type !== "create_invoice" || !message.data) return null;
   
+  // Check if it's an object with an invoice property
   if (!isRecord(message.data) || !("invoice" in message.data)) return null;
   
+  // Parse the invoice data with Zod for type safety
   const parseResult = InvoicePreviewSchema.safeParse(message.data.invoice);
   
   if (!parseResult.success) {
@@ -116,48 +112,17 @@ function InvoicePreviewCard({
   const invoice = parseResult.data;
   
   return (
-    <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
-      <div className="text-sm font-semibold mb-2">Factuur Preview</div>
-      <div className="space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Nummer:</span>
-          <span className="font-medium">{invoice.invoiceNum}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Client:</span>
-          <span className="font-medium">{invoice.clientName}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Datum:</span>
-          <span className="font-medium">
-            {new Date(invoice.date).toLocaleDateString("nl-NL")}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Vervaldatum:</span>
-          <span className="font-medium">
-            {new Date(invoice.dueDate).toLocaleDateString("nl-NL")}
-          </span>
-        </div>
-        <div className="border-t pt-2 mt-2">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Subtotaal:</span>
-            <span>€{invoice.total.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>BTW:</span>
-            <span>€{invoice.vatAmount.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between font-semibold mt-1">
-            <span>Totaal:</span>
-            <span className="text-primary">€{invoice.totalWithVat.toFixed(2)}</span>
-          </div>
-        </div>
+    <div className="mt-3 rounded border border-border bg-background p-3">
+      <div className="text-xs font-semibold">Factuur Preview</div>
+      <div className="mt-2 space-y-1 text-xs">
+        <div>Nummer: {invoice.invoiceNum}</div>
+        <div>Client: {invoice.clientName}</div>
+        <div>Totaal: €{invoice.totalWithVat.toFixed(2)}</div>
       </div>
       {message.needsConfirmation && (
         <button
           onClick={() => onConfirm(message.id)}
-          className="mt-3 w-full rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="mt-2 rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
         >
           Bevestig & Opslaan
         </button>
@@ -176,8 +141,10 @@ function QuotationPreviewCard({
 }): React.ReactElement | null {
   if (message.type !== "create_offerte" || !message.data) return null;
   
+  // Check if it's an object with a quotation property
   if (!isRecord(message.data) || !("quotation" in message.data)) return null;
   
+  // Parse the quotation data with Zod for type safety
   const parseResult = QuotationPreviewSchema.safeParse(message.data.quotation);
   
   if (!parseResult.success) {
@@ -187,50 +154,17 @@ function QuotationPreviewCard({
   const quotation = parseResult.data;
   
   return (
-    <div className="mt-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 p-4">
-      <div className="text-sm font-semibold mb-2">Offerte Preview</div>
-      <div className="space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Nummer:</span>
-          <span className="font-medium">{quotation.quoteNum}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Client:</span>
-          <span className="font-medium">{quotation.clientName}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Datum:</span>
-          <span className="font-medium">
-            {new Date(quotation.date).toLocaleDateString("nl-NL")}
-          </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Geldig tot:</span>
-          <span className="font-medium">
-            {new Date(quotation.validUntil).toLocaleDateString("nl-NL")}
-          </span>
-        </div>
-        <div className="border-t pt-2 mt-2">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Subtotaal:</span>
-            <span>€{quotation.total.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>BTW:</span>
-            <span>€{quotation.vatAmount.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between font-semibold mt-1">
-            <span>Totaal:</span>
-            <span className="text-blue-700 dark:text-blue-400">
-              €{quotation.totalWithVat.toFixed(2)}
-            </span>
-          </div>
-        </div>
+    <div className="mt-3 rounded border border-border bg-background p-3">
+      <div className="text-xs font-semibold">Offerte Preview</div>
+      <div className="mt-2 space-y-1 text-xs">
+        <div>Nummer: {quotation.quoteNum}</div>
+        <div>Client: {quotation.clientName}</div>
+        <div>Totaal: €{quotation.totalWithVat.toFixed(2)}</div>
       </div>
       {message.needsConfirmation && (
         <button
           onClick={() => onConfirm(message.id)}
-          className="mt-3 w-full rounded-md bg-blue-600 hover:bg-blue-700 px-3 py-2 text-sm font-medium text-white transition-colors"
+          className="mt-2 rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90"
         >
           Bevestig & Opslaan
         </button>
@@ -245,9 +179,11 @@ function InvoiceListCard({ message }: { message: Message }): React.ReactElement 
   
   if (!isRecord(message.data) || !("invoices" in message.data)) return null;
   
+  // Parse each invoice in the array
   const invoicesData = message.data.invoices;
   if (!Array.isArray(invoicesData)) return null;
   
+  // Parse and filter valid invoices
   const validInvoices: InvoiceListItem[] = [];
   for (const inv of invoicesData.slice(0, 5)) {
     const parsed = InvoiceListItemSchema.safeParse(inv);
@@ -307,25 +243,16 @@ export default function AIAssistPage() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hallo! Ik ben je AI Assistent. Ik kan je helpen met vragen over ZZP HUB, facturen en offertes aanmaken, uitgaven registreren, relaties toevoegen, en BTW berekeningen. Wat kan ik voor je doen?",
+      content: "Hallo! Ik ben je AI Assistent. Ik kan je helpen met vragen over ZZP HUB, facturen aanmaken, offertes maken, en BTW berekeningen. Wat kan ik voor je doen?",
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isDebugMode, setIsDebugMode] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
-  const [successBanner, setSuccessBanner] = useState<{
-    message: string;
-    entityType?: "invoice" | "offerte" | "expense" | "client";
-    entityId?: string;
-  } | null>(null);
 
   const quickActions = [
     { label: "Maak factuur", icon: FileText, prompt: "Maak een factuur" },
     { label: "Maak offerte", icon: FileText, prompt: "Maak een offerte" },
-    { label: "Voeg uitgave toe", icon: Receipt, prompt: "Registreer een uitgave" },
-    { label: "Nieuwe relatie", icon: Users, prompt: "Voeg een nieuwe klant toe" },
     { label: "BTW overzicht", icon: Calculator, prompt: "Hoeveel BTW ben ik verschuldigd deze maand?" },
     { label: "Help", icon: HelpCircle, prompt: "Hoe gebruik ik ZZP HUB?" },
   ];
@@ -343,7 +270,6 @@ export default function AIAssistPage() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
-    setSuccessBanner(null); // Clear any existing success banner
 
     try {
       const response = await fetch("/api/ai/chat", {
@@ -366,35 +292,9 @@ export default function AIAssistPage() {
         data: result.data,
         type: result.type,
         needsConfirmation: result.needsConfirmation,
-        requestId: result.requestId,
-        intent: result.intent,
-        missingFields: result.missingFields,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-
-      // Update debug info if debug mode is on
-      if (isDebugMode) {
-        setDebugInfo({
-          requestId: result.requestId,
-          intent: result.intent,
-          type: result.type,
-          draft: result.data,
-          missingFields: result.missingFields,
-        });
-      }
-
-      // Show success banner if entity was created
-      if (result.data?.success && !result.needsConfirmation) {
-        const entityType = result.type?.replace("create_", "") as "invoice" | "offerte" | "expense" | "client";
-        const entityId = result.data?.invoice?.id || result.data?.quotation?.id || result.data?.expense?.id || result.data?.client?.id;
-        
-        setSuccessBanner({
-          message: result.message || "Item succesvol aangemaakt!",
-          entityType,
-          entityId,
-        });
-      }
     } catch (error) {
       console.error("Error sending message:", error);
       const errorMessage: Message = {
@@ -413,14 +313,16 @@ export default function AIAssistPage() {
     const message = messages.find((m) => m.id === messageId);
     if (!message || !message.data) return;
     
+    // Use type guard to safely check data structure
     if (!isRecord(message.data)) return;
     
+    // Check for invoice or quotation id using type-safe access
     const hasInvoiceId = isRecord(message.data.invoice) && typeof message.data.invoice.id === "string";
     const hasQuotationId = isRecord(message.data.quotation) && typeof message.data.quotation.id === "string";
     
     if (!hasInvoiceId && !hasQuotationId) return;
 
-    // TODO: Implement confirmation logic via API
+    // TODO: Implement confirmation logic
     alert("Bevestig functionaliteit wordt binnenkort toegevoegd!");
   };
 
@@ -429,45 +331,12 @@ export default function AIAssistPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">AI Assist</h1>
         <p className="text-sm text-muted-foreground">
-          Stel vragen, maak facturen, offertes, uitgaven en relaties met natuurlijke taal
+          Stel vragen, maak facturen en offertes met natuurlijke taal
         </p>
       </div>
 
-      {/* Debug Toggle */}
-      <DebugToggle isDebugMode={isDebugMode} onToggle={() => setIsDebugMode(!isDebugMode)} />
-
-      {/* Debug Panel */}
-      <DebugPanel 
-        debugInfo={debugInfo} 
-        isOpen={isDebugMode} 
-        onClose={() => setDebugInfo(null)} 
-      />
-
-      {/* Success Banner */}
-      {successBanner && (
-        <SuccessBanner
-          message={successBanner.message}
-          entityType={successBanner.entityType}
-          entityId={successBanner.entityId}
-          onDismiss={() => setSuccessBanner(null)}
-          onOpen={() => {
-            // Navigate to entity
-            if (successBanner.entityType && successBanner.entityId) {
-              const link = successBanner.entityType === "invoice" 
-                ? `/facturen/${successBanner.entityId}`
-                : successBanner.entityType === "offerte"
-                ? `/offertes/${successBanner.entityId}`
-                : successBanner.entityType === "expense"
-                ? `/uitgaven`
-                : `/relaties`;
-              window.location.href = link;
-            }
-          }}
-        />
-      )}
-
       {/* Quick Actions */}
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3">
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         {quickActions.map((action) => (
           <button
             key={action.label}
@@ -497,12 +366,16 @@ export default function AIAssistPage() {
             >
               <div className="whitespace-pre-wrap text-sm">{message.content}</div>
 
-              {/* Preview Cards */}
+              {/* Invoice Preview */}
               <InvoicePreviewCard message={message} onConfirm={handleConfirm} />
+
+              {/* Quotation Preview */}
               <QuotationPreviewCard message={message} onConfirm={handleConfirm} />
-              <ExpensePreviewCard message={message} onConfirm={handleConfirm} />
-              <ClientPreviewCard message={message} onConfirm={handleConfirm} />
+
+              {/* Invoice List */}
               <InvoiceListCard message={message} />
+
+              {/* BTW Summary */}
               <BTWSummaryCard message={message} />
 
               <div className="mt-1 text-xs opacity-70">
