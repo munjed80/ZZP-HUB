@@ -183,3 +183,60 @@ WHERE email = 'test@example.com';
 1. **Robots.txt**: Bezoek `https://matrixtop.com/robots.txt`
 2. **Sitemap.xml**: Bezoek `https://matrixtop.com/sitemap.xml`
 3. **Per-Page Metadata**: Controleer de `<title>` tag op elke pagina met format: "[Page Title] | ZZP-HUB"
+
+## AI Assist
+
+ZZP HUB bevat een geavanceerde AI-assistent die gebruikers helpt met natuurlijke taal in het Nederlands. De assistent kan facturen, offertes, uitgaven en relaties aanmaken, BTW berekenen, en vragen beantwoorden over de applicatie.
+
+### Features
+- **Multi-step data collectie**: Vraagt stap-voor-stap naar ontbrekende informatie
+- **Preview & Confirm**: Toont preview voordat entiteiten worden aangemaakt
+- **Dutch language parsing**: Herkent Nederlandse invoer zoals "320 stops @ 1,25"
+- **Tenant isolation**: Strikte scheiding tussen gebruikers (userId scoping)
+- **Audit logging**: Volledige logging met requestId voor observability
+- **Debug mode**: Developer mode voor troubleshooting
+
+### Ondersteunde Acties
+1. **Facturen aanmaken**: "Maak factuur voor Acme BV 320 stops @ 1.25"
+2. **Offertes aanmaken**: "Maak offerte voor Daily 40 uur x 75 euro"
+3. **Uitgaven registreren**: "Registreer uitgave: koffie 15 euro 9% btw"
+4. **Relaties toevoegen**: "Voeg klant toe: Acme BV, email@acme.nl"
+5. **BTW berekenen**: "Hoeveel BTW ben ik verschuldigd deze maand?"
+6. **Facturen opvragen**: "Toon onbetaalde facturen"
+7. **Help vragen**: "Hoe maak ik een factuur?"
+
+### Quick Start
+1. Ga naar `/ai-assist` in de applicatie
+2. Gebruik de quick action buttons of typ een vraag
+3. Volg de instructies van de assistent
+4. Bevestig previews voordat entiteiten worden aangemaakt
+
+### Architectuur
+Zie [AI_ASSIST_ARCHITECTURE.md](docs/AI_ASSIST_ARCHITECTURE.md) voor:
+- Complete architectuur uitleg
+- Request flow diagrammen
+- Nieuwe acties toevoegen
+- Testing & debugging
+- Security best practices
+
+### Debug Mode
+Schakel debug mode in door op het bug-icoon rechtsboven te klikken. Dit toont:
+- Request ID voor tracing
+- Gedetecteerde intent
+- Huidige draft velden
+- Ontbrekende velden
+- Validatie errors
+
+### API Endpoints
+- `POST /api/ai/chat` - Hoofd chat endpoint
+- `POST /api/ai/intent` - Intent classificatie
+- `POST /api/ai/draft/update` - Update conversatie draft
+- `POST /api/ai/draft/confirm` - Bevestig en voer draft uit
+
+### Security
+- **Multi-tenant correctness**: Alle queries gescoped op userId uit sessie
+- **No silent failures**: Altijd preview OF error met uitleg
+- **Audit logging**: Elke actie gelogd met requestId
+- **Input validation**: Zod schemas op alle lagen
+- **Friendly errors**: Geen raw Prisma errors naar gebruiker
+
