@@ -92,5 +92,3 @@ export const createExpenseActionSchema = z.object({
 });
 
 export type CreateExpenseAction = z.infer<typeof createExpenseActionSchema>;
-
-export type CreateClientAction = z.infer<typeof createClientActionSchema>;

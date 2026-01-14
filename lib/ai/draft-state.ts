@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ConversationStateSchema, type ConversationState } from "../schemas/drafts";
+import { ConversationStateSchema, type ConversationState } from "./schemas/drafts";
 import { z } from "zod";
 
 /**
