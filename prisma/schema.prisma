@@ -245,8 +245,13 @@ model AiActionAuditLog {
   userId        String
   actionType    String
   payloadHash   String
+  payloadJson   String?  @db.Text
+  requestId     String?
   resultId      String?
   resultType    String?
+  entityType    String?
+  entityId      String?
+  status        String?
   success       Boolean
   errorMessage  String?
   createdAt     DateTime @default(now())
@@ -254,6 +259,7 @@ model AiActionAuditLog {
   @@index([userId])
   @@index([createdAt])
   @@index([actionType])
+  @@index([requestId])
 }
 
 model SupportMessage {
@@ -290,4 +296,19 @@ model Release {
   releaseDate DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+}
+
+model ConversationDraft {
+  id              String   @id @default(uuid())
+  conversationId  String   @unique
+  userId          String
+  intent          String
+  draftJson       String   @db.Text
+  status          String   @default("active")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([conversationId])
+  @@index([status])
 }

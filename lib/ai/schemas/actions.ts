@@ -76,3 +76,21 @@ export type CreateOfferteAction = z.infer<typeof createOfferteActionSchema>;
 export type QueryInvoicesAction = z.infer<typeof queryInvoicesActionSchema>;
 export type ComputeBTWAction = z.infer<typeof computeBTWActionSchema>;
 export type CreateClientAction = z.infer<typeof createClientActionSchema>;
+/**
+ * Schema for creating an expense via AI
+ */
+export const createExpenseActionSchema = z.object({
+  category: z.string().min(1, "Category is required"),
+  amount: z.number().positive("Amount must be positive"),
+  amountExcl: z.number().positive().optional(),
+  vatRate: z.enum(["21", "9", "0"]).default("21"),
+  date: z.string().optional(), // ISO date string
+  description: z.string().optional(),
+  vendor: z.string().optional(),
+  paymentMethod: z.enum(["CASH", "CARD", "BANK_TRANSFER", "OTHER"]).optional(),
+  receiptUrl: z.string().url().optional(),
+});
+
+export type CreateExpenseAction = z.infer<typeof createExpenseActionSchema>;
+
+export type CreateClientAction = z.infer<typeof createClientActionSchema>;
