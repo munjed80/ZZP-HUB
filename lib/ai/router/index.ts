@@ -182,8 +182,8 @@ async function handleCreateExpense(
       needsConfirmation: result.success,
       message: result.message,
     };
-  } catch {
-    logAIStep({ requestId, step: "create_failed" });
+  } catch (error: unknown) {
+    logAIStep({ requestId, step: "create_failed", details: { error: String(error) } });
     return {
       intent: "create_uitgave",
       requestId,
@@ -347,7 +347,8 @@ export async function routeAIRequest(
   // Validate intent with schema
   try {
     IntentSchema.parse({ intent, confidence });
-  } catch {
+  } catch (error: unknown) {
+    logAIStep({ requestId, step: "validation_failed", details: { error: String(error) } });
     return {
       intent: "unknown",
       requestId,

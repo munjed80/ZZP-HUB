@@ -19,12 +19,20 @@ import {
 import { z } from "zod";
 
 /**
+ * Supported multi-step intent types
+ * This constant is the single source of truth for both the type and validation
+ */
+const MULTI_STEP_INTENTS = ["create_client", "create_factuur", "create_offerte"] as const;
+
+/**
  * Intent types supported by multi-step flow
  */
-export type MultiStepIntent = 
-  | "create_client"
-  | "create_factuur" 
-  | "create_offerte";
+export type MultiStepIntent = typeof MULTI_STEP_INTENTS[number];
+
+/**
+ * Maximum length for simple name detection (used in heuristics)
+ */
+const MAX_SIMPLE_NAME_LENGTH = 50;
 
 /**
  * Mapping of field names to natural Dutch questions
@@ -304,8 +312,8 @@ export function parseMessageForIntent(
       // If we're missing name and got a simple text response, treat it as the name
       if (!existingDraft.name && !updates.name) {
         const cleanedMessage = message.trim();
-        // Simple heuristic: if message is just a name (no special chars, < 50 chars)
-        if (cleanedMessage.length > 0 && cleanedMessage.length < 50 && !cleanedMessage.includes("@")) {
+        // Simple heuristic: if message is just a name (no special chars, reasonable length)
+        if (cleanedMessage.length > 0 && cleanedMessage.length < MAX_SIMPLE_NAME_LENGTH && !cleanedMessage.includes("@")) {
           updates.name = cleanedMessage;
         }
       }
@@ -349,8 +357,8 @@ export function parseMessageForIntent(
       // If we're missing clientName and got a simple text (potential name)
       if (!existingDraft.clientName && !updates.clientName) {
         const cleanedMessage = message.trim();
-        // If it looks like just a name (no numbers, short)
-        if (cleanedMessage.length > 0 && cleanedMessage.length < 50 && !/\d/.test(cleanedMessage)) {
+        // If it looks like just a name (no numbers, reasonable length)
+        if (cleanedMessage.length > 0 && cleanedMessage.length < MAX_SIMPLE_NAME_LENGTH && !/\d/.test(cleanedMessage)) {
           updates.clientName = cleanedMessage;
         }
       }
@@ -573,5 +581,5 @@ export async function handleMultiStepMessage(
  * Check if an intent should use multi-step flow
  */
 export function isMultiStepIntent(intent: string): intent is MultiStepIntent {
-  return ["create_client", "create_factuur", "create_offerte"].includes(intent);
+  return (MULTI_STEP_INTENTS as readonly string[]).includes(intent);
 }
