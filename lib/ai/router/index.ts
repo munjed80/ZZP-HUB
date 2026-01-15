@@ -1,27 +1,22 @@
 import { findRelevantSections, buildContextString } from "./knowledge-loader";
 import {
-  createInvoiceActionSchema,
-  createOfferteActionSchema,
   createExpenseActionSchema,
-  createClientActionSchema,
   queryInvoicesActionSchema,
   computeBTWActionSchema,
 } from "../schemas/actions";
 import { IntentSchema } from "../schemas/drafts";
-import { toolCreateInvoiceDraft } from "../tools/invoice-tools";
-import { toolCreateOfferteDraft } from "../tools/offerte-tools";
 import { toolCreateExpenseDraft } from "../tools/expense-tools";
-import { toolCreateClientIfMissing } from "../tools/client-tools";
 import { toolListInvoices, toolComputeBTW } from "../tools/query-tools";
 import { 
-  parseLineItems, 
   parseExpense, 
-  parseClient, 
-  extractClientName,
-  normalizeVatRate,
-  normalizeDecimal 
 } from "../parsers";
 import { generateRequestId, logAIStep } from "../audit";
+import { 
+  handleMultiStepMessage, 
+  isMultiStepIntent,
+  getActiveConversation,
+  type MultiStepIntent 
+} from "../conversation-manager";
 
 interface RouterContext {
   userId: string;
@@ -40,19 +35,21 @@ export type IntentType =
   | "update_settings"
   | "unknown";
 
+export type RouterResultType = 
+  | "answer" 
+  | "create_invoice" 
+  | "create_offerte" 
+  | "create_expense"
+  | "create_client"
+  | "query_invoices" 
+  | "query_expenses"
+  | "compute_btw"
+  | "settings_guidance";
+
 export interface RouterResult {
   intent: IntentType;
   requestId: string;
-  type?: 
-    | "answer" 
-    | "create_invoice" 
-    | "create_offerte" 
-    | "create_expense"
-    | "create_client"
-    | "query_invoices" 
-    | "query_expenses"
-    | "compute_btw"
-    | "settings_guidance";
+  type?: RouterResultType;
   data?: Record<string, unknown>;
   message?: string;
   needsConfirmation?: boolean;
@@ -111,81 +108,6 @@ function detectIntent(message: string): { intent: IntentType; confidence: number
 }
 
 /**
- * Extract invoice parameters using enhanced parsers
- */
-function extractInvoiceParams(message: string): {
-  clientName?: string;
-  amount?: number;
-  items?: Array<{ description: string; quantity: number; price: number; unit: string; vatRate: string }>;
-  vatRate?: "21" | "9" | "0";
-  dueInDays?: number;
-  description?: string;
-} {
-  const params: ReturnType<typeof extractInvoiceParams> = {};
-
-  // Extract client name
-  params.clientName = extractClientName(message) || undefined;
-
-  // Try to parse line items first
-  const items = parseLineItems(message);
-  if (items.length > 0) {
-    params.items = items;
-    // Use VAT rate from first item
-    params.vatRate = items[0].vatRate as "21" | "9" | "0";
-  } else {
-    // Extract single amount
-    const amountMatch = message.match(/(?:bedrag|amount|€)\s*([\d,\.]+)/i);
-    if (amountMatch) {
-      params.amount = normalizeDecimal(amountMatch[1]);
-    }
-    
-    // Extract VAT rate
-    const vatMatch = message.match(/btw\s*([\d,\.]+)%?/i);
-    if (vatMatch) {
-      params.vatRate = normalizeVatRate(vatMatch[1]);
-    }
-  }
-
-  // Extract due days
-  const dueMatch = message.match(/(?:binnen|in|due)\s+(\d+)\s+(?:dagen|days)/i);
-  if (dueMatch) {
-    params.dueInDays = parseInt(dueMatch[1]);
-  }
-
-  return params;
-}
-
-/**
- * Extract offerte parameters using enhanced parsers
- */
-function extractOfferteParams(message: string): {
-  clientName?: string;
-  items?: Array<{ description: string; quantity: number; price: number; unit: string; vatRate: string }>;
-  vatRate?: "21" | "9" | "0";
-  validForDays?: number;
-} {
-  const params: ReturnType<typeof extractOfferteParams> = {};
-
-  // Extract client name
-  params.clientName = extractClientName(message) || undefined;
-
-  // Parse line items
-  const items = parseLineItems(message);
-  if (items.length > 0) {
-    params.items = items;
-    params.vatRate = items[0].vatRate as "21" | "9" | "0";
-  }
-
-  // Extract validity period
-  const validMatch = message.match(/(?:geldig|valid)\s+(\d+)\s+(?:dagen|days)/i);
-  if (validMatch) {
-    params.validForDays = parseInt(validMatch[1]);
-  }
-
-  return params;
-}
-
-/**
  * Handle help questions using knowledge base
  */
 async function handleHelpQuestion(message: string, requestId: string): Promise<RouterResult> {
@@ -215,154 +137,8 @@ async function handleHelpQuestion(message: string, requestId: string): Promise<R
 }
 
 /**
- * Handle create invoice intent
- */
-async function handleCreateInvoice(
-  message: string, 
-  context: RouterContext
-): Promise<RouterResult> {
-  const requestId = context.requestId || generateRequestId();
-  logAIStep({ requestId, step: "intent_detected", details: { intent: "create_factuur" } });
-
-  const params = extractInvoiceParams(message);
-
-  // Check for missing required fields
-  const missing: string[] = [];
-  if (!params.clientName) missing.push("clientName");
-  if (!params.amount && (!params.items || params.items.length === 0)) {
-    missing.push("amount or items");
-  }
-
-  if (missing.length > 0) {
-    logAIStep({ requestId, step: "validation_failed", details: { missingFields: missing } });
-    return {
-      intent: "create_factuur",
-      requestId,
-      type: "create_invoice",
-      needsMoreInfo: true,
-      missingFields: missing,
-      message: `Om een factuur aan te maken heb ik de volgende informatie nodig: ${missing.join(", ")}. Kun je deze gegevens verstrekken?`,
-    };
-  }
-
-  // Validate with schema
-  try {
-    const validated = createInvoiceActionSchema.parse(params);
-    logAIStep({ requestId, step: "create_started", details: { clientName: params.clientName } });
-    const result = await toolCreateInvoiceDraft(validated, { userId: context.userId });
-
-    if (result.success) {
-      logAIStep({ requestId, step: "create_success", details: { invoiceId: result.invoice?.id } });
-    } else {
-      logAIStep({ requestId, step: "create_failed", details: { error: result.message } });
-    }
-
-    return {
-      intent: "create_factuur",
-      requestId,
-      type: "create_invoice",
-      data: result,
-      needsConfirmation: result.success,
-      message: result.message,
-    };
-  } catch (error: unknown) {
-    logAIStep({ requestId, step: "create_failed", details: { error: String(error) } });
-    return {
-      intent: "create_factuur",
-      requestId,
-      type: "create_invoice",
-      data: { success: false },
-      message: `Fout bij validatie: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
-}
-
-/**
- * Handle create offerte intent
- */
-async function handleCreateOfferte(
-  message: string, 
-  context: RouterContext
-): Promise<RouterResult> {
-  const requestId = context.requestId || generateRequestId();
-  logAIStep({ requestId, step: "intent_detected", details: { intent: "create_offerte" } });
-
-  const params = extractOfferteParams(message);
-
-  // Check for missing fields
-  if (!params.clientName) {
-    logAIStep({ requestId, step: "validation_failed", details: { missingFields: ["clientName"] } });
-    return {
-      intent: "create_offerte",
-      requestId,
-      type: "create_offerte",
-      needsMoreInfo: true,
-      missingFields: ["clientName"],
-      message: "Voor welke klant is deze offerte?",
-    };
-  }
-  
-  if (!params.items || params.items.length === 0) {
-    logAIStep({ requestId, step: "validation_failed", details: { missingFields: ["items"] } });
-    return {
-      intent: "create_offerte",
-      requestId,
-      type: "create_offerte",
-      needsMoreInfo: true,
-      missingFields: ["items"],
-      message: "Welke items/aantal/prijs wil je in de offerte opnemen?",
-    };
-  }
-
-  try {
-    const validated = createOfferteActionSchema.parse(params);
-    logAIStep({ requestId, step: "create_started", details: { clientName: params.clientName } });
-    const result = await toolCreateOfferteDraft(validated, { userId: context.userId });
-
-    if (result.success && result.quotation) {
-      logAIStep({ requestId, step: "create_success", details: { quotationId: result.quotation.id } });
-      
-      const quotation = result.quotation;
-      const confirmationMessage = `Offerte preview voor ${quotation.clientName}:\n\n` +
-        (quotation.lines || []).map((line: { description: string; quantity: number; price: number }) => 
-          `- ${line.description}: ${line.quantity}x €${line.price.toFixed(2)}`
-        ).join('\n') +
-        `\n\nSubtotaal: €${quotation.total.toFixed(2)}` +
-        `\nBTW (${params.vatRate || "21"}%): €${quotation.vatAmount.toFixed(2)}` +
-        `\nTotaal: €${quotation.totalWithVat.toFixed(2)}`;
-
-      return {
-        intent: "create_offerte",
-        requestId,
-        type: "create_offerte",
-        data: result,
-        needsConfirmation: true,
-        message: confirmationMessage,
-      };
-    }
-
-    logAIStep({ requestId, step: "create_failed", details: { error: result.message } });
-    return {
-      intent: "create_offerte",
-      requestId,
-      type: "create_offerte",
-      data: result,
-      message: result.message || "Er is een fout opgetreden bij het aanmaken van de offerte.",
-    };
-  } catch (error: unknown) {
-    logAIStep({ requestId, step: "create_failed", details: { error: String(error) } });
-    return {
-      intent: "create_offerte",
-      requestId,
-      type: "create_offerte",
-      data: { success: false },
-      message: `Fout: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
-}
-
-/**
  * Handle create expense intent
+ * Note: Expenses still use single-shot flow as they are simpler
  */
 async function handleCreateExpense(
   message: string, 
@@ -385,7 +161,7 @@ async function handleCreateExpense(
       type: "create_expense",
       needsMoreInfo: true,
       missingFields: missing,
-      message: `Voor een uitgave heb ik nodig: ${missing.join(", ")}`,
+      message: `Wat is de categorie en het bedrag van de uitgave?`,
     };
   }
 
@@ -413,59 +189,7 @@ async function handleCreateExpense(
       requestId,
       type: "create_expense",
       data: { success: false },
-      message: `Fout: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
-}
-
-/**
- * Handle create client intent
- */
-async function handleCreateClient(
-  message: string, 
-  context: RouterContext
-): Promise<RouterResult> {
-  const requestId = context.requestId || generateRequestId();
-  logAIStep({ requestId, step: "intent_detected", details: { intent: "create_client" } });
-
-  const parsed = parseClient(message);
-
-  if (!parsed.name) {
-    logAIStep({ requestId, step: "validation_failed", details: { missingFields: ["name"] } });
-    return {
-      intent: "create_client",
-      requestId,
-      type: "create_client",
-      needsMoreInfo: true,
-      missingFields: ["name"],
-      message: "Wat is de naam van de klant/relatie?",
-    };
-  }
-
-  try {
-    const validated = createClientActionSchema.parse(parsed);
-    logAIStep({ requestId, step: "create_started", details: { clientName: parsed.name } });
-    const result = await toolCreateClientIfMissing(validated, { userId: context.userId });
-
-    if (result.success) {
-      logAIStep({ requestId, step: "create_success", details: { clientId: result.client?.id } });
-    }
-
-    return {
-      intent: "create_client",
-      requestId,
-      type: "create_client",
-      data: result,
-      message: result.message,
-    };
-  } catch (error: unknown) {
-    logAIStep({ requestId, step: "create_failed", details: { error: String(error) } });
-    return {
-      intent: "create_client",
-      requestId,
-      type: "create_client",
-      data: { success: false },
-      message: `Fout: ${error instanceof Error ? error.message : String(error)}`,
+      message: "Er ging iets mis bij het registreren van de uitgave. Probeer het opnieuw.",
     };
   }
 }
@@ -567,18 +291,64 @@ function handleSettingsGuidance(requestId: string): RouterResult {
 
 /**
  * Main router function
+ * Now supports multi-step conversation flow for create actions
  */
 export async function routeAIRequest(
   message: string,
   context: RouterContext
 ): Promise<RouterResult> {
   const requestId = context.requestId || generateRequestId();
+  
+  // Step 1: Check if there's an active multi-step conversation
+  // If so, continue that conversation regardless of message content
+  const activeConversation = await getActiveConversation(context.userId);
+  
+  if (activeConversation && isMultiStepIntent(activeConversation.intent)) {
+    // Check if user wants to cancel
+    const normalizedMessage = message.toLowerCase().trim();
+    if (["annuleren", "cancel", "stop", "afbreken", "nee"].includes(normalizedMessage)) {
+      const { cancelConversation } = await import("../conversation-manager");
+      await cancelConversation(activeConversation.conversationId, context.userId);
+      return {
+        intent: activeConversation.intent as IntentType,
+        requestId,
+        message: "Begrepen, ik heb de actie geannuleerd. Waarmee kan ik je helpen?",
+      };
+    }
+
+    // Continue the active conversation
+    logAIStep({ requestId, step: "intent_detected", details: { 
+      intent: activeConversation.intent, 
+      continuing: true,
+      conversationId: activeConversation.conversationId 
+    }});
+    
+    const result = await handleMultiStepMessage(
+      message,
+      activeConversation.intent as MultiStepIntent,
+      context.userId,
+      requestId
+    );
+
+    return {
+      intent: result.intent as IntentType,
+      requestId: result.requestId,
+      type: result.type as RouterResultType | undefined,
+      data: result.data,
+      message: result.message,
+      needsMoreInfo: result.needsMoreInfo,
+      missingFields: result.missingFields,
+    };
+  }
+
+  // Step 2: Detect intent from the message
   const { intent, confidence } = detectIntent(message);
 
   // Validate intent with schema
   try {
     IntentSchema.parse({ intent, confidence });
-  } catch (error) {
+  } catch (error: unknown) {
+    logAIStep({ requestId, step: "validation_failed", details: { error: String(error) } });
     return {
       intent: "unknown",
       requestId,
@@ -588,17 +358,35 @@ export async function routeAIRequest(
 
   const contextWithRequestId = { ...context, requestId };
 
+  // Step 3: Route to appropriate handler
+  // Multi-step intents use the conversation manager
+  if (isMultiStepIntent(intent)) {
+    logAIStep({ requestId, step: "intent_detected", details: { intent, isMultiStep: true }});
+    
+    const result = await handleMultiStepMessage(
+      message,
+      intent,
+      context.userId,
+      requestId
+    );
+
+    return {
+      intent: result.intent as IntentType,
+      requestId: result.requestId,
+      type: result.type as RouterResultType | undefined,
+      data: result.data,
+      message: result.message,
+      needsMoreInfo: result.needsMoreInfo,
+      missingFields: result.missingFields,
+    };
+  }
+
+  // Non-multi-step intents use existing handlers
   switch (intent) {
     case "help_question":
       return handleHelpQuestion(message, requestId);
-    case "create_factuur":
-      return handleCreateInvoice(message, contextWithRequestId);
-    case "create_offerte":
-      return handleCreateOfferte(message, contextWithRequestId);
     case "create_uitgave":
       return handleCreateExpense(message, contextWithRequestId);
-    case "create_client":
-      return handleCreateClient(message, contextWithRequestId);
     case "query_invoices":
       return handleQueryInvoices(message, contextWithRequestId);
     case "compute_btw":
