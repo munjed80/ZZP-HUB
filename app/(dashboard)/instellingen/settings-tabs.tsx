@@ -67,7 +67,7 @@ type SettingsTabsProps = {
   user: { name?: string | null; email: string } | null;
 };
 
-// Section Card Component - Clean, light-mode only design
+// Section Card Component - Supports dark mode
 function SectionCard({ 
   icon: Icon, 
   title, 
@@ -83,17 +83,17 @@ function SectionCard({
 }) {
   return (
     <div className={cn(
-      "bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300",
+      "bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300",
       className
     )}>
-      <div className="p-6 border-b border-gray-100">
+      <div className="p-6 border-b border-border">
         <div className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-teal-50 to-blue-50 flex items-center justify-center">
-            <Icon className="w-6 h-6 text-teal-600" />
+          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Icon className="w-6 h-6 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-            <p className="mt-1 text-sm text-gray-600">{description}</p>
+            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           </div>
         </div>
       </div>
@@ -113,16 +113,16 @@ function InputField({
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-foreground">
         {label}
       </label>
       <input
         {...props}
         className={cn(
-          "w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900",
-          "focus:ring-2 focus:ring-teal-500 focus:border-transparent",
+          "w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground",
+          "focus:ring-2 focus:ring-primary focus:border-transparent",
           "transition-all duration-200",
-          "text-base",
+          "text-base placeholder:text-muted-foreground",
           props.className
         )}
       />
@@ -151,14 +151,14 @@ function Toggle({
         />
         <div className={cn(
           "w-12 h-6 rounded-full transition-all duration-300",
-          checked ? "bg-teal-500" : "bg-gray-300"
+          checked ? "bg-primary" : "bg-muted"
         )}></div>
         <div className={cn(
-          "absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300",
+          "absolute left-1 top-1 w-4 h-4 bg-card rounded-full transition-all duration-300",
           checked && "translate-x-6"
         )}></div>
       </div>
-      <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+      <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground">
         {label}
       </span>
     </label>
@@ -347,7 +347,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
           {/* Avatar Upload */}
           <div className="flex items-center gap-6">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-muted border-2 border-border">
                 {avatarPreview ? (
                   <Image
                     src={avatarPreview}
@@ -358,14 +358,14 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                     unoptimized={avatarPreview.startsWith("data:")}
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-gray-400">
+                  <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                     <User className="w-8 h-8" />
                   </div>
                 )}
               </div>
               {avatarUploading && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50">
-                  <RefreshCw className="h-6 w-6 animate-spin text-white" />
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-background/80">
+                  <RefreshCw className="h-6 w-6 animate-spin text-foreground" />
                 </div>
               )}
             </div>
@@ -386,7 +386,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                 ref={avatarInputRef}
                 onChange={handleAvatarUpload}
               />
-              <p className="mt-2 text-sm text-gray-500">PNG of JPG, max 3MB</p>
+              <p className="mt-2 text-sm text-muted-foreground">PNG of JPG, max 3MB</p>
             </div>
           </div>
 
@@ -410,14 +410,14 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             label="E-mailadres"
             value={profileEmail}
             readOnly
-            className="bg-gray-50 cursor-not-allowed"
+            className="bg-muted cursor-not-allowed"
           />
 
-          <div className="flex justify-end pt-4 border-t border-gray-100">
+          <div className="flex justify-end pt-4 border-t border-border">
             <Button
               type="submit"
               disabled={isProfilePending}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-base rounded-lg transition-colors"
+              className="px-8 py-3 text-base rounded-lg transition-colors"
             >
               {isProfilePending ? "Opslaan..." : "Profiel opslaan"}
             </Button>
@@ -441,8 +441,8 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
         description="E-mailinstellingen voor facturen en communicatie"
       >
         <form onSubmit={handleEmailSettingsSubmit} className="space-y-6">
-          <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
-            <p className="text-sm text-gray-700">
+          <div className="p-4 bg-secondary/30 border border-secondary rounded-lg">
+            <p className="text-sm text-foreground">
               Deze instellingen bepalen hoe je facturen en offertes worden verstuurd naar klanten.
             </p>
           </div>
@@ -464,11 +464,11 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             />
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-gray-100">
+          <div className="flex justify-end pt-4 border-t border-border">
             <Button
               type="submit"
               disabled={isEmailPending}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-base rounded-lg transition-colors"
+              className="px-8 py-3 text-base rounded-lg transition-colors"
             >
               {isEmailPending ? "Opslaan..." : "Instellingen opslaan"}
             </Button>
@@ -510,11 +510,11 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             />
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-gray-100">
+          <div className="flex justify-end pt-4 border-t border-border">
             <Button
               type="submit"
               disabled={isPasswordPending}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-base rounded-lg transition-colors"
+              className="px-8 py-3 text-base rounded-lg transition-colors"
             >
               <Lock className="w-4 h-4 mr-2" />
               {isPasswordPending ? "Wijzigen..." : "Wachtwoord wijzigen"}
@@ -530,16 +530,16 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
         description="Data export en backup beheer"
       >
         <div className="space-y-6">
-          <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <p className="text-sm text-gray-700">
+          <div className="p-4 bg-muted border border-border rounded-lg">
+            <p className="text-sm text-foreground">
               Download al uw gegevens (facturen, relaties, uitgaven) als JSON-backup voor archivering of migratie.
             </p>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-card border border-border rounded-lg">
             <div>
-              <h3 className="font-medium text-gray-900">Volledige backup</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <h3 className="font-medium text-foreground">Volledige backup</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Inclusief alle facturen, klanten en uitgaven
               </p>
             </div>
@@ -547,7 +547,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
               type="button"
               onClick={handleBackupDownload}
               disabled={isBackupPending}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 text-base rounded-lg transition-colors"
+              className="px-6 py-2.5 text-base rounded-lg transition-colors"
             >
               <Download className="w-4 h-4 mr-2" />
               {isBackupPending ? "Exporteren..." : "Download"}
@@ -563,23 +563,23 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
         description="Beheer uw abonnement en betalingen"
       >
         <div className="space-y-6">
-          <div className="flex items-center justify-between p-6 bg-gradient-to-br from-teal-50 to-blue-50 rounded-lg border border-teal-100">
+          <div className="flex items-center justify-between p-6 bg-primary/10 rounded-lg border border-primary/20">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-gray-900">{abonnement.type}</span>
-                <span className="px-3 py-1 bg-teal-100 text-teal-700 text-xs font-semibold rounded-full">
+                <span className="text-2xl font-bold text-foreground">{abonnement.type}</span>
+                <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-semibold rounded-full">
                   {abonnement.status}
                 </span>
               </div>
-              <p className="mt-1 text-lg font-semibold text-teal-600">{abonnement.prijs}</p>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-1 text-lg font-semibold text-primary">{abonnement.prijs}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
                 Inclusief premium templates, BTW-hulp en prioriteitssupport
               </p>
             </div>
           </div>
 
-          <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
-            <p className="text-sm text-gray-700">
+          <div className="p-4 bg-secondary/30 border border-secondary rounded-lg">
+            <p className="text-sm text-foreground">
               Abonnementsbeheer is momenteel alleen beschikbaar via support. 
               Neem contact op voor wijzigingen aan uw abonnement.
             </p>
@@ -595,7 +595,7 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-foreground mb-3">
               Taal
             </label>
             <div className="flex gap-3">
@@ -605,8 +605,8 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                 className={cn(
                   "flex-1 px-6 py-3 rounded-lg border-2 font-medium transition-all",
                   language === "nl"
-                    ? "border-teal-500 bg-teal-50 text-teal-700"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-card text-muted-foreground hover:border-muted-foreground"
                 )}
               >
                 <Check className={cn("w-5 h-5 mx-auto mb-1", language === "nl" ? "opacity-100" : "opacity-0")} />
@@ -618,15 +618,15 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                 className={cn(
                   "flex-1 px-6 py-3 rounded-lg border-2 font-medium transition-all",
                   language === "en"
-                    ? "border-teal-500 bg-teal-50 text-teal-700"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-card text-muted-foreground hover:border-muted-foreground"
                 )}
               >
                 <Check className={cn("w-5 h-5 mx-auto mb-1", language === "en" ? "opacity-100" : "opacity-0")} />
                 English
               </button>
             </div>
-            <p className="mt-3 text-xs text-gray-500">
+            <p className="mt-3 text-xs text-muted-foreground">
               Taalwijzigingen worden automatisch opgeslagen
             </p>
           </div>

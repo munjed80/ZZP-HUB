@@ -172,15 +172,15 @@ export function InvoiceForm({
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-slate-900">
+        <h1 className="text-2xl font-bold text-foreground">
           {mode === "edit" ? "Factuur bewerken" : "Nieuwe factuur"}
         </h1>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-muted-foreground">
           Koppel een relatie, vul factuurregels in en bewaar als concept. Klantadres en BTW-gegevens worden direct ingevuld.
         </p>
       </div>
 
-      <Card className="bg-white">
+      <Card className="bg-card">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>Factuurgegevens</CardTitle>
           <Badge variant="info">Concept</Badge>
@@ -189,47 +189,47 @@ export function InvoiceForm({
           <form onSubmit={onSubmit} className="space-y-6">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-800">Factuurnummer</label>
+              <label className="text-sm font-medium text-foreground">Factuurnummer</label>
               <input
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
                 {...form.register("invoiceNum")}
                 placeholder="draft-2025-001"
               />
               {form.formState.errors.invoiceNum && (
-                <p className="text-xs text-amber-700">{form.formState.errors.invoiceNum.message}</p>
+                <p className="text-xs text-warning">{form.formState.errors.invoiceNum.message}</p>
               )}
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-800">Factuurdatum</label>
+              <label className="text-sm font-medium text-foreground">Factuurdatum</label>
               <input
                 type="date"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
                 {...form.register("date")}
               />
               {form.formState.errors.date && (
-                <p className="text-xs text-amber-700">{form.formState.errors.date.message}</p>
+                <p className="text-xs text-warning">{form.formState.errors.date.message}</p>
               )}
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-800">Vervaldatum</label>
+              <label className="text-sm font-medium text-foreground">Vervaldatum</label>
               <input
                 type="date"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
                 {...form.register("dueDate")}
               />
               {form.formState.errors.dueDate && (
-                <p className="text-xs text-amber-700">{form.formState.errors.dueDate.message}</p>
+                <p className="text-xs text-warning">{form.formState.errors.dueDate.message}</p>
               )}
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-slate-800">Relatie</label>
+            <label className="text-sm font-medium text-foreground">Relatie</label>
             <div className="relative">
               <input
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
                 placeholder="Zoek op naam, e-mail of stad"
                 value={searchTerm}
                 onFocus={() => setOpenList(true)}
@@ -243,9 +243,9 @@ export function InvoiceForm({
                 }}
               />
               {openList && (
-                <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-border bg-popover shadow-lg">
                   {filteredClients.length === 0 && (
-                    <p className="px-3 py-2 text-sm text-slate-600">Geen matches gevonden.</p>
+                    <p className="px-3 py-2 text-sm text-muted-foreground">Geen matches gevonden.</p>
                   )}
                   {filteredClients.map((client) => (
                     <button
@@ -256,55 +256,55 @@ export function InvoiceForm({
                         setSearchTerm(client.name);
                         setOpenList(false);
                       }}
-                      className="block w-full px-3 py-2 text-left text-sm hover:bg-slate-50"
+                      className="block w-full px-3 py-2 text-left text-sm hover:bg-muted"
                     >
-                      <div className="font-semibold text-slate-900">{client.name}</div>
-                      <div className="text-xs text-slate-500">{client.email}</div>
+                      <div className="font-semibold text-foreground">{client.name}</div>
+                      <div className="text-xs text-muted-foreground">{client.email}</div>
                     </button>
                   ))}
                 </div>
               )}
             </div>
             {form.formState.errors.clientId && (
-              <p className="text-xs text-amber-700">{form.formState.errors.clientId.message}</p>
+              <p className="text-xs text-warning">{form.formState.errors.clientId.message}</p>
             )}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <Card className="bg-slate-50">
+            <Card className="bg-muted">
               <CardHeader>
                 <CardTitle>Relatie adres</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-slate-700">
+              <CardContent className="text-sm text-muted-foreground">
                 {selectedClient ? (
                   <>
-                    <p className="font-semibold text-slate-900">{selectedClient.name}</p>
+                    <p className="font-semibold text-foreground">{selectedClient.name}</p>
                     <p>{selectedClient.address}</p>
                     <p>
                       {selectedClient.postalCode} {selectedClient.city}
                     </p>
-                    <p className="text-xs text-slate-600">KVK: {selectedClient.kvkNumber || "—"}</p>
-                    <p className="text-xs text-slate-600">BTW-id: {selectedClient.btwId || "—"}</p>
+                    <p className="text-xs text-muted-foreground">KVK: {selectedClient.kvkNumber || "—"}</p>
+                    <p className="text-xs text-muted-foreground">BTW-id: {selectedClient.btwId || "—"}</p>
                   </>
                 ) : (
-                  <p className="italic text-slate-500">Selecteer een relatie om adresgegevens te tonen.</p>
+                  <p className="italic text-muted-foreground">Selecteer een relatie om adresgegevens te tonen.</p>
                 )}
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-50">
+            <Card className="bg-muted">
               <CardHeader>
                 <CardTitle>Betaalstatus</CardTitle>
               </CardHeader>
-              <CardContent className="text-sm text-slate-700">
+              <CardContent className="text-sm text-muted-foreground">
                 <p>Conceptfactuur. Aanpassen van vervaldatum en BTW per regel wordt ondersteund.</p>
               </CardContent>
             </Card>
           </div>
 
-          <div className="overflow-x-auto rounded-lg border border-slate-200">
-            <table className="min-w-full divide-y divide-slate-200 text-sm">
-              <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="min-w-full divide-y divide-border text-sm">
+              <thead className="bg-muted text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">Omschrijving</th>
                   <th className="px-3 py-2">Aantal</th>
@@ -315,7 +315,7 @@ export function InvoiceForm({
                   <th className="px-3 py-2"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border">
                 {fields.map((field, index) => {
                   const lineTotal = (Number(watchedLines[index]?.quantity) || 0) * (Number(watchedLines[index]?.price) || 0);
 
@@ -323,13 +323,13 @@ export function InvoiceForm({
                     <tr key={field.id} className="align-top">
                       <td className="px-3 py-2">
                         <input
-                          className="w-full rounded-lg border border-slate-200 px-2 py-2 text-sm"
+                          className="w-full rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground placeholder:text-muted-foreground"
                           placeholder="Omschrijving"
                           {...form.register(`lines.${index}.description` as const)}
                           defaultValue={field.description}
                         />
                         {form.formState.errors.lines?.[index]?.description && (
-                          <p className="text-xs text-amber-700">
+                          <p className="text-xs text-warning">
                             {form.formState.errors.lines[index]?.description?.message}
                           </p>
                         )}
@@ -338,19 +338,19 @@ export function InvoiceForm({
                         <input
                           type="number"
                           step="0.01"
-                          className="w-24 rounded-lg border border-slate-200 px-2 py-2 text-sm"
+                          className="w-24 rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground"
                           {...form.register(`lines.${index}.quantity` as const, { valueAsNumber: true })}
                           defaultValue={field.quantity}
                         />
                         {form.formState.errors.lines?.[index]?.quantity && (
-                          <p className="text-xs text-amber-700">
+                          <p className="text-xs text-warning">
                             {form.formState.errors.lines[index]?.quantity?.message}
                           </p>
                         )}
                       </td>
                       <td className="px-3 py-2">
                          <select
-                           className="w-28 rounded-lg border border-slate-200 px-2 py-2 text-sm"
+                           className="w-28 rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground"
                            {...form.register(`lines.${index}.unit` as const)}
                            defaultValue={field.unit}
                          >
@@ -361,7 +361,7 @@ export function InvoiceForm({
                           ))}
                          </select>
                         {form.formState.errors.lines?.[index]?.unit && (
-                          <p className="text-xs text-amber-700">
+                          <p className="text-xs text-warning">
                             {form.formState.errors.lines[index]?.unit?.message}
                           </p>
                         )}
@@ -370,19 +370,19 @@ export function InvoiceForm({
                         <input
                           type="number"
                           step="0.01"
-                          className="w-28 rounded-lg border border-slate-200 px-2 py-2 text-sm"
+                          className="w-28 rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground"
                           {...form.register(`lines.${index}.price` as const, { valueAsNumber: true })}
                           defaultValue={field.price}
                         />
                         {form.formState.errors.lines?.[index]?.price && (
-                          <p className="text-xs text-amber-700">
+                          <p className="text-xs text-warning">
                             {form.formState.errors.lines[index]?.price?.message}
                           </p>
                         )}
                       </td>
                       <td className="px-3 py-2">
                         <select
-                          className="w-24 rounded-lg border border-slate-200 px-2 py-2 text-sm"
+                          className="w-24 rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground"
                           {...form.register(`lines.${index}.vat` as const)}
                           defaultValue={field.vat}
                         >
@@ -391,19 +391,19 @@ export function InvoiceForm({
                           <option value="0">0%</option>
                         </select>
                         {form.formState.errors.lines?.[index]?.vat && (
-                          <p className="text-xs text-amber-700">
+                          <p className="text-xs text-warning">
                             {form.formState.errors.lines[index]?.vat?.message}
                           </p>
                         )}
                       </td>
-                      <td className="px-3 py-2 text-right font-semibold text-slate-900">
+                      <td className="px-3 py-2 text-right font-semibold text-foreground">
                         {formatBedrag(lineTotal)}
                       </td>
                       <td className="px-3 py-2 text-right">
                         <button
                           type="button"
                           onClick={() => remove(index)}
-                          className="rounded-md px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                          className="rounded-md px-2 py-1 text-xs font-semibold text-muted-foreground hover:bg-muted"
                           aria-label="Verwijder regel"
                         >
                           <Trash2 className="h-4 w-4" aria-hidden />
@@ -436,7 +436,7 @@ export function InvoiceForm({
             </Button>
           </div>
 
-          <div className="grid gap-3 rounded-lg bg-slate-50 p-4 text-sm text-slate-800 md:grid-cols-3">
+          <div className="grid gap-3 rounded-lg bg-muted p-4 text-sm text-foreground md:grid-cols-3">
             <div className="flex items-center justify-between md:col-span-2">
               <span className="font-medium">Subtotaal</span>
               <span className="font-semibold">{formatBedrag(subtotal)}</span>
@@ -445,9 +445,9 @@ export function InvoiceForm({
               <span className="font-medium">BTW totaal</span>
               <span className="font-semibold">{formatBedrag(totalVat)}</span>
             </div>
-            <div className="flex items-center justify-between md:col-span-3 border-t border-slate-200 pt-3">
-              <span className="text-base font-semibold text-slate-900">Totaal incl. BTW</span>
-              <span className="text-base font-semibold text-slate-900">{formatBedrag(grandTotal)}</span>
+            <div className="flex items-center justify-between md:col-span-3 border-t border-border pt-3">
+              <span className="text-base font-semibold text-foreground">Totaal incl. BTW</span>
+              <span className="text-base font-semibold text-foreground">{formatBedrag(grandTotal)}</span>
             </div>
           </div>
 

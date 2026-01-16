@@ -55,16 +55,16 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-3 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[#111827] shadow-[0_6px_16px_-12px_rgba(15,23,42,0.18)] focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100">
-            <Search className="h-4 w-4 text-[#6B7280]" aria-hidden />
+          <div className="flex w-full items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-foreground shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+            <Search className="h-4 w-4 text-muted-foreground" aria-hidden />
             <input
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               type="search"
               placeholder="Zoek op factuurnummer of klant"
-              className="w-full bg-transparent text-sm text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none"
+              className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
               aria-label="Zoek facturen"
             />
           </div>
@@ -100,7 +100,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
       </div>
 
       {filteredInvoices.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 bg-[#F9FAFB] px-4 py-8 text-center text-sm text-[#6B7280]">
+        <div className="rounded-2xl border border-dashed border-border bg-muted px-4 py-8 text-center text-sm text-muted-foreground">
           Geen facturen gevonden. Pas je zoekopdracht of status aan.
         </div>
       ) : (

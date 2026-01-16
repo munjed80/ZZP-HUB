@@ -24,10 +24,10 @@ export type InvoiceCardProps = {
 };
 
 const statusClasses: Record<InvoiceCardProps["status"], string> = {
-  paid: "bg-green-100 text-green-700",
-  concept: "bg-gray-100 text-gray-700",
-  open: "bg-orange-100 text-orange-700",
-  overdue: "bg-rose-100 text-rose-700",
+  paid: "bg-success/15 text-success dark:bg-success/20",
+  concept: "bg-muted text-muted-foreground dark:bg-muted/80",
+  open: "bg-warning/15 text-warning-foreground dark:bg-warning/20",
+  overdue: "bg-destructive/15 text-destructive dark:bg-destructive/20",
 };
 
 const statusLabels: Record<InvoiceCardProps["status"], string> = {
@@ -54,13 +54,13 @@ export function InvoiceCard({
   onOpenChange,
 }: InvoiceCardProps) {
   return (
-    <div className="bg-white border border-gray-100 shadow-sm rounded-xl px-4 py-4 transition hover:-translate-y-[1px]">
+    <div className="bg-card border border-border shadow-sm rounded-xl px-4 py-4 transition hover:-translate-y-[1px]">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 space-y-1">
-              <p className="truncate text-lg font-bold text-gray-900">{clientName}</p>
-              <p className="truncate text-sm text-gray-500">
+              <p className="truncate text-lg font-bold text-foreground">{clientName}</p>
+              <p className="truncate text-sm text-muted-foreground">
                 #{invoiceNum} • {formattedDate}
               </p>
             </div>
@@ -74,12 +74,12 @@ export function InvoiceCard({
               onOpenChange={onOpenChange}
             />
           </div>
-          <div className="flex flex-wrap gap-3 text-xs text-gray-500">
-            <span className="rounded-full bg-gray-100 px-3 py-1 text-[11px] font-medium text-gray-700">
+          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+            <span className="rounded-full bg-muted px-3 py-1 text-[11px] font-medium text-muted-foreground">
               {dueLabel} {formattedDueDate}
             </span>
             {paidDateLabel ? (
-              <span className="rounded-full bg-green-100 px-3 py-1 text-[11px] font-medium text-green-700">
+              <span className="rounded-full bg-success/15 px-3 py-1 text-[11px] font-medium text-success dark:bg-success/20">
                 Betaald op {paidDateLabel}
               </span>
             ) : null}
@@ -88,7 +88,7 @@ export function InvoiceCard({
 
         <div className="flex flex-col items-end gap-3">
           <div className="text-right">
-            <p className="text-xl font-bold tabular-nums text-gray-900">{formatBedrag(amount)}</p>
+            <p className="text-xl font-bold tabular-nums text-foreground">{formatBedrag(amount)}</p>
           </div>
           <div className="flex items-center gap-2">
             <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[status]}`}>

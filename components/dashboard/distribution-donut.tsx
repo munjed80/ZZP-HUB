@@ -33,7 +33,7 @@ export function DistributionDonut({ revenue, expenses, profit }: Props) {
 
   if (total === 0) {
     return (
-      <div className="rounded-xl border border-[var(--border)] bg-white/70 px-4 py-8 text-center text-sm text-[var(--muted)]">
+      <div className="rounded-xl border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
         Nog geen gegevens voor omzet, kosten of winst.
       </div>
     );
@@ -73,9 +73,11 @@ export function DistributionDonut({ revenue, expenses, profit }: Props) {
             formatter={tooltipFormatter}
             contentStyle={{
               borderRadius: 12,
-              border: "1px solid var(--border)",
-              boxShadow: "0 16px 50px -30px var(--shadow-muted, rgba(15, 47, 58, 0.35))",
-              background: "#ffffff",
+              border: "1px solid rgb(var(--border))",
+              // Shadow uses hardcoded color as it provides consistent subtle depth across themes
+              boxShadow: "0 16px 50px -30px rgba(15, 47, 58, 0.35)",
+              background: "rgb(var(--card))",
+              color: "rgb(var(--card-foreground))",
             }}
           />
           <Pie
@@ -85,7 +87,7 @@ export function DistributionDonut({ revenue, expenses, profit }: Props) {
             innerRadius={64}
             outerRadius={96}
             paddingAngle={4}
-            stroke="#f7fbff"
+            stroke="rgb(var(--border))"
           >
             {data.map((entry) => (
               <Cell key={entry.name} fill={entry.color} stroke="transparent" />
@@ -93,18 +95,18 @@ export function DistributionDonut({ revenue, expenses, profit }: Props) {
           </Pie>
         </PieChart>
       </ResponsiveContainer>
-      <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-[var(--muted)]">
+      <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-muted-foreground">
         {data.map((item) => (
-          <div key={item.name} className="rounded-xl border border-[var(--border)] bg-white/70 px-3 py-2">
+          <div key={item.name} className="rounded-xl border border-border bg-card px-3 py-2">
             <div className="flex items-center gap-2">
               <span
                 className="h-2 w-2 rounded-full"
                 style={{ backgroundColor: item.color }}
                 aria-hidden
               />
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">{item.name}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{item.name}</p>
             </div>
-            <p className="mt-1 text-sm font-semibold text-[var(--foreground)]">{formatBedrag(item.value)}</p>
+            <p className="mt-1 text-sm font-semibold text-foreground">{formatBedrag(item.value)}</p>
           </div>
         ))}
       </div>

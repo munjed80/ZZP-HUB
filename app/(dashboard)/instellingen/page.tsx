@@ -18,14 +18,14 @@ export default async function InstellingenPagina() {
   const user = await fetchUserAccount();
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Clean header - Light mode only */}
-      <div className="bg-gradient-to-br from-slate-50 to-gray-50 border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-background">
+      {/* Clean header - supports dark mode */}
+      <div className="bg-muted border-b border-border px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
             Instellingen
           </h1>
-          <p className="mt-2 text-base text-gray-600 max-w-2xl">
+          <p className="mt-2 text-base text-muted-foreground max-w-2xl">
             Beheer uw profiel, bedrijfsgegevens en voorkeuren
           </p>
         </div>
