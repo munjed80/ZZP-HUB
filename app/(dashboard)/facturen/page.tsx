@@ -99,11 +99,11 @@ export default async function FacturenPagina() {
   });
 
   return (
-    <div className="space-y-6 bg-[#F9FAFB] text-[#111827]">
+    <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-semibold tracking-tight">Facturen</h1>
-          <p className="text-sm text-[#6B7280]">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Facturen</h1>
+          <p className="text-sm text-muted-foreground">
             Beheer facturen, volg betalingen en houd alles overzichtelijk bij.
           </p>
         </div>
@@ -119,24 +119,24 @@ export default async function FacturenPagina() {
         </Link>
       </div>
 
-      <Card className="border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <Card className="border border-border bg-card p-4 shadow-sm sm:p-6">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-[#111827]">Alle facturen</CardTitle>
+            <CardTitle className="text-lg font-semibold text-foreground">Alle facturen</CardTitle>
             <Badge
               variant="muted"
-              className="rounded-full border border-slate-200 bg-slate-50 text-xs font-semibold text-[#111827] shadow-none"
+              className="rounded-full border border-border bg-muted text-xs font-semibold text-foreground shadow-none"
             >
               {facturen.length}
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="text-[15px] text-[#111827]">
+        <CardContent className="text-[15px] text-foreground">
           {facturen.length === 0 ? (
             fetchError ? (
-              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-[#F9FAFB] px-6 py-10 text-center">
-                <p className="text-lg font-semibold text-[#111827]">Facturen konden niet worden geladen</p>
-                <p className="text-sm text-[#6B7280]">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
+              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-muted px-6 py-10 text-center">
+                <p className="text-lg font-semibold text-foreground">Facturen konden niet worden geladen</p>
+                <p className="text-sm text-muted-foreground">We konden de facturen niet ophalen. Probeer het later opnieuw.</p>
               </div>
             ) : (
               <EmptyState />

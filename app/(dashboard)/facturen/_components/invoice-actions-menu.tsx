@@ -235,7 +235,7 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
     <div className="relative" ref={menuRef}>
       <button
         type="button"
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white p-0 text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-gray-900"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card p-0 text-foreground shadow-sm transition hover:bg-muted hover:text-foreground"
         aria-label="Acties"
         aria-expanded={showMenu}
         onClick={() => {
@@ -248,30 +248,30 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
       </button>
 
       {showMenu && (
-        <div className="absolute right-0 top-8 z-50 w-56 rounded-lg border border-gray-200 bg-white text-gray-800 shadow-xl">
-          <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+        <div className="absolute right-0 top-8 z-50 w-56 rounded-lg border border-border bg-popover text-popover-foreground shadow-xl">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div className="space-y-0.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">Acties</p>
-              <p className="text-sm font-semibold leading-tight text-gray-800">Factuur {pdfInvoice.invoiceNum}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Acties</p>
+              <p className="text-sm font-semibold leading-tight text-foreground">Factuur {pdfInvoice.invoiceNum}</p>
             </div>
-            <span className="rounded-full bg-gray-100 px-2 py-1 text-[11px] font-semibold text-gray-700">Snel</span>
+            <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold text-muted-foreground">Snel</span>
           </div>
 
           <div className="flex flex-col py-1">
             <button
               type="button"
-              className="flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100"
+              className="flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-muted"
               onClick={() => handleNavigate(viewHref)}
             >
-              <Eye className="h-4 w-4 text-gray-800" aria-hidden />
+              <Eye className="h-4 w-4 text-foreground" aria-hidden />
               Bekijk factuur
             </button>
             <button
               type="button"
-              className="flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100"
+              className="flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-muted"
               onClick={() => handleNavigate(editTarget)}
             >
-              <Edit3 className="h-4 w-4 text-gray-800" aria-hidden />
+              <Edit3 className="h-4 w-4 text-foreground" aria-hidden />
               Bewerk factuur
             </button>
             <button
@@ -279,14 +279,14 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
               onClick={handleDownloadPdf}
               disabled={!hasPdfData || isDownloading}
               className={cn(
-                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100",
-                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white",
+                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-muted",
+                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent",
               )}
             >
               {isDownloading ? (
-                <Loader2 className="h-4 w-4 animate-spin text-gray-800" aria-hidden />
+                <Loader2 className="h-4 w-4 animate-spin text-foreground" aria-hidden />
               ) : (
-                <FileDown className="h-4 w-4 text-gray-800" aria-hidden />
+                <FileDown className="h-4 w-4 text-foreground" aria-hidden />
               )}
               {isDownloading ? "PDF genereren..." : "Download PDF"}
             </button>
@@ -295,11 +295,11 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
               onClick={handleShare}
               disabled={!hasPdfData}
               className={cn(
-                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100",
-                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white",
+                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-muted",
+                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent",
               )}
             >
-              <Share2 className="h-4 w-4 text-gray-800" aria-hidden />
+              <Share2 className="h-4 w-4 text-foreground" aria-hidden />
               Deel
             </button>
             <button
@@ -307,14 +307,14 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
               onClick={handleSendEmail}
               disabled={!recipientEmail || isSendingEmail}
               className={cn(
-                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-gray-800 hover:bg-gray-100",
-                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white",
+                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-muted",
+                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent",
               )}
             >
               {isSendingEmail ? (
-                <Loader2 className="h-4 w-4 animate-spin text-gray-800" aria-hidden />
+                <Loader2 className="h-4 w-4 animate-spin text-foreground" aria-hidden />
               ) : (
-                <Mail className="h-4 w-4 text-gray-800" aria-hidden />
+                <Mail className="h-4 w-4 text-foreground" aria-hidden />
               )}
               {isSendingEmail ? "Verzenden..." : "Verstuur per e-mail"}
             </button>
@@ -323,14 +323,14 @@ export function InvoiceActionsMenu({ pdfInvoice, invoiceId, editHref, shareLink,
               onClick={handleDelete}
               disabled={isPending}
               className={cn(
-                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50",
-                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-white",
+                "flex w-full items-center justify-start gap-2 px-4 py-3 text-left text-sm font-medium text-destructive hover:bg-destructive/10",
+                "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent",
               )}
             >
               {isDeleting ? (
-                <Loader2 className="h-4 w-4 animate-spin text-red-600" aria-hidden />
+                <Loader2 className="h-4 w-4 animate-spin text-destructive" aria-hidden />
               ) : (
-                <Trash2 className="h-4 w-4 text-red-600" aria-hidden />
+                <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
               )}
               {isDeleting ? "Verwijderen..." : confirmDelete ? "Klik nogmaals om te verwijderen" : "Verwijder"}
             </button>

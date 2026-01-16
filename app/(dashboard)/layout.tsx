@@ -36,7 +36,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
       <div className="flex min-h-screen">
         <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl} userId={sessie.user.id}>
           <div className="flex flex-1 flex-col">
-            <header className="sticky top-0 z-30 border-b border-border bg-white/80 shadow-sm backdrop-blur-xl">
+            <header className="sticky top-0 z-30 border-b border-border bg-card/80 shadow-sm backdrop-blur-xl">
               <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 pt-[env(safe-area-inset-top)] md:h-16 md:px-6">
                 {/* Left: Company Badge */}
                 <div className="flex min-w-0 items-center gap-3">
