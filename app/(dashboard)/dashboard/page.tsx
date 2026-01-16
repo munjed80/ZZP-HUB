@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatBedrag } from "@/lib/utils";
 import { DistributionDonut } from "@/components/dashboard/distribution-donut";
+import { NotificationsPanel } from "@/components/dashboard/notifications-panel";
 import { getDashboardStats } from "@/actions/get-dashboard-stats";
 import { DEFAULT_VAT_RATE } from "@/lib/constants";
 import type { Metadata } from "next";
@@ -98,6 +99,12 @@ export default async function DashboardPagina() {
           Financieel overzicht {now.getFullYear()}
         </p>
       </div>
+
+      {/* Notifications Panel - shows invoice due reminders and agenda notifications */}
+      <NotificationsPanel 
+        invoiceNotifications={stats.invoiceNotifications}
+        agendaNotifications={stats.agendaNotifications}
+      />
 
       <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => {

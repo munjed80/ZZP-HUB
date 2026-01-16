@@ -3,31 +3,29 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  LayoutDashboard,
   Receipt,
   Users,
-  FileSignature,
   Wallet,
-  FileText,
-  CalendarDays,
+  Settings,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Order aligned with mobile navigation requirement: Facturen, Relaties, Offertes, Uitgaven, BTW, Agenda
+// Bottom navigation order: Dashboard, Facturen, Relaties, Uitgaven, Instellingen, Menu
 const navItems = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/relaties", label: "Relaties", icon: Users },
-  { href: "/offertes", label: "Offertes", icon: FileSignature },
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
-  { href: "/btw-aangifte", label: "BTW", icon: FileText },
-  { href: "/agenda", label: "Agenda", icon: CalendarDays },
+  { href: "/instellingen", label: "Instellingen", icon: Settings },
 ];
 
 type MobileNavProps = {
   onMenuClick?: () => void;
 };
 
-export function MobileNav(props: MobileNavProps = {}) {
-  const { onMenuClick } = props;
+export function MobileNav({ onMenuClick }: MobileNavProps) {
   const pathname = usePathname();
 
   return (
@@ -54,6 +52,19 @@ export function MobileNav(props: MobileNavProps = {}) {
             </Link>
           );
         })}
+        {/* Menu button to open the full menu sidebar */}
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className={cn(
+            "flex w-full flex-col items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-[10px] font-bold leading-tight transition-all duration-200",
+            "text-muted-foreground hover:text-foreground hover:bg-muted hover:scale-[1.02]"
+          )}
+          aria-label="Open menu"
+        >
+          <Menu className="h-5 w-5 transition-transform duration-200" aria-hidden={true} />
+          <span>Menu</span>
+        </button>
       </div>
     </nav>
   );

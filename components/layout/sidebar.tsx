@@ -34,15 +34,16 @@ type NavigatieItem = {
   onClick?: () => void;
 };
 
+// Menu order as per requirement: Facturen, Relaties, Offertes, Uitgaven, BTW, Agenda
 export const navigatie: NavigatieItem[] = [
   { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
-  { href: "/agenda", label: "Agenda", icon: CalendarDays },
-  { href: "/relaties", label: "Relaties", icon: Users },
   { href: "/facturen", label: "Facturen", icon: Receipt },
+  { href: "/relaties", label: "Relaties", icon: Users },
   { href: "/offertes", label: "Offertes", icon: FileSignature },
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
-  { href: "/uren", label: "Uren", icon: Clock3 },
   { href: "/btw-aangifte", label: "BTW-aangifte", icon: FileText },
+  { href: "/agenda", label: "Agenda", icon: CalendarDays },
+  { href: "/uren", label: "Uren", icon: Clock3 },
   { href: "/ai-assist", label: "AI Assist", icon: Sparkles },
   { href: "/support", label: "Support", icon: LifeBuoy },
   { href: "/instellingen", label: "Instellingen", icon: Settings },
