@@ -60,6 +60,17 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
   return (
     <AvatarContext.Provider value={avatarUrl}>
       <Sidebar userRole={userRole} />
+      {/* Mobile hamburger menu button */}
+      <button
+        type="button"
+        onClick={() => setMobileMenuOpen(true)}
+        className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card shadow-md transition-all hover:bg-muted md:hidden"
+        aria-label="Open menu"
+      >
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
       {children}
       <MobileNav
         onMenuClick={() => setMobileMenuOpen(true)}
