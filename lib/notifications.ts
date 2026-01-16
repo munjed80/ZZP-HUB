@@ -48,7 +48,8 @@ export function getInvoiceNotificationType(
   todayStart.setHours(0, 0, 0, 0);
   
   const diffInMs = dueDateStart.getTime() - todayStart.getTime();
-  const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+  // Use Math.round to handle any floating point precision issues since both dates are at midnight
+  const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
   
   if (diffInDays < 0) {
     return "overdue";
@@ -119,7 +120,8 @@ export function getAgendaNotificationType(
   todayStart.setHours(0, 0, 0, 0);
   
   const diffInMs = eventDateStart.getTime() - todayStart.getTime();
-  const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+  // Use Math.round to handle any floating point precision issues since both dates are at midnight
+  const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
   
   if (diffInDays === 0) {
     return "event_today";
