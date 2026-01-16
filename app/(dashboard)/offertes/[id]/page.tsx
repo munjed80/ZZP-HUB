@@ -108,24 +108,24 @@ export default async function OfferteDetailPagina({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <nav className="flex items-center gap-2 text-sm text-slate-600">
-        <Link href="/" className="hover:text-slate-900">
+      <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-foreground">
           Home
         </Link>
         <span aria-hidden>/</span>
-        <Link href="/offertes" className="hover:text-slate-900">
+        <Link href="/offertes" className="hover:text-foreground">
           Offertes
         </Link>
         <span aria-hidden>/</span>
-        <span className="font-semibold text-slate-900">Offerte {pdfQuotation.invoiceNum}</span>
+        <span className="font-semibold text-foreground">Offerte {pdfQuotation.invoiceNum}</span>
       </nav>
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Offerte {pdfQuotation.invoiceNum}</h1>
-          <p className="text-sm text-slate-600">
+          <h1 className="text-2xl font-bold text-foreground">Offerte {pdfQuotation.invoiceNum}</h1>
+          <p className="text-sm text-muted-foreground">
             Datum: {pdfQuotation.date} · Geldig tot: {pdfQuotation.dueDate}
           </p>
-          <p className="text-sm text-slate-600">Klant: {pdfQuotation.client.name}</p>
+          <p className="text-sm text-muted-foreground">Klant: {pdfQuotation.client.name}</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <SendQuotationEmailButton quotationId={quotation.id} recipientEmail={quotation.client.email} />
@@ -138,45 +138,45 @@ export default async function OfferteDetailPagina({ params }: PageProps) {
         </div>
       </div>
 
-      <Card className="bg-white">
+      <Card className="bg-card">
         <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
             <CardTitle>Offertedetails</CardTitle>
-            <p className="text-sm text-slate-600">Bekijk offerteregels en bedrijfsgegevens.</p>
+            <p className="text-sm text-muted-foreground">Bekijk offerteregels en bedrijfsgegevens.</p>
           </div>
           <Badge variant={statusVariant}>{statusLabel}</Badge>
         </CardHeader>
 
         <CardContent className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border border-slate-200 p-4">
-              <p className="text-sm font-semibold text-slate-900">Klant</p>
-              <p className="text-sm text-slate-700">{pdfQuotation.client.name}</p>
-              <p className="text-sm text-slate-700">{pdfQuotation.client.address}</p>
-              <p className="text-sm text-slate-700">
+            <div className="rounded-lg border border-border p-4">
+              <p className="text-sm font-semibold text-foreground">Klant</p>
+              <p className="text-sm text-muted-foreground">{pdfQuotation.client.name}</p>
+              <p className="text-sm text-muted-foreground">{pdfQuotation.client.address}</p>
+              <p className="text-sm text-muted-foreground">
                 {pdfQuotation.client.postalCode} {pdfQuotation.client.city}
               </p>
             </div>
-            <div className="rounded-lg border border-slate-200 p-4">
-              <p className="text-sm font-semibold text-slate-900">Bedrijf</p>
+            <div className="rounded-lg border border-border p-4">
+              <p className="text-sm font-semibold text-foreground">Bedrijf</p>
               {pdfQuotation.companyProfile ? (
                 <>
-                  <p className="text-sm text-slate-700">{pdfQuotation.companyProfile.companyName}</p>
-                  <p className="text-sm text-slate-700">{pdfQuotation.companyProfile.address}</p>
-                  <p className="text-sm text-slate-700">
+                  <p className="text-sm text-muted-foreground">{pdfQuotation.companyProfile.companyName}</p>
+                  <p className="text-sm text-muted-foreground">{pdfQuotation.companyProfile.address}</p>
+                  <p className="text-sm text-muted-foreground">
                     {pdfQuotation.companyProfile.postalCode} {pdfQuotation.companyProfile.city}
                   </p>
-                  <p className="text-sm text-slate-700">KVK: {pdfQuotation.companyProfile.kvkNumber ?? "—"}</p>
-                  <p className="text-sm text-slate-700">IBAN: {pdfQuotation.companyProfile.iban ?? "—"}</p>
+                  <p className="text-sm text-muted-foreground">KVK: {pdfQuotation.companyProfile.kvkNumber ?? "—"}</p>
+                  <p className="text-sm text-muted-foreground">IBAN: {pdfQuotation.companyProfile.iban ?? "—"}</p>
                 </>
               ) : (
-                <p className="text-sm text-slate-700">Geen bedrijfsprofiel gevonden.</p>
+                <p className="text-sm text-muted-foreground">Geen bedrijfsprofiel gevonden.</p>
               )}
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-slate-200">
-            <div className="grid grid-cols-6 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <div className="overflow-hidden rounded-lg border border-border">
+            <div className="grid grid-cols-6 bg-muted px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <span>Omschrijving</span>
               <span className="text-center">Aantal</span>
               <span className="text-center">Eenheid</span>
@@ -184,11 +184,11 @@ export default async function OfferteDetailPagina({ params }: PageProps) {
               <span className="text-center">BTW</span>
               <span className="text-right">Bedrag</span>
             </div>
-            <div className="divide-y divide-slate-200">
+            <div className="divide-y divide-border">
               {pdfQuotation.lines.map((line, index) => {
                 const lineTotal = line.quantity * line.price;
                 return (
-                  <div key={index} className="grid grid-cols-6 px-4 py-3 text-sm text-slate-800">
+                  <div key={index} className="grid grid-cols-6 px-4 py-3 text-sm text-foreground">
                     <span className="pr-4">{line.description}</span>
                     <span className="text-center">{line.quantity}</span>
                     <span className="text-center">{line.unit}</span>
@@ -201,7 +201,7 @@ export default async function OfferteDetailPagina({ params }: PageProps) {
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-1 text-sm text-slate-800">
+          <div className="flex flex-col items-end gap-1 text-sm text-foreground">
             <div className="flex w-full max-w-md items-center justify-between">
               <span>Subtotaal (excl. BTW)</span>
               <span className="font-semibold">{formatBedrag(totals.subtotal)}</span>
@@ -218,7 +218,7 @@ export default async function OfferteDetailPagina({ params }: PageProps) {
               <span>Totaal</span>
               <span>{formatBedrag(totals.total)}</span>
             </div>
-            <p className="mt-2 text-xs text-slate-600">
+            <p className="mt-2 text-xs text-muted-foreground">
               Geldig tot {pdfQuotation.dueDate}. Bij akkoord kunnen we direct een factuur opmaken.
             </p>
           </div>

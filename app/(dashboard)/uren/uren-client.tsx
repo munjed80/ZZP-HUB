@@ -127,11 +127,11 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm text-slate-700">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>Gewerkte uren: {totalHours.toFixed(2)}</span>
               <span>Doel: {HOURS_GOAL}</span>
             </div>
-            <div className="h-4 w-full overflow-hidden rounded-full bg-slate-100 ring-1 ring-inset ring-slate-200">
+            <div className="h-4 w-full overflow-hidden rounded-full bg-muted ring-1 ring-inset ring-border">
               <div
                 className={cn("h-full rounded-full transition-all duration-300", progressColor)}
                 style={{ width: `${progress}%` }}
@@ -141,15 +141,15 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
                 role="progressbar"
               />
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-600">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               {goalReached ? (
                 <>
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden="true" />
+                  <CheckCircle2 className="h-4 w-4 text-success" aria-hidden="true" />
                   Geweldig! Je hebt het urencriterium gehaald.
                 </>
               ) : (
                 <>
-                  <Clock3 className="h-4 w-4 text-sky-600" aria-hidden="true" />
+                  <Clock3 className="h-4 w-4 text-primary" aria-hidden="true" />
                   Nog {Math.max(HOURS_GOAL - totalHours, 0).toFixed(2)} uur te gaan tot het criterium.
                 </>
               )}
@@ -158,10 +158,10 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
         </CardContent>
       </Card>
 
-      <Card className="bg-white">
+      <Card className="bg-card">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-slate-500" aria-hidden="true" />
+            <CalendarDays className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <CardTitle>Snel uren schrijven</CardTitle>
           </div>
         </CardHeader>
@@ -171,32 +171,32 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
             className="flex flex-col gap-3 md:grid md:grid-cols-[150px_140px_1fr_auto] md:items-center md:gap-4"
           >
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Datum</label>
+              <label className="text-xs font-semibold text-muted-foreground">Datum</label>
               <input
                 type="date"
                 value={formState.date}
                 onChange={(event) => setFormState((prev) => ({ ...prev, date: event.target.value }))}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Aantal uur</label>
+              <label className="text-xs font-semibold text-muted-foreground">Aantal uur</label>
               <input
                 type="number"
                 step="0.25"
                 min="0"
                 value={formState.hours}
                 onChange={(event) => setFormState((prev) => ({ ...prev, hours: event.target.value }))}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
                 placeholder="0.00"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">Omschrijving</label>
+              <label className="text-xs font-semibold text-muted-foreground">Omschrijving</label>
               <input
                 value={formState.description}
                 onChange={(event) => setFormState((prev) => ({ ...prev, description: event.target.value }))}
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
                 placeholder="Project, klant of taak"
               />
             </div>
@@ -218,25 +218,25 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
               )}
             </button>
           </form>
-          {formError && <p className="mt-2 text-xs text-amber-700">{formError}</p>}
+          {formError && <p className="mt-2 text-xs text-warning">{formError}</p>}
         </CardContent>
       </Card>
 
-      <Card className="bg-white">
+      <Card className="bg-card">
         <CardHeader className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-slate-500" aria-hidden="true" />
+            <CalendarDays className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <CardTitle>Historie (dit jaar)</CardTitle>
           </div>
           <Badge variant="info">{entries.length} registraties</Badge>
         </CardHeader>
         <CardContent>
           {entries.length === 0 ? (
-            <p className="text-sm text-slate-600">Nog geen uren geregistreerd dit jaar.</p>
+            <p className="text-sm text-muted-foreground">Nog geen uren geregistreerd dit jaar.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+              <table className="min-w-full divide-y divide-border text-sm">
+                <thead className="bg-muted text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <tr>
                     <th className="px-3 py-2">Datum</th>
                     <th className="px-3 py-2">Omschrijving</th>
@@ -244,14 +244,14 @@ export function UrenClient({ entries, totalHours }: UrenClientProps) {
                     <th className="px-3 py-2 text-right">Acties</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-border">
                   {entries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-50">
-                      <td className="px-3 py-3 text-slate-700">{formatDate(entry.date)}</td>
+                    <tr key={entry.id} className="hover:bg-muted/50">
+                      <td className="px-3 py-3 text-muted-foreground">{formatDate(entry.date)}</td>
                       <td className="px-3 py-3">
-                        <div className="font-medium text-slate-900">{entry.description}</div>
+                        <div className="font-medium text-foreground">{entry.description}</div>
                       </td>
-                      <td className="px-3 py-3 text-right tabular-nums font-semibold text-slate-900">
+                      <td className="px-3 py-3 text-right tabular-nums font-semibold text-foreground">
                         {entry.hours.toFixed(2)} uur
                       </td>
                       <td className="px-3 py-3 text-right">

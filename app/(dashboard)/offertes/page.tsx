@@ -61,8 +61,8 @@ export default async function OffertesPagina() {
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--foreground)]">Offertes</h1>
-            <p className="text-sm text-[var(--muted)]">
+            <h1 className="text-2xl font-bold text-foreground">Offertes</h1>
+            <p className="text-sm text-muted-foreground">
               Maak offertes, verstuur per mail en zet geaccepteerde offertes om naar facturen.
             </p>
           </div>
@@ -73,10 +73,10 @@ export default async function OffertesPagina() {
         </div>
       </div>
 
-      <Card className="bg-white/95 border-[var(--border)] shadow-md shadow-slate-200/70">
+      <Card className="bg-card border-border shadow-md">
         <CardHeader className="flex items-center justify-between pb-3">
           <div className="flex items-center gap-2">
-            <FileSignature className="h-4 w-4 text-[#1b6b7a]" aria-hidden />
+            <FileSignature className="h-4 w-4 text-primary" aria-hidden />
             <CardTitle>Laatste offertes</CardTitle>
           </div>
           <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export default async function OffertesPagina() {
             <ExportButton resource="quotations" />
           </div>
         </CardHeader>
-        <CardContent className="divide-y divide-[var(--border-subtle)]">
+        <CardContent className="divide-y divide-border">
           {offertes.length === 0 ? (
             <EmptyState />
           ) : (
@@ -98,14 +98,14 @@ export default async function OffertesPagina() {
                    className="flex flex-col gap-3 py-3 md:flex-row md:items-center md:justify-between"
                  >
                    <div className="space-y-1">
-                     <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-[var(--foreground)] hover:underline">
+                     <Link href={`/offertes/${offerte.id}`} className="text-sm font-semibold text-foreground hover:underline">
                        {offerte.quoteNum}
                      </Link>
-                     <p className="text-sm text-[var(--muted)]">{offerte.client?.name}</p>
+                     <p className="text-sm text-muted-foreground">{offerte.client?.name}</p>
                    </div>
                    <div className="flex flex-wrap items-center gap-2">
                      <Badge variant={statusVariant(offerte.status)}>{statusLabel(offerte.status)}</Badge>
-                     <p className="text-sm font-semibold text-[var(--foreground)]">
+                     <p className="text-sm font-semibold text-foreground">
                        {formatBedrag(totalAmount)}
                      </p>
                      <QuotationActionsMenu
