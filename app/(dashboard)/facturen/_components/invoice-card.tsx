@@ -25,7 +25,7 @@ export type InvoiceCardProps = {
 
 const statusClasses: Record<InvoiceCardProps["status"], string> = {
   paid: "bg-success/15 text-success dark:bg-success/20",
-  concept: "bg-muted text-muted-foreground",
+  concept: "bg-muted text-muted-foreground dark:bg-muted/80",
   open: "bg-warning/15 text-warning-foreground dark:bg-warning/20",
   overdue: "bg-destructive/15 text-destructive dark:bg-destructive/20",
 };

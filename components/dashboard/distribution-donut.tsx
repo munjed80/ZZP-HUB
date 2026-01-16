@@ -74,6 +74,7 @@ export function DistributionDonut({ revenue, expenses, profit }: Props) {
             contentStyle={{
               borderRadius: 12,
               border: "1px solid rgb(var(--border))",
+              // Shadow uses hardcoded color as it provides consistent subtle depth across themes
               boxShadow: "0 16px 50px -30px rgba(15, 47, 58, 0.35)",
               background: "rgb(var(--card))",
               color: "rgb(var(--card-foreground))",
