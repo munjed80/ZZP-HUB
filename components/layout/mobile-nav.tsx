@@ -26,7 +26,8 @@ type MobileNavProps = {
   onMenuClick?: () => void;
 };
 
-export function MobileNav({ onMenuClick }: MobileNavProps = {}) {
+export function MobileNav(props: MobileNavProps = {}) {
+  const { onMenuClick } = props;
   const pathname = usePathname();
 
   return (
