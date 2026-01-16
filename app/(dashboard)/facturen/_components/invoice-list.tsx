@@ -10,7 +10,7 @@ export type InvoiceListItem = {
   id: string;
   invoiceNum: string;
   clientName: string;
-  status: "open" | "paid" | "concept";
+  status: "open" | "paid" | "concept" | "overdue";
   formattedDate: string;
   formattedDueDate: string;
   isPaid: boolean;
@@ -20,6 +20,7 @@ export type InvoiceListItem = {
   amount: number;
   pdfInvoice: ReturnType<typeof mapInvoiceToPdfData>;
   recipientEmail?: string;
+  isOverdue?: boolean;
 };
 
 type InvoiceListProps = {
@@ -121,6 +122,7 @@ export function InvoiceList({ invoices }: InvoiceListProps) {
               recipientEmail={invoice.recipientEmail}
               isOpen={openInvoiceId === invoice.id}
               onOpenChange={(open) => setOpenInvoiceId(open ? invoice.id : null)}
+              isOverdue={invoice.isOverdue}
             />
           ))}
         </div>

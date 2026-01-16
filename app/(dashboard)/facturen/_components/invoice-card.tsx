@@ -9,7 +9,7 @@ export type InvoiceCardProps = {
   id: string;
   invoiceNum: string;
   clientName: string;
-  status: "open" | "paid" | "concept";
+  status: "open" | "paid" | "concept" | "overdue";
   formattedDate: string;
   formattedDueDate: string;
   isPaid: boolean;
@@ -20,18 +20,21 @@ export type InvoiceCardProps = {
   recipientEmail?: string;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  isOverdue?: boolean;
 };
 
 const statusClasses: Record<InvoiceCardProps["status"], string> = {
   paid: "bg-green-100 text-green-700",
   concept: "bg-gray-100 text-gray-700",
   open: "bg-orange-100 text-orange-700",
+  overdue: "bg-rose-100 text-rose-700",
 };
 
 const statusLabels: Record<InvoiceCardProps["status"], string> = {
   paid: "Betaald",
   concept: "Concept",
   open: "Open",
+  overdue: "Verlopen",
 };
 
 export function InvoiceCard({

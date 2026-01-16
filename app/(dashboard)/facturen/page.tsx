@@ -59,9 +59,14 @@ export default async function FacturenPagina() {
       month: "short",
     });
     const isPaid = factuur.emailStatus === InvoiceEmailStatus.BETAALD;
-    let status: "paid" | "concept" | "open";
+    const isOverdue = !isPaid && factuur.emailStatus !== InvoiceEmailStatus.CONCEPT && new Date(factuur.dueDate) < now;
+    
+    // Determine status: paid > overdue > open > concept
+    let status: "paid" | "concept" | "open" | "overdue";
     if (isPaid) {
       status = "paid";
+    } else if (isOverdue) {
+      status = "overdue";
     } else if (factuur.emailStatus === InvoiceEmailStatus.CONCEPT) {
       status = "concept";
     } else {
@@ -74,7 +79,6 @@ export default async function FacturenPagina() {
           year: "numeric",
         })
       : null;
-    const isOverdue = !isPaid && new Date(factuur.dueDate) < now;
 
     return {
       id: factuur.id,
@@ -90,6 +94,7 @@ export default async function FacturenPagina() {
       paidDateLabel,
       dueToneClass: isOverdue ? "text-[#D8A446]" : "text-[#A8E6DB]",
       dueLabel: isOverdue ? "Te laat ·" : "Vervalt",
+      isOverdue,
     };
   });
 

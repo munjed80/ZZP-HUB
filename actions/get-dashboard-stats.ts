@@ -4,6 +4,15 @@ import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { DEFAULT_VAT_RATE } from "@/lib/constants";
+import {
+  getInvoiceNotificationType,
+  getInvoiceNotificationSeverity,
+  getInvoiceNotificationMessage,
+  getAgendaNotificationType,
+  getAgendaNotificationMessage,
+  type InvoiceNotification,
+  type AgendaNotification,
+} from "@/lib/notifications";
 
 const MONTH_LABELS = ["Jan", "Feb", "Mrt", "Apr", "Mei", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const createMonthlyChartData = () => MONTH_LABELS.map((name) => ({ name, revenue: 0, expenses: 0 }));
@@ -37,11 +46,13 @@ export async function getDashboardStats() {
 
   let invoices: InvoiceWithRelations[] = [];
   let recentInvoices: InvoiceWithRelations[] = [];
+  let unpaidInvoices: InvoiceWithRelations[] = [];
+  let upcomingEvents: { id: string; title: string; description: string | null; start: Date; end: Date }[] = [];
   let expenses: Awaited<ReturnType<typeof prisma.expense.findMany>> = [];
   const sliceRecentExpenses = (list: typeof expenses) => (list ?? []).slice(0, 5);
 
   try {
-    const [invoicesForYear, latestInvoices, expensesForYear] = await Promise.all([
+    const [invoicesForYear, latestInvoices, expensesForYear, unpaidInvoicesResult, eventsResult] = await Promise.all([
       prisma.invoice.findMany({
         where: {
           ...finalizedInvoiceFilter,
@@ -60,9 +71,31 @@ export async function getDashboardStats() {
         where: { ...scope, date: { gte: startOfYear, lt: endOfYear } },
         orderBy: { date: "desc" },
       }),
+      // Get all unpaid invoices for notifications (not BETAALD)
+      prisma.invoice.findMany({
+        where: {
+          ...scope,
+          emailStatus: { not: InvoiceEmailStatus.BETAALD },
+        },
+        include: { lines: true, client: true },
+        orderBy: { dueDate: "asc" },
+      }),
+      // Get upcoming events (next 7 days)
+      prisma.event.findMany({
+        where: {
+          ...scope,
+          start: {
+            gte: now,
+            lte: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+          },
+        },
+        orderBy: { start: "asc" },
+      }),
     ]);
     invoices = invoicesForYear;
     recentInvoices = latestInvoices;
+    unpaidInvoices = unpaidInvoicesResult;
+    upcomingEvents = eventsResult;
     expenses = expensesForYear;
   } catch (error) {
     console.error("Kon dashboardstatistieken niet ophalen", { error, userId });
@@ -77,6 +110,8 @@ export async function getDashboardStats() {
       monthlyChartData,
       recentInvoices: [],
       recentExpenses: [],
+      invoiceNotifications: [],
+      agendaNotifications: [],
     };
   }
 
@@ -111,6 +146,41 @@ export async function getDashboardStats() {
     const vatToPay = totalVatCollected - totalVatPaid;
     const incomeTaxReservation = Math.max(0, netProfit * 0.35);
 
+    // Build invoice notifications
+    const invoiceNotifications: InvoiceNotification[] = [];
+    for (const invoice of unpaidInvoices) {
+      const notificationType = getInvoiceNotificationType(invoice.dueDate, now);
+      if (notificationType) {
+        const amount = invoice.lines.reduce((sum, line) => sum + calculateLineAmount(line), 0);
+        invoiceNotifications.push({
+          invoiceId: invoice.id,
+          invoiceNum: invoice.invoiceNum,
+          clientName: invoice.client.name,
+          amount,
+          dueDate: invoice.dueDate,
+          notificationType,
+          severity: getInvoiceNotificationSeverity(notificationType),
+          message: getInvoiceNotificationMessage(notificationType, invoice.invoiceNum, invoice.client.name),
+        });
+      }
+    }
+
+    // Build agenda notifications
+    const agendaNotifications: AgendaNotification[] = [];
+    for (const event of upcomingEvents) {
+      const notificationType = getAgendaNotificationType(event.start, now);
+      if (notificationType) {
+        agendaNotifications.push({
+          eventId: event.id,
+          title: event.title,
+          start: event.start,
+          notificationType,
+          severity: notificationType === "event_today" ? "highlight" : "info",
+          message: getAgendaNotificationMessage(notificationType, event.title, event.start),
+        });
+      }
+    }
+
     return {
       yearlyRevenue,
       yearlyExpenses,
@@ -122,6 +192,8 @@ export async function getDashboardStats() {
       monthlyChartData,
       recentInvoices,
       recentExpenses: sliceRecentExpenses(expenses),
+      invoiceNotifications,
+      agendaNotifications,
     };
   } catch (error) {
     console.error("Kon dashboardstatistieken niet berekenen", { error, userId });
@@ -136,6 +208,8 @@ export async function getDashboardStats() {
       monthlyChartData: createMonthlyChartData(),
       recentInvoices,
       recentExpenses: sliceRecentExpenses(expenses),
+      invoiceNotifications: [],
+      agendaNotifications: [],
     };
   }
 }
