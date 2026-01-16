@@ -578,30 +578,12 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Button
-              type="button"
-              className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 text-base rounded-lg transition-colors"
-            >
-              <CreditCard className="w-4 h-4 mr-2" />
-              Abonnement wijzigen
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              className="px-6 py-3 text-base rounded-lg"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Betaalmethode
-            </Button>
+          <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+            <p className="text-sm text-gray-700">
+              Abonnementsbeheer is momenteel alleen beschikbaar via support. 
+              Neem contact op voor wijzigingen aan uw abonnement.
+            </p>
           </div>
-
-          <Button
-            type="button"
-            className="w-full border border-rose-200 bg-white hover:bg-rose-50 text-rose-600 px-6 py-3 text-base rounded-lg transition-colors"
-          >
-            Abonnement annuleren
-          </Button>
         </div>
       </SectionCard>
 
@@ -644,26 +626,12 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
                 English
               </button>
             </div>
+            <p className="mt-3 text-xs text-gray-500">
+              Taalwijzigingen worden automatisch opgeslagen
+            </p>
           </div>
         </div>
       </SectionCard>
-
-      {/* Sticky save button for mobile */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden shadow-lg">
-        <div className="max-w-5xl mx-auto">
-          <Button
-            type="button"
-            className="w-full bg-teal-600 hover:bg-teal-700 text-white py-4 text-base rounded-lg transition-colors"
-            onClick={() => {
-              // Scroll to top to see save status
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              toast.info("Gebruik de opslagknoppen in elke sectie om uw wijzigingen op te slaan");
-            }}
-          >
-            Wijzigingen opslaan
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
