@@ -6,6 +6,8 @@ import { requireSession } from "@/lib/auth/tenant";
 import { getCompanyMembers } from "@/lib/auth/company-access";
 import { UserRole } from "@prisma/client";
 import crypto from "crypto";
+import { sendEmail } from "@/lib/email";
+import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
 
 /**
  * Invite an accountant to access the company
@@ -85,6 +87,17 @@ export async function inviteAccountant(email: string, role: UserRole) {
       };
     }
 
+    // Get company profile for email
+    const companyProfile = await prisma.companyProfile.findUnique({
+      where: { userId: session.userId },
+    });
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+    });
+
+    const companyName = companyProfile?.companyName || user?.naam || user?.email || "Bedrijf";
+
     // Generate secure token
     const token = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date();
@@ -101,15 +114,30 @@ export async function inviteAccountant(email: string, role: UserRole) {
       },
     });
 
-    // TODO: Send email with invitation link
-    // For now, we'll return the token for manual sharing
-    const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/accept-invite?token=${token}`;
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
+
+    // Send invitation email
+    try {
+      await sendEmail({
+        to: email,
+        subject: `Uitnodiging om toegang te krijgen tot ${companyName}`,
+        react: AccountantInviteEmail({
+          acceptUrl: inviteUrl,
+          companyName,
+          isNewUser: !existingUser,
+        }),
+      });
+    } catch (emailError) {
+      console.error("Failed to send invite email:", emailError);
+      // Continue even if email fails - the invite is still created and URL can be shared manually
+    }
 
     revalidatePath("/accountant-access");
 
     return {
       success: true,
-      message: "Uitnodiging succesvol aangemaakt.",
+      message: "Uitnodiging succesvol verstuurd.",
       inviteUrl,
     };
   } catch (error) {

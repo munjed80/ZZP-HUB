@@ -1,0 +1,362 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { sendEmail } from "@/lib/email";
+import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
+
+// Error codes for clear error handling
+const INVITE_ERROR_CODES = {
+  INVITE_NOT_FOUND: "INVITE_NOT_FOUND",
+  INVITE_EXPIRED: "INVITE_EXPIRED",
+  INVITE_USED: "INVITE_USED",
+  EMAIL_INVALID: "EMAIL_INVALID",
+  LINK_FAILED: "LINK_FAILED",
+  DB_ERROR: "DB_ERROR",
+  MISSING_TOKEN: "MISSING_TOKEN",
+} as const;
+
+type InviteErrorCode = (typeof INVITE_ERROR_CODES)[keyof typeof INVITE_ERROR_CODES];
+
+interface AcceptInviteResult {
+  success: boolean;
+  errorCode?: InviteErrorCode;
+  message: string;
+  companyName?: string;
+  email?: string;
+  isNewUser?: boolean;
+  userId?: string;
+}
+
+/**
+ * Generate a secure random password
+ */
+function generateSecurePassword(): string {
+  const length = 16;
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+  let password = "";
+  const randomBytes = crypto.randomBytes(length);
+  for (let i = 0; i < length; i++) {
+    password += chars[randomBytes[i] % chars.length];
+  }
+  return password;
+}
+
+/**
+ * Public endpoint to accept an accountant invitation
+ * This endpoint does NOT require authentication
+ * 
+ * Flow:
+ * 1. Validate token exists, not used, not expired
+ * 2. If email already exists → link directly as accountant
+ * 3. If email does NOT exist → auto-create user with random password
+ * 4. Send welcome email with credentials if new user
+ * 5. Mark invite as used
+ * 6. Return success with user info
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { token } = body;
+
+    if (!token || typeof token !== "string") {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.MISSING_TOKEN,
+          message: "Token ontbreekt in het verzoek.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Find the invite by token
+    const invite = await prisma.accountantInvite.findUnique({
+      where: { token },
+      include: {
+        company: {
+          select: {
+            companyProfile: {
+              select: {
+                companyName: true,
+              },
+            },
+            naam: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    // Check if invite exists
+    if (!invite) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.INVITE_NOT_FOUND,
+          message: "Uitnodiging niet gevonden. De link is mogelijk ongeldig.",
+        },
+        { status: 404 }
+      );
+    }
+
+    // Check if already used
+    if (invite.acceptedAt) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.INVITE_USED,
+          message: "Deze uitnodiging is al geaccepteerd.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check if expired
+    if (invite.expiresAt < new Date()) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.INVITE_EXPIRED,
+          message: "Deze uitnodiging is verlopen. Vraag een nieuwe uitnodiging aan.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(invite.email)) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.EMAIL_INVALID,
+          message: "Het e-mailadres in de uitnodiging is ongeldig.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const companyName =
+      invite.company.companyProfile?.companyName ||
+      invite.company.naam ||
+      invite.company.email ||
+      "Bedrijf";
+
+    // Check if user already exists
+    let user = await prisma.user.findUnique({
+      where: { email: invite.email },
+    });
+
+    let isNewUser = false;
+    let temporaryPassword: string | undefined;
+
+    if (!user) {
+      // Create new user with auto-generated password
+      isNewUser = true;
+      temporaryPassword = generateSecurePassword();
+      const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+
+      user = await prisma.user.create({
+        data: {
+          email: invite.email,
+          password: hashedPassword,
+          role: invite.role,
+          emailVerified: true, // Auto-verify since they came through invite link
+          onboardingCompleted: true, // Skip onboarding for accountants
+        },
+      });
+    }
+
+    // Check if already a member of this company
+    const existingMember = await prisma.companyMember.findUnique({
+      where: {
+        companyId_userId: {
+          companyId: invite.companyId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (existingMember) {
+      // Already a member, just mark invite as used
+      await prisma.accountantInvite.update({
+        where: { id: invite.id },
+        data: { acceptedAt: new Date() },
+      });
+
+      return NextResponse.json<AcceptInviteResult>({
+        success: true,
+        message: `U heeft al toegang tot ${companyName}.`,
+        companyName,
+        email: invite.email,
+        isNewUser: false,
+        userId: user.id,
+      });
+    }
+
+    // Create company member link
+    await prisma.companyMember.create({
+      data: {
+        companyId: invite.companyId,
+        userId: user.id,
+        role: invite.role,
+      },
+    });
+
+    // Mark invite as accepted
+    await prisma.accountantInvite.update({
+      where: { id: invite.id },
+      data: { acceptedAt: new Date() },
+    });
+
+    // Send welcome email to new users with their temporary password
+    if (isNewUser && temporaryPassword) {
+      const baseUrl =
+        process.env.NEXTAUTH_URL ||
+        process.env.BASE_URL ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        "http://localhost:3000";
+      const loginUrl = `${baseUrl}/login`;
+
+      try {
+        await sendEmail({
+          to: invite.email,
+          subject: `Welkom bij Matrixtop - U heeft toegang tot ${companyName}`,
+          react: AccountantInviteEmail({
+            acceptUrl: loginUrl,
+            companyName,
+            temporaryPassword,
+            isNewUser: true,
+          }),
+        });
+      } catch (emailError) {
+        console.error("Failed to send welcome email:", emailError);
+        // Don't fail the entire operation if email fails
+      }
+    }
+
+    return NextResponse.json<AcceptInviteResult>({
+      success: true,
+      message: isNewUser
+        ? `Welkom! Uw account is aangemaakt en u heeft nu toegang tot ${companyName}. Controleer uw e-mail voor uw inloggegevens.`
+        : `U heeft nu toegang tot ${companyName}.`,
+      companyName,
+      email: invite.email,
+      isNewUser,
+      userId: user.id,
+    });
+  } catch (error) {
+    console.error("Error accepting invite:", error);
+    return NextResponse.json<AcceptInviteResult>(
+      {
+        success: false,
+        errorCode: INVITE_ERROR_CODES.DB_ERROR,
+        message: "Er is een onverwachte fout opgetreden. Probeer het later opnieuw.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET endpoint to validate an invitation token without accepting it
+ * Used by the frontend to show the invite details before the user accepts
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const token = searchParams.get("token");
+
+    if (!token) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.MISSING_TOKEN,
+          message: "Token ontbreekt in het verzoek.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Find the invite by token
+    const invite = await prisma.accountantInvite.findUnique({
+      where: { token },
+      include: {
+        company: {
+          select: {
+            companyProfile: {
+              select: {
+                companyName: true,
+              },
+            },
+            naam: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!invite) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.INVITE_NOT_FOUND,
+          message: "Uitnodiging niet gevonden. De link is mogelijk ongeldig.",
+        },
+        { status: 404 }
+      );
+    }
+
+    if (invite.acceptedAt) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.INVITE_USED,
+          message: "Deze uitnodiging is al geaccepteerd.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (invite.expiresAt < new Date()) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.INVITE_EXPIRED,
+          message: "Deze uitnodiging is verlopen. Vraag een nieuwe uitnodiging aan.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const companyName =
+      invite.company.companyProfile?.companyName ||
+      invite.company.naam ||
+      invite.company.email ||
+      "Bedrijf";
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: invite.email },
+    });
+
+    return NextResponse.json<AcceptInviteResult>({
+      success: true,
+      message: "Uitnodiging is geldig.",
+      companyName,
+      email: invite.email,
+      isNewUser: !existingUser,
+    });
+  } catch (error) {
+    console.error("Error validating invite:", error);
+    return NextResponse.json<AcceptInviteResult>(
+      {
+        success: false,
+        errorCode: INVITE_ERROR_CODES.DB_ERROR,
+        message: "Er is een onverwachte fout opgetreden. Probeer het later opnieuw.",
+      },
+      { status: 500 }
+    );
+  }
+}
