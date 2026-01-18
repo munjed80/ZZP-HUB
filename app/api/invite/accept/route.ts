@@ -213,13 +213,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Create company member link
-    await prisma.companyMember.create({
-      data: {
-        companyId: invite.companyId,
-        userId: user.id,
-        role: invite.role,
-      },
-    });
+    try {
+      await prisma.companyMember.create({
+        data: {
+          companyId: invite.companyId,
+          userId: user.id,
+          role: invite.role,
+        },
+      });
+    } catch (linkError) {
+      console.error("Failed to create company member link:", linkError);
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.LINK_FAILED,
+          message: "Er is een fout opgetreden bij het koppelen van uw account. Probeer het later opnieuw.",
+        },
+        { status: 500 }
+      );
+    }
 
     // Mark invite as accepted
     await prisma.accountantInvite.update({
@@ -342,6 +354,19 @@ export async function GET(request: NextRequest) {
           success: false,
           errorCode: INVITE_ERROR_CODES.INVITE_EXPIRED,
           message: "Deze uitnodiging is verlopen. Vraag een nieuwe uitnodiging aan.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(invite.email)) {
+      return NextResponse.json<AcceptInviteResult>(
+        {
+          success: false,
+          errorCode: INVITE_ERROR_CODES.EMAIL_INVALID,
+          message: "Het e-mailadres in de uitnodiging is ongeldig.",
         },
         { status: 400 }
       );
