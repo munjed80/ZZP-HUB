@@ -78,6 +78,8 @@ export function ActionSheet({
 
   // Detect mobile viewport
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const mediaQuery = window.matchMedia("(max-width: 767px)");
 
     const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
@@ -151,15 +153,13 @@ export function ActionSheet({
     }
   };
 
-  // Improved backdrop with better contrast
+  // Styling classes
   const overlayClasses =
     "fixed inset-0 z-50 bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 duration-200";
 
-  // Mobile bottom sheet - full width, centered, with safe area padding
   const mobileContentClasses =
     "fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[85vh] w-full max-w-[560px] rounded-t-[24px] border-t border-x border-border bg-card shadow-[0_-8px_32px_-8px_rgba(0,0,0,0.3)] data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom-full data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom-full duration-300 ease-out pb-[env(safe-area-inset-bottom)]";
 
-  // Desktop dropdown - positioned near trigger
   const desktopContentClasses =
     "fixed right-8 bottom-20 z-50 w-[360px] max-w-[calc(100vw-4rem)] rounded-2xl border border-border bg-card shadow-[0_16px_48px_-12px_rgba(0,0,0,0.25)] data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom-4 data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:fade-out-0 duration-200";
 
@@ -167,6 +167,14 @@ export function ActionSheet({
     "overflow-hidden focus:outline-none",
     isMobile ? mobileContentClasses : desktopContentClasses,
   );
+
+  const actionButtonBaseClasses =
+    "flex w-full items-center gap-3 rounded-lg px-4 py-3.5 text-left text-sm font-medium transition-all min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed";
+
+  const actionButtonVariantClasses = (variant?: "default" | "danger") =>
+    variant === "danger"
+      ? "text-destructive hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20"
+      : "text-foreground hover:bg-muted hover:text-foreground active:bg-muted/80";
 
   return (
     <Dialog.Root open={resolvedOpen} onOpenChange={handleOpenChange}>
@@ -228,12 +236,8 @@ export function ActionSheet({
                   }}
                   disabled={action.disabled}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-lg px-4 py-3.5 text-left text-sm font-medium transition-all min-h-[48px]",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-                    "disabled:opacity-50 disabled:cursor-not-allowed",
-                    action.variant === "danger"
-                      ? "text-destructive hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20"
-                      : "text-foreground hover:bg-muted hover:text-foreground active:bg-muted/80",
+                    actionButtonBaseClasses,
+                    actionButtonVariantClasses(action.variant),
                   )}
                 >
                   {action.icon && (
