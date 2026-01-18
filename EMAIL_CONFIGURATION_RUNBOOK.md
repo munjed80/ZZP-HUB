@@ -127,7 +127,7 @@ npm run dev
 
 1. Check health endpoint:
 ```bash
-curl https://zzp-hub.matrixtop.com/api/health/email
+curl https://your-domain.com/api/health/email
 ```
 
 2. Monitor logs for email events:
