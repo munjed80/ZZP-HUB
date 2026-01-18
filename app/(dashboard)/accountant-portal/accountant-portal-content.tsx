@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { getAccountantCompanies } from "@/app/actions/accountant-access-actions";
+import { switchCompanyContext } from "@/app/actions/company-context-actions";
 import { toast } from "sonner";
 import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink } from "lucide-react";
 import { UserRole } from "@prisma/client";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type Company = {
   id: string;
@@ -23,12 +24,10 @@ export function AccountantPortalContent() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [switching, setSwitching] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
-    loadCompanies();
-  }, []);
-
-  async function loadCompanies() {
+  const loadCompanies = async () => {
     setLoading(true);
     const result = await getAccountantCompanies();
 
@@ -39,6 +38,25 @@ export function AccountantPortalContent() {
     }
 
     setLoading(false);
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadCompanies();
+  }, []);
+
+  async function handleCompanyClick(companyId: string) {
+    setSwitching(true);
+    const result = await switchCompanyContext(companyId);
+
+    if (result.success) {
+      toast.success("Bedrijfscontext gewisseld");
+      // Redirect to dashboard after switching
+      router.push("/dashboard");
+    } else {
+      toast.error(result.message || "Fout bij wisselen van bedrijf");
+      setSwitching(false);
+    }
   }
 
   const filteredCompanies = companies.filter((company) =>
@@ -112,10 +130,11 @@ export function AccountantPortalContent() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCompanies.map((company) => (
-            <Link
+            <button
               key={company.id}
-              href={`/dashboard?companyId=${company.companyId}`}
-              className="block group"
+              onClick={() => handleCompanyClick(company.companyId)}
+              disabled={switching}
+              className="block group text-left w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="h-full bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-200">
                 {/* Company Header */}
@@ -206,7 +225,7 @@ export function AccountantPortalContent() {
                   </div>
                 </div>
               </div>
-            </Link>
+            </button>
           ))}
         </div>
       )}

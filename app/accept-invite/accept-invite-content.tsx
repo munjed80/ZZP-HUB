@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { acceptInvite } from "@/app/actions/accountant-access-actions";
 import { toast } from "sonner";
@@ -12,36 +12,37 @@ export function AcceptInviteContent() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
 
+  const processInvite = useCallback(async (token: string) => {
+    const result = await acceptInvite(token);
+
+    if (result.success) {
+      setStatus("success");
+      setMessage(result.message);
+      toast.success(result.message);
+      
+      // Redirect to accountant portal after 2 seconds
+      setTimeout(() => {
+        router.push("/accountant-portal");
+      }, 2000);
+    } else {
+      setStatus("error");
+      setMessage(result.message);
+      toast.error(result.message);
+    }
+  }, [router]);
+
   useEffect(() => {
     const token = searchParams.get("token");
 
     if (!token) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       setStatus("error");
       setMessage("Ongeldige uitnodigingslink. Er ontbreekt een token.");
       return;
     }
 
-    async function processInvite() {
-      const result = await acceptInvite(token!);
-
-      if (result.success) {
-        setStatus("success");
-        setMessage(result.message);
-        toast.success(result.message);
-        
-        // Redirect to accountant portal after 2 seconds
-        setTimeout(() => {
-          router.push("/accountant-portal");
-        }, 2000);
-      } else {
-        setStatus("error");
-        setMessage(result.message);
-        toast.error(result.message);
-      }
-    }
-
-    processInvite();
-  }, [searchParams, router]);
+    processInvite(token);
+  }, [searchParams, processInvite]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

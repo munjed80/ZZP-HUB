@@ -37,11 +37,7 @@ export function AccountantAccessContent() {
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
+  const loadData = async () => {
     const [membersResult, invitesResult] = await Promise.all([
       listCompanyMembers(),
       getPendingInvites(),
@@ -54,7 +50,12 @@ export function AccountantAccessContent() {
     if (invitesResult.success) {
       setPendingInvites(invitesResult.invites || []);
     }
-  }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadData();
+  }, []);
 
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault();
