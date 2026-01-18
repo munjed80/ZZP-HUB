@@ -280,7 +280,7 @@ export async function POST(request: NextRequest) {
           invite.role
         );
       } catch (sessionError) {
-        console.error("Failed to create accountant session:", sessionError);
+        console.error("Failed to create accountant session - user will need to log in manually:", sessionError);
         // Don't fail - they can still log in normally
       }
     }

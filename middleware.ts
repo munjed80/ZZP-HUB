@@ -20,6 +20,7 @@ const protectedPrefixes = [
   '/agenda',
   '/instellingen',
   '/admin',
+  '/accountant-portal',
 ];
 
 const isProtectedPath = (pathname: string) =>
@@ -42,12 +43,14 @@ const isAccountantAllowedPath = (pathname: string) =>
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only guard protected app routes
+  // Only guard protected app routes - early return for public routes
+  // This prevents unnecessary session lookups on public pages
   if (!isProtectedPath(pathname)) {
     return NextResponse.next();
   }
 
   // Try to get any valid session (NextAuth or accountant session)
+  // This is only called for protected routes, minimizing DB queries
   const combinedSession = await getAnyCombinedSession(request);
   
   // If we have an accountant session, check if the route is allowed
@@ -114,5 +117,6 @@ export const config = {
     '/agenda/:path*',
     '/instellingen/:path*',
     '/admin/:path*',
+    '/accountant-portal/:path*',
   ],
 };

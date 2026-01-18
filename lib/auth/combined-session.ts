@@ -76,7 +76,9 @@ export async function getAnyCombinedSession(
       }
     }
   } catch (error) {
-    console.error("Error getting accountant session:", error);
+    // Silently fail - this is expected in some contexts
+    // If cookies() fails, we just don't have an accountant session
+    console.error("Error getting accountant session in combined-session:", error);
   }
   
   return null;
