@@ -107,7 +107,9 @@ For more information, see:
   try {
     execSync('node scripts/restore-after-build.mjs', { stdio: 'inherit' });
   } catch (error) {
-    console.error('⚠️  Warning: Failed to restore some files');
+    console.error('❌ Failed to restore files:', error.message);
+    console.error('⚠️  You may need to manually restore from .capacitor-backup/');
+    process.exit(1);
   }
 }
 

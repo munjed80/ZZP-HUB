@@ -36,27 +36,45 @@ const backups = [
 
 console.log('🔄 Restoring backed up files...\n');
 
+let successCount = 0;
+let errorCount = 0;
+
 backups.forEach(({ src, dest }) => {
   const srcPath = join(ROOT_DIR, src);
   const destPath = join(ROOT_DIR, dest);
   
   if (existsSync(srcPath)) {
-    if (existsSync(destPath)) {
-      rmSync(destPath, { recursive: true, force: true });
+    try {
+      if (existsSync(destPath)) {
+        rmSync(destPath, { recursive: true, force: true });
+      }
+      // Ensure parent directory exists
+      const parentDir = join(ROOT_DIR, dest.split('/').slice(0, -1).join('/'));
+      if (!existsSync(parentDir)) {
+        mkdirSync(parentDir, { recursive: true });
+      }
+      console.log(`  ✓ ${dest}`);
+      renameSync(srcPath, destPath);
+      successCount++;
+    } catch (error) {
+      console.error(`  ✗ Failed to restore ${dest}:`, error.message);
+      errorCount++;
     }
-    // Ensure parent directory exists
-    const parentDir = join(ROOT_DIR, dest.split('/').slice(0, -1).join('/'));
-    if (!existsSync(parentDir)) {
-      mkdirSync(parentDir, { recursive: true });
-    }
-    console.log(`  ✓ ${dest}`);
-    renameSync(srcPath, destPath);
   }
 });
 
 // Remove backup directory
 if (existsSync(BACKUP_DIR)) {
-  rmSync(BACKUP_DIR, { recursive: true, force: true });
+  try {
+    rmSync(BACKUP_DIR, { recursive: true, force: true });
+  } catch (error) {
+    console.error('  ⚠️  Could not remove backup directory:', error.message);
+  }
 }
 
-console.log('\n✅ Restoration complete\n');
+console.log(`\n✅ Restoration complete (${successCount} restored, ${errorCount} errors)\n`);
+
+if (errorCount > 0) {
+  console.warn('⚠️  Some files could not be restored. Check manually.\n');
+  process.exit(1);
+}

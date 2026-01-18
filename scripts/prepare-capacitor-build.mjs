@@ -38,14 +38,27 @@ const backups = [
 console.log('📦 Preparing for Capacitor build...\n');
 console.log('  Backing up incompatible files (API routes, server actions, middleware)...\n');
 
+let successCount = 0;
+let errorCount = 0;
+
 backups.forEach(({ src, dest }) => {
   const srcPath = join(ROOT_DIR, src);
   const destPath = join(ROOT_DIR, dest);
   
   if (existsSync(srcPath)) {
-    console.log(`  ✓ ${src}`);
-    renameSync(srcPath, destPath);
+    try {
+      console.log(`  ✓ ${src}`);
+      renameSync(srcPath, destPath);
+      successCount++;
+    } catch (error) {
+      console.error(`  ✗ Failed to backup ${src}:`, error.message);
+      errorCount++;
+    }
   }
 });
 
-console.log('\n✅ Preparation complete\n');
+console.log(`\n✅ Preparation complete (${successCount} backed up, ${errorCount} errors)\n`);
+
+if (errorCount > 0) {
+  console.warn('⚠️  Some files could not be backed up. Build may fail.\n');
+}
