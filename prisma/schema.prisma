@@ -93,6 +93,8 @@ model User {
   ownedCompanyMembers   CompanyMember[]          @relation("CompanyOwner")
   accountantMemberships CompanyMember[]          @relation("AccountantMember")
   sentInvites           AccountantInvite[]
+  accountantSessions    AccountantSession[]      @relation("AccountantSessions")
+  companyAccountantSessions AccountantSession[]  @relation("AccountantSessionCompany")
 }
 
 model CompanyProfile {
@@ -350,4 +352,24 @@ model AccountantInvite {
   @@index([companyId])
   @@index([token])
   @@index([email])
+}
+
+model AccountantSession {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  email        String
+  companyId    String
+  role         UserRole
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  lastAccessAt DateTime @default(now())
+
+  user    User @relation("AccountantSessions", fields: [userId], references: [id], onDelete: Cascade)
+  company User @relation("AccountantSessionCompany", fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([sessionToken])
+  @@index([userId])
+  @@index([companyId])
+  @@index([expiresAt])
 }

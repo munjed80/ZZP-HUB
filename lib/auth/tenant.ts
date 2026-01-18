@@ -8,33 +8,52 @@
 import "server-only";
 import { getServerAuthSession } from "../auth";
 import { UserRole } from "@prisma/client";
+import { getAccountantSession } from "./accountant-session";
 
 export interface SessionContext {
   userId: string;
   role: UserRole;
   email: string;
+  isAccountantSession?: boolean;
+  companyId?: string;
 }
 
 /**
  * Get the current session or throw if not authenticated
+ * Supports both NextAuth sessions and accountant sessions
  * @throws Error if user is not authenticated or is suspended
  */
 export async function requireSession(): Promise<SessionContext> {
+  // First try NextAuth session
   const session = await getServerAuthSession();
   
-  if (!session?.user) {
-    throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
+  if (session?.user) {
+    if (session.user.isSuspended) {
+      throw new Error("Dit account is geblokkeerd. Neem contact op met support.");
+    }
+    
+    return {
+      userId: session.user.id,
+      role: session.user.role,
+      email: session.user.email,
+      isAccountantSession: false,
+    };
   }
   
-  if (session.user.isSuspended) {
-    throw new Error("Dit account is geblokkeerd. Neem contact op met support.");
+  // Try accountant session
+  const accountantSession = await getAccountantSession();
+  
+  if (accountantSession) {
+    return {
+      userId: accountantSession.userId,
+      role: accountantSession.role,
+      email: accountantSession.email,
+      isAccountantSession: true,
+      companyId: accountantSession.companyId,
+    };
   }
   
-  return {
-    userId: session.user.id,
-    role: session.user.role,
-    email: session.user.email,
-  };
+  throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
 }
 
 /**
@@ -46,6 +65,11 @@ export async function requireSession(): Promise<SessionContext> {
 export async function requireTenantContext(): Promise<{ userId: string }> {
   const session = await requireSession();
   
+  // For accountant sessions, use the companyId directly
+  if (session.isAccountantSession && session.companyId) {
+    return { userId: session.companyId };
+  }
+  
   // Import dynamically to avoid circular dependency
   const { getActiveCompanyId } = await import("./company-context");
   
@@ -54,7 +78,7 @@ export async function requireTenantContext(): Promise<{ userId: string }> {
     return { userId: session.userId };
   }
   
-  // For accountants and staff, use the active company context
+  // For accountants and staff with NextAuth session, use the active company context
   const companyId = await getActiveCompanyId();
   return { userId: companyId };
 }

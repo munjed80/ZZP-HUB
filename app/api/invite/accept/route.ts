@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { sendEmail } from "@/lib/email";
 import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
+import { createAccountantSession } from "@/lib/auth/accountant-session";
 
 // Error codes for clear error handling
 const INVITE_ERROR_CODES = {
@@ -196,11 +197,24 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingMember) {
-      // Already a member, just mark invite as used
+      // Already a member, just mark invite as used and create session
       await prisma.accountantInvite.update({
         where: { id: invite.id },
         data: { acceptedAt: new Date() },
       });
+
+      // Create accountant session for immediate access
+      try {
+        await createAccountantSession(
+          user.id,
+          user.email,
+          invite.companyId,
+          existingMember.role
+        );
+      } catch (sessionError) {
+        console.error("Failed to create accountant session:", sessionError);
+        // Don't fail - they can still log in normally
+      }
 
       return NextResponse.json<AcceptInviteResult>({
         success: true,
@@ -239,6 +253,21 @@ export async function POST(request: NextRequest) {
       data: { acceptedAt: new Date() },
     });
 
+    // Create accountant session for immediate access (for existing users)
+    if (!isNewUser) {
+      try {
+        await createAccountantSession(
+          user.id,
+          user.email,
+          invite.companyId,
+          invite.role
+        );
+      } catch (sessionError) {
+        console.error("Failed to create accountant session:", sessionError);
+        // Don't fail - they can still log in normally
+      }
+    }
+
     // Send welcome email to new users with their temporary password
     if (isNewUser && temporaryPassword) {
       const baseUrl =
@@ -268,7 +297,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json<AcceptInviteResult>({
       success: true,
       message: isNewUser
-        ? `Welkom! Uw account is aangemaakt en u heeft nu toegang tot ${companyName}. Controleer uw e-mail voor uw inloggegevens.`
+        ? `Welkom! Uw account is aangemaakt en u heeft nu direct toegang tot ${companyName}.`
         : `U heeft nu toegang tot ${companyName}.`,
       companyName,
       email: invite.email,

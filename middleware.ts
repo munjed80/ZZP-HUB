@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import { getAnyCombinedSession } from './lib/auth/combined-session';
 
 // Routes that should be accessible even without email verification
 const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-required', '/resend-verification'];
@@ -24,6 +25,20 @@ const protectedPrefixes = [
 const isProtectedPath = (pathname: string) =>
   protectedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
+// Routes that accountants can access with accountant session
+const accountantAllowedPrefixes = [
+  '/accountant-portal',
+  '/dashboard',
+  '/facturen',
+  '/relaties',
+  '/uitgaven',
+  '/btw-aangifte',
+  '/agenda',
+];
+
+const isAccountantAllowedPath = (pathname: string) =>
+  accountantAllowedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -32,7 +47,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Get the JWT token
+  // Try to get any valid session (NextAuth or accountant session)
+  const combinedSession = await getAnyCombinedSession(request);
+  
+  // If we have an accountant session, check if the route is allowed
+  if (combinedSession?.isAccountantSession) {
+    // Accountants can only access certain routes
+    if (isAccountantAllowedPath(pathname)) {
+      return NextResponse.next();
+    }
+    
+    // Redirect to accountant portal for disallowed routes
+    const accountantPortalUrl = new URL('/accountant-portal', request.url);
+    return NextResponse.redirect(accountantPortalUrl);
+  }
+  
+  // Get the JWT token for regular NextAuth sessions
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   const emailVerified = Boolean(token?.emailVerified);
   const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';
