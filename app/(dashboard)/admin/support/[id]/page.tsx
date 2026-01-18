@@ -30,6 +30,11 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+// Required for static export
+export function generateStaticParams() {
+  return [];
+}
+
 export default async function SupportDetailPage({ params }: PageProps) {
   const { id } = await params;
   const session = await getServerAuthSession();

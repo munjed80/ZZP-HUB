@@ -8,6 +8,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
+    "build:web": "node scripts/build-capacitor.mjs",
+    "build:mobile": "npm run build:web && npx cap sync",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios",
     "start": "node scripts/start-prod.mjs",
     "lint": "npx eslint .",
     "postbuild": "node scripts/postbuild.js",
@@ -19,6 +24,10 @@
     "smoke:prod": "node scripts/smoke-prod.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^7.4.5",
+    "@capacitor/core": "^8.0.1",
+    "@capacitor/ios": "^8.0.1",
     "@ducanh2912/next-pwa": "^10.2.9",
     "@hookform/resolvers": "^3.9.0",
     "@prisma/client": "^6.1.0",

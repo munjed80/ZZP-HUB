@@ -16,6 +16,11 @@ type PageProps = {
   }>;
 };
 
+// Required for static export
+export function generateStaticParams() {
+  return [];
+}
+
 function mapVatRate(rate: BtwTarief): "21" | "9" | "0" {
   if (rate === "HOOG_21") return "21";
   if (rate === "LAAG_9") return "9";
