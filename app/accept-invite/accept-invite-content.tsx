@@ -54,6 +54,7 @@ export function AcceptInviteContent() {
         setStatus("error");
         setErrorCode(data.errorCode || null);
         setMessage(data.errorCode ? ERROR_MESSAGES[data.errorCode] || data.message : data.message);
+        toast.error(data.errorCode ? ERROR_MESSAGES[data.errorCode] || data.message : data.message);
       }
     } catch (error) {
       console.error("Error validating invite:", error);
@@ -98,7 +99,7 @@ export function AcceptInviteContent() {
             // Existing users go directly to accountant portal
             router.push("/accountant-portal");
           }
-        }, 3000);
+        }, 1500);
       } else {
         setStatus("error");
         setErrorCode(data.errorCode || null);
@@ -184,6 +185,7 @@ export function AcceptInviteContent() {
 
               <button
                 onClick={acceptInvitation}
+                disabled={false}
                 className="w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
               >
                 Uitnodiging Accepteren

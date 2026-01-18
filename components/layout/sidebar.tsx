@@ -186,6 +186,12 @@ export function MobileSidebar({
               if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
                 return null;
               }
+              if (item.accountantOnly && userRole !== UserRole.ACCOUNTANT_VIEW && userRole !== UserRole.ACCOUNTANT_EDIT && userRole !== UserRole.STAFF) {
+                return null;
+              }
+              if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
+                return null;
+              }
               const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
               const Icon = item.icon;
               
