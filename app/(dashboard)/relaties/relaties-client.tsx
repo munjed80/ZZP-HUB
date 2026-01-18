@@ -362,7 +362,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                 <label className="text-sm font-medium text-foreground">E-mail</label>
                 <input
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
-                  placeholder="info@bedrijf.nl"
+                  placeholder="contact@bedrijf.nl"
                   {...form.register("email")}
                 />
                 {form.formState.errors.email && (

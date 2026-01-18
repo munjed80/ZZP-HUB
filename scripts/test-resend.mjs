@@ -16,7 +16,7 @@ import { Resend } from 'resend';
 // Configuration
 const TEST_TO = process.env.TEST_TO;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL || 'ZZP Hub <no-reply@matrixtop.com>';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'ZZP Hub <no-reply@zzpershub.nl>';
 
 // Validation
 if (!TEST_TO) {

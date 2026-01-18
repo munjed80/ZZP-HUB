@@ -22,7 +22,7 @@ function maskEmail(email: string): string {
 /**
  * Get support email for client-side usage (mailto links, display text, etc.)
  * Can be overridden via NEXT_PUBLIC_SUPPORT_EMAIL env var
- * Validates that override is under expected domain (matrixtop.com)
+ * Validates that override is under expected domain (zzpershub.nl)
  */
 export function getPublicSupportEmail(): string {
   const envOverride = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
@@ -38,7 +38,7 @@ export function getPublicSupportEmail(): string {
   }
   
   // Validate override domain
-  const expectedDomain = 'matrixtop.com';
+  const expectedDomain = 'zzpershub.nl';
   if (!envOverride.includes(`@${expectedDomain}`)) {
     // Log warning once at startup (server-side only)
     if (typeof window === 'undefined' && !domainWarningLogged) {

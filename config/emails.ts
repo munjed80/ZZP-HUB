@@ -1,13 +1,13 @@
 /**
  * Single source of truth for all email addresses used in the application.
  *
- * Defaults are matrixtop.com - NEVER use resend.dev or zzp-hub.nl
+ * Official domain: zzpershub.nl
  */
 
 const APP_NAME = "ZZP Hub";
-// Hard defaults - matrixtop.com addresses
-export const SUPPORT_EMAIL = "support@matrixtop.com";
-export const NO_REPLY_EMAIL = "no-reply@matrixtop.com";
+// Official email addresses - zzpershub.nl domain
+export const SUPPORT_EMAIL = "support@zzpershub.nl";
+export const NO_REPLY_EMAIL = "no-reply@zzpershub.nl";
 export const FROM_EMAIL = `${APP_NAME} <${NO_REPLY_EMAIL}>`;
 const FROM_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
