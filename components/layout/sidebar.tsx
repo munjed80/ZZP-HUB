@@ -22,6 +22,8 @@ import {
   LogOut,
   Rocket,
   Inbox,
+  UserPlus,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarBrand } from "@/components/sidebar/sidebar-brand";
@@ -44,6 +46,8 @@ export const navigatie: NavigatieItem[] = [
   { href: "/btw-aangifte", label: "BTW-aangifte", icon: FileText },
   { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/uren", label: "Uren", icon: Clock3 },
+  { href: "/accountant-portal", label: "Accountant Portal", icon: Briefcase },
+  { href: "/accountant-access", label: "Accountant Toegang", icon: UserPlus },
   { href: "/ai-assist", label: "AI Assist", icon: Sparkles },
   { href: "/support", label: "Support", icon: LifeBuoy },
   { href: "/instellingen", label: "Instellingen", icon: Settings },
