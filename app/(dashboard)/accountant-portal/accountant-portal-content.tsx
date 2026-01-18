@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { getAccountantCompanies } from "@/app/actions/accountant-access-actions";
 import { switchCompanyContext } from "@/app/actions/company-context-actions";
 import { toast } from "sonner";
-import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink } from "lucide-react";
+import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink, Filter, Calendar, TrendingUp, Euro } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { useRouter } from "next/navigation";
 
@@ -17,14 +17,24 @@ type Company = {
     unpaidInvoices: number;
     invoicesDueSoon: number;
     vatDueSoon: boolean;
+    periodOmzet?: number;
+    periodBTW?: number;
+    status?: "ok" | "needs_review";
   };
 };
+
+type FilterPeriod = "custom" | "month" | "quarter" | "year";
 
 export function AccountantPortalContent() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [switching, setSwitching] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [onlyWithIssues, setOnlyWithIssues] = useState(false);
+  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>("month");
+  const [customDateFrom, setCustomDateFrom] = useState("");
+  const [customDateTo, setCustomDateTo] = useState("");
   const router = useRouter();
 
   const loadCompanies = async () => {
@@ -59,9 +69,25 @@ export function AccountantPortalContent() {
     }
   }
 
-  const filteredCompanies = companies.filter((company) =>
-    company.companyName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCompanies = useMemo(() => {
+    return companies.filter((company) => {
+      // Search filter
+      const matchesSearch = company.companyName.toLowerCase().includes(searchQuery.toLowerCase());
+      if (!matchesSearch) return false;
+
+      // Issues filter
+      if (onlyWithIssues) {
+        const hasIssues = 
+          (company.stats.unpaidInvoices ?? 0) > 0 || 
+          (company.stats.invoicesDueSoon ?? 0) > 0 || 
+          company.stats.vatDueSoon || 
+          company.stats.status === "needs_review";
+        if (!hasIssues) return false;
+      }
+
+      return true;
+    });
+  }, [companies, searchQuery, onlyWithIssues]);
 
   const getRoleLabel = (role: UserRole): string => {
     switch (role) {
@@ -69,6 +95,8 @@ export function AccountantPortalContent() {
         return "Alleen lezen";
       case UserRole.ACCOUNTANT_EDIT:
         return "Bewerken";
+      case UserRole.ACCOUNTANT:
+        return "Accountant";
       case UserRole.STAFF:
         return "Medewerker";
       default:
@@ -102,17 +130,132 @@ export function AccountantPortalContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Search Bar */}
-      <div className="mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Zoek bedrijf..."
-            className="w-full pl-10 pr-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
+      {/* Search and Filter Bar */}
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Zoek bedrijf..."
+              className="w-full pl-10 pr-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-colors ${
+              showFilters || onlyWithIssues
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:border-primary"
+            }`}
+          >
+            <Filter className="h-5 w-5" />
+            <span className="hidden sm:inline">Filters</span>
+          </button>
+        </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Period Filter */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Periode
+                </label>
+                <select
+                  value={filterPeriod}
+                  onChange={(e) => setFilterPeriod(e.target.value as FilterPeriod)}
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="month">Huidige maand</option>
+                  <option value="quarter">Huidige kwartaal</option>
+                  <option value="year">Huidig jaar</option>
+                  <option value="custom">Aangepast</option>
+                </select>
+              </div>
+
+              {/* Custom Date Range */}
+              {filterPeriod === "custom" && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Van
+                    </label>
+                    <input
+                      type="date"
+                      value={customDateFrom}
+                      onChange={(e) => setCustomDateFrom(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Tot
+                    </label>
+                    <input
+                      type="date"
+                      value={customDateTo}
+                      onChange={(e) => setCustomDateTo(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Issues Filter */}
+              <div className="flex items-end">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={onlyWithIssues}
+                    onChange={(e) => setOnlyWithIssues(e.target.checked)}
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                  />
+                  <span className="text-sm text-foreground">Alleen met problemen</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <Building2 className="h-8 w-8 text-primary" />
+            <div>
+              <p className="text-sm text-muted-foreground">Totaal Bedrijven</p>
+              <p className="text-2xl font-semibold text-foreground">{companies.length}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-8 w-8 text-amber-600" />
+            <div>
+              <p className="text-sm text-muted-foreground">Met Problemen</p>
+              <p className="text-2xl font-semibold text-foreground">
+                {companies.filter(c => 
+                  (c.stats.unpaidInvoices ?? 0) > 0 || 
+                  (c.stats.invoicesDueSoon ?? 0) > 0 || 
+                  c.stats.vatDueSoon
+                ).length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <FileText className="h-8 w-8 text-green-600" />
+            <div>
+              <p className="text-sm text-muted-foreground">Actieve Bedrijven</p>
+              <p className="text-2xl font-semibold text-foreground">{filteredCompanies.length}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -122,8 +265,8 @@ export function AccountantPortalContent() {
           <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <p className="text-lg font-medium text-foreground">Geen bedrijven gevonden</p>
           <p className="text-sm text-muted-foreground mt-2">
-            {searchQuery
-              ? "Probeer een andere zoekopdracht"
+            {searchQuery || onlyWithIssues
+              ? "Probeer de filters aan te passen"
               : "U heeft nog geen toegang tot bedrijven"}
           </p>
         </div>
@@ -215,6 +358,52 @@ export function AccountantPortalContent() {
                       </span>
                     )}
                   </div>
+
+                  {/* Period Omzet */}
+                  {company.stats.periodOmzet !== undefined && (
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          Periode omzet
+                        </span>
+                      </div>
+                      <span className="text-sm font-semibold text-foreground">
+                        € {(company.stats.periodOmzet / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Period BTW */}
+                  {company.stats.periodBTW !== undefined && (
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Euro className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          Periode BTW
+                        </span>
+                      </div>
+                      <span className="text-sm font-semibold text-foreground">
+                        € {(company.stats.periodBTW / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Status */}
+                  {company.stats.status && (
+                    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <span className="text-sm text-muted-foreground">Status</span>
+                      {company.stats.status === "ok" ? (
+                        <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-semibold">
+                          OK
+                        </span>
+                      ) : (
+                        <span className="text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">
+                          Te controleren
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* View Button */}

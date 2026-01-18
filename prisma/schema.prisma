@@ -46,6 +46,8 @@ enum UserRole {
   STAFF
   ACCOUNTANT_VIEW
   ACCOUNTANT_EDIT
+  ZZP
+  ACCOUNTANT
 }
 
 enum SupportMessageStatus {
@@ -328,12 +330,13 @@ model ConversationDraft {
 }
 
 model CompanyMember {
-  id        String   @id @default(uuid())
-  companyId String
-  userId    String
-  role      UserRole
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  companyId   String
+  userId      String
+  role        UserRole
+  permissions String?  @db.Text // JSON: {read: true, edit: true, export: true, btw: true}
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   company    User @relation("CompanyOwner", fields: [companyId], references: [id], onDelete: Cascade)
   accountant User @relation("AccountantMember", fields: [userId], references: [id], onDelete: Cascade)
