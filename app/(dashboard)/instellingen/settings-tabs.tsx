@@ -607,45 +607,29 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
               Thema
             </label>
             <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setTheme("system")}
-                className={cn(
-                  "flex-1 px-4 py-3 rounded-lg border-2 font-medium transition-all",
-                  mounted && theme === "system"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-card text-muted-foreground hover:border-muted-foreground"
-                )}
-              >
-                <Monitor className={cn("w-5 h-5 mx-auto mb-1", mounted && theme === "system" ? "opacity-100" : "opacity-50")} />
-                Systeem
-              </button>
-              <button
-                type="button"
-                onClick={() => setTheme("light")}
-                className={cn(
-                  "flex-1 px-4 py-3 rounded-lg border-2 font-medium transition-all",
-                  mounted && theme === "light"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-card text-muted-foreground hover:border-muted-foreground"
-                )}
-              >
-                <Sun className={cn("w-5 h-5 mx-auto mb-1", mounted && theme === "light" ? "opacity-100" : "opacity-50")} />
-                Licht
-              </button>
-              <button
-                type="button"
-                onClick={() => setTheme("dark")}
-                className={cn(
-                  "flex-1 px-4 py-3 rounded-lg border-2 font-medium transition-all",
-                  mounted && theme === "dark"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-card text-muted-foreground hover:border-muted-foreground"
-                )}
-              >
-                <Moon className={cn("w-5 h-5 mx-auto mb-1", mounted && theme === "dark" ? "opacity-100" : "opacity-50")} />
-                Donker
-              </button>
+              {([
+                { value: "system", label: "Systeem", Icon: Monitor },
+                { value: "light", label: "Licht", Icon: Sun },
+                { value: "dark", label: "Donker", Icon: Moon },
+              ] as const).map(({ value, label, Icon }) => {
+                const isActive = mounted && theme === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTheme(value)}
+                    className={cn(
+                      "flex-1 px-4 py-3 rounded-lg border-2 font-medium transition-all",
+                      isActive
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-muted-foreground hover:border-muted-foreground"
+                    )}
+                  >
+                    <Icon className={cn("w-5 h-5 mx-auto mb-1", isActive ? "opacity-100" : "opacity-50")} />
+                    {label}
+                  </button>
+                );
+              })}
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
               Systeem volgt je apparaatinstellingen. Themawijzigingen worden automatisch opgeslagen.
