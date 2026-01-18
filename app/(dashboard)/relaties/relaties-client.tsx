@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pencil, Plus, Search, Trash2, Users } from "lucide-react";
+import { FileText, Pencil, Plus, Receipt, Search, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -12,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { clientSchema, type ClientFormValues } from "./schema";
 import { createClient, deleteClient, updateClient, type getClients } from "./actions";
-import { EntityActionsMenu } from "@/components/ui/entity-actions-menu";
+import { ActionSheet } from "@/components/ui/action-sheet";
 import { ExportButton } from "@/components/ui/export-button";
 
 type ClientList = Awaited<ReturnType<typeof getClients>>;
@@ -198,48 +197,43 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                         <td className="px-3 py-3 text-muted-foreground">—</td>
                         <td className="px-3 py-3 text-muted-foreground">{client.city}</td>
                         <td className="px-3 py-3 text-right">
-                          <EntityActionsMenu
+                          <ActionSheet
+                            iconOnly
                             title="Relatie acties"
                             description={client.name}
-                            triggerClassName="px-2 py-1 text-xs"
-                          >
-                            <div className="space-y-2 p-2">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                className="w-full justify-start gap-2"
-                                onClick={() => {
+                            ariaLabel={`Acties voor ${client.name}`}
+                            actions={[
+                              {
+                                label: "Bewerk relatie",
+                                icon: <Pencil className="h-5 w-5" />,
+                                onClick: () => {
                                   setEditingClient(client);
                                   setOpen(true);
-                                }}
-                              >
-                                <Pencil className="h-4 w-4" aria-hidden />
-                                Bewerk relatie
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                className="w-full justify-start gap-2"
-                                onClick={() => handleDelete(client.id)}
-                                disabled={isPending}
-                              >
-                                <Trash2 className="h-4 w-4" aria-hidden />
-                                Verwijder
-                              </Button>
-                              <Link
-                                href={`/facturen/nieuw?clientId=${client.id}`}
-                                className={buttonVariants("ghost", "w-full justify-start gap-2")}
-                              >
-                                Nieuwe factuur
-                              </Link>
-                              <Link
-                                href={`/offertes/nieuw?clientId=${client.id}`}
-                                className={buttonVariants("ghost", "w-full justify-start gap-2")}
-                              >
-                                Nieuwe offerte
-                              </Link>
-                            </div>
-                          </EntityActionsMenu>
+                                },
+                              },
+                              {
+                                label: "Nieuwe factuur",
+                                icon: <Receipt className="h-5 w-5" />,
+                                onClick: () => {
+                                  router.push(`/facturen/nieuw?clientId=${client.id}`);
+                                },
+                              },
+                              {
+                                label: "Nieuwe offerte",
+                                icon: <FileText className="h-5 w-5" />,
+                                onClick: () => {
+                                  router.push(`/offertes/nieuw?clientId=${client.id}`);
+                                },
+                              },
+                              {
+                                label: "Verwijder relatie",
+                                icon: <Trash2 className="h-5 w-5" />,
+                                variant: "danger" as const,
+                                onClick: () => handleDelete(client.id),
+                                disabled: isPending,
+                              },
+                            ]}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -259,50 +253,43 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                         <p className="text-sm font-bold text-foreground">{client.name}</p>
                         <p className="text-xs text-muted-foreground mt-1">{client.address}</p>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <EntityActionsMenu
-                          title="Relatie acties"
-                          description={client.name}
-                          triggerClassName="px-2 py-1 text-xs"
-                        >
-                          <div className="space-y-2 p-2">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              className="w-full justify-start gap-2"
-                              onClick={() => {
-                                setEditingClient(client);
-                                setOpen(true);
-                              }}
-                            >
-                              <Pencil className="h-4 w-4" aria-hidden />
-                              Bewerk relatie
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              className="w-full justify-start gap-2"
-                              onClick={() => handleDelete(client.id)}
-                              disabled={isPending}
-                            >
-                              <Trash2 className="h-4 w-4" aria-hidden />
-                              Verwijder
-                            </Button>
-                            <Link
-                              href={`/facturen/nieuw?clientId=${client.id}`}
-                              className={buttonVariants("ghost", "w-full justify-start gap-2")}
-                            >
-                              Nieuwe factuur
-                            </Link>
-                            <Link
-                              href={`/offertes/nieuw?clientId=${client.id}`}
-                              className={buttonVariants("ghost", "w-full justify-start gap-2")}
-                            >
-                              Nieuwe offerte
-                            </Link>
-                          </div>
-                        </EntityActionsMenu>
-                      </div>
+                      <ActionSheet
+                        iconOnly
+                        title="Relatie acties"
+                        description={client.name}
+                        ariaLabel={`Acties voor ${client.name}`}
+                        actions={[
+                          {
+                            label: "Bewerk relatie",
+                            icon: <Pencil className="h-5 w-5" />,
+                            onClick: () => {
+                              setEditingClient(client);
+                              setOpen(true);
+                            },
+                          },
+                          {
+                            label: "Nieuwe factuur",
+                            icon: <Receipt className="h-5 w-5" />,
+                            onClick: () => {
+                              router.push(`/facturen/nieuw?clientId=${client.id}`);
+                            },
+                          },
+                          {
+                            label: "Nieuwe offerte",
+                            icon: <FileText className="h-5 w-5" />,
+                            onClick: () => {
+                              router.push(`/offertes/nieuw?clientId=${client.id}`);
+                            },
+                          },
+                          {
+                            label: "Verwijder relatie",
+                            icon: <Trash2 className="h-5 w-5" />,
+                            variant: "danger" as const,
+                            onClick: () => handleDelete(client.id),
+                            disabled: isPending,
+                          },
+                        ]}
+                      />
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
