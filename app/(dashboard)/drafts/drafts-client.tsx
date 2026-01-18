@@ -168,13 +168,11 @@ export function DraftsClient({ drafts, errorMessage }: DraftsClientProps) {
 
       {drafts.length === 0 ? (
         <EmptyState
-          icon={FileText}
+          icon={<FileText className="h-5 w-5" />}
           title="Geen concepten"
           description="Upload ontvangstbewijzen om concepten te maken die je kunt goedkeuren."
-          action={{
-            label: "Upload ontvangstbewijs",
-            onClick: () => router.push("/upload"),
-          }}
+          actionHref="/upload"
+          actionLabel="Upload ontvangstbewijs"
         />
       ) : (
         <div className="space-y-4">
@@ -225,9 +223,9 @@ export function DraftsClient({ drafts, errorMessage }: DraftsClientProps) {
                       {draft.status === "DRAFT" || draft.status === "PENDING_REVIEW" ? (
                         <>
                           <Button
-                            size="sm"
                             onClick={() => handleApprove(draft.id)}
                             disabled={isProcessing || isPending}
+                            className="min-h-[36px] py-1.5 px-3 text-xs"
                           >
                             {isProcessing ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -237,29 +235,29 @@ export function DraftsClient({ drafts, errorMessage }: DraftsClientProps) {
                             Goedkeuren
                           </Button>
                           <Button
-                            size="sm"
                             variant="outline"
                             onClick={() => handleReject(draft.id)}
                             disabled={isProcessing || isPending}
+                            className="min-h-[36px] py-1.5 px-3 text-xs"
                           >
                             <XCircle className="w-4 h-4 mr-1" />
                             Afkeuren
                           </Button>
                           <Button
-                            size="sm"
                             variant="destructive"
                             onClick={() => handleDelete(draft.id)}
                             disabled={isProcessing || isPending}
+                            className="min-h-[36px] py-1.5 px-3 text-xs"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </>
                       ) : (
                         <Button
-                          size="sm"
                           variant="outline"
                           onClick={() => handleDelete(draft.id)}
                           disabled={isProcessing || isPending}
+                          className="min-h-[36px] py-1.5 px-3 text-xs"
                         >
                           <Trash2 className="w-4 h-4 mr-1" />
                           Verwijderen

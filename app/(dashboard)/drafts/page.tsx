@@ -2,7 +2,7 @@ import { getDrafts } from "./actions";
 import { DraftsClient } from "./drafts-client";
 
 export default async function DraftsPage() {
-  let drafts = [];
+  let drafts: Awaited<ReturnType<typeof getDrafts>> = [];
   let errorMessage: string | undefined;
 
   try {

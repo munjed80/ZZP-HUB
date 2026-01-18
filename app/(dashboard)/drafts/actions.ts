@@ -39,7 +39,7 @@ export async function getDrafts() {
     receiptUrl: draft.receiptUrl,
     status: draft.status,
     approvedBy: draft.approvedBy,
-    approvedAt: draft.approvedAt?.toISOString(),
+    approvedAt: draft.approvedAt?.toISOString() ?? null,
     createdAt: draft.createdAt.toISOString(),
   }));
 }

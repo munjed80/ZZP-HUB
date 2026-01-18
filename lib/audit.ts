@@ -5,7 +5,7 @@
  */
 
 import "server-only";
-import { prisma } from "../prisma";
+import { prisma } from "./prisma";
 
 /**
  * Log an action to the audit trail
