@@ -43,6 +43,9 @@ enum Eenheid {
 enum UserRole {
   SUPERADMIN
   COMPANY_ADMIN
+  STAFF
+  ACCOUNTANT_VIEW
+  ACCOUNTANT_EDIT
 }
 
 enum SupportMessageStatus {
@@ -77,16 +80,19 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  companyProfile      CompanyProfile?
-  clients             Client[]
-  invoices            Invoice[]
-  quotations          Quotation[]
-  expenses            Expense[]
-  timeEntries         TimeEntry[]
-  events              Event[]
-  verificationTokens  EmailVerificationToken[]
-  passwordResetTokens PasswordResetToken[]
-  supportMessages     SupportMessage[]
+  companyProfile         CompanyProfile?
+  clients                Client[]
+  invoices               Invoice[]
+  quotations             Quotation[]
+  expenses               Expense[]
+  timeEntries            TimeEntry[]
+  events                 Event[]
+  verificationTokens     EmailVerificationToken[]
+  passwordResetTokens    PasswordResetToken[]
+  supportMessages        SupportMessage[]
+  ownedCompanyMembers    CompanyMember[] @relation("CompanyOwner")
+  accountantMemberships  CompanyMember[] @relation("AccountantMember")
+  sentInvites            AccountantInvite[]
 }
 
 model CompanyProfile {
@@ -311,4 +317,37 @@ model ConversationDraft {
   @@index([userId])
   @@index([conversationId])
   @@index([status])
+}
+
+model CompanyMember {
+  id         String   @id @default(uuid())
+  companyId  String
+  userId     String
+  role       UserRole
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company    User @relation("CompanyOwner", fields: [companyId], references: [id], onDelete: Cascade)
+  accountant User @relation("AccountantMember", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, userId])
+  @@index([companyId])
+  @@index([userId])
+}
+
+model AccountantInvite {
+  id         String    @id @default(uuid())
+  companyId  String
+  email      String
+  role       UserRole
+  token      String    @unique
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  company User @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([token])
+  @@index([email])
 }
