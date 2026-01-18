@@ -3,9 +3,12 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import { UserAvatarMenu } from "@/components/layout/user-avatar-menu";
 import { NewActionMenu } from "@/components/layout/new-action-menu";
+import { CompanySwitcher } from "@/components/layout/company-switcher";
 import { DashboardClientShell } from "@/components/layout/dashboard-client-shell";
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getActiveCompanyId } from "@/lib/auth/company-context";
+import { UserRole } from "@prisma/client";
 
 export default async function DashboardShell({ children }: { children: ReactNode }) {
   const sessie = await getServerAuthSession();
@@ -14,11 +17,22 @@ export default async function DashboardShell({ children }: { children: ReactNode
   }
 
   const userName = sessie.user.name || sessie.user.email || "Gebruiker";
+  
+  // Get active company ID (for accountants, this may differ from their userId)
+  const activeCompanyId = await getActiveCompanyId();
+  
+  // Fetch profile for the active company
   const profile = await prisma.companyProfile.findUnique({
-    where: { userId: sessie.user.id },
+    where: { userId: activeCompanyId },
     select: { logoUrl: true, companyName: true },
   });
   const avatarUrl = profile?.logoUrl ?? null;
+  
+  // Check if user is an accountant/staff who can switch companies
+  const showCompanySwitcher = 
+    sessie.user.role === UserRole.ACCOUNTANT_VIEW ||
+    sessie.user.role === UserRole.ACCOUNTANT_EDIT ||
+    sessie.user.role === UserRole.STAFF;
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";
@@ -58,6 +72,9 @@ export default async function DashboardShell({ children }: { children: ReactNode
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2">
+                  {showCompanySwitcher && (
+                    <CompanySwitcher currentCompanyName={profile?.companyName || "ZZP HUB"} />
+                  )}
                   <NewActionMenu />
                   <UserAvatarMenu userName={userName} userInitials={userInitials} avatarUrl={avatarUrl} />
                 </div>

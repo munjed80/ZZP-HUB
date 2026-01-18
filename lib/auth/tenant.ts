@@ -39,12 +39,24 @@ export async function requireSession(): Promise<SessionContext> {
 
 /**
  * Get tenant context for the current user
- * For this app, userId IS the tenant key
+ * For this app, userId IS the tenant key, but with company context support
+ * for accountants who can access multiple companies.
  * @throws Error if user is not authenticated
  */
 export async function requireTenantContext(): Promise<{ userId: string }> {
   const session = await requireSession();
-  return { userId: session.userId };
+  
+  // Import dynamically to avoid circular dependency
+  const { getActiveCompanyId } = await import("./company-context");
+  
+  // For SUPERADMIN and COMPANY_ADMIN, always use their own userId
+  if (session.role === "SUPERADMIN" || session.role === "COMPANY_ADMIN") {
+    return { userId: session.userId };
+  }
+  
+  // For accountants and staff, use the active company context
+  const companyId = await getActiveCompanyId();
+  return { userId: companyId };
 }
 
 /**

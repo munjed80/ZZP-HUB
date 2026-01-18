@@ -24,6 +24,8 @@ import {
   Inbox,
   Upload,
   FilePlus2,
+  UserPlus,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarBrand } from "@/components/sidebar/sidebar-brand";
@@ -33,6 +35,8 @@ type NavigatieItem = {
   label: string;
   icon: typeof LayoutDashboard;
   superAdminOnly?: boolean;
+  accountantOnly?: boolean;
+  companyAdminOnly?: boolean;
   onClick?: () => void;
 };
 
@@ -48,6 +52,8 @@ export const navigatie: NavigatieItem[] = [
   { href: "/btw-aangifte", label: "BTW-aangifte", icon: FileText },
   { href: "/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/uren", label: "Uren", icon: Clock3 },
+  { href: "/accountant-portal", label: "Accountant Portal", icon: Briefcase, accountantOnly: true },
+  { href: "/accountant-access", label: "Accountant Toegang", icon: UserPlus, companyAdminOnly: true },
   { href: "/ai-assist", label: "AI Assist", icon: Sparkles },
   { href: "/support", label: "Support", icon: LifeBuoy },
   { href: "/instellingen", label: "Instellingen", icon: Settings },
@@ -73,6 +79,12 @@ export function Sidebar({
       <nav className="flex-1 space-y-1">
         {navigatie.map((item) => {
           if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
+            return null;
+          }
+          if (item.accountantOnly && userRole !== UserRole.ACCOUNTANT_VIEW && userRole !== UserRole.ACCOUNTANT_EDIT && userRole !== UserRole.STAFF) {
+            return null;
+          }
+          if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
             return null;
           }
           const actief =
