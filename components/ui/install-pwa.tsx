@@ -87,31 +87,31 @@ export function InstallPWA() {
 
   return (
     <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:max-w-sm z-50">
-      <div className="rounded-xl border border-[var(--border)] bg-white/90 backdrop-blur shadow-xl p-4 text-sm">
+      <div className="rounded-xl border border-border bg-card/90 backdrop-blur shadow-xl p-4 text-sm">
         <div className="flex items-start gap-3">
-          <div className="h-9 w-9 shrink-0 rounded-lg bg-[var(--primary)] text-white flex items-center justify-center font-semibold">
+          <div className="h-9 w-9 shrink-0 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-semibold">
             Z
           </div>
           <div className="space-y-2 flex-1">
-            <div className="font-semibold text-[var(--primary)]">Installeer ZZP HUB</div>
+            <div className="font-semibold text-primary">Installeer ZZP HUB</div>
             {isIOS ? (
-              <p className="text-[var(--muted)]">
+              <p className="text-muted-foreground">
                 Open Safari, tik op het deel-icoon en kies <strong>Zet op beginscherm</strong> voor een app-ervaring.
               </p>
             ) : (
-              <p className="text-[var(--muted)]">Installeer de app voor een snellere, fullscreen ervaring.</p>
+              <p className="text-muted-foreground">Installeer de app voor een snellere, fullscreen ervaring.</p>
             )}
             {!isIOS && (
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={handleInstall}
-                  className="inline-flex items-center justify-center rounded-lg bg-[var(--primary)] px-3 py-1.5 text-white text-sm font-medium transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                  className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-primary-foreground text-sm font-medium transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   Installeren
                 </button>
                 <button
                   onClick={dismiss}
-                  className="inline-flex items-center justify-center rounded-lg border border-[rgb(var(--brand-primary))] px-3 py-1.5 text-[rgb(var(--brand-primary))] text-sm font-medium transition hover:bg-[rgb(var(--brand-primary)/0.08)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--brand-primary))]"
+                  className="inline-flex items-center justify-center rounded-lg border border-primary px-3 py-1.5 text-primary text-sm font-medium transition hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   Later
                 </button>
@@ -121,7 +121,7 @@ export function InstallPWA() {
           <button
             aria-label="Sluit installatiesuggestie"
             onClick={dismiss}
-            className="text-[rgb(var(--brand-primary))] hover:text-[rgb(var(--brand-primary-active))] transition"
+            className="text-primary hover:text-primary/80 transition"
           >
             ×
           </button>

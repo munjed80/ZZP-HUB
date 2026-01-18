@@ -111,7 +111,7 @@ export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail
       triggerClassName={className}
     >
       <div className="flex flex-col gap-2 p-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted)]">Document</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Document</p>
         <InvoicePdfDownloadButton
           invoice={pdfQuotation}
           documentType="OFFERTE"
@@ -141,7 +141,7 @@ export function QuotationActionsMenu({ pdfQuotation, quotationId, recipientEmail
         </Button>
       </div>
 
-      <div className="border-t border-[var(--border)] p-3 space-y-2">
+      <div className="border-t border-border p-3 space-y-2">
         <div className="flex flex-wrap gap-2">
           <Link href={`/offertes/${quotationId}`} className={buttonVariants("ghost", "w-full justify-start gap-2")}>
             <Pencil className="h-4 w-4" aria-hidden />
