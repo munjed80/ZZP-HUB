@@ -90,15 +90,10 @@ export function AcceptInviteContent() {
         }));
         toast.success(data.message);
 
-        // Redirect based on whether this is a new user
+        // Redirect to accountant portal for all users
+        // New users will have a session created automatically
         setTimeout(() => {
-          if (data.isNewUser) {
-            // New users need to log in with their temporary password
-            router.push("/login");
-          } else {
-            // Existing users go directly to accountant portal
-            router.push("/accountant-portal");
-          }
+          router.push("/accountant-portal");
         }, 1500);
       } else {
         setStatus("error");
@@ -177,7 +172,7 @@ export function AcceptInviteContent() {
                       Nieuw account wordt aangemaakt
                     </p>
                     <p className="text-blue-700 dark:text-blue-300 mt-1">
-                      Er wordt automatisch een account voor u aangemaakt. U ontvangt een e-mail met uw inloggegevens.
+                      Er wordt automatisch een account voor u aangemaakt. U krijgt direct toegang na acceptatie.
                     </p>
                   </div>
                 </div>
@@ -214,15 +209,9 @@ export function AcceptInviteContent() {
                 Uitnodiging Geaccepteerd!
               </h1>
               <p className="text-muted-foreground mb-6">{message}</p>
-              {inviteInfo.isNewUser ? (
-                <p className="text-sm text-muted-foreground">
-                  U wordt doorgestuurd naar de inlogpagina...
-                </p>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  U wordt doorgestuurd naar het Accountant Portal...
-                </p>
-              )}
+              <p className="text-sm text-muted-foreground">
+                U wordt doorgestuurd naar het Accountant Portal...
+              </p>
             </div>
           )}
 
