@@ -54,6 +54,12 @@ enum SupportMessageStatus {
   CLOSED
 }
 
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
 model User {
   id          String   @id @default(uuid())
   email       String   @unique
@@ -338,20 +344,25 @@ model CompanyMember {
 }
 
 model AccountantInvite {
-  id         String    @id @default(uuid())
-  companyId  String
-  email      String
-  role       UserRole
-  token      String    @unique
-  expiresAt  DateTime
-  acceptedAt DateTime?
-  createdAt  DateTime  @default(now())
+  id           String       @id @default(uuid())
+  companyId    String
+  email        String
+  role         UserRole
+  token        String       @unique
+  tokenHash    String?      // Hashed version of the invite token for security
+  otpHash      String?      // Hashed 6-digit OTP code
+  otpExpiresAt DateTime?    // OTP expiry (e.g., 10 minutes from creation)
+  status       InviteStatus @default(PENDING)
+  expiresAt    DateTime
+  acceptedAt   DateTime?
+  createdAt    DateTime     @default(now())
 
   company User @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
   @@index([token])
   @@index([email])
+  @@index([status])
 }
 
 model AccountantSession {

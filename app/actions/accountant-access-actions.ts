@@ -4,14 +4,27 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth/tenant";
 import { getCompanyMembers } from "@/lib/auth/company-access";
-import { UserRole } from "@prisma/client";
+import { UserRole, InviteStatus } from "@prisma/client";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
 import { sendEmail } from "@/lib/email";
-import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
+import AccountantOTPEmail from "@/components/emails/AccountantOTPEmail";
 import { logInviteCreated } from "@/lib/auth/security-audit";
 
 /**
+ * Generate a cryptographically secure 6-digit OTP code
+ */
+function generateOTPCode(): string {
+  // Generate 3 random bytes (24 bits) which gives us 0-16777215
+  const randomBytes = crypto.randomBytes(3);
+  // Convert to number and mod by 1000000 to get 6 digits
+  const num = (randomBytes.readUIntBE(0, 3) % 900000) + 100000;
+  return num.toString();
+}
+
+/**
  * Invite an accountant to access the company
+ * Generates a secure token and 6-digit OTP code
  */
 export async function inviteAccountant(email: string, role: UserRole) {
   try {
@@ -69,12 +82,12 @@ export async function inviteAccountant(email: string, role: UserRole) {
       }
     }
 
-    // Check for pending invite
+    // Check for pending invite - if exists, invalidate it
     const pendingInvite = await prisma.accountantInvite.findFirst({
       where: {
         companyId: session.userId,
         email,
-        acceptedAt: null,
+        status: InviteStatus.PENDING,
         expiresAt: {
           gt: new Date(),
         },
@@ -82,10 +95,11 @@ export async function inviteAccountant(email: string, role: UserRole) {
     });
 
     if (pendingInvite) {
-      return {
-        success: false,
-        message: "Er is al een uitnodiging verstuurd naar dit e-mailadres.",
-      };
+      // Invalidate the previous invite by marking it as expired
+      await prisma.accountantInvite.update({
+        where: { id: pendingInvite.id },
+        data: { status: InviteStatus.EXPIRED },
+      });
     }
 
     // Get company profile for email
@@ -101,16 +115,30 @@ export async function inviteAccountant(email: string, role: UserRole) {
 
     // Generate secure token
     const token = crypto.randomBytes(32).toString("hex");
+    const tokenHash = await bcrypt.hash(token, 10);
+    
+    // Generate 6-digit OTP
+    const otpCode = generateOTPCode();
+    const otpHash = await bcrypt.hash(otpCode, 10);
+    
+    // Token expires in 7 days, OTP expires in 10 minutes
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
+    expiresAt.setDate(expiresAt.getDate() + 7);
+    
+    const otpExpiresAt = new Date();
+    otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
 
-    // Create invite
+    // Create invite with OTP
     await prisma.accountantInvite.create({
       data: {
         companyId: session.userId,
         email,
         role,
         token,
+        tokenHash,
+        otpHash,
+        otpExpiresAt,
+        status: InviteStatus.PENDING,
         expiresAt,
       },
     });
@@ -124,17 +152,18 @@ export async function inviteAccountant(email: string, role: UserRole) {
     });
 
     const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
+    const accessUrl = `${baseUrl}/accountant-verify?token=${token}`;
 
-    // Send invitation email
+    // Send invitation email with OTP
     try {
       await sendEmail({
         to: email,
-        subject: `Uitnodiging om toegang te krijgen tot ${companyName}`,
-        react: AccountantInviteEmail({
-          acceptUrl: inviteUrl,
+        subject: `Uw toegangscode voor ${companyName}`,
+        react: AccountantOTPEmail({
+          accessUrl,
           companyName,
-          isNewUser: !existingUser,
+          otpCode,
+          validityMinutes: 10,
         }),
       });
     } catch (emailError) {
@@ -147,13 +176,120 @@ export async function inviteAccountant(email: string, role: UserRole) {
     return {
       success: true,
       message: "Uitnodiging succesvol verstuurd.",
-      inviteUrl,
+      inviteUrl: accessUrl,
     };
   } catch (error) {
     console.error("Error inviting accountant:", error);
     return {
       success: false,
       message: "Er is een fout opgetreden bij het versturen van de uitnodiging.",
+    };
+  }
+}
+
+/**
+ * Resend OTP code for an existing pending invite
+ * Generates a new OTP and updates the expiry
+ */
+export async function resendOTPCode(inviteId: string) {
+  try {
+    const session = await requireSession();
+
+    // Find the invite
+    const invite = await prisma.accountantInvite.findUnique({
+      where: { id: inviteId },
+    });
+
+    if (!invite) {
+      return { success: false, message: "Uitnodiging niet gevonden." };
+    }
+
+    // Only company owner can resend
+    if (invite.companyId !== session.userId && session.role !== UserRole.SUPERADMIN) {
+      return {
+        success: false,
+        message: "U kunt alleen codes voor uw eigen uitnodigingen opnieuw versturen.",
+      };
+    }
+
+    // Check if invite is still pending
+    if (invite.status !== InviteStatus.PENDING) {
+      return {
+        success: false,
+        message: "Deze uitnodiging is niet meer actief.",
+      };
+    }
+
+    // Check if invite token is expired
+    if (invite.expiresAt < new Date()) {
+      return {
+        success: false,
+        message: "De uitnodiging is verlopen. Stuur een nieuwe uitnodiging.",
+      };
+    }
+
+    // Get company profile for email
+    const companyProfile = await prisma.companyProfile.findUnique({
+      where: { userId: session.userId },
+    });
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+    });
+
+    const companyName = companyProfile?.companyName || user?.naam || user?.email || "Bedrijf";
+
+    // Generate new 6-digit OTP
+    const otpCode = generateOTPCode();
+    const otpHash = await bcrypt.hash(otpCode, 10);
+    
+    // New OTP expires in 10 minutes
+    const otpExpiresAt = new Date();
+    otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
+
+    // Update invite with new OTP
+    await prisma.accountantInvite.update({
+      where: { id: invite.id },
+      data: {
+        otpHash,
+        otpExpiresAt,
+      },
+    });
+
+    const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const accessUrl = `${baseUrl}/accountant-verify?token=${invite.token}`;
+
+    // Send email with new OTP
+    try {
+      await sendEmail({
+        to: invite.email,
+        subject: `Nieuwe toegangscode voor ${companyName}`,
+        react: AccountantOTPEmail({
+          accessUrl,
+          companyName,
+          otpCode,
+          validityMinutes: 10,
+        }),
+      });
+    } catch (emailError) {
+      console.error("Failed to send OTP email:", emailError);
+      return {
+        success: false,
+        message: "Er is een fout opgetreden bij het versturen van de e-mail.",
+      };
+    }
+
+    revalidatePath("/accountant-access");
+
+    return {
+      success: true,
+      message: "Nieuwe code succesvol verstuurd.",
+    };
+  } catch (error) {
+    console.error("Error resending OTP:", error);
+    return {
+      success: false,
+      message: "Er is een fout opgetreden bij het opnieuw versturen van de code.",
     };
   }
 }
@@ -427,7 +563,7 @@ export async function getPendingInvites() {
     const invites = await prisma.accountantInvite.findMany({
       where: {
         companyId: session.userId,
-        acceptedAt: null,
+        status: InviteStatus.PENDING,
         expiresAt: {
           gt: new Date(),
         },

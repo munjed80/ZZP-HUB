@@ -8,9 +8,10 @@ import {
   revokeAccountantAccess,
   getPendingInvites,
   cancelInvite,
+  resendOTPCode,
 } from "@/app/actions/accountant-access-actions";
 import { toast } from "sonner";
-import { UserPlus, UserX, Mail, Clock, Copy, X } from "lucide-react";
+import { UserPlus, UserX, Mail, Clock, Copy, X, RefreshCw } from "lucide-react";
 
 type CompanyMember = {
   id: string;
@@ -33,6 +34,7 @@ export function AccountantAccessContent() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<UserRole>(UserRole.ACCOUNTANT_VIEW);
   const [loading, setLoading] = useState(false);
+  const [resendingId, setResendingId] = useState<string | null>(null);
   const [members, setMembers] = useState<CompanyMember[]>([]);
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
@@ -100,6 +102,18 @@ export function AccountantAccessContent() {
     } else {
       toast.error(result.message);
     }
+  }
+
+  async function handleResendOTP(inviteId: string) {
+    setResendingId(inviteId);
+    const result = await resendOTPCode(inviteId);
+
+    if (result.success) {
+      toast.success(result.message);
+    } else {
+      toast.error(result.message);
+    }
+    setResendingId(null);
   }
 
   function copyInviteUrl(url: string) {
@@ -207,7 +221,7 @@ export function AccountantAccessContent() {
               </button>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Deze link is 7 dagen geldig
+              De verificatiecode is per e-mail verstuurd en is 10 minuten geldig. De link zelf is 7 dagen geldig.
             </p>
           </div>
         )}
@@ -239,16 +253,30 @@ export function AccountantAccessContent() {
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleCancelInvite(invite.id)}
-                  className="ml-3 p-2 rounded-lg text-muted-foreground hover:bg-background hover:text-destructive transition-colors"
-                  title="Annuleren"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-2 ml-3">
+                  <button
+                    onClick={() => handleResendOTP(invite.id)}
+                    disabled={resendingId === invite.id}
+                    className="p-2 rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
+                    title="Nieuwe code versturen"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${resendingId === invite.id ? 'animate-spin' : ''}`} />
+                  </button>
+                  <button
+                    onClick={() => handleCancelInvite(invite.id)}
+                    className="p-2 rounded-lg text-muted-foreground hover:bg-background hover:text-destructive transition-colors"
+                    title="Annuleren"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+          
+          <p className="mt-4 text-xs text-muted-foreground">
+            💡 Tip: Klik op de vernieuw-knop om een nieuwe verificatiecode te versturen als de vorige is verlopen.
+          </p>
         </div>
       )}
 
