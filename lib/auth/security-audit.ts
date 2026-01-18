@@ -15,7 +15,14 @@ export type SecurityEventType =
   | "ACCOUNTANT_SESSION_DELETED"
   | "COMPANY_ACCESS_GRANTED"
   | "COMPANY_ACCESS_REVOKED"
-  | "DATA_EXPORTED";
+  | "DATA_EXPORTED"
+  | "ACCOUNTANT_VIEW_COMPANY"
+  | "ACCOUNTANT_EDIT_INVOICE"
+  | "ACCOUNTANT_EDIT_EXPENSE"
+  | "ACCOUNTANT_APPROVE_RECORD"
+  | "ACCOUNTANT_MARK_REVIEWED"
+  | "ACCOUNTANT_EXPORT_DATA"
+  | "ACCOUNTANT_GENERATE_REPORT";
 
 export interface SecurityAuditParams {
   userId: string;
@@ -177,5 +184,127 @@ export async function logCompanyAccessRevoked(params: {
     eventType: "COMPANY_ACCESS_REVOKED",
     companyId: params.companyId,
     targetUserId: params.targetUserId,
+  });
+}
+
+/**
+ * Log accountant viewing company data
+ */
+export async function logAccountantViewCompany(params: {
+  userId: string;
+  companyId: string;
+}): Promise<void> {
+  await logSecurityEvent({
+    userId: params.userId,
+    eventType: "ACCOUNTANT_VIEW_COMPANY",
+    companyId: params.companyId,
+  });
+}
+
+/**
+ * Log accountant editing invoice
+ */
+export async function logAccountantEditInvoice(params: {
+  userId: string;
+  companyId: string;
+  invoiceId: string;
+}): Promise<void> {
+  await logSecurityEvent({
+    userId: params.userId,
+    eventType: "ACCOUNTANT_EDIT_INVOICE",
+    companyId: params.companyId,
+    metadata: { invoiceId: params.invoiceId },
+  });
+}
+
+/**
+ * Log accountant editing expense
+ */
+export async function logAccountantEditExpense(params: {
+  userId: string;
+  companyId: string;
+  expenseId: string;
+}): Promise<void> {
+  await logSecurityEvent({
+    userId: params.userId,
+    eventType: "ACCOUNTANT_EDIT_EXPENSE",
+    companyId: params.companyId,
+    metadata: { expenseId: params.expenseId },
+  });
+}
+
+/**
+ * Log accountant approving a record
+ */
+export async function logAccountantApproveRecord(params: {
+  userId: string;
+  companyId: string;
+  recordType: string;
+  recordId: string;
+}): Promise<void> {
+  await logSecurityEvent({
+    userId: params.userId,
+    eventType: "ACCOUNTANT_APPROVE_RECORD",
+    companyId: params.companyId,
+    metadata: {
+      recordType: params.recordType,
+      recordId: params.recordId,
+    },
+  });
+}
+
+/**
+ * Log accountant marking something as reviewed
+ */
+export async function logAccountantMarkReviewed(params: {
+  userId: string;
+  companyId: string;
+  itemType: string;
+  itemId: string;
+}): Promise<void> {
+  await logSecurityEvent({
+    userId: params.userId,
+    eventType: "ACCOUNTANT_MARK_REVIEWED",
+    companyId: params.companyId,
+    metadata: {
+      itemType: params.itemType,
+      itemId: params.itemId,
+    },
+  });
+}
+
+/**
+ * Log accountant exporting data
+ */
+export async function logAccountantExportData(params: {
+  userId: string;
+  companyId: string;
+  exportType: string;
+  recordCount?: number;
+}): Promise<void> {
+  await logSecurityEvent({
+    userId: params.userId,
+    eventType: "ACCOUNTANT_EXPORT_DATA",
+    companyId: params.companyId,
+    metadata: {
+      exportType: params.exportType,
+      recordCount: params.recordCount,
+    },
+  });
+}
+
+/**
+ * Log accountant generating a report
+ */
+export async function logAccountantGenerateReport(params: {
+  userId: string;
+  companyId: string;
+  reportType: string;
+}): Promise<void> {
+  await logSecurityEvent({
+    userId: params.userId,
+    eventType: "ACCOUNTANT_GENERATE_REPORT",
+    companyId: params.companyId,
+    metadata: { reportType: params.reportType },
   });
 }
