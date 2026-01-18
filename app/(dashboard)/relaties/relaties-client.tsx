@@ -310,111 +310,135 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
       </Card>
 
       {open && (
-        <div id="nieuwe-relatie-dialog" className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-xl bg-card border border-border p-6 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">
+        <div id="nieuwe-relatie-dialog" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-xl rounded-2xl bg-card border border-border shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 p-6 border-b border-border bg-muted/30">
+              <div className="space-y-1">
+                <h2 className="text-xl font-semibold text-foreground">
                   {editingClient ? "Relatie bewerken" : "Nieuwe relatie"}
                 </h2>
-                <p className="text-sm text-muted-foreground">Vul de klantgegevens in. Naam en e-mail zijn verplicht.</p>
+                <p className="text-sm text-muted-foreground">
+                  Vul de klantgegevens in. Naam en e-mail zijn verplicht.
+                </p>
               </div>
               <Button
                 type="button"
                 variant="ghost"
-                className="px-3 py-2"
+                className="h-10 w-10 p-0 rounded-full shrink-0"
                 onClick={() => {
                   setOpen(false);
                   resetForm();
                 }}
+                aria-label="Sluiten"
               >
-                Sluiten
+                <span className="text-lg">×</span>
               </Button>
             </div>
 
-            <form onSubmit={onSubmit} className="mt-4 grid gap-4 md:grid-cols-2">
-              <div className="space-y-1 md:col-span-2">
-                <label className="text-sm font-medium text-foreground">Bedrijfsnaam</label>
+            {/* Form */}
+            <form onSubmit={onSubmit} className="p-6 space-y-6">
+              {/* Company Name - Full width */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  Bedrijfsnaam <span className="text-destructive">*</span>
+                </label>
                 <input
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                  className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="Studio Delta BV"
                   {...form.register("name")}
                 />
                 {form.formState.errors.name && (
-                  <p className="text-xs text-warning">{form.formState.errors.name.message}</p>
+                  <p className="text-xs text-destructive">{form.formState.errors.name.message}</p>
                 )}
               </div>
 
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">E-mail</label>
-                <input
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
-                  placeholder="contact@bedrijf.nl"
-                  {...form.register("email")}
-                />
-                {form.formState.errors.email && (
-                  <p className="text-xs text-warning">{form.formState.errors.email.message}</p>
-                )}
+              {/* Email and KVK - Two columns */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">
+                    E-mail <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="contact@bedrijf.nl"
+                    type="email"
+                    {...form.register("email")}
+                  />
+                  {form.formState.errors.email && (
+                    <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">KVK-nummer</label>
+                  <input
+                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="12345678"
+                    {...form.register("kvkNumber")}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">KVK</label>
+              {/* BTW-ID - Full width */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">BTW-nummer</label>
                 <input
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
-                  placeholder="12345678"
-                  {...form.register("kvkNumber")}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">BTW-ID</label>
-                <input
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                  className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="NL123456789B01"
                   {...form.register("btwId")}
                 />
               </div>
 
-              <div className="space-y-1 md:col-span-2">
-                <label className="text-sm font-medium text-foreground">Adres</label>
-                <input
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
-                  placeholder="Keizersgracht 12"
-                  {...form.register("address")}
-                />
-                {form.formState.errors.address && (
-                  <p className="text-xs text-warning">{form.formState.errors.address.message}</p>
-                )}
+              {/* Address section */}
+              <div className="space-y-4 pt-2 border-t border-border">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Adresgegevens</p>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Straat en huisnummer</label>
+                  <input
+                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="Keizersgracht 12"
+                    {...form.register("address")}
+                  />
+                  {form.formState.errors.address && (
+                    <p className="text-xs text-destructive">{form.formState.errors.address.message}</p>
+                  )}
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Postcode</label>
+                    <input
+                      className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      placeholder="1015 CX"
+                      {...form.register("postalCode")}
+                    />
+                    {form.formState.errors.postalCode && (
+                      <p className="text-xs text-destructive">{form.formState.errors.postalCode.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Stad</label>
+                    <input
+                      className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      placeholder="Amsterdam"
+                      {...form.register("city")}
+                    />
+                    {form.formState.errors.city && (
+                      <p className="text-xs text-destructive">{form.formState.errors.city.message}</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">Postcode</label>
-                <input
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
-                  placeholder="1015 CX"
-                  {...form.register("postalCode")}
-                />
-                {form.formState.errors.postalCode && (
-                  <p className="text-xs text-warning">{form.formState.errors.postalCode.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">Stad</label>
-                <input
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
-                  placeholder="Amsterdam"
-                  {...form.register("city")}
-                />
-                {form.formState.errors.city && (
-                  <p className="text-xs text-warning">{form.formState.errors.city.message}</p>
-                )}
-              </div>
-
-              <div className="flex justify-end gap-2 md:col-span-2">
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <Button
                   type="button"
                   variant="secondary"
+                  className="px-6"
                   onClick={() => {
                     setOpen(false);
                     resetForm();
@@ -422,8 +446,8 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                 >
                   Annuleren
                 </Button>
-                <Button type="submit" disabled={isPending}>
-                  {isPending ? "Opslaan..." : "Relatie opslaan"}
+                <Button type="submit" disabled={isPending} className="px-6">
+                  {isPending ? "Opslaan..." : editingClient ? "Wijzigingen opslaan" : "Relatie toevoegen"}
                 </Button>
               </div>
             </form>
