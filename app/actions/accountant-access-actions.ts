@@ -8,6 +8,7 @@ import { UserRole } from "@prisma/client";
 import crypto from "crypto";
 import { sendEmail } from "@/lib/email";
 import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
+import { logInviteCreated } from "@/lib/auth/security-audit";
 
 /**
  * Invite an accountant to access the company
@@ -112,6 +113,14 @@ export async function inviteAccountant(email: string, role: UserRole) {
         token,
         expiresAt,
       },
+    });
+
+    // Log invite creation for audit
+    await logInviteCreated({
+      userId: session.userId,
+      email,
+      role,
+      companyId: session.userId,
     });
 
     const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";

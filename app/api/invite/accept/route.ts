@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { sendEmail } from "@/lib/email";
 import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
 import { createAccountantSession } from "@/lib/auth/accountant-session";
+import { logInviteAccepted, logCompanyAccessGranted } from "@/lib/auth/security-audit";
 
 // Error codes for clear error handling
 const INVITE_ERROR_CODES = {
@@ -251,6 +252,22 @@ export async function POST(request: NextRequest) {
     await prisma.accountantInvite.update({
       where: { id: invite.id },
       data: { acceptedAt: new Date() },
+    });
+
+    // Log invite acceptance and company access grant for audit
+    await logInviteAccepted({
+      userId: user.id,
+      email: invite.email,
+      companyId: invite.companyId,
+      role: invite.role,
+      isNewUser,
+    });
+
+    await logCompanyAccessGranted({
+      userId: invite.companyId,
+      targetUserId: user.id,
+      companyId: invite.companyId,
+      role: invite.role,
     });
 
     // Create accountant session for immediate access (for existing users)

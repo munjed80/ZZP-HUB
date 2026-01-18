@@ -11,6 +11,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import crypto from "crypto";
+import { logAccountantSessionCreated } from "./security-audit";
 
 const ACCOUNTANT_SESSION_COOKIE = "zzp-accountant-session";
 const SESSION_EXPIRY_DAYS = 30; // 30 days
@@ -61,6 +62,14 @@ export async function createAccountantSession(
     sameSite: "lax",
     maxAge: SESSION_EXPIRY_DAYS * 24 * 60 * 60, // seconds
     path: "/",
+  });
+  
+  // Log session creation for audit
+  await logAccountantSessionCreated({
+    userId,
+    email,
+    companyId,
+    role,
   });
   
   return {
