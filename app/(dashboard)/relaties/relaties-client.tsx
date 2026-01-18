@@ -228,7 +228,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                               {
                                 label: "Verwijder relatie",
                                 icon: <Trash2 className="h-5 w-5" />,
-                                variant: "danger" as const,
+                                variant: "danger",
                                 onClick: () => handleDelete(client.id),
                                 disabled: isPending,
                               },
@@ -284,7 +284,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                           {
                             label: "Verwijder relatie",
                             icon: <Trash2 className="h-5 w-5" />,
-                            variant: "danger" as const,
+                            variant: "danger",
                             onClick: () => handleDelete(client.id),
                             disabled: isPending,
                           },

@@ -114,6 +114,12 @@ export function ActionSheet({
     onOpenChange?.(next);
   };
 
+  const iconOnlyTriggerClasses =
+    "min-h-[44px] h-11 w-11 rounded-full border border-border bg-card p-0 text-muted-foreground shadow-sm transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary hover:shadow-md focus-visible:border-primary/60 focus-visible:bg-primary/10";
+
+  const defaultTriggerClasses =
+    "min-h-[44px] px-4 py-2.5 gap-2 border border-border text-card-foreground shadow-sm hover:shadow-md hover:border-border/80";
+
   const trigger = (
     <Dialog.Trigger asChild>
       <button
@@ -121,9 +127,7 @@ export function ActionSheet({
         onClick={() => handleOpenChange(true)}
         className={cn(
           buttonVariants(iconOnly ? "ghost" : "secondary"),
-          iconOnly
-            ? "min-h-[44px] h-11 w-11 rounded-full border border-border bg-card p-0 text-muted-foreground shadow-sm transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary hover:shadow-md focus-visible:border-primary/60 focus-visible:bg-primary/10"
-            : "min-h-[44px] px-4 py-2.5 gap-2 border border-border text-card-foreground shadow-sm hover:shadow-md hover:border-border/80",
+          iconOnly ? iconOnlyTriggerClasses : defaultTriggerClasses,
           triggerClassName,
         )}
         aria-haspopup="dialog"
@@ -226,9 +230,9 @@ export function ActionSheet({
           {/* Actions list */}
           <div className={cn("overflow-y-auto", isMobile ? "px-4 py-3" : "px-3 py-3")}>
             <div className="space-y-1">
-              {actions.map((action, index) => (
+              {actions.map((action) => (
                 <button
-                  key={index}
+                  key={action.label}
                   type="button"
                   onClick={() => {
                     action.onClick();
