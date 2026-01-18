@@ -4,7 +4,8 @@ import Image from "next/image";
 import { useEffect, useRef, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
 import { 
   User, Building2, FileText, CreditCard, Bell, Shield, 
-  Database, Download, Lock, RefreshCw, Check, Globe, Palette
+  Database, Download, Lock, RefreshCw, Check, Globe, Palette,
+  Monitor, Sun, Moon
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { LOCAL_PROFILE_STORAGE_KEY } from "@/lib/constants";
 import { changePassword, downloadBackup, saveProfileAvatar, saveProfileBasics, updateEmailSettings } from "./actions";
 import { SettingsForm, type CompanyProfileData } from "./settings-form";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/components/providers/theme-provider";
 
 const LANGUAGE_KEY = "zzp-hub-language";
 const MAX_AVATAR_BYTES = 3 * 1024 * 1024;
@@ -167,6 +169,7 @@ function Toggle({
 
 export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsProps) {
   const profileSeed = buildProfileSeed(initialProfile, user);
+  const { theme, setTheme } = useTheme();
   
   const [isPasswordPending, startPasswordTransition] = useTransition();
   const [isBackupPending, startBackupTransition] = useTransition();
@@ -191,6 +194,11 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
   const [language, setLanguage] = useState<"nl" | "en">(profileSeed.language);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -582,6 +590,49 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             <p className="text-sm text-foreground">
               Abonnementsbeheer is momenteel alleen beschikbaar via support. 
               Neem contact op voor wijzigingen aan uw abonnement.
+            </p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Appearance Section - Theme */}
+      <SectionCard
+        icon={Palette}
+        title="Weergave"
+        description="Thema en uiterlijk instellingen"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-3">
+              Thema
+            </label>
+            <div className="flex gap-3">
+              {([
+                { value: "system", label: "Systeem", Icon: Monitor },
+                { value: "light", label: "Licht", Icon: Sun },
+                { value: "dark", label: "Donker", Icon: Moon },
+              ] as const).map(({ value, label, Icon }) => {
+                const isActive = mounted && theme === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTheme(value)}
+                    className={cn(
+                      "flex-1 px-4 py-3 rounded-lg border-2 font-medium transition-all",
+                      isActive
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-muted-foreground hover:border-muted-foreground"
+                    )}
+                  >
+                    <Icon className={cn("w-5 h-5 mx-auto mb-1", isActive ? "opacity-100" : "opacity-50")} />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Systeem volgt je apparaatinstellingen. Themawijzigingen worden automatisch opgeslagen.
             </p>
           </div>
         </div>
