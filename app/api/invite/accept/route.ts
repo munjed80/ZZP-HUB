@@ -29,16 +29,33 @@ interface AcceptInviteResult {
 }
 
 /**
- * Generate a secure random password
+ * Generate a secure random password using rejection sampling to avoid modulo bias
  */
 function generateSecurePassword(): string {
   const length = 16;
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
+  const charsLength = chars.length;
   let password = "";
-  const randomBytes = crypto.randomBytes(length);
-  for (let i = 0; i < length; i++) {
-    password += chars[randomBytes[i] % chars.length];
+  
+  // Generate enough random bytes (we need 16 chars, request more to account for rejections)
+  const randomValues = crypto.randomBytes(32);
+  
+  let randomIndex = 0;
+  while (password.length < length && randomIndex < randomValues.length) {
+    const randomValue = randomValues[randomIndex++];
+    // Use rejection sampling to avoid modulo bias
+    // Only use values that fit evenly into our charset
+    const maxUsableValue = 256 - (256 % charsLength);
+    if (randomValue < maxUsableValue) {
+      password += chars[randomValue % charsLength];
+    }
   }
+  
+  // Fallback: if we somehow didn't get enough chars, use crypto.randomUUID
+  while (password.length < length) {
+    password += crypto.randomUUID().replace(/-/g, "").charAt(0);
+  }
+  
   return password;
 }
 

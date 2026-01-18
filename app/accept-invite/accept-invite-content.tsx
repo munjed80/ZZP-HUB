@@ -27,13 +27,15 @@ type PageStatus = "loading" | "ready" | "accepting" | "success" | "error";
 export function AcceptInviteContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [status, setStatus] = useState<PageStatus>("loading");
-  const [message, setMessage] = useState("");
-  const [errorCode, setErrorCode] = useState<string | null>(null);
-  const [inviteInfo, setInviteInfo] = useState<InviteInfo>({});
-
+  
   // Get token from URL
   const token = useMemo(() => searchParams.get("token"), [searchParams]);
+  
+  // Determine initial state based on whether we have a token
+  const [status, setStatus] = useState<PageStatus>(() => token ? "loading" : "error");
+  const [message, setMessage] = useState<string>(() => token ? "" : ERROR_MESSAGES.MISSING_TOKEN);
+  const [errorCode, setErrorCode] = useState<string | null>(() => token ? null : "MISSING_TOKEN");
+  const [inviteInfo, setInviteInfo] = useState<InviteInfo>({});
 
   // Validate the invite token
   const validateInvite = useCallback(async (inviteToken: string) => {
@@ -113,17 +115,14 @@ export function AcceptInviteContent() {
   }, [token, router]);
 
   useEffect(() => {
-    // Handle missing token case at component mount
+    // Skip if no token - state is already set in initialization
     if (!token) {
-      // Schedule state updates for next tick to avoid synchronous setState in effect
-      const timeoutId = setTimeout(() => {
-        setStatus("error");
-        setErrorCode("MISSING_TOKEN");
-        setMessage(ERROR_MESSAGES.MISSING_TOKEN);
-      }, 0);
-      return () => clearTimeout(timeoutId);
+      return;
     }
 
+    // Note: validateInvite is an async function that fetches data and updates state based on response.
+    // This is a valid use case for calling an async function from useEffect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     validateInvite(token);
   }, [token, validateInvite]);
 
