@@ -25,7 +25,7 @@ ZZP HUB is een premium financieel dashboard voor zzp'ers. Het combineert facture
 - **Hoe verstuur ik een document?** Open de factuur of offerte en kies **Acties → Verstuur via e-mail** of **Download PDF**.
 - **Wat kost het?** Premium/Pro abonnement, maandelijks opzegbaar.
 - **Hoe houd ik 1225 uur bij?** Gebruik *Uren*; voortgang zie je op het dashboard.
-- **Waar vind ik support?** Ga naar *Support* in de sidebar of mail support@matrixtop.com.
+- **Waar vind ik support?** Ga naar *Support* in de sidebar of mail support@zzpershub.nl.
 
 ## Support & contact
 - Gebruik het **supportformulier** in de app (velden: onderwerp, e-mail, bericht, optioneel screenshot-URL).

@@ -81,16 +81,16 @@
 RESEND_API_KEY="re_xxxxxxxxxxxxx"
 
 # Optional overrides (can be public-facing)
-SUPPORT_EMAIL="support@matrixtop.com"
-NEXT_PUBLIC_SUPPORT_EMAIL="support@matrixtop.com"
-NO_REPLY_EMAIL="no-reply@matrixtop.com"
+SUPPORT_EMAIL="support@zzpershub.nl"
+NEXT_PUBLIC_SUPPORT_EMAIL="support@zzpershub.nl"
+NO_REPLY_EMAIL="no-reply@zzpershub.nl"
 ```
 
 ### Data Protection
 
 #### Email Address Usage:
-- **Default From**: `ZZP Hub <no-reply@matrixtop.com>`
-- **Support Contact**: `support@matrixtop.com`
+- **Default From**: `ZZP Hub <no-reply@zzpershub.nl>`
+- **Support Contact**: `support@zzpershub.nl`
 - **User Emails**: Stored in database, never logged
 - **Logging**: Only email addresses involved in send operations
 
@@ -180,7 +180,7 @@ NO_REPLY_EMAIL="no-reply@matrixtop.com"
 Before deploying to production:
 
 - [ ] `RESEND_API_KEY` set in Coolify (keep secret!)
-- [ ] Verify Resend domain `matrixtop.com`
+- [ ] Verify Resend domain `zzpershub.nl`
 - [ ] Verify sender addresses authorized in Resend
 - [ ] Test health endpoint after deployment
 - [ ] Monitor logs for email events

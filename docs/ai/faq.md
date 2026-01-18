@@ -43,7 +43,7 @@ Use the BTW-aangifte overview, then file via Mijn Belastingdienst.
 
 ### How to get help?
 - Use Support form in sidebar
-- Email support@matrixtop.com
+- Email support@zzpershub.nl
 
 ### What does it cost?
 €4,99/month, cancel anytime, 14-day trial.
