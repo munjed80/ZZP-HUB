@@ -50,7 +50,17 @@ function LoginContent() {
       return;
     }
 
-    const nextUrl = searchParams.get("next") ?? searchParams.get("callbackUrl") ?? "/dashboard";
+    // Fetch session to get user role
+    const response = await fetch("/api/auth/session");
+    const session = await response.json();
+    
+    // Redirect based on role
+    let defaultRedirect = "/dashboard";
+    if (session?.user?.role === "ACCOUNTANT" || session?.user?.role === "ACCOUNTANT_VIEW" || session?.user?.role === "ACCOUNTANT_EDIT") {
+      defaultRedirect = "/accountant-portal";
+    }
+    
+    const nextUrl = searchParams.get("next") ?? searchParams.get("callbackUrl") ?? defaultRedirect;
     router.push(nextUrl);
     router.refresh();
   };
