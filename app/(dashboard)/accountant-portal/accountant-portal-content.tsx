@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { getAccountantCompanies } from "@/app/actions/accountant-access-actions";
 import { switchCompanyContext } from "@/app/actions/company-context-actions";
 import { toast } from "sonner";
-import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink, Filter, Calendar, TrendingUp, Euro } from "lucide-react";
+import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink, Filter, Calendar, TrendingUp, Euro, Eye } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { useRouter } from "next/navigation";
 
@@ -55,7 +55,13 @@ export function AccountantPortalContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function handleCompanyClick(companyId: string) {
+  async function handleCompanyClick(companyId: string, viewDossier = false) {
+    if (viewDossier) {
+      // Navigate directly to dossier
+      router.push(`/accountant-portal/dossier/${companyId}`);
+      return;
+    }
+
     setSwitching(true);
     const result = await switchCompanyContext(companyId);
 
@@ -406,12 +412,28 @@ export function AccountantPortalContent() {
                   )}
                 </div>
 
-                {/* View Button */}
-                <div className="mt-4 pt-4 border-t border-border">
-                  <div className="text-sm text-primary font-medium group-hover:underline flex items-center gap-1">
-                    Dashboard openen
-                    <ExternalLink className="h-3 w-3" />
-                  </div>
+                {/* Action Buttons */}
+                <div className="mt-4 pt-4 border-t border-border flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCompanyClick(company.companyId, true);
+                    }}
+                    className="flex-1 px-3 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Eye className="h-4 w-4" />
+                    Dossier
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCompanyClick(company.companyId, false);
+                    }}
+                    className="flex-1 px-3 py-2 border border-border text-foreground text-sm font-medium rounded-lg hover:bg-muted transition-colors flex items-center justify-center gap-2"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Dashboard
+                  </button>
                 </div>
               </div>
             </button>
