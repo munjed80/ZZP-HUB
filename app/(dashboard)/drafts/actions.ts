@@ -183,7 +183,7 @@ export async function updateDraft(
  */
 export async function approveDraft(draftId: string) {
   const session = await requireSession();
-  const { userId } = { userId: session.userId };
+  const userId = session.userId;
   
   // Get existing draft
   const existing = await prisma.expense.findFirst({
@@ -237,7 +237,7 @@ export async function approveDraft(draftId: string) {
  */
 export async function rejectDraft(draftId: string, reason?: string) {
   const session = await requireSession();
-  const { userId } = { userId: session.userId };
+  const userId = session.userId;
   
   // Get existing draft
   const existing = await prisma.expense.findFirst({

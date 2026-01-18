@@ -87,6 +87,10 @@ export class PlaceholderParser implements DocumentExtractor {
 
 /**
  * Helper to detect VAT rate from text or amount
+ * 
+ * Note: For calculation from amounts, expects:
+ * - totalAmount: amount INCLUSIVE of VAT
+ * - vatAmount: the VAT amount itself
  */
 export function detectVatRate(text?: string, vatAmount?: number, totalAmount?: number): BtwTarief | undefined {
   if (!text && (!vatAmount || !totalAmount)) {
@@ -94,8 +98,11 @@ export function detectVatRate(text?: string, vatAmount?: number, totalAmount?: n
   }
   
   // If we have amounts, calculate percentage
-  if (vatAmount && totalAmount && totalAmount > 0) {
-    const percentage = (vatAmount / totalAmount) * 100;
+  // VAT rate = (vatAmount / amountExclVAT) * 100
+  // Where amountExclVAT = totalAmount - vatAmount
+  if (vatAmount && totalAmount && totalAmount > vatAmount) {
+    const amountExclVAT = totalAmount - vatAmount;
+    const percentage = (vatAmount / amountExclVAT) * 100;
     
     if (percentage >= 20 && percentage <= 22) return BtwTarief.HOOG_21;
     if (percentage >= 8 && percentage <= 10) return BtwTarief.LAAG_9;

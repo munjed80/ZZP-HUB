@@ -133,20 +133,21 @@ export function UploadClient() {
     }
   };
 
-  const onSubmit = async (values: DraftFormValues) => {
-    if (!extractedData || !assetId) {
+  const onSubmit = async (formData: DraftFormValues) => {
+    if (!assetId) {
       toast.error("Geen bestand geüpload");
       return;
     }
 
     startTransition(async () => {
       try {
+        // Create draft with form data (user may have edited the extracted values)
         const result = await createDraftFromExtraction({
           extractedData: {
-            totalAmount: values.amountExcl,
-            vatRate: values.vatRate,
-            date: values.date,
-            vendorName: values.description,
+            totalAmount: formData.amountExcl,
+            vatRate: formData.vatRate,
+            date: formData.date,
+            vendorName: formData.description,
           },
           assetId,
           storageUrl,
