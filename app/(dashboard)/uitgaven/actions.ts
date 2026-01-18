@@ -11,7 +11,10 @@ export async function getExpenses(): Promise<ExpenseClientShape[]> {
 
   try {
     const expenses = await prisma.expense.findMany({
-      where: { userId },
+      where: { 
+        userId,
+        status: "APPROVED" // Only show approved expenses, exclude drafts
+      },
       orderBy: { date: "desc" },
       take: 50,
     });
@@ -47,6 +50,7 @@ export async function createExpense(values: ExpenseFormValues) {
         vatRate: data.vatRate,
         date: new Date(data.date),
         receiptUrl: trimmedUrl,
+        status: "APPROVED", // Manual entries are automatically approved
       },
     });
 

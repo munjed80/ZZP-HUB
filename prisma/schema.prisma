@@ -51,6 +51,19 @@ enum SupportMessageStatus {
   CLOSED
 }
 
+enum ExtractionStatus {
+  PENDING
+  EXTRACTED
+  FAILED
+}
+
+enum DraftStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
 model User {
   id          String   @id @default(uuid())
   email       String   @unique
@@ -181,16 +194,22 @@ model QuotationLine {
 }
 
 model Expense {
-  id          String    @id @default(uuid())
+  id          String      @id @default(uuid())
   userId      String
   category    String
   description String
-  amountExcl  Decimal   @db.Decimal(12, 2)
+  amountExcl  Decimal     @db.Decimal(12, 2)
   vatRate     BtwTarief
   date        DateTime
   receiptUrl  String?
-  createdAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id])
+  status      DraftStatus @default(APPROVED)
+  approvedBy  String?
+  approvedAt  DateTime?
+  createdAt   DateTime    @default(now())
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
+  @@index([userId, createdAt])
 }
 
 model TimeEntry {
@@ -311,4 +330,52 @@ model ConversationDraft {
   @@index([userId])
   @@index([conversationId])
   @@index([status])
+}
+
+model UploadAsset {
+  id                String              @id @default(uuid())
+  userId            String
+  filename          String
+  mimeType          String
+  size              Int
+  storagePath       String
+  storageUrl        String?
+  createdAt         DateTime            @default(now())
+  extractedDocument ExtractedDocument?
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ExtractedDocument {
+  id              String           @id @default(uuid())
+  userId          String
+  assetId         String           @unique
+  status          ExtractionStatus @default(PENDING)
+  extractedJson   String?          @db.Text
+  confidenceScore Decimal?         @db.Decimal(5, 2)
+  errorMessage    String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  asset           UploadAsset      @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  actorId    String
+  entityType String
+  entityId   String
+  action     String
+  beforeJson String?  @db.Text
+  afterJson  String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
 }
