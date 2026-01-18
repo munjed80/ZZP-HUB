@@ -7,9 +7,9 @@ Successfully eliminated all hardcoded email addresses and implemented a single s
 
 ### Files Created
 1. **`/config/emails.ts`** - Central email configuration
-   - Default `SUPPORT_EMAIL`: `support@matrixtop.com`
-   - Default `NO_REPLY_EMAIL`: `no-reply@matrixtop.com`
-   - Default `FROM_EMAIL`: `ZZP Hub <no-reply@matrixtop.com>`
+   - Default `SUPPORT_EMAIL`: `support@zzpershub.nl`
+   - Default `NO_REPLY_EMAIL`: `no-reply@zzpershub.nl`
+   - Default `FROM_EMAIL`: `ZZP Hub <no-reply@zzpershub.nl>`
    - Server-side helper functions with optional env overrides
 
 2. **`/lib/publicConfig.ts`** - Client-safe email helpers
@@ -48,7 +48,7 @@ Successfully eliminated all hardcoded email addresses and implemented a single s
    - `lib/assistant/guide.ts`
 
 5. **Documentation**:
-   - `content/help/zzp-hub-knowledge.md` - Updated to matrixtop.com
+   - `content/help/zzp-hub-knowledge.md` - Updated to zzpershub.nl
    - `.env.example` - Added new optional env vars
 
 ## Hardcoded Emails Removed
@@ -57,9 +57,9 @@ Successfully eliminated all hardcoded email addresses and implemented a single s
 - `support@zzp-hub.nl` in 5 locations
 - `noreply@zzp-hub.nl` in env example
 
-### After (matrixtop.com)
+### After (zzpershub.nl)
 - All emails use centralized config from `/config/emails.ts`
-- Default: `support@matrixtop.com` and `no-reply@matrixtop.com`
+- Default: `support@zzpershub.nl` and `no-reply@zzpershub.nl`
 - Can be overridden via environment variables
 
 ## Environment Variables
@@ -71,12 +71,12 @@ RESEND_API_KEY="re_xxxxxxxxxxxxx"
 
 ### Optional (with sensible defaults)
 ```bash
-# Override support email (default: support@matrixtop.com)
-SUPPORT_EMAIL="support@matrixtop.com"
-NEXT_PUBLIC_SUPPORT_EMAIL="support@matrixtop.com"
+# Override support email (default: support@zzpershub.nl)
+SUPPORT_EMAIL="support@zzpershub.nl"
+NEXT_PUBLIC_SUPPORT_EMAIL="support@zzpershub.nl"
 
-# Override no-reply email (default: no-reply@matrixtop.com)
-NO_REPLY_EMAIL="no-reply@matrixtop.com"
+# Override no-reply email (default: no-reply@zzpershub.nl)
+NO_REPLY_EMAIL="no-reply@zzpershub.nl"
 ```
 
 ## Benefits
@@ -116,10 +116,10 @@ NO_REPLY_EMAIL="no-reply@matrixtop.com"
 Before deploying to production:
 
 - [ ] Set `RESEND_API_KEY` in Coolify
-- [ ] Verify `matrixtop.com` domain in Resend
+- [ ] Verify `zzpershub.nl` domain in Resend
 - [ ] Verify sender addresses in Resend:
-  - `no-reply@matrixtop.com`
-  - `support@matrixtop.com`
+  - `no-reply@zzpershub.nl`
+  - `support@zzpershub.nl`
 - [ ] (Optional) Set override env vars if needed
 - [ ] Deploy to production
 - [ ] Test health endpoint: `curl https://your-domain.com/api/health/email`
@@ -184,4 +184,4 @@ For issues or questions:
 - Review the deployment runbook: `EMAIL_CONFIGURATION_RUNBOOK.md`
 - Check health endpoint: `/api/health/email`
 - Review structured logs for email events
-- Contact: support@matrixtop.com
+- Contact: support@zzpershub.nl

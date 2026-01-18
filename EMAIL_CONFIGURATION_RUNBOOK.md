@@ -7,9 +7,9 @@ This document describes the email configuration changes and how to deploy them.
 
 ### 1. Centralized Email Configuration
 - **Created** `/config/emails.ts`: Single source of truth for all email addresses
-  - Default `SUPPORT_EMAIL`: `support@matrixtop.com`
-  - Default `NO_REPLY_EMAIL`: `no-reply@matrixtop.com`
-  - Default `FROM_EMAIL`: `ZZP Hub <no-reply@matrixtop.com>`
+  - Default `SUPPORT_EMAIL`: `support@zzpershub.nl`
+  - Default `NO_REPLY_EMAIL`: `no-reply@zzpershub.nl`
+  - Default `FROM_EMAIL`: `ZZP Hub <no-reply@zzpershub.nl>`
 
 - **Created** `/lib/publicConfig.ts`: Client-safe email configuration helpers
 
@@ -18,7 +18,7 @@ This document describes the email configuration changes and how to deploy them.
 - `components/assistant/assistant-drawer.tsx`: Uses centralized support email
 - `app/(auth)/login/page.tsx`: Uses centralized support email for "forgot password" link
 - `lib/assistant/guide.ts`: FAQ uses centralized support email
-- `content/help/zzp-hub-knowledge.md`: Documentation updated to matrixtop.com
+- `content/help/zzp-hub-knowledge.md`: Documentation updated to zzpershub.nl
 
 ### 3. Updated Email Sending
 - `lib/email.ts`: 
@@ -41,12 +41,12 @@ RESEND_API_KEY="re_xxxxxxxxxxxxx"
 
 ### Optional (with defaults)
 ```bash
-# Override support email (default: support@matrixtop.com)
-SUPPORT_EMAIL="support@matrixtop.com"
-NEXT_PUBLIC_SUPPORT_EMAIL="support@matrixtop.com"
+# Override support email (default: support@zzpershub.nl)
+SUPPORT_EMAIL="support@zzpershub.nl"
+NEXT_PUBLIC_SUPPORT_EMAIL="support@zzpershub.nl"
 
-# Override no-reply email (default: no-reply@matrixtop.com)
-NO_REPLY_EMAIL="no-reply@matrixtop.com"
+# Override no-reply email (default: no-reply@zzpershub.nl)
+NO_REPLY_EMAIL="no-reply@zzpershub.nl"
 ```
 
 ## Deployment Steps
@@ -64,10 +64,10 @@ NO_REPLY_EMAIL="no-reply@matrixtop.com"
 ### 2. Verify Resend Configuration
 
 1. Log into [Resend Dashboard](https://resend.com/domains)
-2. Verify domain `matrixtop.com` is verified
+2. Verify domain `zzpershub.nl` is verified
 3. Verify sender addresses are authorized:
-   - `no-reply@matrixtop.com`
-   - `support@matrixtop.com`
+   - `no-reply@zzpershub.nl`
+   - `support@zzpershub.nl`
 
 ### 3. Deploy
 
@@ -101,8 +101,8 @@ Expected response:
 ```bash
 RESEND_API_KEY="re_test_xxxxx"
 # Optional overrides
-SUPPORT_EMAIL="support@matrixtop.com"
-NO_REPLY_EMAIL="no-reply@matrixtop.com"
+SUPPORT_EMAIL="support@zzpershub.nl"
+NO_REPLY_EMAIL="no-reply@zzpershub.nl"
 ```
 
 2. Start dev server:
@@ -140,11 +140,11 @@ curl https://zzp-hub.matrixtop.com/api/health/email
 3. Test user registration flow:
    - Register a test account
    - Verify email is sent to correct address
-   - Check email is from `no-reply@matrixtop.com`
+   - Check email is from `no-reply@zzpershub.nl`
 
 4. Test support form:
    - Submit support form
-   - Verify email arrives at `support@matrixtop.com`
+   - Verify email arrives at `support@zzpershub.nl`
 
 ## Rollback Plan
 
@@ -156,7 +156,7 @@ If issues occur:
 ## Verification Checklist
 
 - [ ] `RESEND_API_KEY` configured in Coolify
-- [ ] Domain `matrixtop.com` verified in Resend
+- [ ] Domain `zzpershub.nl` verified in Resend
 - [ ] Sender addresses authorized in Resend
 - [ ] Health check returns `{"status":"ok"}`
 - [ ] Registration sends verification email

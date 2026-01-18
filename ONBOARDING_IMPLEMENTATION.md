@@ -199,7 +199,7 @@ NEXTAUTH_SECRET="generate-with-openssl"
 
 # Email (optional in dev)
 RESEND_API_KEY="re_..."
-EMAIL_FROM="ZZP-HUB <noreply@zzp-hub.nl>"
+EMAIL_FROM="ZZP-HUB <no-reply@zzpershub.nl>"
 
 # KVK (optional - uses mock by default)
 USE_REAL_KVK_API="false"
@@ -328,4 +328,4 @@ For issues or questions:
 - Review README.md verification checklist
 - Check server logs for errors
 - Verify environment configuration
-- Contact support: support@zzp-hub.nl
+- Contact support: support@zzpershub.nl
