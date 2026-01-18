@@ -157,7 +157,6 @@ model Invoice {
   convertedFromOfferte   Quotation?         @relation(fields: [convertedFromOfferteId], references: [id])
   lines                  InvoiceLine[]
 
-  @@index([userId])
   @@index([createdAt])
   @@index([userId, createdAt])
 }
