@@ -53,8 +53,8 @@ export function AccountantAccessContent() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleInvite(e: React.FormEvent) {

@@ -35,14 +35,14 @@ export function AcceptInviteContent() {
     const token = searchParams.get("token");
 
     if (!token) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
       setStatus("error");
       setMessage("Ongeldige uitnodigingslink. Er ontbreekt een token.");
       return;
     }
 
     processInvite(token);
-  }, [searchParams, processInvite]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

@@ -160,6 +160,20 @@ function generateExpensesCSV(expenses: Expense[]): string {
 }
 
 /**
+ * Map BtwTarief enum to summary category key
+ */
+function getVatCategoryKey(tariff: BtwTarief): "high_21" | "low_9" | "zero_0" | "exempt" | "reversed" {
+  const mapping: Record<BtwTarief, "high_21" | "low_9" | "zero_0" | "exempt" | "reversed"> = {
+    HOOG_21: "high_21",
+    LAAG_9: "low_9",
+    NUL_0: "zero_0",
+    VRIJGESTELD: "exempt",
+    VERLEGD: "reversed",
+  };
+  return mapping[tariff] || "exempt";
+}
+
+/**
  * Generate VAT summary
  */
 function generateVATSummary(
@@ -205,7 +219,7 @@ function generateVATSummary(
       const vatAmount = amount * vatRate;
       const gross = amount + vatAmount;
 
-      const categoryKey = line.vatRate.toLowerCase().replace("_", "_") as keyof typeof summary.sales;
+      const categoryKey = getVatCategoryKey(line.vatRate);
       if (summary.sales[categoryKey]) {
         summary.sales[categoryKey].net += amount;
         summary.sales[categoryKey].vat += vatAmount;
@@ -225,7 +239,7 @@ function generateVATSummary(
     const vatAmount = amount * vatRate;
     const gross = amount + vatAmount;
 
-    const categoryKey = expense.vatRate.toLowerCase().replace("_", "_") as keyof typeof summary.purchases;
+    const categoryKey = getVatCategoryKey(expense.vatRate);
     if (summary.purchases[categoryKey]) {
       summary.purchases[categoryKey].net += amount;
       summary.purchases[categoryKey].vat += vatAmount;
