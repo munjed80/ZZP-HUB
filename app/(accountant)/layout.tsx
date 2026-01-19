@@ -14,5 +14,6 @@ export default async function AccountantLayout({ children }: { children: ReactNo
     redirect("/dashboard");
   }
 
+  // Keep this shell minimal to avoid duplicating the dashboard navigation on accountant pages
   return <div className="min-h-screen bg-background">{children}</div>;
 }

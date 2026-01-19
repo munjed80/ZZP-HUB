@@ -128,6 +128,7 @@ export async function middleware(request: NextRequest) {
   const userRole = token.role as string | undefined;
   const isAccountantPath = isAccountantAllowedPath(pathname);
 
+  // Non-accountants visiting accountant-specific routes get routed to the standard dashboard
   if (isAccountantPath && !isAccountantRole(userRole)) {
     const dashboardUrl = new URL('/dashboard', request.url);
     dashboardUrl.searchParams.set('next', nextParam);
