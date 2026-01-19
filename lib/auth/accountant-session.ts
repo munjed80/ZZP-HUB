@@ -158,18 +158,18 @@ export async function deleteAccountantSession(): Promise<void> {
     const sessionToken = cookieStore.get(ACCOUNTANT_SESSION_COOKIE)?.value;
     
     if (sessionToken) {
-      // Get session details for logging before deletion
+      // Get session details for logging, then delete in one operation
       const session = await prisma.accountantSession.findUnique({
         where: { sessionToken },
       });
       
-      // Delete from database
-      await prisma.accountantSession.deleteMany({
-        where: { sessionToken },
-      });
-      
-      // Log session deletion for audit
       if (session) {
+        // Delete from database
+        await prisma.accountantSession.delete({
+          where: { sessionToken },
+        });
+        
+        // Log session deletion for audit
         await logSecurityEvent({
           userId: session.userId,
           eventType: "ACCOUNTANT_SESSION_DELETED",
