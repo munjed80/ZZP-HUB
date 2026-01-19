@@ -121,8 +121,8 @@ function InputField({
       <input
         {...props}
         className={cn(
-          "w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground",
-          "focus:ring-2 focus:ring-primary focus:border-transparent",
+          "w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground",
+          "focus:ring-2 focus:ring-ring focus:border-transparent",
           "transition-all duration-200",
           "text-base placeholder:text-muted-foreground",
           props.className

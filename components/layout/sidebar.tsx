@@ -25,7 +25,7 @@ import {
   UserPlus,
   Briefcase,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { assertUniqueHrefs, cn, isAccountantRole } from "@/lib/utils";
 import { SidebarBrand } from "@/components/sidebar/sidebar-brand";
 
 type NavigatieItem = {
@@ -58,6 +58,8 @@ export const navigatie: NavigatieItem[] = [
   { href: "/admin/support", label: "Support Inbox", icon: Inbox, superAdminOnly: true },
 ];
 
+assertUniqueHrefs(navigatie, "Sidebar navigation");
+
 export function Sidebar({
   userRole,
   collapsed = false,
@@ -77,7 +79,7 @@ export function Sidebar({
           if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
             return null;
           }
-          if (item.accountantOnly && userRole !== UserRole.ACCOUNTANT_VIEW && userRole !== UserRole.ACCOUNTANT_EDIT && userRole !== UserRole.STAFF) {
+          if (item.accountantOnly && !isAccountantRole(userRole)) {
             return null;
           }
           if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
@@ -186,7 +188,7 @@ export function MobileSidebar({
               if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
                 return null;
               }
-              if (item.accountantOnly && userRole !== UserRole.ACCOUNTANT_VIEW && userRole !== UserRole.ACCOUNTANT_EDIT && userRole !== UserRole.STAFF) {
+              if (item.accountantOnly && !isAccountantRole(userRole)) {
                 return null;
               }
               if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {

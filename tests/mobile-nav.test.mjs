@@ -43,7 +43,6 @@ const accountantNavItems = [
 const isAccountantRole = (role) =>
   role === UserRole.ACCOUNTANT_VIEW ||
   role === UserRole.ACCOUNTANT_EDIT ||
-  role === UserRole.STAFF ||
   role === UserRole.ACCOUNTANT;
 
 // Get navigation items based on role (mimics mobile-nav.tsx logic)
@@ -101,11 +100,12 @@ describe("Mobile Navigation Role-Based Filtering", () => {
     assert.strictEqual(instellingenItem, undefined, "ACCOUNTANT user should NOT see Instellingen navigation item");
   });
   
-  test("STAFF user does NOT see Instellingen", () => {
+  test("STAFF user sees Instellingen", () => {
     const navItems = getNavItemsForRole(UserRole.STAFF);
     const instellingenItem = navItems.find(item => item.label === "Instellingen");
     
-    assert.strictEqual(instellingenItem, undefined, "STAFF user should NOT see Instellingen navigation item");
+    assert.ok(instellingenItem, "STAFF user should see Instellingen navigation item");
+    assert.strictEqual(instellingenItem.href, "/instellingen", "Instellingen should route to /instellingen");
   });
   
   test("Accountant users see Portal pointing to /accountant-portal", () => {

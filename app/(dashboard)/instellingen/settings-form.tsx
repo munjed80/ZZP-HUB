@@ -45,8 +45,8 @@ function InputField({
       <input
         {...props}
         className={cn(
-          "w-full px-4 py-3 rounded-lg border bg-background text-foreground placeholder:text-muted-foreground",
-          error ? "border-destructive focus:ring-destructive" : "border-input focus:ring-primary",
+          "w-full rounded-lg border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted-foreground",
+          error ? "border-destructive focus:ring-destructive" : "focus:ring-ring",
           "focus:ring-2 focus:border-transparent",
           "transition-all duration-200",
           "text-base",
@@ -164,7 +164,7 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
             Betaaltermijn
           </label>
           <select
-            className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-base"
+            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base text-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring"
             {...form.register("paymentTerms", { valueAsNumber: true })}
           >
             {paymentOptions.map((option) => (
@@ -186,7 +186,7 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
           <input
             type="file"
             accept="image/*"
-            className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground text-base file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all"
+            className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base text-foreground transition-all file:mr-4 file:rounded-md file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/20 focus:border-transparent focus:ring-2 focus:ring-ring"
             onChange={async (event) => {
               const file = event.target.files?.[0];
               if (!file) return;
