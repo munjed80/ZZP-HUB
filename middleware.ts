@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { resolveAuthSecret } from '@/lib/auth/secret';
 import { shouldLogAuth } from '@/lib/auth/logging';
+// Edge-safe accountant role helper (server-only variant lives in lib/auth/tenant.ts)
 import { isAccountantRole } from '@/lib/utils';
 
 // Cookie name for accountant sessions

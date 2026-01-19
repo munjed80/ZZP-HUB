@@ -50,6 +50,12 @@ function readUserString(user: unknown, key: "id" | "role"): string | undefined {
   return undefined;
 }
 
+function maskUserId(userId?: string) {
+  if (!userId) return undefined;
+  const visibleLength = Math.min(6, userId.length);
+  return userId.slice(-visibleLength);
+}
+
 function isMissingOnboardingColumns(error: unknown) {
   if (
     error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -269,7 +275,7 @@ export const authOptions: NextAuthOptions = {
 
       if (shouldLogAuth) {
         console.log("[AUTH] SESSION_CALLBACK", {
-          userId: allowSensitiveAuthLogs ? session.user?.id?.slice?.(-6) : undefined,
+          userId: allowSensitiveAuthLogs ? maskUserId(session.user?.id) : undefined,
           role: session.user?.role,
           emailVerified: session.user?.emailVerified,
           onboardingCompleted: session.user?.onboardingCompleted,
@@ -306,7 +312,7 @@ export const authOptions: NextAuthOptions = {
         const userId = readUserString(user, "id");
         const userRole = readUserString(user, "role");
         console.log("[AUTH] SIGN_IN", {
-          userId: allowSensitiveAuthLogs ? userId?.slice?.(-6) : undefined,
+          userId: allowSensitiveAuthLogs ? maskUserId(userId) : undefined,
           role: userRole,
         });
       }
@@ -314,7 +320,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session }) {
       if (shouldLogAuth) {
         console.log("[AUTH] SESSION_EVENT", {
-          userId: allowSensitiveAuthLogs ? session.user?.id?.slice?.(-6) : undefined,
+          userId: allowSensitiveAuthLogs ? maskUserId(session.user?.id) : undefined,
           role: session.user?.role,
         });
       }
@@ -329,7 +335,7 @@ export function getServerAuthSession() {
   return getServerSession(authOptions).then((session) => {
     if (shouldLogAuth) {
       console.log(session ? "[AUTH] SESSION_READ" : "[AUTH] SESSION_MISSING", {
-        userId: allowSensitiveAuthLogs ? session?.user?.id?.slice?.(-6) : undefined,
+        userId: allowSensitiveAuthLogs ? maskUserId(session?.user?.id) : undefined,
         role: session?.user?.role,
       });
     }

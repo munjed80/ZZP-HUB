@@ -5,6 +5,8 @@ function deriveDevFallbackSecret(): string {
   const seed =
     process.env.AUTH_DEV_SECRET ||
     process.env.NEXTAUTH_URL ||
+    process.env.APP_URL ||
+    process.env.BASE_URL ||
     DEFAULT_DEV_SECRET_SEED;
 
   // Simple deterministic string hash (inspired by the classic 31x hash) to avoid
