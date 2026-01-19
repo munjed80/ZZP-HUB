@@ -88,8 +88,54 @@ export async function POST(request: NextRequest) {
       itemId: id,
     });
 
-    // In a real implementation, you might want to add a "reviewed" flag to the database
-    // For now, we just log the action in the audit trail
+    // Update the reviewed status in the database
+    const now = new Date();
+    if (type === "invoice") {
+      await prisma.invoice.update({
+        where: { id },
+        data: {
+          reviewedAt: now,
+          reviewedBy: userId,
+          reviewStatus: "approved",
+        },
+      });
+    } else if (type === "expense") {
+      await prisma.expense.update({
+        where: { id },
+        data: {
+          reviewedAt: now,
+          reviewedBy: userId,
+          reviewStatus: "approved",
+        },
+      });
+    }
+
+    // Create a notification for the company owner
+    let entityName = "";
+    if (type === "invoice") {
+      const invoice = await prisma.invoice.findUnique({
+        where: { id },
+        select: { invoiceNum: true },
+      });
+      entityName = invoice?.invoiceNum || "";
+    } else if (type === "expense") {
+      const expense = await prisma.expense.findUnique({
+        where: { id },
+        select: { description: true },
+      });
+      entityName = expense?.description || "";
+    }
+
+    await prisma.notification.create({
+      data: {
+        userId: companyId,
+        type: `${type}_reviewed`,
+        title: `${type === "invoice" ? "Factuur" : "Uitgave"} goedgekeurd`,
+        message: `Uw accountant heeft ${entityName} gecontroleerd en goedgekeurd`,
+        entityType: type,
+        entityId: id,
+      },
+    });
 
     return NextResponse.json({
       success: true,

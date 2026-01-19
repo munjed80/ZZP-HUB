@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink, Filter, Calendar, TrendingUp, Euro, Eye } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { NotificationsPanel } from "@/components/notifications/notifications-panel";
 
 type Company = {
   id: string;
@@ -263,6 +264,11 @@ export function AccountantPortalContent() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Notifications Panel */}
+      <div className="mb-6">
+        <NotificationsPanel showUnreadOnly={false} limit={10} />
       </div>
 
       {/* Companies Grid */}
