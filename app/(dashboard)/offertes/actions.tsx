@@ -100,7 +100,7 @@ function mapQuotationToPdfData(
             quotation.user.companyProfile.emailReplyTo ??
             quotation.user.companyProfile.emailSenderName ??
             quotation.user.email,
-          website: process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? undefined,
+          // Note: website is intentionally omitted from quotation PDFs
         }
       : null,
     lines: quotation.lines.map((line) => ({
@@ -190,63 +190,89 @@ export async function convertOfferteToInvoice(offerteId: string) {
 
   const { userId } = await requireTenantContext();
 
-  const quotation = await prisma.quotation.findFirst({
-    where: { id: offerteId, userId },
-    include: { lines: true, client: true, user: { include: { companyProfile: true } }, convertedInvoice: true },
-  });
+  try {
+    const quotation = await prisma.quotation.findFirst({
+      where: { id: offerteId, userId },
+      include: { lines: true, client: true, user: { include: { companyProfile: true } }, convertedInvoice: true },
+    });
 
-  if (!quotation) {
-    return { success: false, message: "Offerte niet gevonden." };
-  }
+    if (!quotation) {
+      console.error("OFFERT_TO_FACTUUR_FAILED", {
+        offerteId,
+        companyId: userId,
+        error: "Offerte niet gevonden",
+      });
+      return { success: false, message: "Offerte niet gevonden." };
+    }
 
-  // Check if invoice was already created from this offerte
-  if (quotation.convertedInvoice) {
+    // Check if invoice was already created from this offerte
+    if (quotation.convertedInvoice) {
+      console.log("OFFERT_TO_FACTUUR_SUCCESS", {
+        offerteId,
+        invoiceId: quotation.convertedInvoice.id,
+        companyId: userId,
+        note: "Already converted, returning existing invoice",
+      });
+      revalidatePath("/offertes");
+      revalidatePath(`/offertes/${offerteId}`);
+      revalidatePath("/facturen");
+      revalidatePath(`/facturen/${quotation.convertedInvoice.id}`);
+      return { success: true, invoiceId: quotation.convertedInvoice.id, alreadyConverted: true };
+    }
+
+    const invoice = await prisma.$transaction(async (tx) => {
+      const createdInvoice = await tx.invoice.create({
+        data: {
+          userId,
+          clientId: quotation.clientId,
+          invoiceNum: `INV-${quotation.quoteNum.replace(/^off[-]?/i, "")}`,
+          date: new Date(),
+          dueDate: quotation.validUntil,
+          emailStatus: InvoiceEmailStatus.CONCEPT,
+          convertedFromOfferteId: offerteId,
+        },
+      });
+
+      await tx.invoiceLine.createMany({
+        data: quotation.lines.map((line) => ({
+          invoiceId: createdInvoice.id,
+          description: line.description,
+          quantity: line.quantity,
+          price: line.price,
+          amount: line.amount,
+          vatRate: line.vatRate,
+          unit: line.unit,
+        })),
+      });
+
+      await tx.quotation.update({
+        where: { id: quotation.id },
+        data: { status: QuotationStatus.OMGEZET },
+      });
+
+      return createdInvoice;
+    });
+
+    console.log("OFFERT_TO_FACTUUR_SUCCESS", {
+      offerteId,
+      invoiceId: invoice.id,
+      companyId: userId,
+    });
+
     revalidatePath("/offertes");
     revalidatePath(`/offertes/${offerteId}`);
     revalidatePath("/facturen");
-    revalidatePath(`/facturen/${quotation.convertedInvoice.id}`);
-    return { success: true, invoiceId: quotation.convertedInvoice.id, alreadyConverted: true };
+    revalidatePath(`/facturen/${invoice.id}`);
+
+    return { success: true, invoiceId: invoice.id };
+  } catch (error) {
+    console.error("OFFERT_TO_FACTUUR_FAILED", {
+      offerteId,
+      companyId: userId,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+    return { success: false, message: "Omzetten naar factuur is mislukt. Probeer het opnieuw." };
   }
-
-  const invoice = await prisma.$transaction(async (tx) => {
-    const createdInvoice = await tx.invoice.create({
-      data: {
-        userId,
-        clientId: quotation.clientId,
-        invoiceNum: `INV-${quotation.quoteNum.replace(/^off[-]?/i, "")}`,
-        date: new Date(),
-        dueDate: quotation.validUntil,
-        emailStatus: InvoiceEmailStatus.CONCEPT,
-        convertedFromOfferteId: offerteId,
-      },
-    });
-
-    await tx.invoiceLine.createMany({
-      data: quotation.lines.map((line) => ({
-        invoiceId: createdInvoice.id,
-        description: line.description,
-        quantity: line.quantity,
-        price: line.price,
-        amount: line.amount,
-        vatRate: line.vatRate,
-        unit: line.unit,
-      })),
-    });
-
-    await tx.quotation.update({
-      where: { id: quotation.id },
-      data: { status: QuotationStatus.OMGEZET },
-    });
-
-    return createdInvoice;
-  });
-
-  revalidatePath("/offertes");
-  revalidatePath(`/offertes/${offerteId}`);
-  revalidatePath("/facturen");
-  revalidatePath(`/facturen/${invoice.id}`);
-
-  return { success: true, invoiceId: invoice.id };
 }
 
 export async function convertToInvoice(quotationId: string) {

@@ -22,6 +22,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   STAFF: ["read", "write"],
   ACCOUNTANT_VIEW: ["read", "export"],
   ACCOUNTANT_EDIT: ["read", "write", "export", "vat_actions"],
+  ZZP: ["read", "write", "export", "vat_actions"],
+  ACCOUNTANT: ["read", "write", "export"],
 };
 
 /**

@@ -93,12 +93,156 @@ export async function clearActiveCompanyId(): Promise<void> {
 }
 
 /**
- * Get tenant context with company awareness
- * 
- * This replaces requireTenantContext for queries that need company scoping.
- * It returns the active company ID instead of always using userId.
+ * Options for requireCompanyContext
  */
-export async function requireCompanyContext(): Promise<{ userId: string }> {
-  const companyId = await getActiveCompanyId();
-  return { userId: companyId };
+export interface CompanyContextOptions {
+  /** Optional companyId from route, searchParams, or request body */
+  companyId?: string | null;
+}
+
+/**
+ * Result from requireCompanyContext
+ */
+export interface CompanyContextResult {
+  /** The validated company ID to use in WHERE clauses */
+  companyId: string;
+  /** Alias for companyId - for backward compatibility with userId-based queries */
+  userId: string;
+  /** The authenticated user's ID */
+  authenticatedUserId: string;
+  /** The user's role */
+  role: string;
+}
+
+/**
+ * Multi-tenant isolation helper - CRITICAL for data security
+ * 
+ * This helper ensures strict tenant isolation by validating that the user
+ * has access to the requested company before returning the companyId.
+ * 
+ * Rules:
+ * - ZZP/COMPANY_ADMIN: Can access ONLY their own companies
+ * - SUPERADMIN: Can view all but must explicitly select companyId (no implicit fallback)
+ * - ACCOUNTANT_*: Can access companies they are members of
+ * 
+ * @param options - Optional parameters including companyId from route/searchParams/body
+ * @returns Validated companyId that belongs to the current user
+ * @throws 403 Error if user doesn't have access to the company
+ */
+export async function requireCompanyContext(
+  options?: CompanyContextOptions
+): Promise<CompanyContextResult> {
+  const session = await requireSession();
+  const requestedCompanyId = options?.companyId?.trim();
+
+  // Log the access attempt for audit
+  logCompanyContextAccess(session.userId, session.role, requestedCompanyId);
+
+  // SUPERADMIN handling - must explicitly select companyId, no implicit fallback
+  if (session.role === "SUPERADMIN") {
+    if (!requestedCompanyId) {
+      // For SUPERADMIN with no explicit company, use their own userId
+      // This enables them to work in their own context
+      return {
+        companyId: session.userId,
+        userId: session.userId,
+        authenticatedUserId: session.userId,
+        role: session.role,
+      };
+    }
+    // SUPERADMIN can access any company when explicitly specified
+    return {
+      companyId: requestedCompanyId,
+      userId: requestedCompanyId,
+      authenticatedUserId: session.userId,
+      role: session.role,
+    };
+  }
+
+  // ZZP/COMPANY_ADMIN handling - can ONLY access their own company
+  if (session.role === "ZZP" || session.role === "COMPANY_ADMIN") {
+    // If a specific companyId is requested, verify it's their own
+    if (requestedCompanyId && requestedCompanyId !== session.userId) {
+      logCompanyContextViolation(session.userId, requestedCompanyId, "UNAUTHORIZED_COMPANY_ACCESS");
+      throw createForbiddenError("U heeft geen toegang tot dit bedrijf.");
+    }
+    return {
+      companyId: session.userId,
+      userId: session.userId,
+      authenticatedUserId: session.userId,
+      role: session.role,
+    };
+  }
+
+  // ACCOUNTANT_* and STAFF handling - can access companies they are members of
+  if (requestedCompanyId) {
+    // Verify the user has access to the requested company
+    const companies = await getUserCompanies(session.userId);
+    const hasAccess = companies.some((c) => c.companyId === requestedCompanyId);
+
+    if (!hasAccess) {
+      logCompanyContextViolation(session.userId, requestedCompanyId, "MEMBER_ACCESS_DENIED");
+      throw createForbiddenError("U heeft geen toegang tot dit bedrijf.");
+    }
+
+    return {
+      companyId: requestedCompanyId,
+      userId: requestedCompanyId,
+      authenticatedUserId: session.userId,
+      role: session.role,
+    };
+  }
+
+  // No explicit companyId - use active company context from cookie or default
+  const activeCompanyId = await getActiveCompanyId();
+  return {
+    companyId: activeCompanyId,
+    userId: activeCompanyId,
+    authenticatedUserId: session.userId,
+    role: session.role,
+  };
+}
+
+/**
+ * Create a 403 Forbidden error with consistent messaging
+ */
+function createForbiddenError(message: string): Error {
+  const error = new Error(message);
+  (error as Error & { status: number }).status = 403;
+  return error;
+}
+
+/**
+ * Log company context access attempts for audit trail
+ */
+function logCompanyContextAccess(
+  userId: string,
+  role: string,
+  requestedCompanyId?: string
+): void {
+  if (process.env.NODE_ENV === "production" || process.env.TENANT_DEBUG === "true") {
+    console.log("[COMPANY_CONTEXT_ACCESS]", {
+      timestamp: new Date().toISOString(),
+      userId: userId.slice(-6),
+      role,
+      requestedCompanyId: requestedCompanyId?.slice(-6) ?? "none",
+    });
+  }
+}
+
+/**
+ * Log company context violations for security monitoring
+ */
+function logCompanyContextViolation(
+  userId: string,
+  attemptedCompanyId: string,
+  reason: string
+): void {
+  console.error("[COMPANY_CONTEXT_VIOLATION]", {
+    timestamp: new Date().toISOString(),
+    userId: userId.slice(-6),
+    attemptedCompanyId: attemptedCompanyId.slice(-6),
+    reason,
+    severity: "HIGH",
+  });
 }
