@@ -28,7 +28,7 @@ export type CompanyProfileData = {
 
 const paymentOptions = [14, 30];
 
-// Light-mode only Input Field Component
+// Theme-aware Input Field Component
 function InputField({ 
   label, 
   error,
@@ -39,14 +39,14 @@ function InputField({
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-foreground">
         {label}
       </label>
       <input
         {...props}
         className={cn(
-          "w-full px-4 py-3 rounded-lg border text-gray-900",
-          error ? "border-rose-300 focus:ring-rose-500" : "border-gray-300 focus:ring-teal-500",
+          "w-full px-4 py-3 rounded-lg border bg-background text-foreground placeholder:text-muted-foreground",
+          error ? "border-destructive focus:ring-destructive" : "border-input focus:ring-primary",
           "focus:ring-2 focus:border-transparent",
           "transition-all duration-200",
           "text-base",
@@ -54,7 +54,7 @@ function InputField({
         )}
       />
       {error && (
-        <p className="text-sm text-rose-600">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       )}
     </div>
   );
@@ -160,11 +160,11 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
 
         {/* Payment Terms Select */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-foreground">
             Betaaltermijn
           </label>
           <select
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all text-base"
+            className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-base"
             {...form.register("paymentTerms", { valueAsNumber: true })}
           >
             {paymentOptions.map((option) => (
@@ -174,19 +174,19 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
             ))}
           </select>
           {form.formState.errors.paymentTerms && (
-            <p className="text-sm text-rose-600">{form.formState.errors.paymentTerms.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.paymentTerms.message}</p>
           )}
         </div>
 
         {/* Logo Upload */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-foreground">
             Bedrijfslogo
           </label>
           <input
             type="file"
             accept="image/*"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 text-base file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 transition-all"
+            className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground text-base file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all"
             onChange={async (event) => {
               const file = event.target.files?.[0];
               if (!file) return;
@@ -201,22 +201,22 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
             }}
           />
           {logoPreview && (
-            <div className="mt-3 flex items-center gap-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+            <div className="mt-3 flex items-center gap-4 p-3 bg-muted border border-border rounded-lg">
               <Image
                 src={logoPreview}
                 alt="Logo preview"
                 width={56}
                 height={56}
-                className="h-14 w-14 rounded-lg border border-gray-200 object-contain bg-white p-1"
+                className="h-14 w-14 rounded-lg border border-border object-contain bg-card p-1"
               />
-              <p className="text-sm text-gray-600">Logo preview</p>
+              <p className="text-sm text-muted-foreground">Logo preview</p>
             </div>
           )}
         </div>
       </div>
 
       {/* KOR Toggle */}
-      <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+      <div className="border border-border rounded-lg p-4 bg-muted">
         <Controller
           name="korEnabled"
           control={form.control}
@@ -231,16 +231,16 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
                 />
                 <div className={cn(
                   "w-12 h-6 rounded-full transition-all duration-300",
-                  field.value ? "bg-teal-500" : "bg-gray-300"
+                  field.value ? "bg-primary" : "bg-border"
                 )}></div>
                 <div className={cn(
-                  "absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300",
+                  "absolute left-1 top-1 w-4 h-4 bg-card rounded-full transition-all duration-300",
                   field.value && "translate-x-6"
                 )}></div>
               </div>
               <div>
-                <p className="font-medium text-gray-900">KOR-regeling toepassen</p>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="font-medium text-foreground">KOR-regeling toepassen</p>
+                <p className="text-sm text-muted-foreground mt-1">
                   Nieuwe factuurregels staan standaard op 0% BTW (KOR)
                 </p>
               </div>
@@ -249,11 +249,11 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
         />
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-gray-100">
+      <div className="flex justify-end pt-4 border-t border-border">
         <Button
           type="submit"
           disabled={isPending}
-          className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-base rounded-lg transition-colors"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-base rounded-lg transition-colors"
         >
           {isPending ? "Opslaan..." : "Bedrijfsprofiel opslaan"}
         </Button>
