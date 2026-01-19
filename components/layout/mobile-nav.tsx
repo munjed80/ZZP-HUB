@@ -9,11 +9,14 @@ import {
   Wallet,
   Settings,
   Menu,
+  Briefcase,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { UserRole } from "@prisma/client";
 
-// Bottom navigation order: Dashboard, Facturen, Relaties, Uitgaven, Instellingen, Menu
-const navItems = [
+// Bottom navigation for ZZP/COMPANY_ADMIN users
+const zzpNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/relaties", label: "Relaties", icon: Users },
@@ -21,12 +24,33 @@ const navItems = [
   { href: "/instellingen", label: "Instellingen", icon: Settings },
 ];
 
+// Bottom navigation for ACCOUNTANT users (minimal, only allowed routes)
+const accountantNavItems = [
+  { href: "/accountant-portal", label: "Portal", icon: Briefcase },
+  { href: "/facturen", label: "Facturen", icon: Receipt },
+  { href: "/relaties", label: "Relaties", icon: Users },
+  { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
+  { href: "/btw-aangifte", label: "BTW", icon: FileText },
+];
+
+// Check if user has accountant role
+const isAccountantRole = (role?: UserRole): boolean =>
+  role === UserRole.ACCOUNTANT_VIEW ||
+  role === UserRole.ACCOUNTANT_EDIT ||
+  role === UserRole.STAFF ||
+  role === UserRole.ACCOUNTANT;
+
 type MobileNavProps = {
   onMenuClick?: () => void;
+  userRole?: UserRole;
 };
 
-export function MobileNav({ onMenuClick }: MobileNavProps) {
+export function MobileNav({ onMenuClick, userRole }: MobileNavProps) {
   const pathname = usePathname();
+  
+  // Select navigation items based on user role
+  // Default to ZZP nav if role is unknown/undefined (defensive check)
+  const navItems = isAccountantRole(userRole) ? accountantNavItems : zzpNavItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 shadow-[0_-10px_28px_-20px_rgba(15,23,42,0.18)] backdrop-blur-md md:hidden pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">

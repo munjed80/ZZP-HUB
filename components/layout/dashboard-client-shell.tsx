@@ -73,6 +73,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
       </button>
       {children}
       <MobileNav
+        userRole={userRole}
         onMenuClick={() => setMobileMenuOpen(true)}
       />
       <MobileSidebar
