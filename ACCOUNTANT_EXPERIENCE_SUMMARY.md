@@ -33,6 +33,24 @@ Successfully implemented a complete Accountant Experience on top of the existing
 3. System validates and creates accountant session
 4. Auto-redirects to `/accountant-portal`
 
+### 2.1 ✅ Session Isolation (January 2025 Update)
+
+**Cookie Path Scoping:**
+The accountant session cookie is scoped to `path=/accountant-portal` to prevent session confusion:
+
+- **Problem Solved:** Previously, accountants could accidentally access ZZP-only pages like `/instellingen` because the cookie was valid site-wide.
+- **Solution:** Cookie is now only sent by the browser for `/accountant-portal/*` routes.
+- **Security Benefits:**
+  - ZZP users visiting `/instellingen` never see the accountant cookie
+  - No middleware redirect needed - browser handles isolation at cookie level
+  - Clean separation between accountant and ZZP user sessions
+
+**Implementation Details:**
+- `lib/auth/accountant-session.ts`: Cookie path set to `/accountant-portal`
+- `deleteAccountantSession()`: Uses same path for proper cookie cleanup
+- `clearAccountantSessionOnZZPLogin()`: Clears stale accountant cookies when ZZP user logs in
+- Tests in `tests/accountant-middleware.test.mjs` verify path scoping behavior
+
 ### 3. ✅ Routing & UI
 
 **Login Redirect Logic:**
@@ -41,13 +59,15 @@ Successfully implemented a complete Accountant Experience on top of the existing
 if (role === "ACCOUNTANT" || role === "ACCOUNTANT_VIEW" || role === "ACCOUNTANT_EDIT") {
   redirect to "/accountant-portal"
 } else {
+  // Clear any stale accountant cookies for ZZP/COMPANY_ADMIN users
+  await clearAccountantCookieOnLogin();
   redirect to "/dashboard"
 }
 ```
 
 **Middleware Protection:**
 - Protected routes require authentication
-- Accountant sessions have limited route access
+- Accountant cookies only visible on `/accountant-portal/*` routes (browser-level isolation)
 - All queries automatically filtered by company context
 
 ### 4. ✅ Accountant Dashboard

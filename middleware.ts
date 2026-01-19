@@ -3,6 +3,9 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 // Cookie name for accountant sessions
+// Note: This cookie is scoped to path="/accountant-portal" - it will ONLY be sent by the browser
+// for requests to /accountant-portal/* routes. This prevents session confusion where accountants
+// could accidentally access ZZP-only pages like /instellingen.
 const ACCOUNTANT_SESSION_COOKIE = 'zzp-accountant-session';
 
 // Routes that should be accessible even without email verification
@@ -28,16 +31,11 @@ const protectedPrefixes = [
 const isProtectedPath = (pathname: string) =>
   protectedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
-// Routes that accountants can access with accountant session cookie
-// Note: Deep validation (expiry, permissions, tenant) happens server-side
+// Routes that accountants can access when they have an accountant session cookie
+// Note: Since the cookie is scoped to path="/accountant-portal", the browser will only send it
+// for /accountant-portal/* routes. This list is kept for future reference and explicit documentation.
 const accountantAllowedPrefixes = [
   '/accountant-portal',
-  '/dashboard',
-  '/facturen',
-  '/relaties',
-  '/uitgaven',
-  '/btw-aangifte',
-  '/agenda',
 ];
 
 const isAccountantAllowedPath = (pathname: string) =>
@@ -53,12 +51,19 @@ export async function middleware(request: NextRequest) {
   }
 
   // EDGE-COMPATIBLE: Check for accountant session cookie presence via request.cookies
+  // 
+  // IMPORTANT: The accountant session cookie is scoped to path="/accountant-portal", meaning:
+  // - The browser will ONLY send this cookie for requests to /accountant-portal/* routes
+  // - For all other routes (like /instellingen, /facturen, etc.), the cookie is NOT sent
+  // - This prevents the bug where accountants could accidentally access ZZP-only pages
+  // 
   // Deep validation (session lookup, expiry, permissions, tenant isolation) 
   // is done server-side in API routes and server components
   const accountantSessionCookie = request.cookies.get(ACCOUNTANT_SESSION_COOKIE)?.value;
   
   if (accountantSessionCookie) {
     // Log that we detected an accountant session cookie (structured log)
+    // This should only happen for /accountant-portal/* routes due to cookie path scoping
     if (process.env.NODE_ENV !== 'production' || process.env.SECURITY_DEBUG === 'true') {
       console.log('[MIDDLEWARE] ACCOUNTANT_SESSION_COOKIE_DETECTED', {
         timestamp: new Date().toISOString(),
@@ -66,12 +71,14 @@ export async function middleware(request: NextRequest) {
       });
     }
     
-    // Accountants can only access certain routes - redirect to portal for disallowed routes
+    // Since the cookie is path-scoped, we should only see it for /accountant-portal/* routes
+    // Allow access to accountant portal routes
     if (isAccountantAllowedPath(pathname)) {
       return NextResponse.next();
     }
     
-    // Redirect to accountant portal for disallowed routes
+    // If somehow the cookie is present for a non-accountant route (shouldn't happen due to path scoping),
+    // redirect to accountant portal as a safety measure
     const accountantPortalUrl = new URL('/accountant-portal', request.url);
     return NextResponse.redirect(accountantPortalUrl);
   }

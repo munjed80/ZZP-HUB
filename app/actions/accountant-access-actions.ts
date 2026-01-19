@@ -10,6 +10,23 @@ import bcrypt from "bcryptjs";
 import { sendEmail } from "@/lib/email";
 import AccountantOTPEmail from "@/components/emails/AccountantOTPEmail";
 import { logInviteCreated } from "@/lib/auth/security-audit";
+import { clearAccountantSessionOnZZPLogin } from "@/lib/auth/accountant-session";
+
+/**
+ * Clear any accountant session cookie when a ZZP/COMPANY_ADMIN user logs in
+ * This prevents session confusion between accountant and ZZP users.
+ * Should be called after successful NextAuth login for non-accountant users.
+ */
+export async function clearAccountantCookieOnLogin() {
+  try {
+    await clearAccountantSessionOnZZPLogin();
+    return { success: true };
+  } catch (error) {
+    console.error("Error clearing accountant cookie on login:", error);
+    // Don't fail - this is a cleanup operation
+    return { success: false };
+  }
+}
 
 /**
  * Generate a cryptographically secure 6-digit OTP code

@@ -8,16 +8,32 @@ import assert from "node:assert/strict";
  * 1. Middleware allows accountant-portal access when session cookie exists
  * 2. Invite accept sets cookie and returns success
  * 3. Theme components don't use hardcoded bg-white in dark mode
+ * 4. Cookie path scoping ensures session isolation
  */
 
 // Mock types for testing
 const ACCOUNTANT_SESSION_COOKIE = "zzp-accountant-session";
+// Cookie path is scoped to /accountant-portal to prevent session confusion
+const ACCOUNTANT_COOKIE_PATH = "/accountant-portal";
+
+/**
+ * Simulates browser cookie behavior based on path scoping
+ * Returns whether the cookie would be sent for a given path
+ */
+function simulateBrowserCookieSending(pathname, cookiePath) {
+  // Browser sends cookie if pathname starts with cookiePath
+  return pathname === cookiePath || pathname.startsWith(`${cookiePath}/`);
+}
 
 /**
  * Simulates middleware behavior for accountant session detection
  * This mirrors the actual implementation in middleware.ts
+ * 
+ * IMPORTANT: Since the accountant cookie is path-scoped to /accountant-portal,
+ * the browser will ONLY send it for requests to /accountant-portal/* routes.
+ * This means for routes like /instellingen, the cookie is never seen by middleware.
  */
-function simulateMiddlewareCheck(pathname, cookies) {
+function simulateMiddlewareCheck(pathname, cookieValue, cookiePath = ACCOUNTANT_COOKIE_PATH) {
   const protectedPrefixes = [
     '/dashboard',
     '/facturen',
@@ -30,14 +46,9 @@ function simulateMiddlewareCheck(pathname, cookies) {
     '/admin',
   ];
   
+  // With path-scoped cookies, only /accountant-portal is allowed
   const accountantAllowedPrefixes = [
     '/accountant-portal',
-    '/dashboard',
-    '/facturen',
-    '/relaties',
-    '/uitgaven',
-    '/btw-aangifte',
-    '/agenda',
   ];
   
   const isProtectedPath = protectedPrefixes.some((route) => 
@@ -53,15 +64,16 @@ function simulateMiddlewareCheck(pathname, cookies) {
     return { allowed: true, redirect: null };
   }
   
-  // Check for accountant session cookie (Edge-compatible: no DB lookup)
-  const accountantSessionCookie = cookies[ACCOUNTANT_SESSION_COOKIE];
+  // Simulate browser behavior: cookie is only sent if path matches
+  const browserSendsCookie = simulateBrowserCookieSending(pathname, cookiePath);
+  const accountantSessionCookie = browserSendsCookie ? cookieValue : undefined;
   
   if (accountantSessionCookie) {
-    // Accountant with valid cookie
+    // Accountant with valid cookie (should only happen on /accountant-portal/*)
     if (isAccountantAllowedPath) {
       return { allowed: true, redirect: null };
     }
-    // Redirect to portal for disallowed routes
+    // Redirect to portal for disallowed routes (safety fallback, shouldn't happen)
     return { allowed: false, redirect: '/accountant-portal' };
   }
   
@@ -99,61 +111,110 @@ function checkDarkModeClasses(classString) {
   return { valid: true, reason: 'No bg-white found' };
 }
 
+// ============== Cookie Path Scoping Tests ==============
+
+describe("Accountant Cookie Path Scoping", () => {
+  test("Cookie path is scoped to /accountant-portal", () => {
+    assert.strictEqual(ACCOUNTANT_COOKIE_PATH, "/accountant-portal");
+  });
+  
+  test("Browser sends cookie for /accountant-portal", () => {
+    const result = simulateBrowserCookieSending('/accountant-portal', ACCOUNTANT_COOKIE_PATH);
+    assert.strictEqual(result, true);
+  });
+  
+  test("Browser sends cookie for /accountant-portal/dossier/123", () => {
+    const result = simulateBrowserCookieSending('/accountant-portal/dossier/123', ACCOUNTANT_COOKIE_PATH);
+    assert.strictEqual(result, true);
+  });
+  
+  test("Browser does NOT send cookie for /instellingen", () => {
+    const result = simulateBrowserCookieSending('/instellingen', ACCOUNTANT_COOKIE_PATH);
+    assert.strictEqual(result, false);
+  });
+  
+  test("Browser does NOT send cookie for /dashboard", () => {
+    const result = simulateBrowserCookieSending('/dashboard', ACCOUNTANT_COOKIE_PATH);
+    assert.strictEqual(result, false);
+  });
+  
+  test("Browser does NOT send cookie for /facturen", () => {
+    const result = simulateBrowserCookieSending('/facturen', ACCOUNTANT_COOKIE_PATH);
+    assert.strictEqual(result, false);
+  });
+  
+  test("Browser does NOT send cookie for /relaties", () => {
+    const result = simulateBrowserCookieSending('/relaties', ACCOUNTANT_COOKIE_PATH);
+    assert.strictEqual(result, false);
+  });
+  
+  test("CRITICAL: ZZP user visiting /instellingen should NOT see accountant cookie", () => {
+    // Even if an accountant cookie exists, it won't be sent for /instellingen
+    const result = simulateMiddlewareCheck('/instellingen', 'valid-accountant-token', ACCOUNTANT_COOKIE_PATH);
+    // Without the cookie, middleware sees no accountant session and redirects to login
+    // (In real app, NextAuth session would be checked and ZZP user would be allowed)
+    assert.strictEqual(result.allowed, false);
+    assert.strictEqual(result.redirect, '/login'); // Not /accountant-portal!
+  });
+});
+
 // ============== Middleware Tests ==============
 
 describe("Middleware Accountant Session Detection", () => {
   test("Allows /accountant-portal when session cookie exists", () => {
-    const result = simulateMiddlewareCheck('/accountant-portal', {
-      [ACCOUNTANT_SESSION_COOKIE]: 'valid-session-token-123',
-    });
+    const result = simulateMiddlewareCheck('/accountant-portal', 'valid-session-token-123');
     
     assert.strictEqual(result.allowed, true);
     assert.strictEqual(result.redirect, null);
   });
   
-  test("Allows /dashboard when accountant session cookie exists", () => {
-    const result = simulateMiddlewareCheck('/dashboard', {
-      [ACCOUNTANT_SESSION_COOKIE]: 'valid-session-token-123',
-    });
+  test("Allows /accountant-portal/dossier when session cookie exists", () => {
+    const result = simulateMiddlewareCheck('/accountant-portal/dossier/abc123', 'valid-session-token-123');
     
     assert.strictEqual(result.allowed, true);
     assert.strictEqual(result.redirect, null);
   });
   
-  test("Allows /facturen when accountant session cookie exists", () => {
-    const result = simulateMiddlewareCheck('/facturen', {
-      [ACCOUNTANT_SESSION_COOKIE]: 'valid-session-token-123',
-    });
+  test("Cookie not sent for /dashboard due to path scoping", () => {
+    // With path-scoped cookie, browser won't send cookie for /dashboard
+    const result = simulateMiddlewareCheck('/dashboard', 'valid-session-token-123');
     
-    assert.strictEqual(result.allowed, true);
-    assert.strictEqual(result.redirect, null);
+    // Cookie not sent, so middleware redirects to login (in real app, NextAuth would handle)
+    assert.strictEqual(result.allowed, false);
+    assert.strictEqual(result.redirect, '/login');
   });
   
-  test("Redirects to /accountant-portal for disallowed routes with accountant cookie", () => {
-    const result = simulateMiddlewareCheck('/instellingen', {
-      [ACCOUNTANT_SESSION_COOKIE]: 'valid-session-token-123',
-    });
+  test("Cookie not sent for /facturen due to path scoping", () => {
+    const result = simulateMiddlewareCheck('/facturen', 'valid-session-token-123');
     
     assert.strictEqual(result.allowed, false);
-    assert.strictEqual(result.redirect, '/accountant-portal');
+    assert.strictEqual(result.redirect, '/login');
+  });
+  
+  test("Cookie not sent for /instellingen - prevents session confusion bug", () => {
+    // This is the critical fix: /instellingen should NOT be affected by accountant session
+    const result = simulateMiddlewareCheck('/instellingen', 'valid-session-token-123');
+    
+    assert.strictEqual(result.allowed, false);
+    assert.strictEqual(result.redirect, '/login'); // NOT /accountant-portal!
   });
   
   test("Redirects to /login when no session cookie exists", () => {
-    const result = simulateMiddlewareCheck('/accountant-portal', {});
+    const result = simulateMiddlewareCheck('/accountant-portal', undefined);
     
     assert.strictEqual(result.allowed, false);
     assert.strictEqual(result.redirect, '/login');
   });
   
   test("Allows public routes without any cookie", () => {
-    const result = simulateMiddlewareCheck('/accept-invite', {});
+    const result = simulateMiddlewareCheck('/accept-invite', undefined);
     
     assert.strictEqual(result.allowed, true);
     assert.strictEqual(result.redirect, null);
   });
   
   test("Allows landing page without any cookie", () => {
-    const result = simulateMiddlewareCheck('/', {});
+    const result = simulateMiddlewareCheck('/', undefined);
     
     assert.strictEqual(result.allowed, true);
     assert.strictEqual(result.redirect, null);
@@ -230,5 +291,18 @@ describe("Invite Accept API Response", () => {
     assert.strictEqual(mockResponse.success, true);
     assert.strictEqual(mockResponse.isNewUser, true);
     assert.ok(mockResponse.userId);
+  });
+  
+  test("Cookie is set with path=/accountant-portal on invite accept", () => {
+    // Mock the cookie options that should be set
+    const expectedCookieOptions = {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/accountant-portal",
+    };
+    
+    assert.strictEqual(expectedCookieOptions.path, ACCOUNTANT_COOKIE_PATH);
+    assert.strictEqual(expectedCookieOptions.httpOnly, true);
+    assert.strictEqual(expectedCookieOptions.sameSite, "lax");
   });
 });

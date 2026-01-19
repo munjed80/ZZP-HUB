@@ -286,6 +286,12 @@ select {
   caret-color: rgb(248 250 252); /* white caret/cursor */
 }
 
+/* Option elements in dark mode - limited browser support but helps where available */
+.dark select option {
+  background-color: rgb(15 23 42); /* slate-900 */
+  color: rgb(248 250 252); /* slate-50 */
+}
+
 .dark input::placeholder,
 .dark textarea::placeholder {
   color: rgb(100 116 139); /* slate-500 - readable placeholder */

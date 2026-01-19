@@ -207,6 +207,25 @@ function logTenantViolation(
 }
 
 /**
+ * Roles that are considered "accountant" roles
+ * These users should be redirected to /accountant-portal instead of /dashboard
+ */
+export const ACCOUNTANT_ROLES: UserRole[] = [
+  UserRole.ACCOUNTANT,
+  UserRole.ACCOUNTANT_VIEW,
+  UserRole.ACCOUNTANT_EDIT,
+];
+
+/**
+ * Check if a role is an accountant role
+ * Use this utility for consistent role checking throughout the app
+ */
+export function isAccountantRole(role: string | UserRole | undefined): boolean {
+  if (!role) return false;
+  return ACCOUNTANT_ROLES.includes(role as UserRole);
+}
+
+/**
  * Helper to validate that a query result belongs to the current tenant
  * Use this after fetching data to double-check ownership
  */

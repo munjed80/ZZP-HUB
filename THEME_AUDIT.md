@@ -6,6 +6,34 @@ Successfully implemented a comprehensive design token system across the ZZP-HUB 
 
 ## Recent Updates (2025-01)
 
+### Dark Mode Input/Autofill Fixes (January 2025)
+
+**Global CSS Fixes (`app/globals.css`):**
+
+1. **Input Text Visibility:**
+   - All inputs (`input`, `textarea`, `select`) in dark mode now have:
+     - `color: rgb(248 250 252)` (slate-50 - white text)
+     - `background-color: rgb(15 23 42)` (slate-900 - dark background)
+     - `border-color: rgb(51 65 85)` (slate-700 - visible border)
+     - `caret-color: rgb(248 250 252)` (white cursor)
+
+2. **Select Option Elements:**
+   - Added specific styling for `select option` in dark mode
+   - Ensures dropdown options are readable in dark theme
+
+3. **Safari/WebKit Autofill Fix:**
+   - Comprehensive `-webkit-autofill` styling for dark mode
+   - Uses `-webkit-text-fill-color` and `-webkit-box-shadow` tricks
+   - Ensures autofilled text remains visible against dark background
+
+4. **Date/Time Inputs:**
+   - Added `color-scheme: dark` for native date/time pickers
+   - Ensures consistent dark theme appearance
+
+5. **File Inputs:**
+   - Custom styling for file selector buttons in dark mode
+   - Proper hover states with theme-appropriate colors
+
 ### Fixed Components for Dark Mode
 
 1. **SidebarBrand** (`components/sidebar/sidebar-brand.tsx`)
