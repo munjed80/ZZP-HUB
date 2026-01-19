@@ -120,7 +120,7 @@ export async function middleware(request: NextRequest) {
   const emailVerified = Boolean(token?.emailVerified);
   const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';
   const onboardingCompleted = onboardingCookie || Boolean(token?.onboardingCompleted);
-  const role = token?.role as string | undefined;
+  const userRole = token?.role as string | undefined;
   const setupRoutes = ['/setup', '/onboarding'];
 
   // If not logged in, redirect to login
@@ -131,21 +131,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAccountantRole(role) && !isAccountantAllowedPath(pathname)) {
+  if (isAccountantRole(userRole) && !isAccountantAllowedPath(pathname)) {
     const accountantPortalUrl = new URL('/accountant-portal', request.url);
     accountantPortalUrl.searchParams.set('next', nextParam);
-    logRedirect('REDIRECT_ACCOUNTANT_PORTAL', { pathname, role });
+    logRedirect('REDIRECT_ACCOUNTANT_PORTAL', { pathname, role: userRole });
     return NextResponse.redirect(accountantPortalUrl);
   }
 
   // If logged in but email not verified, redirect to verify-required
   // (except if already on a pre-verification route)
   // SUPERADMIN bypasses email verification to ensure immediate admin access
-  const requiresVerification = role !== 'SUPERADMIN' && !emailVerified;
+  const requiresVerification = userRole !== 'SUPERADMIN' && !emailVerified;
   if (requiresVerification && !preVerificationRoutes.includes(pathname)) {
     const verifyUrl = new URL('/verify-required', request.url);
     verifyUrl.searchParams.set('next', nextParam);
-    logRedirect('REDIRECT_VERIFY_EMAIL', { pathname, role });
+    logRedirect('REDIRECT_VERIFY_EMAIL', { pathname, role: userRole });
     return NextResponse.redirect(verifyUrl);
   }
 
@@ -155,13 +155,13 @@ export async function middleware(request: NextRequest) {
   if (emailVerified && !onboardingCompleted && !onSetupRoute) {
     const setupUrl = new URL('/setup', request.url);
     setupUrl.searchParams.set('next', nextParam);
-    logRedirect('REDIRECT_SETUP', { pathname, role });
+    logRedirect('REDIRECT_SETUP', { pathname, role: userRole });
     return NextResponse.redirect(setupUrl);
   }
 
   logRedirect('ALLOW_ROUTE', {
     pathname,
-    role,
+    role: userRole,
     emailVerified,
     onboardingCompleted,
   });

@@ -1,3 +1,5 @@
+const HASH_MULTIPLIER = 31;
+
 function deriveDevFallbackSecret(): string {
   const seed =
     process.env.AUTH_DEV_SECRET ||
@@ -5,12 +7,11 @@ function deriveDevFallbackSecret(): string {
     process.env.NEXT_PUBLIC_APP_URL ||
     "http://localhost:3000";
 
-  // Simple deterministic string hash (similar to Java's hashCode) to avoid
+  // Simple deterministic string hash (inspired by the classic 31x hash) to avoid
   // a hardcoded dev secret while keeping middleware and API aligned
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1) {
-    hash = (hash << 5) - hash + seed.charCodeAt(i);
-    hash |= 0;
+    hash = (hash * HASH_MULTIPLIER + seed.charCodeAt(i)) | 0;
   }
 
   return `dev-${Math.abs(hash)}-zzp-hub`;
