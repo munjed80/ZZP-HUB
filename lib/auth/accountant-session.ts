@@ -28,6 +28,20 @@ export interface AccountantSessionData {
 }
 
 /**
+ * Helper function to clear the accountant session cookie
+ * Uses consistent options with the same path as when the cookie was set
+ */
+async function clearAccountantCookie(cookieStore: Awaited<ReturnType<typeof cookies>>): Promise<void> {
+  cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: ACCOUNTANT_COOKIE_PATH,
+  });
+}
+
+/**
  * Create a new accountant session
  * Called after successful invite acceptance
  */
@@ -108,14 +122,7 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
         timestamp: new Date().toISOString(),
         reason: 'SESSION_NOT_FOUND',
       });
-      // Delete cookie with the same path it was set with
-      cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 0,
-        path: ACCOUNTANT_COOKIE_PATH,
-      });
+      await clearAccountantCookie(cookieStore);
       return null;
     }
     
@@ -131,14 +138,7 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
       await prisma.accountantSession.delete({
         where: { id: session.id },
       });
-      // Delete cookie with the same path it was set with
-      cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 0,
-        path: ACCOUNTANT_COOKIE_PATH,
-      });
+      await clearAccountantCookie(cookieStore);
       return null;
     }
     
@@ -203,14 +203,7 @@ export async function deleteAccountantSession(): Promise<void> {
       });
     }
     
-    // Delete cookie with the same path it was set with
-    cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 0, // Expire immediately
-      path: ACCOUNTANT_COOKIE_PATH,
-    });
+    await clearAccountantCookie(cookieStore);
   } catch (error) {
     console.error("Error deleting accountant session:", error);
   }
@@ -283,14 +276,7 @@ export async function clearAccountantSessionOnZZPLogin(): Promise<void> {
         where: { sessionToken },
       });
       
-      // Clear the cookie with the same path it was set with
-      cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 0,
-        path: ACCOUNTANT_COOKIE_PATH,
-      });
+      await clearAccountantCookie(cookieStore);
     }
   } catch (error) {
     // Don't throw - this is a cleanup operation
