@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth/next";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { buildAbsoluteUrl, getAppBaseUrl } from "./base-url";
+import { allowSensitiveAuthLogs, shouldLogAuth } from "./auth/logging";
+import { resolveAuthSecret } from "./auth/secret";
 
 interface Credentials {
   email: string;
@@ -35,6 +37,24 @@ function isAuthorizeResult(user: unknown): user is AuthorizeResult {
 }
 
 const DEFAULT_ROLE: UserRole = "COMPANY_ADMIN";
+const authSecret = resolveAuthSecret();
+
+function readUserString(user: unknown, key: "id" | "role"): string | undefined {
+  if (
+    user &&
+    typeof user === "object" &&
+    typeof (user as Record<string, unknown>)[key] === "string"
+  ) {
+    return (user as Record<string, string>)[key];
+  }
+  return undefined;
+}
+
+function maskUserId(userId?: string) {
+  if (!userId) return undefined;
+  const visibleLength = Math.min(6, userId.length);
+  return userId.slice(-visibleLength);
+}
 
 function isMissingOnboardingColumns(error: unknown) {
   if (
@@ -68,8 +88,6 @@ export async function authorize(
 
   try {
     const maskedEmail = credentials.email.replace(/(.).+(@.*)/, "$1***$2");
-    const shouldLogAuth =
-      process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
     if (shouldLogAuth) {
       console.log("Authorize attempt", { emailMasked: maskedEmail });
     }
@@ -192,6 +210,7 @@ export async function authorize(
  * NextAuth configuration options
  */
 export const authOptions: NextAuthOptions = {
+  secret: authSecret,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -253,6 +272,16 @@ export const authOptions: NextAuthOptions = {
         session.user.emailVerified = Boolean(token.emailVerified);
         session.user.onboardingCompleted = Boolean(token.onboardingCompleted);
       }
+
+      if (shouldLogAuth) {
+        console.log("[AUTH] SESSION_CALLBACK", {
+          userId: allowSensitiveAuthLogs ? maskUserId(session.user?.id) : undefined,
+          role: session.user?.role,
+          emailVerified: session.user?.emailVerified,
+          onboardingCompleted: session.user?.onboardingCompleted,
+        });
+      }
+
       return session;
     },
     async redirect({ url, baseUrl }) {
@@ -277,13 +306,42 @@ export const authOptions: NextAuthOptions = {
       return safeBaseUrl;
     },
   },
+  events: {
+    async signIn({ user }) {
+      if (shouldLogAuth) {
+        const userId = readUserString(user, "id");
+        const userRole = readUserString(user, "role");
+        console.log("[AUTH] SIGN_IN", {
+          userId: allowSensitiveAuthLogs ? maskUserId(userId) : undefined,
+          role: userRole,
+        });
+      }
+    },
+    async session({ session }) {
+      if (shouldLogAuth) {
+        console.log("[AUTH] SESSION_EVENT", {
+          userId: allowSensitiveAuthLogs ? maskUserId(session.user?.id) : undefined,
+          role: session.user?.role,
+        });
+      }
+    },
+  },
   pages: {
     signIn: "/login",
   },
 };
 
 export function getServerAuthSession() {
-  return getServerSession(authOptions);
+  return getServerSession(authOptions).then((session) => {
+    if (shouldLogAuth) {
+      console.log(session ? "[AUTH] SESSION_READ" : "[AUTH] SESSION_MISSING", {
+        userId: allowSensitiveAuthLogs ? maskUserId(session?.user?.id) : undefined,
+        role: session?.user?.role,
+      });
+    }
+
+    return session;
+  });
 }
 
 export async function getCurrentUserId(): Promise<string | undefined> {
