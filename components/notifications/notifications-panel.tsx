@@ -49,9 +49,33 @@ export function NotificationsPanel({ showUnreadOnly = false, limit = 50 }: Notif
 
   useEffect(() => {
     loadNotifications();
-    // Refresh notifications every 60 seconds
-    const interval = setInterval(loadNotifications, 60000);
-    return () => clearInterval(interval);
+    
+    // Only set up auto-refresh if page is visible
+    let interval: NodeJS.Timeout | null = null;
+    
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (interval) {
+          clearInterval(interval);
+          interval = null;
+        }
+      } else {
+        loadNotifications();
+        interval = setInterval(loadNotifications, 60000);
+      }
+    };
+    
+    // Initial setup
+    if (!document.hidden) {
+      interval = setInterval(loadNotifications, 60000);
+    }
+    
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    
+    return () => {
+      if (interval) clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showUnreadOnly, limit]);
 

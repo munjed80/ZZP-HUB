@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify access
+    // Verify access - either user owns the expense or is an accountant with access
     if (expense.userId !== userId) {
       // Check if user is an accountant with access
       const hasAccess = await prisma.companyMember.findUnique({
@@ -100,19 +100,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error processing OCR:", error);
-    
-    // Update expense status to failed if we have the ID
-    try {
-      const body = await request.json();
-      if (body.expenseId) {
-        await prisma.expense.update({
-          where: { id: body.expenseId },
-          data: { ocrStatus: "failed" },
-        });
-      }
-    } catch (e) {
-      // Ignore error in error handler
-    }
 
     return NextResponse.json(
       { success: false, message: "Fout bij OCR verwerking" },

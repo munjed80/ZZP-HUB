@@ -23,7 +23,12 @@ export async function GET(request: NextRequest) {
     const unreadOnly = searchParams.get("unreadOnly") === "true";
     const limit = parseInt(searchParams.get("limit") || "50");
 
-    const where: any = { userId };
+    interface NotificationWhere {
+      userId: string;
+      isRead?: boolean;
+    }
+
+    const where: NotificationWhere = { userId };
     if (unreadOnly) {
       where.isRead = false;
     }

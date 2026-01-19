@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { MessageSquare, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { UserRole } from "@prisma/client";
+
+// Accountant role types
+const ACCOUNTANT_ROLES: UserRole[] = ["ACCOUNTANT", "ACCOUNTANT_VIEW", "ACCOUNTANT_EDIT"];
 
 interface Note {
   id: string;
@@ -111,7 +115,7 @@ export function NotesList({ entityType, entityId, companyId, canAddNotes = true 
   };
 
   const getRoleBadge = (role: string) => {
-    if (role === "ACCOUNTANT" || role === "ACCOUNTANT_VIEW" || role === "ACCOUNTANT_EDIT") {
+    if (ACCOUNTANT_ROLES.includes(role as UserRole)) {
       return (
         <span className="inline-block px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
           Accountant
