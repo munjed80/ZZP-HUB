@@ -15,6 +15,8 @@ import { logAccountantSessionCreated } from "./security-audit";
 
 const ACCOUNTANT_SESSION_COOKIE = "zzp-accountant-session";
 const SESSION_EXPIRY_DAYS = 30; // 30 days
+// Cookie path scoped to accountant portal only - prevents session confusion with ZZP dashboard
+const ACCOUNTANT_COOKIE_PATH = "/accountant-portal";
 
 export interface AccountantSessionData {
   sessionId: string;
@@ -54,14 +56,14 @@ export async function createAccountantSession(
     },
   });
   
-  // Set secure HTTP-only cookie
+  // Set secure HTTP-only cookie - scoped to /accountant-portal to prevent session confusion with ZZP dashboard
   const cookieStore = await cookies();
   cookieStore.set(ACCOUNTANT_SESSION_COOKIE, sessionToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: SESSION_EXPIRY_DAYS * 24 * 60 * 60, // seconds
-    path: "/",
+    path: ACCOUNTANT_COOKIE_PATH,
   });
   
   // Log session creation for audit
@@ -106,7 +108,14 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
         timestamp: new Date().toISOString(),
         reason: 'SESSION_NOT_FOUND',
       });
-      cookieStore.delete(ACCOUNTANT_SESSION_COOKIE);
+      // Delete cookie with the same path it was set with
+      cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 0,
+        path: ACCOUNTANT_COOKIE_PATH,
+      });
       return null;
     }
     
@@ -122,7 +131,14 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
       await prisma.accountantSession.delete({
         where: { id: session.id },
       });
-      cookieStore.delete(ACCOUNTANT_SESSION_COOKIE);
+      // Delete cookie with the same path it was set with
+      cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 0,
+        path: ACCOUNTANT_COOKIE_PATH,
+      });
       return null;
     }
     
@@ -173,6 +189,7 @@ export async function requireAccountantSession(): Promise<AccountantSessionData>
 
 /**
  * Delete the current accountant session (logout)
+ * Must use the same Path attribute as when the cookie was set
  */
 export async function deleteAccountantSession(): Promise<void> {
   try {
@@ -186,8 +203,14 @@ export async function deleteAccountantSession(): Promise<void> {
       });
     }
     
-    // Delete cookie
-    cookieStore.delete(ACCOUNTANT_SESSION_COOKIE);
+    // Delete cookie with the same path it was set with
+    cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 0, // Expire immediately
+      path: ACCOUNTANT_COOKIE_PATH,
+    });
   } catch (error) {
     console.error("Error deleting accountant session:", error);
   }
@@ -236,3 +259,46 @@ export async function verifyAccountantCompanyAccess(
     return false;
   }
 }
+
+/**
+ * Clear accountant session cookie when a ZZP/COMPANY_ADMIN user logs in via NextAuth
+ * This prevents session confusion where an accountant cookie could affect ZZP user experience.
+ * 
+ * Note: Since the cookie is path-scoped to /accountant-portal, it won't affect most ZZP pages,
+ * but this provides an extra safety measure to clean up any stale sessions.
+ */
+export async function clearAccountantSessionOnZZPLogin(): Promise<void> {
+  try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get(ACCOUNTANT_SESSION_COOKIE)?.value;
+    
+    if (sessionToken) {
+      // Log that we're clearing an accountant session due to ZZP login
+      console.log('[ACCOUNTANT_SESSION_CLEARED_ON_ZZP_LOGIN]', {
+        timestamp: new Date().toISOString(),
+      });
+      
+      // Delete from database
+      await prisma.accountantSession.deleteMany({
+        where: { sessionToken },
+      });
+      
+      // Clear the cookie with the same path it was set with
+      cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 0,
+        path: ACCOUNTANT_COOKIE_PATH,
+      });
+    }
+  } catch (error) {
+    // Don't throw - this is a cleanup operation
+    console.error("Error clearing accountant session on ZZP login:", error);
+  }
+}
+
+/**
+ * Export the cookie path constant for use in other modules
+ */
+export const ACCOUNTANT_SESSION_COOKIE_PATH = ACCOUNTANT_COOKIE_PATH;

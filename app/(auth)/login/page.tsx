@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, Lock, Mail, Sparkles, Home } from "lucide-react";
 import { Suspense, useState } from "react";
+import { clearAccountantCookieOnLogin } from "@/app/actions/accountant-access-actions";
 
 const schema = z.object({
   email: z.string().email("Voer een geldig e-mailadres in"),
@@ -56,8 +57,17 @@ function LoginContent() {
     
     // Redirect based on role
     let defaultRedirect = "/dashboard";
-    if (session?.user?.role === "ACCOUNTANT" || session?.user?.role === "ACCOUNTANT_VIEW" || session?.user?.role === "ACCOUNTANT_EDIT") {
+    const isAccountantRole = 
+      session?.user?.role === "ACCOUNTANT" || 
+      session?.user?.role === "ACCOUNTANT_VIEW" || 
+      session?.user?.role === "ACCOUNTANT_EDIT";
+    
+    if (isAccountantRole) {
       defaultRedirect = "/accountant-portal";
+    } else {
+      // Clear any stale accountant session cookie for ZZP/COMPANY_ADMIN users
+      // This prevents session confusion when switching between user types
+      await clearAccountantCookieOnLogin();
     }
     
     const nextUrl = searchParams.get("next") ?? searchParams.get("callbackUrl") ?? defaultRedirect;
