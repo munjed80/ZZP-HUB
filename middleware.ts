@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { resolveAuthSecret } from '@/lib/auth/secret';
+import { shouldLogAuth } from '@/lib/auth/logging';
 import { isAccountantRole } from '@/lib/utils';
 
 // Cookie name for accountant sessions
@@ -44,7 +45,6 @@ const isAccountantAllowedPath = (pathname: string) =>
   accountantAllowedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
 const authSecret = resolveAuthSecret();
-const shouldLogAuth = process.env.AUTH_DEBUG === 'true' || process.env.NODE_ENV !== 'production';
 
 const logRedirect = (event: string, details: Record<string, unknown>) => {
   if (!shouldLogAuth) return;
@@ -117,9 +117,6 @@ export async function middleware(request: NextRequest) {
       error: tokenErrorReason,
     });
   }
-  const emailVerified = Boolean(token?.emailVerified);
-  const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';
-  const onboardingCompleted = onboardingCookie || Boolean(token?.onboardingCompleted);
   const setupRoutes = ['/setup', '/onboarding'];
 
   // If not logged in, redirect to login
@@ -138,6 +135,10 @@ export async function middleware(request: NextRequest) {
     logRedirect('REDIRECT_ACCOUNTANT_PORTAL', { pathname, role: userRole });
     return NextResponse.redirect(accountantPortalUrl);
   }
+
+  const emailVerified = Boolean(token.emailVerified);
+  const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';
+  const onboardingCompleted = onboardingCookie || Boolean(token.onboardingCompleted);
 
   // If logged in but email not verified, redirect to verify-required
   // (except if already on a pre-verification route)

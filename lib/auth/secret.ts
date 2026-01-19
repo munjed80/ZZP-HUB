@@ -10,7 +10,7 @@ function deriveDevFallbackSecret(): string {
   // a hardcoded dev secret while keeping middleware and API aligned
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1) {
-    hash = (hash * HASH_MULTIPLIER + seed.charCodeAt(i)) | 0;
+    hash = (hash * HASH_MULTIPLIER + seed.charCodeAt(i)) | 0; // force 32-bit int to avoid overflow
   }
 
   return `dev-${Math.abs(hash)}-zzp-hub`;

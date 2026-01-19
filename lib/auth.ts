@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { buildAbsoluteUrl, getAppBaseUrl } from "./base-url";
+import { allowSensitiveAuthLogs, shouldLogAuth } from "./auth/logging";
 import { resolveAuthSecret } from "./auth/secret";
 
 interface Credentials {
@@ -36,9 +37,6 @@ function isAuthorizeResult(user: unknown): user is AuthorizeResult {
 }
 
 const DEFAULT_ROLE: UserRole = "COMPANY_ADMIN";
-const allowSensitiveAuthLogs = process.env.AUTH_DEBUG === "true";
-const shouldLogAuth =
-  allowSensitiveAuthLogs || process.env.NODE_ENV !== "production";
 const authSecret = resolveAuthSecret();
 
 function readUserString(user: unknown, key: "id" | "role"): string | undefined {
