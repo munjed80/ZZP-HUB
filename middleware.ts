@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import { resolveAuthSecret } from '@/lib/auth/secret';
+import { isAccountantRole } from '@/lib/utils';
 
 // Cookie name for accountant sessions
 // Note: This cookie is scoped to path="/accountant-portal" - it will ONLY be sent by the browser
@@ -41,12 +43,24 @@ const accountantAllowedPrefixes = [
 const isAccountantAllowedPath = (pathname: string) =>
   accountantAllowedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
+const authSecret = resolveAuthSecret();
+const shouldLogAuth = process.env.AUTH_DEBUG === 'true' || process.env.NODE_ENV !== 'production';
+
+const logRedirect = (event: string, details: Record<string, unknown>) => {
+  if (!shouldLogAuth) return;
+  console.log(`[MIDDLEWARE] ${event}`, {
+    ...details,
+    timestamp: new Date().toISOString(),
+  });
+};
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Only guard protected app routes - early return for public routes
   // This prevents unnecessary session lookups on public pages
   if (!isProtectedPath(pathname)) {
+    logRedirect('PUBLIC_ROUTE_ALLOWED', { pathname });
     return NextResponse.next();
   }
 
@@ -64,7 +78,7 @@ export async function middleware(request: NextRequest) {
   if (accountantSessionCookie) {
     // Log that we detected an accountant session cookie (structured log)
     // This should only happen for /accountant-portal/* routes due to cookie path scoping
-    if (process.env.NODE_ENV !== 'production' || process.env.SECURITY_DEBUG === 'true') {
+    if (shouldLogAuth || process.env.SECURITY_DEBUG === 'true') {
       console.log('[MIDDLEWARE] ACCOUNTANT_SESSION_COOKIE_DETECTED', {
         timestamp: new Date().toISOString(),
         pathname,
@@ -84,18 +98,35 @@ export async function middleware(request: NextRequest) {
   }
   
   // Get the JWT token for regular NextAuth sessions
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  let token = null;
+  try {
+    token = await getToken({ req: request, secret: authSecret });
+  } catch (error) {
+    logRedirect('TOKEN_READ_ERROR', {
+      pathname,
+      error: error instanceof Error ? error.message : 'unknown_error',
+    });
+  }
   const emailVerified = Boolean(token?.emailVerified);
   const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';
   const onboardingCompleted = onboardingCookie || Boolean(token?.onboardingCompleted);
   const role = token?.role as string | undefined;
   const setupRoutes = ['/setup', '/onboarding'];
+  const nextParam = `${pathname}${request.nextUrl.search}`;
 
   // If not logged in, redirect to login
   if (!token) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
+    loginUrl.searchParams.set('next', nextParam);
+    logRedirect('REDIRECT_LOGIN_NO_TOKEN', { pathname, hasAuthSecret: Boolean(authSecret) });
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (isAccountantRole(role) && !isAccountantAllowedPath(pathname)) {
+    const accountantPortalUrl = new URL('/accountant-portal', request.url);
+    accountantPortalUrl.searchParams.set('next', nextParam);
+    logRedirect('REDIRECT_ACCOUNTANT_PORTAL', { pathname, role });
+    return NextResponse.redirect(accountantPortalUrl);
   }
 
   // If logged in but email not verified, redirect to verify-required
@@ -104,7 +135,8 @@ export async function middleware(request: NextRequest) {
   const requiresVerification = role !== 'SUPERADMIN' && !emailVerified;
   if (requiresVerification && !preVerificationRoutes.includes(pathname)) {
     const verifyUrl = new URL('/verify-required', request.url);
-    verifyUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
+    verifyUrl.searchParams.set('next', nextParam);
+    logRedirect('REDIRECT_VERIFY_EMAIL', { pathname, role });
     return NextResponse.redirect(verifyUrl);
   }
 
@@ -113,10 +145,17 @@ export async function middleware(request: NextRequest) {
   const onSetupRoute = setupRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
   if (emailVerified && !onboardingCompleted && !onSetupRoute) {
     const setupUrl = new URL('/setup', request.url);
-    setupUrl.searchParams.set('next', `${pathname}${request.nextUrl.search}`);
+    setupUrl.searchParams.set('next', nextParam);
+    logRedirect('REDIRECT_SETUP', { pathname, role });
     return NextResponse.redirect(setupUrl);
   }
 
+  logRedirect('ALLOW_ROUTE', {
+    pathname,
+    role,
+    emailVerified,
+    onboardingCompleted,
+  });
   return NextResponse.next();
 }
 
