@@ -36,7 +36,7 @@ export function InvoicePaymentStatus({ invoiceId, isPaid, paidDateLabel }: Invoi
   const handleMarkUnpaid = () => runAction(() => markAsUnpaid(invoiceId), "Betaling ongedaan gemaakt");
 
   const commonClasses =
-    "inline-flex h-9 !min-h-0 items-center gap-2 rounded-full border px-3 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200 focus-visible:ring-offset-2";
+    "inline-flex h-9 !min-h-0 items-center gap-2 rounded-full border px-3 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2";
 
   if (isPaid) {
     return (
@@ -45,12 +45,12 @@ export function InvoicePaymentStatus({ invoiceId, isPaid, paidDateLabel }: Invoi
         variant="ghost"
         disabled={isPending}
         onClick={handleMarkUnpaid}
-        className={`${commonClasses} border border-emerald-600 text-emerald-600 bg-transparent hover:bg-emerald-50`}
+        className={`${commonClasses} border-success text-success bg-transparent hover:bg-success/10 dark:border-success dark:text-success dark:hover:bg-success/20`}
       >
         {isPending ? (
-          <Loader2 className="h-4 w-4 animate-spin text-emerald-600" />
+          <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <Undo2 className="h-4 w-4 text-emerald-600" aria-hidden />
+          <Undo2 className="h-4 w-4" aria-hidden />
         )}
         Maak open
       </Button>
