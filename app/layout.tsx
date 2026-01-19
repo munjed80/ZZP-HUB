@@ -1,10 +1,19 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { SonnerToaster } from "@/components/providers/sonner-provider";
 import { CookieBanner } from "@/components/ui/cookie-banner";
 import { ServiceWorkerRegister } from "@/components/providers/service-worker-register";
 import { InstallPWA } from "@/components/ui/install-pwa";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+
+// Load Inter font with optimized subsets and weights
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://zzp-hub.app"),
@@ -78,13 +87,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nl" suppressHydrationWarning>
+    <html lang="nl" suppressHydrationWarning className={inter.variable}>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className="antialiased">
+      <body className={`${inter.className} antialiased`}>
         <ThemeProvider>
           {children}
           <SonnerToaster />
