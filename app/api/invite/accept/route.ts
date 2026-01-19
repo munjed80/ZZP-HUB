@@ -283,6 +283,7 @@ export async function POST(request: NextRequest) {
 
     // Create accountant session for immediate access (for ALL users - both new and existing)
     // This allows accountants to access the portal immediately after accepting the invite
+    // Previously only existing users got immediate access, causing new users to be redirected to login
     try {
       await createAccountantSession(
         user.id,

@@ -63,7 +63,6 @@ export async function middleware(request: NextRequest) {
       console.log('[MIDDLEWARE] ACCOUNTANT_SESSION_COOKIE_DETECTED', {
         timestamp: new Date().toISOString(),
         pathname,
-        hasToken: !!accountantSessionCookie,
       });
     }
     
