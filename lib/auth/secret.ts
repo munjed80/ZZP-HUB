@@ -1,4 +1,20 @@
-const DEV_FALLBACK_SECRET = "zzp-hub-dev-secret";
+function deriveDevFallbackSecret(): string {
+  const seed =
+    process.env.AUTH_DEV_SECRET ||
+    process.env.NEXTAUTH_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "http://localhost:3000";
+
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash |= 0;
+  }
+
+  return `dev-${Math.abs(hash)}-zzp-hub`;
+}
+
+const DEV_FALLBACK_SECRET = deriveDevFallbackSecret();
 
 let hasWarnedAboutSecret = false;
 

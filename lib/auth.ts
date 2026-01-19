@@ -293,9 +293,13 @@ export const authOptions: NextAuthOptions = {
   events: {
     async signIn({ user }) {
       if (shouldLogAuth) {
+        const userRecord = user as Record<string, unknown>;
+        const userId = typeof userRecord.id === "string" ? userRecord.id : undefined;
+        const userRole =
+          typeof userRecord.role === "string" ? (userRecord.role as string) : undefined;
         console.log("[AUTH] SIGN_IN", {
-          userId: (user as any)?.id?.slice?.(-6),
-          role: (user as any)?.role,
+          userId: userId?.slice?.(-6),
+          role: userRole,
         });
       }
     },
@@ -313,17 +317,17 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-export async function getServerAuthSession() {
-  const session = await getServerSession(authOptions);
+export function getServerAuthSession() {
+  return getServerSession(authOptions).then((session) => {
+    if (shouldLogAuth) {
+      console.log(session ? "[AUTH] SESSION_READ" : "[AUTH] SESSION_MISSING", {
+        userId: session?.user?.id?.slice?.(-6),
+        role: session?.user?.role,
+      });
+    }
 
-  if (shouldLogAuth) {
-    console.log(session ? "[AUTH] SESSION_READ" : "[AUTH] SESSION_MISSING", {
-      userId: session?.user?.id?.slice?.(-6),
-      role: session?.user?.role,
-    });
-  }
-
-  return session;
+    return session;
+  });
 }
 
 export async function getCurrentUserId(): Promise<string | undefined> {

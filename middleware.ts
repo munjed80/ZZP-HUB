@@ -56,6 +56,7 @@ const logRedirect = (event: string, details: Record<string, unknown>) => {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const nextParam = `${pathname}${request.nextUrl.search}`;
 
   // Only guard protected app routes - early return for public routes
   // This prevents unnecessary session lookups on public pages
@@ -97,6 +98,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(accountantPortalUrl);
   }
   
+  if (!authSecret) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('next', nextParam);
+    logRedirect('REDIRECT_LOGIN_NO_SECRET', { pathname });
+    return NextResponse.redirect(loginUrl);
+  }
+  
   // Get the JWT token for regular NextAuth sessions
   let token = null;
   try {
@@ -112,7 +120,6 @@ export async function middleware(request: NextRequest) {
   const onboardingCompleted = onboardingCookie || Boolean(token?.onboardingCompleted);
   const role = token?.role as string | undefined;
   const setupRoutes = ['/setup', '/onboarding'];
-  const nextParam = `${pathname}${request.nextUrl.search}`;
 
   // If not logged in, redirect to login
   if (!token) {
