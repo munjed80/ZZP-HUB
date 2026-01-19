@@ -12,7 +12,7 @@ import {
   Briefcase,
   FileText,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { assertUniqueHrefs, cn, isAccountantRole } from "@/lib/utils";
 import { UserRole } from "@prisma/client";
 
 // Bottom navigation for ZZP/COMPANY_ADMIN users
@@ -33,12 +33,8 @@ const accountantNavItems = [
   { href: "/btw-aangifte", label: "BTW", icon: FileText },
 ];
 
-// Check if user has accountant role
-const isAccountantRole = (role?: UserRole): boolean =>
-  role === UserRole.ACCOUNTANT_VIEW ||
-  role === UserRole.ACCOUNTANT_EDIT ||
-  role === UserRole.STAFF ||
-  role === UserRole.ACCOUNTANT;
+assertUniqueHrefs(zzpNavItems, "MobileNav ZZP");
+assertUniqueHrefs(accountantNavItems, "MobileNav Accountant");
 
 type MobileNavProps = {
   onMenuClick?: () => void;

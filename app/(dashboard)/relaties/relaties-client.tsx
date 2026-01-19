@@ -123,7 +123,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
             <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden />
               <input
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 pl-9 text-sm text-foreground placeholder:text-muted-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                 placeholder="Zoek op naam of stad"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
@@ -344,7 +344,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                   Bedrijfsnaam <span className="text-destructive">*</span>
                 </label>
                 <input
-                  className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring"
                   placeholder="Studio Delta BV"
                   {...form.register("name")}
                 />
@@ -360,7 +360,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                     E-mail <span className="text-destructive">*</span>
                   </label>
                   <input
-                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring"
                     placeholder="contact@bedrijf.nl"
                     type="email"
                     {...form.register("email")}
@@ -373,7 +373,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">KVK-nummer</label>
                   <input
-                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring"
                     placeholder="12345678"
                     {...form.register("kvkNumber")}
                   />
@@ -384,7 +384,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">BTW-nummer</label>
                 <input
-                  className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring"
                   placeholder="NL123456789B01"
                   {...form.register("btwId")}
                 />
@@ -397,7 +397,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Straat en huisnummer</label>
                   <input
-                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring"
                     placeholder="Keizersgracht 12"
                     {...form.register("address")}
                   />
@@ -410,7 +410,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground">Postcode</label>
                     <input
-                      className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring"
                       placeholder="1015 CX"
                       {...form.register("postalCode")}
                     />
@@ -422,7 +422,7 @@ export function RelatiesClient({ clients }: { clients: ClientList }) {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground">Stad</label>
                     <input
-                      className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                      className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-transparent focus:ring-2 focus:ring-ring"
                       placeholder="Amsterdam"
                       {...form.register("city")}
                     />

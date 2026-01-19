@@ -191,7 +191,7 @@ export function InvoiceForm({
             <div className="space-y-1">
               <label className="text-sm font-medium text-foreground">Factuurnummer</label>
               <input
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                 {...form.register("invoiceNum")}
                 placeholder="draft-2025-001"
               />
@@ -204,7 +204,7 @@ export function InvoiceForm({
               <label className="text-sm font-medium text-foreground">Factuurdatum</label>
               <input
                 type="date"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                 {...form.register("date")}
               />
               {form.formState.errors.date && (
@@ -216,7 +216,7 @@ export function InvoiceForm({
               <label className="text-sm font-medium text-foreground">Vervaldatum</label>
               <input
                 type="date"
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                 {...form.register("dueDate")}
               />
               {form.formState.errors.dueDate && (
@@ -229,7 +229,7 @@ export function InvoiceForm({
             <label className="text-sm font-medium text-foreground">Relatie</label>
             <div className="relative">
               <input
-                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                 placeholder="Zoek op naam, e-mail of stad"
                 value={searchTerm}
                 onFocus={() => setOpenList(true)}
@@ -323,7 +323,7 @@ export function InvoiceForm({
                     <tr key={field.id} className="align-top">
                       <td className="px-3 py-2">
                         <input
-                          className="w-full rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                          className="w-full rounded-lg border border-border bg-background px-2 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                           placeholder="Omschrijving"
                           {...form.register(`lines.${index}.description` as const)}
                           defaultValue={field.description}
@@ -338,7 +338,7 @@ export function InvoiceForm({
                         <input
                           type="number"
                           step="0.01"
-                          className="w-24 rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground"
+                          className="w-24 rounded-lg border border-border bg-background px-2 py-2 text-sm text-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                           {...form.register(`lines.${index}.quantity` as const, { valueAsNumber: true })}
                           defaultValue={field.quantity}
                         />
@@ -350,7 +350,7 @@ export function InvoiceForm({
                       </td>
                       <td className="px-3 py-2">
                          <select
-                           className="w-28 rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground"
+                           className="w-28 rounded-lg border border-border bg-background px-2 py-2 text-sm text-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                            {...form.register(`lines.${index}.unit` as const)}
                            defaultValue={field.unit}
                          >
@@ -370,7 +370,7 @@ export function InvoiceForm({
                         <input
                           type="number"
                           step="0.01"
-                          className="w-28 rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground"
+                          className="w-28 rounded-lg border border-border bg-background px-2 py-2 text-sm text-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                           {...form.register(`lines.${index}.price` as const, { valueAsNumber: true })}
                           defaultValue={field.price}
                         />
@@ -382,7 +382,7 @@ export function InvoiceForm({
                       </td>
                       <td className="px-3 py-2">
                         <select
-                          className="w-24 rounded-lg border border-input bg-background px-2 py-2 text-sm text-foreground"
+                          className="w-24 rounded-lg border border-border bg-background px-2 py-2 text-sm text-foreground focus:border-transparent focus:ring-2 focus:ring-ring"
                           {...form.register(`lines.${index}.vat` as const)}
                           defaultValue={field.vat}
                         >

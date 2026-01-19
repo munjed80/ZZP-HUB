@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, FileText, Send, CalendarDays, Receipt, Users, Clock3 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { assertUniqueHrefs, cn } from "@/lib/utils";
 
 const createActions = [
   { href: "/facturen/nieuw", label: "Nieuwe factuur", icon: FileText },
@@ -13,6 +13,8 @@ const createActions = [
   { href: "/agenda?add=1", label: "Nieuwe agenda-item", icon: CalendarDays },
   { href: "/uren?action=new", label: "Nieuwe urenregistratie", icon: Clock3 },
 ];
+
+assertUniqueHrefs(createActions, "NewActionMenu");
 
 export function NewActionMenu() {
   const [open, setOpen] = useState(false);

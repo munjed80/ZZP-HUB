@@ -36,3 +36,24 @@ export function isAccountantRole(role: string | undefined | null): boolean {
   if (!role) return false;
   return ACCOUNTANT_ROLES.includes(role as typeof ACCOUNTANT_ROLES[number]);
 }
+
+export function assertUniqueHrefs(
+  items: Array<{ href: string }>,
+  context: string,
+): void {
+  if (process.env.NODE_ENV === "production") return;
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+  for (const item of items) {
+    if (seen.has(item.href)) {
+      duplicates.add(item.href);
+    } else {
+      seen.add(item.href);
+    }
+  }
+  if (duplicates.size > 0) {
+    throw new Error(
+      `[${context}] Duplicate navigation hrefs: ${[...duplicates].join(", ")}`,
+    );
+  }
+}
