@@ -11,7 +11,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import crypto from "crypto";
-import { logAccountantSessionCreated } from "./security-audit";
+import { logAccountantSessionCreated, logSecurityEvent } from "./security-audit";
 
 const ACCOUNTANT_SESSION_COOKIE = "zzp-accountant-session";
 const SESSION_EXPIRY_DAYS = 30; // 30 days
@@ -158,10 +158,26 @@ export async function deleteAccountantSession(): Promise<void> {
     const sessionToken = cookieStore.get(ACCOUNTANT_SESSION_COOKIE)?.value;
     
     if (sessionToken) {
+      // Get session details for logging before deletion
+      const session = await prisma.accountantSession.findUnique({
+        where: { sessionToken },
+      });
+      
       // Delete from database
       await prisma.accountantSession.deleteMany({
         where: { sessionToken },
       });
+      
+      // Log session deletion for audit
+      if (session) {
+        await logSecurityEvent({
+          userId: session.userId,
+          eventType: "ACCOUNTANT_SESSION_DELETED",
+          companyId: session.companyId,
+          targetEmail: session.email,
+          metadata: { role: session.role },
+        });
+      }
     }
     
     // Delete cookie
