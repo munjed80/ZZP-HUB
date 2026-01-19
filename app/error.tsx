@@ -21,17 +21,17 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-muted px-4">
       <div className="text-center">
         <div className="mb-8 flex justify-center">
-          <div className="rounded-full bg-red-100 p-6">
-            <AlertCircle className="h-16 w-16 text-red-600" />
+          <div className="rounded-full bg-destructive/10 p-6">
+            <AlertCircle className="h-16 w-16 text-destructive" />
           </div>
         </div>
-        <h2 className="mb-4 text-3xl font-bold text-slate-900">
+        <h2 className="mb-4 text-3xl font-bold text-foreground">
           Er is iets misgegaan.
         </h2>
-        <p className="mb-8 text-lg text-slate-600">
+        <p className="mb-8 text-lg text-muted-foreground">
           We konden je verzoek niet verwerken. Probeer het opnieuw.
         </p>
         <button

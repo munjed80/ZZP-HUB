@@ -1,9 +1,9 @@
 # Theme Audit Report
-Generated: 2026-01-19T01:14:29.138Z
+Generated: 2026-01-19T01:18:01.890Z
 
 ## Summary
 
-Found **53** potential hardcoded color issues in **15** files.
+Found **29** potential hardcoded color issues in **7** files.
 
 ## Recommendations
 
@@ -15,19 +15,6 @@ Found **53** potential hardcoded color issues in **15** files.
 ## Issues by File
 
 
-### `app/(auth)/layout.tsx`
-
-Found 2 issue(s):
-
-- **Line 10**: `text-slate-900`
-  ```
-  <div className="min-h-screen bg-[#f8f9fa] text-slate-900">
-  ```
-- **Line 77**: `bg-white`
-  ```
-  <div className="relative flex items-center justify-center bg-white">
-  ```
-
 ### `app/(dashboard)/admin/companies/companies-client.tsx`
 
 Found 1 issue(s):
@@ -35,15 +22,6 @@ Found 1 issue(s):
 - **Line 188**: `text-slate-900`
   ```
   <div className="font-semibold text-slate-900">
-  ```
-
-### `app/(dashboard)/facturen/loading.tsx`
-
-Found 1 issue(s):
-
-- **Line 11**: `bg-white`
-  ```
-  <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4">
   ```
 
 ### `app/(dashboard)/facturen/voorbeeld/page.tsx`
@@ -73,107 +51,6 @@ Found 6 issue(s):
 - **Line 56**: `bg-white`
   ```
   <Card className="bg-white">
-  ```
-
-### `app/(dashboard)/instellingen/settings-form.tsx`
-
-Found 14 issue(s):
-
-- **Line 48**: `text-gray-900`
-  ```
-  "w-full px-4 py-3 rounded-lg border text-gray-900",
-  ```
-- **Line 167**: `text-gray-900`
-  ```
-  className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-
-  ```
-- **Line 242**: `text-gray-900`
-  ```
-  <p className="font-medium text-gray-900">KOR-regeling toepassen</p>
-  ```
-- **Line 42**: `text-gray-700`
-  ```
-  <label className="block text-sm font-medium text-gray-700">
-  ```
-- **Line 163**: `text-gray-700`
-  ```
-  <label className="block text-sm font-medium text-gray-700">
-  ```
-- **Line 183**: `text-gray-700`
-  ```
-  <label className="block text-sm font-medium text-gray-700">
-  ```
-- **Line 210**: `bg-white`
-  ```
-  className="h-14 w-14 rounded-lg border border-gray-200 object-contain bg-white p-1"
-  ```
-- **Line 237**: `bg-white`
-  ```
-  "absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300",
-  ```
-- **Line 49**: `border-gray-300`
-  ```
-  error ? "border-rose-300 focus:ring-rose-500" : "border-gray-300 focus:ring-teal-500",
-  ```
-- **Line 167**: `border-gray-300`
-  ```
-  className="w-full px-4 py-3 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-
-  ```
-- **Line 189**: `border-gray-300`
-  ```
-  className="w-full px-4 py-3 rounded-lg border border-gray-300 text-base file:mr-4 file:py-2 file:px-
-  ```
-- **Line 204**: `border-gray-200`
-  ```
-  <div className="mt-3 flex items-center gap-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-  ```
-- **Line 210**: `border-gray-200`
-  ```
-  className="h-14 w-14 rounded-lg border border-gray-200 object-contain bg-white p-1"
-  ```
-- **Line 219**: `border-gray-200`
-  ```
-  <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-  ```
-
-### `app/(dashboard)/relaties/loading.tsx`
-
-Found 1 issue(s):
-
-- **Line 10**: `bg-white`
-  ```
-  <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
-  ```
-
-### `app/error.tsx`
-
-Found 1 issue(s):
-
-- **Line 31**: `text-slate-900`
-  ```
-  <h2 className="mb-4 text-3xl font-bold text-slate-900">
-  ```
-
-### `app/not-found.tsx`
-
-Found 2 issue(s):
-
-- **Line 9**: `text-slate-900`
-  ```
-  <h1 className="mb-2 text-9xl font-bold text-slate-900">404</h1>
-  ```
-- **Line 12**: `text-slate-900`
-  ```
-  <h2 className="mb-4 text-3xl font-bold text-slate-900">
-  ```
-
-### `app/offline/page.tsx`
-
-Found 1 issue(s):
-
-- **Line 15**: `text-slate-900`
-  ```
-  <h1 className="text-2xl font-semibold text-slate-900">Je bent offline</h1>
   ```
 
 ### `components/assistant/assistant-demo.tsx`
@@ -287,19 +164,6 @@ Found 12 issue(s):
 - **Line 176**: `bg-white`
   ```
   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 pl-9 text-sm text-slate-900 
-  ```
-
-### `components/ui/button.tsx`
-
-Found 2 issue(s):
-
-- **Line 38**: `text-slate-900`
-  ```
-  "text-slate-700 dark:text-slate-200 border border-transparent hover:border-slate-200/60 dark:hover:b
-  ```
-- **Line 26**: `bg-white`
-  ```
-  "text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200/80 dark:borde
   ```
 
 ## Next Steps

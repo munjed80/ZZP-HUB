@@ -22,7 +22,8 @@
     "deploy:prod": "node scripts/deploy-prod.mjs",
     "db:migrate": "prisma migrate deploy",
     "db:generate": "prisma generate",
-    "smoke:prod": "node scripts/smoke-prod.mjs"
+    "smoke:prod": "node scripts/smoke-prod.mjs",
+    "theme:audit": "node scripts/theme-audit.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.1",
