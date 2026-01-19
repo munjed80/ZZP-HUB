@@ -1,10 +1,11 @@
+const DEFAULT_DEV_SECRET_SEED = "http://localhost:3000";
 const HASH_MULTIPLIER = 31;
 
 function deriveDevFallbackSecret(): string {
   const seed =
     process.env.AUTH_DEV_SECRET ||
     process.env.NEXTAUTH_URL ||
-    "http://localhost:3000";
+    DEFAULT_DEV_SECRET_SEED;
 
   // Simple deterministic string hash (inspired by the classic 31x hash) to avoid
   // a hardcoded dev secret while keeping middleware and API aligned

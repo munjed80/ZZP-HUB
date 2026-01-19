@@ -47,11 +47,12 @@ const isAccountantAllowedPath = (pathname: string) =>
 const authSecret = resolveAuthSecret();
 
 const logRedirect = (event: string, details: Record<string, unknown>) => {
-  if (!shouldLogAuth) return;
-  console.log(`[MIDDLEWARE] ${event}`, {
-    ...details,
-    timestamp: new Date().toISOString(),
-  });
+  if (shouldLogAuth) {
+    console.log(`[MIDDLEWARE] ${event}`, {
+      ...details,
+      timestamp: new Date().toISOString(),
+    });
+  }
 };
 
 export async function middleware(request: NextRequest) {
