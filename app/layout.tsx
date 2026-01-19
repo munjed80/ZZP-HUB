@@ -84,7 +84,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className="antialiased font-inter">
+      <body className="antialiased">
         <ThemeProvider>
           {children}
           <SonnerToaster />
