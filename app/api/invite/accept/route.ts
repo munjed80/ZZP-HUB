@@ -254,6 +254,17 @@ export async function POST(request: NextRequest) {
       data: { acceptedAt: new Date() },
     });
 
+    // Structured log for invite acceptance
+    console.log('[ACCOUNTANT_INVITE_ACCEPTED]', {
+      timestamp: new Date().toISOString(),
+      userId: user.id.slice(-6), // Only log last 6 chars for privacy
+      email: invite.email,
+      companyId: invite.companyId.slice(-6),
+      role: invite.role,
+      isNewUser,
+      companyName,
+    });
+
     // Log invite acceptance and company access grant for audit
     await logInviteAccepted({
       userId: user.id,
@@ -270,19 +281,33 @@ export async function POST(request: NextRequest) {
       role: invite.role,
     });
 
-    // Create accountant session for immediate access (for existing users)
-    if (!isNewUser) {
-      try {
-        await createAccountantSession(
-          user.id,
-          user.email,
-          invite.companyId,
-          invite.role
-        );
-      } catch (sessionError) {
-        console.error("Failed to create accountant session - user will need to log in manually:", sessionError);
-        // Don't fail - they can still log in normally
-      }
+    // Create accountant session for immediate access (for ALL users - both new and existing)
+    // This allows accountants to access the portal immediately after accepting the invite
+    // Previously only existing users got immediate access, causing new users to be redirected to login
+    try {
+      await createAccountantSession(
+        user.id,
+        user.email,
+        invite.companyId,
+        invite.role
+      );
+      
+      // Structured log for session creation
+      console.log('[ACCOUNTANT_SESSION_COOKIE_SET]', {
+        timestamp: new Date().toISOString(),
+        userId: user.id.slice(-6), // Only log last 6 chars for privacy
+        email: invite.email,
+        companyId: invite.companyId.slice(-6),
+        role: invite.role,
+        isNewUser,
+      });
+    } catch (sessionError) {
+      console.error('[ACCOUNTANT_SESSION_COOKIE_SET_FAILED]', {
+        timestamp: new Date().toISOString(),
+        error: sessionError instanceof Error ? sessionError.message : 'Unknown error',
+        userId: user.id.slice(-6),
+      });
+      // Don't fail - they can still log in normally
     }
 
     // Send welcome email to new users with their temporary password

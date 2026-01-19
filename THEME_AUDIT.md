@@ -4,6 +4,44 @@
 
 Successfully implemented a comprehensive design token system across the ZZP-HUB application, replacing hard-coded color values with semantic design tokens. The new system features a premium "mauve + fiery" color palette with warm charcoal dark mode and soft off-white light mode.
 
+## Recent Updates (2025-01)
+
+### Fixed Components for Dark Mode
+
+1. **SidebarBrand** (`components/sidebar/sidebar-brand.tsx`)
+   - Replaced `bg-white/90` with `bg-card/90`
+   - Replaced `bg-white/95` with `bg-card/95`
+   - Replaced `border-slate-200/80` with `border-border`
+   - Replaced `bg-slate-50` with `bg-muted`
+   - Replaced `text-slate-900` with `text-foreground`
+   - Replaced `text-slate-500` with `text-muted-foreground`
+   - Replaced hardcoded teal badge colors with `bg-primary/10 text-primary border-primary/30`
+
+### Verified Components
+
+The following components were verified to properly use theme tokens:
+
+1. **Settings Form** (`app/(dashboard)/instellingen/settings-form.tsx`)
+   - Uses `bg-background text-foreground placeholder:text-muted-foreground border-input`
+   - All inputs properly themed
+
+2. **Relaties Client** (`app/(dashboard)/relaties/relaties-client.tsx`)
+   - Uses `bg-background text-foreground placeholder:text-muted-foreground border-input`
+   - Modal uses `bg-card border-border`
+
+3. **Accountant Portal** (`app/(dashboard)/accountant-portal/accountant-portal-content.tsx`)
+   - Uses `bg-background text-foreground placeholder:text-muted-foreground`
+   - All form inputs properly themed
+
+4. **DropdownMenu** (`components/ui/dropdown-menu.tsx`)
+   - Uses `bg-popover text-popover-foreground border-border`
+   - Proper hover states with `hover:bg-accent hover:text-accent-foreground`
+
+5. **ActionSheet** (`components/ui/action-sheet.tsx`)
+   - Uses `bg-card border-border` for content
+   - Uses `bg-muted/30` for header
+   - Proper text colors with `text-foreground` and `text-muted-foreground`
+
 ## Design Token System
 
 ### Token Categories Implemented

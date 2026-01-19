@@ -101,14 +101,24 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
     });
     
     if (!session) {
-      // Clean up invalid cookie
+      // Clean up invalid cookie - structured log for invalid session
+      console.log('[ACCOUNTANT_PORTAL_SESSION_INVALID]', {
+        timestamp: new Date().toISOString(),
+        reason: 'SESSION_NOT_FOUND',
+      });
       cookieStore.delete(ACCOUNTANT_SESSION_COOKIE);
       return null;
     }
     
     // Check if expired
     if (session.expiresAt < new Date()) {
-      // Clean up expired session
+      // Clean up expired session - structured log for expired session
+      console.log('[ACCOUNTANT_PORTAL_SESSION_INVALID]', {
+        timestamp: new Date().toISOString(),
+        reason: 'SESSION_EXPIRED',
+        userId: session.userId.slice(-6),
+        expiredAt: session.expiresAt.toISOString(),
+      });
       await prisma.accountantSession.delete({
         where: { id: session.id },
       });
@@ -122,6 +132,14 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
       data: { lastAccessAt: new Date() },
     });
     
+    // Structured log for valid session
+    console.log('[ACCOUNTANT_PORTAL_SESSION_VALID]', {
+      timestamp: new Date().toISOString(),
+      userId: session.userId.slice(-6),
+      companyId: session.companyId.slice(-6),
+      role: session.role,
+    });
+    
     return {
       sessionId: session.id,
       userId: session.userId,
@@ -131,7 +149,11 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
       expiresAt: session.expiresAt,
     };
   } catch (error) {
-    console.error("Error getting accountant session:", error);
+    console.error('[ACCOUNTANT_PORTAL_SESSION_INVALID]', {
+      timestamp: new Date().toISOString(),
+      reason: 'ERROR',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return null;
   }
 }

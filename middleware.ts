@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { getAnyCombinedSession } from './lib/auth/combined-session';
+
+// Cookie name for accountant sessions
+const ACCOUNTANT_SESSION_COOKIE = 'zzp-accountant-session';
 
 // Routes that should be accessible even without email verification
 const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-required', '/resend-verification'];
@@ -26,7 +28,8 @@ const protectedPrefixes = [
 const isProtectedPath = (pathname: string) =>
   protectedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
-// Routes that accountants can access with accountant session
+// Routes that accountants can access with accountant session cookie
+// Note: Deep validation (expiry, permissions, tenant) happens server-side
 const accountantAllowedPrefixes = [
   '/accountant-portal',
   '/dashboard',
@@ -49,13 +52,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Try to get any valid session (NextAuth or accountant session)
-  // This is only called for protected routes, minimizing DB queries
-  const combinedSession = await getAnyCombinedSession(request);
+  // EDGE-COMPATIBLE: Check for accountant session cookie presence via request.cookies
+  // Deep validation (session lookup, expiry, permissions, tenant isolation) 
+  // is done server-side in API routes and server components
+  const accountantSessionCookie = request.cookies.get(ACCOUNTANT_SESSION_COOKIE)?.value;
   
-  // If we have an accountant session, check if the route is allowed
-  if (combinedSession?.isAccountantSession) {
-    // Accountants can only access certain routes
+  if (accountantSessionCookie) {
+    // Log that we detected an accountant session cookie (structured log)
+    if (process.env.NODE_ENV !== 'production' || process.env.SECURITY_DEBUG === 'true') {
+      console.log('[MIDDLEWARE] ACCOUNTANT_SESSION_COOKIE_DETECTED', {
+        timestamp: new Date().toISOString(),
+        pathname,
+      });
+    }
+    
+    // Accountants can only access certain routes - redirect to portal for disallowed routes
     if (isAccountantAllowedPath(pathname)) {
       return NextResponse.next();
     }
