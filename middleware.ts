@@ -107,12 +107,14 @@ export async function middleware(request: NextRequest) {
   
   // Get the JWT token for regular NextAuth sessions
   let token = null;
+  let tokenErrorReason: string | undefined;
   try {
     token = await getToken({ req: request, secret: authSecret });
   } catch (error) {
+    tokenErrorReason = error instanceof Error ? error.message : 'unknown_error';
     logRedirect('TOKEN_READ_ERROR', {
       pathname,
-      error: error instanceof Error ? error.message : 'unknown_error',
+      error: tokenErrorReason,
     });
   }
   const emailVerified = Boolean(token?.emailVerified);
@@ -125,7 +127,7 @@ export async function middleware(request: NextRequest) {
   if (!token) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('next', nextParam);
-    logRedirect('REDIRECT_LOGIN_NO_TOKEN', { pathname, hasAuthSecret: Boolean(authSecret) });
+    logRedirect('REDIRECT_LOGIN_NO_TOKEN', { pathname, hasAuthSecret: Boolean(authSecret), tokenError: tokenErrorReason });
     return NextResponse.redirect(loginUrl);
   }
 

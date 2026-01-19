@@ -40,6 +40,17 @@ const shouldLogAuth =
   process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
 const authSecret = resolveAuthSecret();
 
+function readUserString(user: unknown, key: "id" | "role"): string | undefined {
+  if (
+    user &&
+    typeof user === "object" &&
+    typeof (user as Record<string, unknown>)[key] === "string"
+  ) {
+    return (user as Record<string, string>)[key];
+  }
+  return undefined;
+}
+
 function isMissingOnboardingColumns(error: unknown) {
   if (
     error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -293,10 +304,8 @@ export const authOptions: NextAuthOptions = {
   events: {
     async signIn({ user }) {
       if (shouldLogAuth) {
-        const userRecord = user as Record<string, unknown>;
-        const userId = typeof userRecord.id === "string" ? userRecord.id : undefined;
-        const userRole =
-          typeof userRecord.role === "string" ? (userRecord.role as string) : undefined;
+        const userId = readUserString(user, "id");
+        const userRole = readUserString(user, "role");
         console.log("[AUTH] SIGN_IN", {
           userId: userId?.slice?.(-6),
           role: userRole,
