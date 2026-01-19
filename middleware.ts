@@ -120,7 +120,6 @@ export async function middleware(request: NextRequest) {
   const emailVerified = Boolean(token?.emailVerified);
   const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';
   const onboardingCompleted = onboardingCookie || Boolean(token?.onboardingCompleted);
-  const userRole = token?.role as string | undefined;
   const setupRoutes = ['/setup', '/onboarding'];
 
   // If not logged in, redirect to login
@@ -130,6 +129,8 @@ export async function middleware(request: NextRequest) {
     logRedirect('REDIRECT_LOGIN_NO_TOKEN', { pathname, hasAuthSecret: Boolean(authSecret), tokenError: tokenErrorReason });
     return NextResponse.redirect(loginUrl);
   }
+
+  const userRole = token.role as string | undefined;
 
   if (isAccountantRole(userRole) && !isAccountantAllowedPath(pathname)) {
     const accountantPortalUrl = new URL('/accountant-portal', request.url);

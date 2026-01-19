@@ -4,7 +4,6 @@ function deriveDevFallbackSecret(): string {
   const seed =
     process.env.AUTH_DEV_SECRET ||
     process.env.NEXTAUTH_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
     "http://localhost:3000";
 
   // Simple deterministic string hash (inspired by the classic 31x hash) to avoid

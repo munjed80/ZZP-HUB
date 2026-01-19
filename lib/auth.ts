@@ -36,8 +36,9 @@ function isAuthorizeResult(user: unknown): user is AuthorizeResult {
 }
 
 const DEFAULT_ROLE: UserRole = "COMPANY_ADMIN";
+const allowSensitiveAuthLogs = process.env.AUTH_DEBUG === "true";
 const shouldLogAuth =
-  process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
+  allowSensitiveAuthLogs || process.env.NODE_ENV !== "production";
 const authSecret = resolveAuthSecret();
 
 function readUserString(user: unknown, key: "id" | "role"): string | undefined {
@@ -270,7 +271,7 @@ export const authOptions: NextAuthOptions = {
 
       if (shouldLogAuth) {
         console.log("[AUTH] SESSION_CALLBACK", {
-          userId: session.user?.id?.slice?.(-6),
+          userId: allowSensitiveAuthLogs ? session.user?.id?.slice?.(-6) : undefined,
           role: session.user?.role,
           emailVerified: session.user?.emailVerified,
           onboardingCompleted: session.user?.onboardingCompleted,
@@ -307,7 +308,7 @@ export const authOptions: NextAuthOptions = {
         const userId = readUserString(user, "id");
         const userRole = readUserString(user, "role");
         console.log("[AUTH] SIGN_IN", {
-          userId: userId?.slice?.(-6),
+          userId: allowSensitiveAuthLogs ? userId?.slice?.(-6) : undefined,
           role: userRole,
         });
       }
@@ -315,7 +316,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session }) {
       if (shouldLogAuth) {
         console.log("[AUTH] SESSION_EVENT", {
-          userId: session.user?.id?.slice?.(-6),
+          userId: allowSensitiveAuthLogs ? session.user?.id?.slice?.(-6) : undefined,
           role: session.user?.role,
         });
       }
@@ -330,7 +331,7 @@ export function getServerAuthSession() {
   return getServerSession(authOptions).then((session) => {
     if (shouldLogAuth) {
       console.log(session ? "[AUTH] SESSION_READ" : "[AUTH] SESSION_MISSING", {
-        userId: session?.user?.id?.slice?.(-6),
+        userId: allowSensitiveAuthLogs ? session?.user?.id?.slice?.(-6) : undefined,
         role: session?.user?.role,
       });
     }
