@@ -8,7 +8,7 @@ export default function LoadingFacturen() {
         <Skeleton className="h-4 w-80" />
       </div>
       <Skeleton className="h-10 w-64" />
-      <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4">
+      <div className="space-y-2 rounded-xl border border-border bg-card p-4">
         <Skeleton className="h-5 w-40" />
         {[1, 2, 3, 4].map((key) => (
           <Skeleton key={key} className="h-12 w-full" />

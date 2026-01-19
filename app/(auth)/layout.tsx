@@ -7,7 +7,7 @@ import "@/app/globals.css";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-slate-900">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="grid min-h-screen lg:grid-cols-2">
         <div className="relative overflow-hidden bg-gradient-to-br from-[#0a2e50] via-[#0c3d66] to-[#0a2e50] text-white">
           <motion.div
@@ -74,10 +74,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        <div className="relative flex items-center justify-center bg-white">
-          <div className="absolute inset-y-0 left-0 w-px bg-slate-100" aria-hidden />
-          <div className="absolute -left-24 top-10 hidden h-40 w-40 rounded-full bg-[#d7e1ea] blur-3xl sm:block" />
-          <div className="absolute right-6 top-0 h-32 w-32 rounded-full bg-[#e4eaef] blur-3xl" />
+        <div className="relative flex items-center justify-center bg-card">
+          <div className="absolute inset-y-0 left-0 w-px bg-border" aria-hidden />
+          <div className="absolute -left-24 top-10 hidden h-40 w-40 rounded-full bg-primary/10 blur-3xl sm:block" />
+          <div className="absolute right-6 top-0 h-32 w-32 rounded-full bg-primary/5 blur-3xl" />
           <div className="relative w-full max-w-md px-6 py-12 sm:px-10 sm:py-16">{children}</div>
         </div>
       </div>

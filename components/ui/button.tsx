@@ -21,21 +21,21 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary:
     "group relative isolate overflow-hidden bg-gradient-to-br from-emerald-600 to-emerald-700 text-white border border-emerald-500/40 shadow-[0_8px_32px_-12px_rgba(16,185,129,0.4)] hover:shadow-[0_12px_48px_-16px_rgba(16,185,129,0.6)] hover:-translate-y-0.5 hover:brightness-110 transition-all duration-300 focus-visible:ring-emerald-400/80",
 
-  // Secondary - Clean white/slate with subtle emerald accent
+  // Secondary - Clean with subtle emerald accent, supports dark mode
   secondary:
-    "text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-[0_4px_24px_-8px_rgba(15,23,42,0.08)] hover:border-emerald-200/80 dark:hover:border-emerald-700/60 hover:bg-slate-50/90 dark:hover:bg-slate-750 hover:-translate-y-0.5 hover:shadow-[0_8px_32px_-12px_rgba(16,185,129,0.12)] transition-all duration-300",
+    "text-foreground bg-card border border-border shadow-[0_4px_24px_-8px_rgba(15,23,42,0.08)] hover:border-primary/30 hover:bg-muted hover:-translate-y-0.5 hover:shadow-[0_8px_32px_-12px_rgba(16,185,129,0.12)] transition-all duration-300",
 
   // Outline - Refined border with emerald hover accent
   outline:
-    "bg-transparent text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/80 shadow-sm hover:bg-emerald-50/60 dark:hover:bg-emerald-950/40 hover:text-emerald-700 dark:hover:text-emerald-300 hover:border-emerald-300/60 dark:hover:border-emerald-600/60 hover:-translate-y-0.5 transition-all duration-300",
+    "bg-transparent text-foreground border border-border shadow-sm hover:bg-primary/10 hover:text-primary hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-300",
 
   // Destructive - Sophisticated rose gradient with depth
   destructive:
     "group relative isolate overflow-hidden bg-gradient-to-br from-rose-500 to-rose-600 text-white border border-rose-400/40 shadow-[0_8px_32px_-12px_rgba(244,63,94,0.4)] hover:shadow-[0_12px_48px_-16px_rgba(244,63,94,0.6)] hover:-translate-y-0.5 hover:brightness-110 transition-all duration-300 focus-visible:ring-rose-400",
 
-  // Ghost - Minimal with refined hover state
+  // Ghost - Minimal with refined hover state, supports dark mode
   ghost:
-    "text-slate-700 dark:text-slate-200 border border-transparent hover:border-slate-200/60 dark:hover:border-slate-700/60 hover:bg-slate-50/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-slate-100 hover:-translate-y-0.5 transition-all duration-300",
+    "text-foreground border border-transparent hover:border-border hover:bg-muted hover:text-foreground hover:-translate-y-0.5 transition-all duration-300",
 
   // Link - Clean text with emerald accent
   link:
