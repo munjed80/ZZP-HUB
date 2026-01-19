@@ -250,11 +250,7 @@ export function SettingsForm({ initialProfile }: { initialProfile: CompanyProfil
       </div>
 
       <div className="flex justify-end pt-4 border-t border-border">
-        <Button
-          type="submit"
-          disabled={isPending}
-          className="px-8 py-3 text-base rounded-lg transition-colors"
-        >
+        <Button type="submit" disabled={isPending} variant="primary">
           {isPending ? "Opslaan..." : "Bedrijfsprofiel opslaan"}
         </Button>
       </div>

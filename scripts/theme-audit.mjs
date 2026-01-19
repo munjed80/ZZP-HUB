@@ -13,15 +13,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 
-// Patterns to detect hardcoded colors
+// Patterns to detect hardcoded colors (excluding compound classes)
 const colorPatterns = [
-  { pattern: /text-gray-900/g, name: 'text-gray-900' },
-  { pattern: /text-gray-700/g, name: 'text-gray-700' },
-  { pattern: /text-slate-900/g, name: 'text-slate-900' },
-  { pattern: /text-black(?![/-])/g, name: 'text-black' },
-  { pattern: /bg-white(?![/-])/g, name: 'bg-white' },
-  { pattern: /border-gray-300/g, name: 'border-gray-300' },
-  { pattern: /border-gray-200/g, name: 'border-gray-200' },
+  { pattern: /text-gray-900(?![-/\w])/g, name: 'text-gray-900' },
+  { pattern: /text-gray-700(?![-/\w])/g, name: 'text-gray-700' },
+  { pattern: /text-slate-900(?![-/\w])/g, name: 'text-slate-900' },
+  { pattern: /text-black(?![-/\w])/g, name: 'text-black' },
+  { pattern: /bg-white(?![-/\w])/g, name: 'bg-white' },
+  { pattern: /border-gray-300(?![-/\w])/g, name: 'border-gray-300' },
+  { pattern: /border-gray-200(?![-/\w])/g, name: 'border-gray-200' },
 ];
 
 // Directories to exclude
@@ -103,7 +103,7 @@ function generateMarkdownReport(findings) {
   }, {});
 
   let report = `# Theme Audit Report
-Generated: ${new Date().toISOString()}
+Generated automatically by theme-audit.mjs
 
 ## Summary
 

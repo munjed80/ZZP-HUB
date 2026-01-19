@@ -1,5 +1,5 @@
 # Theme Audit Report
-Generated: 2026-01-19T01:18:01.890Z
+Generated automatically by theme-audit.mjs
 
 ## Summary
 
