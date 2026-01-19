@@ -400,3 +400,17 @@ select {
   animation: popover-fade-scale 160ms ease-out;
   transform-origin: top right;
 }
+
+/* WebKit autofill overrides for dark mode - iOS/Safari compatibility */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill {
+  -webkit-text-fill-color: rgb(248 250 252) !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgb(15 23 42) inset !important;
+  box-shadow: 0 0 0px 1000px rgb(15 23 42) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: rgb(248 250 252);
+}
