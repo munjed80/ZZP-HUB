@@ -3,22 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
   Receipt,
   Users,
+  FileSignature,
   Wallet,
-  Settings,
+  FileText,
+  CalendarDays,
   Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Bottom navigation order: Dashboard, Facturen, Relaties, Uitgaven, Instellingen, Menu
+// Bottom navigation order as per requirement: Factuurs, Relaties, Offert, Uitgave, Btw, Agenda
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/relaties", label: "Relaties", icon: Users },
+  { href: "/offertes", label: "Offertes", icon: FileSignature },
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
-  { href: "/instellingen", label: "Instellingen", icon: Settings },
+  { href: "/btw-aangifte", label: "BTW", icon: FileText },
+  { href: "/agenda", label: "Agenda", icon: CalendarDays },
 ];
 
 type MobileNavProps = {
