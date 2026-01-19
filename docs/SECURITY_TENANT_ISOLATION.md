@@ -876,7 +876,7 @@ See `tests/tenant-isolation.test.mjs` for unit tests covering:
 
 ## INTEGRATION TEST REQUIREMENT
 
-**Status:** TO BE IMPLEMENTED
+**Status:** ✅ COMPLETED
 
 **Requirements:**
 1. Create two companies (User A, User B)
@@ -888,3 +888,21 @@ See `tests/tenant-isolation.test.mjs` for unit tests covering:
    - User B detail pages return 404/403 for Company A resource IDs
 
 **Implementation File:** `tests/tenant-isolation-integration.test.mjs`
+
+**Test Results:**
+- ✅ List Page Isolation (10 tests)
+  - Company A and B can only see their own clients
+  - Company A and B can only see their own invoices
+  - Company A and B can only see their own offertes
+  - Company A and B can only see their own expenses
+  - Company A and B can only see their own events
+
+- ✅ Detail Page Isolation (12 tests)
+  - Each company can access their own resource details
+  - Each company receives 404/403 when accessing other company's resources
+
+- ✅ Cross-Company Data Access Prevention (3 tests)
+  - Companies cannot list each other's data
+  - Foreign resource access throws proper errors
+
+**Integration Test Coverage:** All entry points validated with multi-tenant isolation tests.

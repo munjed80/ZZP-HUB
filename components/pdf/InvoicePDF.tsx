@@ -20,7 +20,6 @@ export type InvoicePdfCompany = {
   bankName?: string | null;
   logoUrl?: string | null;
   email?: string | null;
-  website?: string | null;
 };
 
 export type InvoicePdfClient = {
@@ -79,17 +78,17 @@ const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
     fontSize: 11,
-    padding: 40,
+    padding: 30,
     lineHeight: 1.5,
     backgroundColor: "#ffffff",
     color: "#0f172a",
   },
   header: {
-    marginBottom: 26,
-    paddingBottom: 20,
+    marginBottom: 24,
+    paddingBottom: 18,
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
-    gap: 16,
+    gap: 14,
   },
   headerTop: {
     flexDirection: "row",
@@ -147,9 +146,10 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   brandName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: 800,
     color: primaryColor,
+    letterSpacing: 0.3,
   },
   headerLeft: {
     gap: 4,
