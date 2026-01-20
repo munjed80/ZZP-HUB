@@ -280,7 +280,7 @@ export function AccountantPortalContent() {
                 Nog geen toegang tot bedrijven
               </h2>
               <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-                Je moet door een ZZP worden uitgenodigd via &quot;Accountant toegang&quot;.
+                Je moet door een ZZP worden uitgenodigd via &apos;Accountant toegang&apos;.
                 Na het accepteren van de uitnodiging krijg je toegang tot het bedrijfsdossier.
               </p>
               <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg max-w-lg mx-auto">
