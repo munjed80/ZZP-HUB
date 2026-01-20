@@ -83,6 +83,13 @@ function LoginContent() {
       target,
     });
     
+    const isAccountant = session?.user?.role === "ACCOUNTANT" || session?.user?.role === "ACCOUNTANT_EDIT" || session?.user?.role === "ACCOUNTANT_VIEW";
+    if (loginType === "zzp" && isAccountant) {
+      setError("Dit account is een boekhouder. Gebruik de boekhouder-login.");
+      setLoading(false);
+      return;
+    }
+
     router.push(target);
     router.refresh();
   };

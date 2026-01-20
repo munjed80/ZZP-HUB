@@ -37,6 +37,7 @@ export function AccountantAccessContent() {
   const [canEdit, setCanEdit] = useState(false);
   const [canExport, setCanExport] = useState(false);
   const [canBTW, setCanBTW] = useState(false);
+  const [fullAccess, setFullAccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [members, setMembers] = useState<CompanyMember[]>([]);
@@ -67,11 +68,12 @@ export function AccountantAccessContent() {
     e.preventDefault();
     setLoading(true);
 
+    const permissions = fullAccess
+      ? { canRead: true, canEdit: true, canExport: true, canBTW: true }
+      : { canRead, canEdit, canExport, canBTW };
+
     const result = await inviteAccountant(email, {
-      canRead,
-      canEdit,
-      canExport,
-      canBTW,
+      ...permissions,
     });
 
     if (result.success) {
@@ -200,12 +202,33 @@ export function AccountantAccessContent() {
                 <p className="text-xs text-muted-foreground">Altijd vereist</p>
               </div>
             </label>
+            <label className="flex items-center gap-2 rounded-lg border border-primary bg-primary/5 px-3 py-2">
+              <input
+                type="checkbox"
+                checked={fullAccess}
+                onChange={(e) => {
+                  const enabled = e.target.checked;
+                  setFullAccess(enabled);
+                  if (enabled) {
+                    setCanEdit(true);
+                    setCanExport(true);
+                    setCanBTW(true);
+                  }
+                }}
+                className="w-4 h-4"
+              />
+              <div>
+                <span className="text-sm font-medium text-foreground">Volledige toegang (alle rechten)</span>
+                <p className="text-xs text-muted-foreground">Activeert alle permissies</p>
+              </div>
+            </label>
             <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
               <input
                 type="checkbox"
-                checked={canEdit}
+                checked={fullAccess ? true : canEdit}
                 onChange={(e) => setCanEdit(e.target.checked)}
                 className="w-4 h-4"
+                disabled={fullAccess}
               />
               <div>
                 <span className="text-sm font-medium text-foreground">Bewerken</span>
@@ -215,9 +238,10 @@ export function AccountantAccessContent() {
             <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
               <input
                 type="checkbox"
-                checked={canExport}
+                checked={fullAccess ? true : canExport}
                 onChange={(e) => setCanExport(e.target.checked)}
                 className="w-4 h-4"
+                disabled={fullAccess}
               />
               <div>
                 <span className="text-sm font-medium text-foreground">Exporteren</span>
@@ -227,9 +251,10 @@ export function AccountantAccessContent() {
             <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
               <input
                 type="checkbox"
-                checked={canBTW}
+                checked={fullAccess ? true : canBTW}
                 onChange={(e) => setCanBTW(e.target.checked)}
                 className="w-4 h-4"
+                disabled={fullAccess}
               />
               <div>
                 <span className="text-sm font-medium text-foreground">BTW-acties</span>

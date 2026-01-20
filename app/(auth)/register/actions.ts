@@ -35,7 +35,7 @@ export async function registerCompany(values: RegisterInput) {
         email: data.email,
         password,
         naam: data.bedrijfsnaam,
-        role: UserRole.COMPANY_ADMIN,
+        role: data.role === "ACCOUNTANT" ? UserRole.ACCOUNTANT : UserRole.COMPANY_ADMIN,
         emailVerified: false,
         emailVerificationSentAt: new Date(),
       },

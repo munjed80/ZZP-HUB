@@ -17,7 +17,7 @@ export default function RegisterPagina() {
   const [isPending, startTransition] = useTransition();
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { bedrijfsnaam: "", email: "", password: "" },
+    defaultValues: { role: "ZZP", bedrijfsnaam: "", email: "", password: "" },
   });
 
   const onSubmit = (data: RegisterInput) => {
@@ -46,6 +46,37 @@ export default function RegisterPagina() {
       </div>
 
       <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
+            <input
+              type="radio"
+              value="ZZP"
+              {...form.register("role", { required: true })}
+              checked={form.watch("role") === "ZZP"}
+              className="w-4 h-4"
+            />
+            <div>
+              <span className="text-sm font-medium text-foreground">Ik ben een ZZP / bedrijf</span>
+              <p className="text-xs text-muted-foreground">Volledige bedrijfsaanmelding</p>
+            </div>
+          </label>
+          <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
+            <input
+              type="radio"
+              value="ACCOUNTANT"
+              {...form.register("role", { required: true })}
+              checked={form.watch("role") === "ACCOUNTANT"}
+              className="w-4 h-4"
+            />
+            <div>
+              <span className="text-sm font-medium text-foreground">Ik ben een boekhouder / accountant</span>
+              <p className="text-xs text-muted-foreground">Toegang tot accountant-portal</p>
+            </div>
+          </label>
+        </div>
+
+        {form.formState.errors.role && <p className="text-xs text-amber-700">{form.formState.errors.role.message}</p>}
+
         <div className="space-y-2">
           <label className="flex items-center gap-2 text-sm font-semibold text-card-foreground" htmlFor="bedrijfsnaam">
             <Building2 className="h-4 w-4 text-muted-foreground" aria-hidden />
@@ -53,7 +84,7 @@ export default function RegisterPagina() {
           </label>
           <input
             id="bedrijfsnaam"
-            required
+            required={form.watch("role") === "ZZP"}
             className="w-full border-0 border-b border-border bg-transparent px-1 pb-3 pt-1 text-sm text-foreground transition-all duration-300 focus:border-b-[2px] focus:border-primary focus:outline-none focus:ring-0"
             {...form.register("bedrijfsnaam")}
             aria-invalid={!!form.formState.errors.bedrijfsnaam}
