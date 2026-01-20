@@ -36,7 +36,7 @@ export const AccountantOTPEmail = ({
             <Text style={paragraph}>Hallo,</Text>
             <Text style={paragraph}>
               U bent uitgenodigd om als accountant toegang te krijgen tot{' '}
-              <strong>{companyName}</strong> in Matrixtop.
+              <strong>{companyName}</strong> in ZZP Hub.
             </Text>
             <Text style={paragraph}>
               Klik op onderstaande knop om naar de toegangspagina te gaan:

@@ -33,12 +33,12 @@ export const AccountantInviteEmail = ({
         <Container style={container}>
           <Section style={box}>
             <Heading style={heading}>
-              {isNewUser ? 'Welkom bij Matrixtop!' : 'Uitnodiging ontvangen'}
+              {isNewUser ? 'Welkom bij ZZP Hub!' : 'Uitnodiging ontvangen'}
             </Heading>
             <Text style={paragraph}>Hallo,</Text>
             <Text style={paragraph}>
               U bent uitgenodigd om als accountant toegang te krijgen tot{' '}
-              <strong>{companyName}</strong> in Matrixtop.
+              <strong>{companyName}</strong> in ZZP Hub.
             </Text>
             {isNewUser && temporaryPassword && (
               <>

@@ -219,9 +219,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate email format
+    // Validate email format (trim to avoid accidental whitespace)
+    const inviteEmail = invite.invitedEmail?.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(invite.invitedEmail)) {
+    if (!inviteEmail || !emailRegex.test(inviteEmail)) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -351,7 +352,7 @@ export async function POST(request: NextRequest) {
     console.log('[ACCOUNTANT_INVITE_ACCEPTED]', {
       timestamp: new Date().toISOString(),
       userId: user.id.slice(-6), // Only log last 6 chars for privacy
-      email: invite.invitedEmail,
+      email: inviteEmail,
       companyId: invite.companyId.slice(-6),
       role: invite.role,
       isNewUser,
@@ -361,7 +362,7 @@ export async function POST(request: NextRequest) {
     // Log invite acceptance and company access grant for audit
     await logInviteAccepted({
       userId: user.id,
-      email: invite.invitedEmail,
+      email: inviteEmail,
       companyId: invite.companyId,
       role: invite.role,
       isNewUser,
@@ -414,8 +415,8 @@ export async function POST(request: NextRequest) {
 
       try {
         await sendEmail({
-          to: invite.invitedEmail,
-          subject: `Welkom bij Matrixtop - U heeft toegang tot ${companyName}`,
+          to: inviteEmail,
+          subject: `Welkom bij ZZP Hub - U heeft toegang tot ${companyName}`,
           react: AccountantInviteEmail({
             acceptUrl: loginUrl,
             companyName,
@@ -546,14 +547,14 @@ export async function GET(request: NextRequest) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: invite.invitedEmail },
+      where: { email: inviteEmail },
     });
 
     return NextResponse.json<AcceptInviteResult>({
       success: true,
       message: "Uitnodiging is geldig.",
       companyName,
-      email: invite.invitedEmail,
+      email: inviteEmail,
       isNewUser: !existingUser,
     });
   } catch (error) {

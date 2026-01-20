@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://matrixtop.com/sitemap.xml",
+    sitemap: "https://zzpershub.nl/sitemap.xml",
   };
 }

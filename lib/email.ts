@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import type { ReactElement } from "react";
-import { getFromEmail } from "@/config/emails";
+import { getFromEmail, getReplyToEmail } from "@/config/emails";
 
 let resendClient: Resend | null = null;
 
@@ -26,6 +26,7 @@ interface SendEmailOptions {
   to: string;
   subject: string;
   react: ReactElement;
+  replyTo?: string;
 }
 
 interface SendEmailResult {
@@ -100,10 +101,11 @@ function logEmailFailure(error: Error | EmailError, to: string, from: string, su
 /**
  * Send an email using Resend or log to console in development
  */
-export async function sendEmail({ to, subject, react }: SendEmailOptions): Promise<SendEmailResult> {
+export async function sendEmail({ to, subject, react, replyTo }: SendEmailOptions): Promise<SendEmailResult> {
   const hasApiKey = Boolean(process.env.RESEND_API_KEY);
   const isProd = process.env.NODE_ENV === "production";
   const from = resolveFromEmail();
+  const resolvedReplyTo = replyTo || getReplyToEmail();
   const type = getEmailType(subject);
   
   // Log send attempt
@@ -141,6 +143,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions): Promi
       to,
       subject,
       html,
+      ...(resolvedReplyTo ? { replyTo: resolvedReplyTo } : {}),
     });
 
     // Check for Resend API errors (result.error is set when API returns an error)

@@ -24,16 +24,16 @@ export const VerificationEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>Verifieer je e-mailadres voor Matrixtop</Preview>
+      <Preview>Verifieer je e-mailadres voor ZZP Hub</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={box}>
-            <Heading style={heading}>Welkom bij Matrixtop!</Heading>
+            <Heading style={heading}>Welkom bij ZZP Hub!</Heading>
             <Text style={paragraph}>
               Hallo {userName || 'daar'},
             </Text>
             <Text style={paragraph}>
-              Bedankt voor je aanmelding bij Matrixtop. Om aan de slag te gaan,
+              Bedankt voor je aanmelding bij ZZP Hub. Om aan de slag te gaan,
               moeten we eerst je e-mailadres verifiëren.
             </Text>
             <Text style={paragraph}>
@@ -53,7 +53,7 @@ export const VerificationEmail = ({
               Deze verificatielink is 24 uur geldig.
             </Text>
             <Text style={footer}>
-              Als je geen account hebt aangemaakt bij Matrixtop, kun je deze
+               Als je geen account hebt aangemaakt bij ZZP Hub, kun je deze
               e-mail negeren.
             </Text>
           </Section>

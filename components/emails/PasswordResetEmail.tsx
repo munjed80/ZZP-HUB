@@ -24,7 +24,7 @@ export const PasswordResetEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>Reset je wachtwoord voor Matrixtop</Preview>
+      <Preview>Reset je wachtwoord voor ZZP Hub</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={box}>
@@ -33,7 +33,7 @@ export const PasswordResetEmail = ({
               Hallo {userName || 'daar'},
             </Text>
             <Text style={paragraph}>
-              We hebben een verzoek ontvangen om je wachtwoord te resetten voor je Matrixtop account.
+              We hebben een verzoek ontvangen om je wachtwoord te resetten voor je ZZP Hub account.
             </Text>
             <Text style={paragraph}>
               Klik op onderstaande knop om een nieuw wachtwoord in te stellen:
