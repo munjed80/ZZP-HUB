@@ -94,6 +94,8 @@ export async function middleware(request: NextRequest) {
     const loginUrl = new URL('/login', request.url);
     if (isAccountantPath) {
       loginUrl.searchParams.set('type', 'accountant');
+    } else {
+      loginUrl.searchParams.set('type', 'zzp');
     }
     loginUrl.searchParams.set('next', nextParam);
     logRedirect('REDIRECT_LOGIN_NO_SECRET', { pathname });
@@ -119,6 +121,8 @@ export async function middleware(request: NextRequest) {
     const loginUrl = new URL('/login', request.url);
     if (isAccountantPath) {
       loginUrl.searchParams.set('type', 'accountant');
+    } else {
+      loginUrl.searchParams.set('type', 'zzp');
     }
     loginUrl.searchParams.set('next', nextParam);
     logRedirect('REDIRECT_LOGIN_NO_TOKEN', { pathname, hasAuthSecret: Boolean(authSecret), tokenError: tokenErrorReason });

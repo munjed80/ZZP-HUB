@@ -24,13 +24,9 @@ const zzpNavItems = [
   { href: "/instellingen", label: "Instellingen", icon: Settings },
 ];
 
-// Bottom navigation for ACCOUNTANT users (minimal, only allowed routes)
+// Bottom navigation for ACCOUNTANT users (portal only)
 const accountantNavItems = [
   { href: "/accountant-portal", label: "Portal", icon: Briefcase },
-  { href: "/facturen", label: "Facturen", icon: Receipt },
-  { href: "/relaties", label: "Relaties", icon: Users },
-  { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
-  { href: "/btw-aangifte", label: "BTW", icon: FileText },
 ];
 
 assertUniqueHrefs(zzpNavItems, "MobileNav ZZP");
