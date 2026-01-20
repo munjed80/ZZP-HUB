@@ -47,11 +47,10 @@ export function validateFromEmail(email: string): void {
  * Server: Can be overridden via SUPPORT_EMAIL env var
  */
 export function getSupportEmail(): string {
+  // Server: allow SUPPORT_EMAIL override. Client: keep default; public overrides handled in getPublicSupportEmail.
   if (typeof window === "undefined") {
-    // Server-side: check env
     return process.env.SUPPORT_EMAIL?.trim() || SUPPORT_EMAIL;
   }
-  // Client-side: use default (public config will handle client override)
   return SUPPORT_EMAIL;
 }
 

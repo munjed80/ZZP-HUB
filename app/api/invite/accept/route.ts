@@ -219,9 +219,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate email format
+    // Validate email format (trim to avoid accidental whitespace)
+    const inviteEmail = invite.invitedEmail?.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!invite.invitedEmail || !emailRegex.test(invite.invitedEmail.trim())) {
+    if (!inviteEmail || !emailRegex.test(inviteEmail)) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -351,7 +352,7 @@ export async function POST(request: NextRequest) {
     console.log('[ACCOUNTANT_INVITE_ACCEPTED]', {
       timestamp: new Date().toISOString(),
       userId: user.id.slice(-6), // Only log last 6 chars for privacy
-      email: invite.invitedEmail,
+      email: inviteEmail,
       companyId: invite.companyId.slice(-6),
       role: invite.role,
       isNewUser,
