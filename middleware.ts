@@ -40,6 +40,12 @@ const isProtectedPath = (pathname: string) =>
 // for /accountant-portal/* routes. This list is kept for future reference and explicit documentation.
 const accountantAllowedPrefixes = [
   '/accountant-portal',
+  '/accountant-portal/dossier',
+  '/facturen',
+  '/relaties',
+  '/uitgaven',
+  '/btw-aangifte',
+  '/dashboard',
 ];
 
 const isAccountantAllowedPath = (pathname: string) =>
@@ -87,17 +93,7 @@ export async function middleware(request: NextRequest) {
         pathname,
       });
     }
-    
-    // Since the cookie is path-scoped, we should only see it for /accountant-portal/* routes
-    // Allow access to accountant portal routes
-    if (isAccountantAllowedPath(pathname)) {
-      return NextResponse.next();
-    }
-    
-    // If somehow the cookie is present for a non-accountant route (shouldn't happen due to path scoping),
-    // redirect to accountant portal as a safety measure
-    const accountantPortalUrl = new URL('/accountant-portal', request.url);
-    return NextResponse.redirect(accountantPortalUrl);
+    return NextResponse.next();
   }
   
   if (!authSecret) {
@@ -130,12 +126,14 @@ export async function middleware(request: NextRequest) {
   }
 
   const userRole = token.role as string | undefined;
+  const isAccountantPath = isAccountantAllowedPath(pathname);
 
-  if (isAccountantRole(userRole) && !isAccountantAllowedPath(pathname)) {
-    const accountantPortalUrl = new URL('/accountant-portal', request.url);
-    accountantPortalUrl.searchParams.set('next', nextParam);
-    logRedirect('REDIRECT_ACCOUNTANT_PORTAL', { pathname, role: userRole });
-    return NextResponse.redirect(accountantPortalUrl);
+  // Non-accountants visiting accountant-specific routes get routed to the standard dashboard
+  if (isAccountantPath && !isAccountantRole(userRole)) {
+    const dashboardUrl = new URL('/dashboard', request.url);
+    dashboardUrl.searchParams.set('next', nextParam);
+    logRedirect('REDIRECT_WRONG_ROLE_DASHBOARD', { pathname, role: userRole });
+    return NextResponse.redirect(dashboardUrl);
   }
 
   const emailVerified = Boolean(token.emailVerified);
