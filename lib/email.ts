@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { render } from "@react-email/render";
 import type { ReactElement } from "react";
 import { getFromEmail, getReplyToEmail } from "@/config/emails";
+import { randomUUID } from "crypto";
 
 // Throttling state for multiple sends
 let lastEmailSendTime = 0;
@@ -117,14 +118,29 @@ function logDeliverabilityCheck(to: string, from: string, authStatus: EmailAuthS
 }
 
 /**
- * Generate plain text version from HTML
- * Strips HTML tags and formats content for plain text email
+ * Generate plain text version from HTML email templates
+ * 
+ * SECURITY NOTE: This function is ONLY used to convert HTML from our own
+ * trusted React email templates (rendered via @react-email/render) into
+ * plain text versions for email. It is NOT used for sanitizing user input
+ * or rendering HTML in browsers. The input HTML always comes from our own
+ * controlled email templates, so there is no XSS risk.
+ * 
+ * @param html - HTML string from React email template rendering
+ * @returns Plain text version suitable for email text/plain part
  */
 function htmlToText(html: string): string {
-  return html
-    // Remove script and style tags with content
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+  let result = html;
+  
+  // Remove script and style tags with content (multiple passes for nested tags)
+  // Using [\s\S]*? for non-greedy matching of any character including newlines
+  for (let i = 0; i < 3; i++) {
+    result = result
+      .replace(/<script[^>]*>[\s\S]*?<\/script\s*>/gi, '')
+      .replace(/<style[^>]*>[\s\S]*?<\/style\s*>/gi, '');
+  }
+  
+  return result
     // Convert common HTML elements to text equivalents
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<\/p>/gi, '\n\n')
@@ -138,11 +154,11 @@ function htmlToText(html: string): string {
     .replace(/<[^>]+>/g, '')
     // Decode common HTML entities
     .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&') // Must be last to avoid double-decoding
     // Clean up whitespace
     .replace(/\n\s*\n\s*\n/g, '\n\n')
     .trim();
@@ -150,12 +166,13 @@ function htmlToText(html: string): string {
 
 /**
  * Add throttling delay between email sends
+ * Adds a random delay of 300-800ms if emails are sent rapidly (within 800ms of each other)
  */
 async function throttleEmailSend(): Promise<void> {
   const now = Date.now();
   const timeSinceLastSend = now - lastEmailSendTime;
   
-  if (timeSinceLastSend < 1000) { // If less than 1 second since last send
+  if (timeSinceLastSend < 800) { // If less than 800ms since last send
     // Random delay between 300-800ms
     const delay = 300 + Math.floor(Math.random() * 500);
     await new Promise(resolve => setTimeout(resolve, delay));
@@ -241,7 +258,7 @@ export async function sendEmail({ to, subject, react, replyTo }: SendEmailOption
       text,
       replyTo: resolvedReplyTo,
       headers: {
-        'X-Entity-Ref-ID': crypto.randomUUID(),
+        'X-Entity-Ref-ID': randomUUID(),
       },
     });
 
@@ -262,12 +279,13 @@ export async function sendEmail({ to, subject, react, replyTo }: SendEmailOption
     }
 
     // Log deliverability check
-    // Note: Resend handles SPF/DKIM/DMARC configuration on their end
-    // We log this to track that we're using proper configuration
+    // Note: When using Resend as the email provider, SPF/DKIM/DMARC are configured
+    // and handled by Resend on their infrastructure. These values represent the
+    // expected authentication status when emails are sent through Resend's verified domain.
     const authStatus: EmailAuthStatus = {
-      spf: "pass", // Resend configures SPF
-      dkim: "pass", // Resend signs with DKIM
-      dmarc: "pass", // Proper alignment through Resend
+      spf: "pass", // Resend configures SPF records
+      dkim: "pass", // Resend signs emails with DKIM
+      dmarc: "pass", // Proper domain alignment via Resend
     };
     logDeliverabilityCheck(to, from, authStatus);
 
