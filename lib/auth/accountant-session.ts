@@ -116,14 +116,14 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
       return null;
     }
     
-    // Find session in database
-    const session = await prisma.accountantSession.findUnique({
-      where: { sessionToken },
-    });
+  // Find session in database
+  const session = await prisma.accountantSession.findUnique({
+    where: { sessionToken },
+  });
     
     if (!session) {
       // Clean up invalid cookie - structured log for invalid session
-      console.log('[ACCOUNTANT_PORTAL_SESSION_INVALID]', {
+      console.log('[ACCOUNTANT_SESSION_INVALID]', {
         timestamp: new Date().toISOString(),
         reason: 'SESSION_NOT_FOUND',
       });
@@ -134,7 +134,7 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
     // Check if expired
     if (session.expiresAt < new Date()) {
       // Clean up expired session - structured log for expired session
-      console.log('[ACCOUNTANT_PORTAL_SESSION_INVALID]', {
+      console.log('[ACCOUNTANT_SESSION_INVALID]', {
         timestamp: new Date().toISOString(),
         reason: 'SESSION_EXPIRED',
         userId: session.userId.slice(-6),
@@ -170,7 +170,7 @@ export async function getAccountantSession(): Promise<AccountantSessionData | nu
       expiresAt: session.expiresAt,
     };
   } catch (error) {
-    console.error('[ACCOUNTANT_PORTAL_SESSION_INVALID]', {
+    console.error('[ACCOUNTANT_SESSION_INVALID]', {
       timestamp: new Date().toISOString(),
       reason: 'ERROR',
       error: error instanceof Error ? error.message : 'Unknown error',

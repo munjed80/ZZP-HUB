@@ -8,11 +8,12 @@ export const metadata: Metadata = {
   description: "Voer uw verificatiecode in om toegang te krijgen.",
 };
 
-export default function AccountantVerifyPage({
+export default async function AccountantVerifyPage({
   searchParams,
 }: {
-  searchParams: { token?: string };
+  searchParams: Promise<{ token?: string }>;
 }) {
-  const tokenParam = searchParams?.token ? `?token=${encodeURIComponent(searchParams.token)}` : "";
+  const resolvedParams = await searchParams;
+  const tokenParam = resolvedParams?.token ? `?token=${encodeURIComponent(resolvedParams.token)}` : "";
   redirect(`/accountant-invite${tokenParam}`);
 }

@@ -37,16 +37,9 @@ const isProtectedPath = (pathname: string) =>
 
 // Routes that accountants can access when they have an accountant session cookie
 // Note: Since the cookie is scoped to path="/accountant-portal", the browser will only send it
-// for /accountant-portal/* routes. This list is kept for future reference and explicit documentation.
-const accountantAllowedPrefixes = [
-  '/accountant-portal',
-  '/accountant-portal/dossier',
-  '/facturen',
-  '/relaties',
-  '/uitgaven',
-  '/btw-aangifte',
-  '/dashboard',
-];
+// for /accountant-portal/* routes. This list is intentionally limited to the portal to avoid
+// accidental access to ZZP-only areas like /dashboard.
+const accountantAllowedPrefixes = ['/accountant-portal', '/accountant-portal/dossier'];
 
 const isAccountantAllowedPath = (pathname: string) =>
   accountantAllowedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
@@ -134,13 +127,21 @@ export async function middleware(request: NextRequest) {
 
   const userRole = token.role as string | undefined;
 
-  // Non-accountants visiting accountant-specific routes get routed to the standard dashboard
+  // Non-accountants visiting accountant-specific routes get routed to the accountant login
   if (isAccountantPath && !(isAccountantRole(userRole) || userRole === 'SUPERADMIN')) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('type', 'accountant');
     loginUrl.searchParams.set('next', nextParam);
     logRedirect('REDIRECT_WRONG_ROLE_LOGIN', { pathname, role: userRole });
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Accountants should never see the ZZP dashboard or related routes; redirect them to the portal
+  if (!isAccountantPath && isAccountantRole(userRole)) {
+    const portalUrl = new URL('/accountant-portal', request.url);
+    portalUrl.searchParams.set('next', nextParam);
+    logRedirect('REDIRECT_ACCOUNTANT_TO_PORTAL', { pathname, role: userRole });
+    return NextResponse.redirect(portalUrl);
   }
 
   const emailVerified = Boolean(token.emailVerified);

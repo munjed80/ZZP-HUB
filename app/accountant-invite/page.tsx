@@ -12,10 +12,11 @@ export const metadata: Metadata = {
 export default async function AccountantInvitePage({
   searchParams,
 }: {
-  searchParams: { token?: string };
+  searchParams: Promise<{ token?: string }>;
 }) {
+  const resolvedParams = await searchParams;
   const session = await getServerAuthSession();
-  const tokenParam = searchParams?.token ? `?token=${encodeURIComponent(searchParams.token)}` : "";
+  const tokenParam = resolvedParams?.token ? `?token=${encodeURIComponent(resolvedParams.token)}` : "";
   const currentUrl = `/accountant-invite${tokenParam}`;
 
   if (!session?.user) {

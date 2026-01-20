@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAccountantSession } from "@/lib/auth/accountant-session";
 import { getServerAuthSession } from "@/lib/auth";
+import { requireCompanyContext } from "@/lib/auth/company-context";
 
 /**
  * Get all notes for an invoice
@@ -30,22 +31,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify access to this company
-    const hasAccess = await prisma.companyMember.findUnique({
-      where: {
-        companyId_userId: {
-          companyId,
-          userId,
-        },
-      },
-    });
-
-    if (!hasAccess) {
-      return NextResponse.json(
-        { success: false, message: "Geen toegang tot dit bedrijf" },
-        { status: 403 }
-      );
-    }
+    // Verify access to this company using strict company context
+    await requireCompanyContext({ companyId });
 
     // Verify invoice belongs to this company
     const invoice = await prisma.invoice.findFirst({
@@ -114,22 +101,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify access to this company
-    const hasAccess = await prisma.companyMember.findUnique({
-      where: {
-        companyId_userId: {
-          companyId,
-          userId,
-        },
-      },
-    });
-
-    if (!hasAccess) {
-      return NextResponse.json(
-        { success: false, message: "Geen toegang tot dit bedrijf" },
-        { status: 403 }
-      );
-    }
+    // Verify access to this company using strict company context
+    await requireCompanyContext({ companyId });
 
     // Verify invoice belongs to this company
     const invoice = await prisma.invoice.findFirst({

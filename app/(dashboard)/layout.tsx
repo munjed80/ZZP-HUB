@@ -16,6 +16,10 @@ export default async function DashboardShell({ children }: { children: ReactNode
     redirect("/login");
   }
 
+  if (sessie.user.role === UserRole.ACCOUNTANT) {
+    redirect("/accountant-portal");
+  }
+
   const userName = sessie.user.name || sessie.user.email || "Gebruiker";
   
   // Get active company ID (for accountants, this may differ from their userId)

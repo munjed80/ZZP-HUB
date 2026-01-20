@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         where: { id },
         data: {
           reviewedAt: now,
-          reviewedBy: userId,
+          reviewedBy: session.userId,
           reviewStatus: "approved",
         },
       });
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         where: { id },
         data: {
           reviewedAt: now,
-          reviewedBy: userId,
+          reviewedBy: session.userId,
           reviewStatus: "approved",
         },
       });
