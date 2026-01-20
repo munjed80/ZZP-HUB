@@ -58,6 +58,7 @@ function simulateMiddlewareCheck(pathname, cookieValue, cookiePath = ACCOUNTANT_
   const isAccountantAllowedPath = accountantAllowedPrefixes.some((route) => 
     pathname === route || pathname.startsWith(`${route}/`)
   );
+  const loginRedirect = isAccountantAllowedPath ? '/login?type=accountant' : '/login';
   
   // Not a protected path - allow
   if (!isProtectedPath) {
@@ -79,7 +80,7 @@ function simulateMiddlewareCheck(pathname, cookieValue, cookiePath = ACCOUNTANT_
   
   // No accountant cookie - check for NextAuth token (would be done separately)
   // For this test, we simulate no NextAuth token
-  return { allowed: false, redirect: '/login' };
+  return { allowed: false, redirect: loginRedirect };
 }
 
 /**
@@ -199,11 +200,11 @@ describe("Middleware Accountant Session Detection", () => {
     assert.strictEqual(result.redirect, '/login'); // NOT /accountant-portal!
   });
   
-  test("Redirects to /login when no session cookie exists", () => {
+  test("Redirects to /login?type=accountant when no session cookie exists", () => {
     const result = simulateMiddlewareCheck('/accountant-portal', undefined);
     
     assert.strictEqual(result.allowed, false);
-    assert.strictEqual(result.redirect, '/login');
+    assert.strictEqual(result.redirect, '/login?type=accountant');
   });
   
   test("Allows public routes without any cookie", () => {

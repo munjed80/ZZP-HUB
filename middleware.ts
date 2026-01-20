@@ -65,6 +65,7 @@ const logRedirect = (event: string, details: Record<string, unknown>) => {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const nextParam = `${pathname}${request.nextUrl.search}`;
+  const isAccountantPath = isAccountantAllowedPath(pathname);
 
   // Only guard protected app routes - early return for public routes
   // This prevents unnecessary session lookups on public pages
@@ -98,6 +99,9 @@ export async function middleware(request: NextRequest) {
   
   if (!authSecret) {
     const loginUrl = new URL('/login', request.url);
+    if (isAccountantPath) {
+      loginUrl.searchParams.set('type', 'accountant');
+    }
     loginUrl.searchParams.set('next', nextParam);
     logRedirect('REDIRECT_LOGIN_NO_SECRET', { pathname });
     return NextResponse.redirect(loginUrl);
@@ -120,20 +124,23 @@ export async function middleware(request: NextRequest) {
   // If not logged in, redirect to login
   if (!token) {
     const loginUrl = new URL('/login', request.url);
+    if (isAccountantPath) {
+      loginUrl.searchParams.set('type', 'accountant');
+    }
     loginUrl.searchParams.set('next', nextParam);
     logRedirect('REDIRECT_LOGIN_NO_TOKEN', { pathname, hasAuthSecret: Boolean(authSecret), tokenError: tokenErrorReason });
     return NextResponse.redirect(loginUrl);
   }
 
   const userRole = token.role as string | undefined;
-  const isAccountantPath = isAccountantAllowedPath(pathname);
 
   // Non-accountants visiting accountant-specific routes get routed to the standard dashboard
-  if (isAccountantPath && !isAccountantRole(userRole)) {
-    const dashboardUrl = new URL('/dashboard', request.url);
-    dashboardUrl.searchParams.set('next', nextParam);
-    logRedirect('REDIRECT_WRONG_ROLE_DASHBOARD', { pathname, role: userRole });
-    return NextResponse.redirect(dashboardUrl);
+  if (isAccountantPath && !(isAccountantRole(userRole) || userRole === 'SUPERADMIN')) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('type', 'accountant');
+    loginUrl.searchParams.set('next', nextParam);
+    logRedirect('REDIRECT_WRONG_ROLE_LOGIN', { pathname, role: userRole });
+    return NextResponse.redirect(loginUrl);
   }
 
   const emailVerified = Boolean(token.emailVerified);
