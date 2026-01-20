@@ -134,15 +134,47 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       };
     }
 
-    // Validate email
+    // Safe debug logging (no PII)
+    console.log("[ACCOUNTANT_INVITE_REQUEST]", {
+      hasEmail: Boolean(email),
+      emailLength: email?.length || 0,
+      companyId: session.userId.slice(-6),
+    });
+
+    // Validate email - strict checks before Prisma call
+    if (!email || typeof email !== 'string') {
+      console.error("[ACCOUNTANT_INVITE_FAILED]", {
+        reason: "EMAIL_MISSING",
+        hasEmail: Boolean(email),
+        emailType: typeof email,
+      });
+      return { success: false, message: "E-mailadres is verplicht." };
+    }
+
+    // Trim and normalize email
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      console.error("[ACCOUNTANT_INVITE_FAILED]", {
+        reason: "EMAIL_EMPTY_AFTER_TRIM",
+        originalLength: email.length,
+      });
+      return { success: false, message: "E-mailadres mag niet leeg zijn." };
+    }
+
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return { success: false, message: "Ongeldig e-mailadres." };
+    if (!emailRegex.test(normalizedEmail)) {
+      console.error("[ACCOUNTANT_INVITE_FAILED]", {
+        reason: "EMAIL_INVALID_FORMAT",
+        emailLength: normalizedEmail.length,
+      });
+      return { success: false, message: "Ongeldig e-mailadres formaat." };
     }
 
     // Check if already a member
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (existingUser) {
@@ -167,7 +199,7 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
     const pendingInvite = await prisma.accountantInvite.findFirst({
       where: {
         companyId: session.userId,
-        invitedEmail: email,
+        invitedEmail: normalizedEmail,
         status: InviteStatus.PENDING,
         expiresAt: {
           gt: new Date(),
@@ -210,11 +242,11 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
     const otpExpiresAt = new Date();
     otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
 
-    // Create invite with OTP
+    // Create invite with OTP - email is guaranteed non-null here
     const invite = await prisma.accountantInvite.create({
       data: {
         companyId: session.userId,
-        invitedEmail: email,
+        invitedEmail: normalizedEmail,
         role: UserRole.ACCOUNTANT,
         tokenHash,
         otpHash,
@@ -225,16 +257,16 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
         permissions: normalizedPermissions.permissionsJson,
       },
     });
-    console.log("ACCOUNTANT_INVITE_CREATED", {
-      companyId: session.userId,
-      inviteId: invite.id,
-      invitedEmail: email,
+    console.log("[ACCOUNTANT_INVITE_CREATED]", {
+      companyId: session.userId.slice(-6),
+      inviteId: invite.id.slice(-6),
+      emailLength: normalizedEmail.length,
     });
 
     // Log invite creation for audit
     await logInviteCreated({
       userId: session.userId,
-      email,
+      email: normalizedEmail,
       role: UserRole.ACCOUNTANT,
       companyId: session.userId,
     });
@@ -245,7 +277,7 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
     // Send invitation email with OTP
     try {
       const emailResult = await sendEmail({
-        to: email,
+        to: normalizedEmail,
         subject: `Uw toegangscode voor ${companyName}`,
         react: AccountantOTPEmail({
           accessUrl,
@@ -255,16 +287,16 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
         }),
       });
       if (emailResult.success) {
-        console.log("ACCOUNTANT_INVITE_EMAIL_SENT", {
-          to: email,
-          inviteId: invite.id,
+        console.log("[ACCOUNTANT_INVITE_EMAIL_SENT]", {
+          emailLength: normalizedEmail.length,
+          inviteId: invite.id.slice(-6),
           messageId: emailResult.messageId,
         });
       }
     } catch (emailError) {
-      console.error("ACCOUNTANT_INVITE_FAILED", {
+      console.error("[ACCOUNTANT_INVITE_FAILED]", {
         reason: "EMAIL_SEND_FAILED",
-        inviteId: invite.id,
+        inviteId: invite.id.slice(-6),
         error: emailError instanceof Error ? emailError.message : "unknown",
       });
       // Continue even if email fails - the invite is still created and URL can be shared manually
@@ -278,7 +310,19 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       inviteUrl: accessUrl,
     };
   } catch (error) {
-    console.error("Error inviting accountant:", error);
+    // Extract error code safely for logging
+    const errorCode = 
+      error && typeof error === 'object' && 'code' in error 
+        ? String((error as { code?: string }).code)
+        : 'UNKNOWN';
+    
+    console.error("[ACCOUNTANT_INVITE_FAILED]", {
+      reason: "UNEXPECTED_ERROR",
+      errorCode,
+      errorMessage: error instanceof Error ? error.message : "unknown",
+      hasEmail: Boolean(email),
+      emailLength: email?.length || 0,
+    });
     return {
       success: false,
       message: "Er is een fout opgetreden bij het versturen van de uitnodiging.",
