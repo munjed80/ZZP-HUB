@@ -24,7 +24,7 @@ export function AccountantNav() {
     try {
       const response = await fetch("/api/accountant/logout", {
         method: "POST",
-        credentials: "include", // Important for cookies
+        credentials: "include", // Ensures cookies are sent for proper session management
       });
 
       const data = await response.json();

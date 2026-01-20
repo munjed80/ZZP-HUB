@@ -10,6 +10,15 @@ import assert from "node:assert/strict";
  * - Role-based access control
  */
 
+/**
+ * Helper function to check if a role is an accountant role
+ */
+function isAccountantRole(role) {
+  return role === "ACCOUNTANT" || 
+         role === "ACCOUNTANT_VIEW" || 
+         role === "ACCOUNTANT_EDIT";
+}
+
 describe("Accountant Portal Empty State", () => {
   
   test("should show empty state when no companies are accessible", () => {
@@ -44,52 +53,27 @@ describe("Accountant Role Validation", () => {
   
   test("should accept ACCOUNTANT role", () => {
     const role = "ACCOUNTANT";
-    const isAccountantRole = 
-      role === "ACCOUNTANT" || 
-      role === "ACCOUNTANT_VIEW" || 
-      role === "ACCOUNTANT_EDIT";
-    
-    assert.strictEqual(isAccountantRole, true, "ACCOUNTANT role should be accepted");
+    assert.strictEqual(isAccountantRole(role), true, "ACCOUNTANT role should be accepted");
   });
 
   test("should accept ACCOUNTANT_VIEW role", () => {
     const role = "ACCOUNTANT_VIEW";
-    const isAccountantRole = 
-      role === "ACCOUNTANT" || 
-      role === "ACCOUNTANT_VIEW" || 
-      role === "ACCOUNTANT_EDIT";
-    
-    assert.strictEqual(isAccountantRole, true, "ACCOUNTANT_VIEW role should be accepted");
+    assert.strictEqual(isAccountantRole(role), true, "ACCOUNTANT_VIEW role should be accepted");
   });
 
   test("should accept ACCOUNTANT_EDIT role", () => {
     const role = "ACCOUNTANT_EDIT";
-    const isAccountantRole = 
-      role === "ACCOUNTANT" || 
-      role === "ACCOUNTANT_VIEW" || 
-      role === "ACCOUNTANT_EDIT";
-    
-    assert.strictEqual(isAccountantRole, true, "ACCOUNTANT_EDIT role should be accepted");
+    assert.strictEqual(isAccountantRole(role), true, "ACCOUNTANT_EDIT role should be accepted");
   });
 
   test("should reject COMPANY_ADMIN role", () => {
     const role = "COMPANY_ADMIN";
-    const isAccountantRole = 
-      role === "ACCOUNTANT" || 
-      role === "ACCOUNTANT_VIEW" || 
-      role === "ACCOUNTANT_EDIT";
-    
-    assert.strictEqual(isAccountantRole, false, "COMPANY_ADMIN role should be rejected");
+    assert.strictEqual(isAccountantRole(role), false, "COMPANY_ADMIN role should be rejected");
   });
 
   test("should reject ZZP role", () => {
     const role = "ZZP";
-    const isAccountantRole = 
-      role === "ACCOUNTANT" || 
-      role === "ACCOUNTANT_VIEW" || 
-      role === "ACCOUNTANT_EDIT";
-    
-    assert.strictEqual(isAccountantRole, false, "ZZP role should be rejected");
+    assert.strictEqual(isAccountantRole(role), false, "ZZP role should be rejected");
   });
 });
 
@@ -111,11 +95,7 @@ describe("Accountant Portal Diagnostics", () => {
 
   test("should log WRONG_ROLE for non-accountant roles", () => {
     const role = "COMPANY_ADMIN";
-    const isAccountant = 
-      role === "ACCOUNTANT" || 
-      role === "ACCOUNTANT_VIEW" || 
-      role === "ACCOUNTANT_EDIT";
-    const reason = !isAccountant ? 'WRONG_ROLE' : undefined;
+    const reason = !isAccountantRole(role) ? 'WRONG_ROLE' : undefined;
     
     assert.strictEqual(reason, 'WRONG_ROLE', "Should log WRONG_ROLE for non-accountant");
   });
