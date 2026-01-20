@@ -158,7 +158,7 @@ describe("safeNextUrl - Length validation", () => {
     const url512 = "/" + "a".repeat(511);
     const result = safeNextUrl(url512, "/fallback");
     // Should be accepted (will be 512 chars total)
-    assert.notStrictEqual(result, "/fallback");
+    assert.strictEqual(result, url512);
   });
 
   test("Accepts normal-length URLs", () => {
