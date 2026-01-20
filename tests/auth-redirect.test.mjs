@@ -1,6 +1,6 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { getDefaultRedirectForRole } from "../lib/auth/role-redirect.js";
+import { getDefaultRedirectForRole, resolveLoginRedirect } from "../lib/auth/role-redirect.js";
 
 describe("Auth redirect by role", () => {
   test("ZZP/Company Admin go to dashboard", () => {
@@ -22,5 +22,43 @@ describe("Auth redirect by role", () => {
     assert.strictEqual(getDefaultRedirectForRole(undefined), "/dashboard");
     assert.strictEqual(getDefaultRedirectForRole(null), "/dashboard");
     assert.strictEqual(getDefaultRedirectForRole(""), "/dashboard");
+  });
+});
+
+describe("Login redirect safety", () => {
+  test("Accountant role goes to accountant portal even when ZZP type selected", () => {
+    const target = resolveLoginRedirect({
+      role: "ACCOUNTANT",
+      selectedType: "zzp",
+      requestedRedirect: "/dashboard",
+    });
+    assert.strictEqual(target, "/accountant-portal");
+  });
+
+  test("Non-accountant selecting accountant type is routed to dashboard", () => {
+    const target = resolveLoginRedirect({
+      role: "ZZP",
+      selectedType: "accountant",
+      requestedRedirect: "/accountant-portal",
+    });
+    assert.strictEqual(target, "/dashboard");
+  });
+
+  test("Keeps safe redirect when no requested redirect is provided", () => {
+    const target = resolveLoginRedirect({
+      role: "ACCOUNTANT_EDIT",
+      selectedType: "accountant",
+      requestedRedirect: undefined,
+    });
+    assert.strictEqual(target, "/accountant-portal");
+  });
+
+  test("Superadmin stays on admin even if accountant type is selected", () => {
+    const target = resolveLoginRedirect({
+      role: "SUPERADMIN",
+      selectedType: "accountant",
+      requestedRedirect: "/accountant-portal",
+    });
+    assert.strictEqual(target, "/admin");
   });
 });
