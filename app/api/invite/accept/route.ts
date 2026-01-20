@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(invite.invitedEmail)) {
+    if (!invite.invitedEmail || !emailRegex.test(invite.invitedEmail.trim())) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -415,7 +415,7 @@ export async function POST(request: NextRequest) {
       try {
         await sendEmail({
           to: invite.invitedEmail,
-          subject: `Welkom bij Matrixtop - U heeft toegang tot ${companyName}`,
+          subject: `Welkom bij ZZP Hub - U heeft toegang tot ${companyName}`,
           react: AccountantInviteEmail({
             acceptUrl: loginUrl,
             companyName,

@@ -7,43 +7,43 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: "https://matrixtop.com",
+      url: "https://zzpershub.nl",
       lastModified: currentDate,
       changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: "https://matrixtop.com/dashboard",
+      url: "https://zzpershub.nl/dashboard",
       lastModified: currentDate,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: "https://matrixtop.com/facturen",
+      url: "https://zzpershub.nl/facturen",
       lastModified: currentDate,
       changeFrequency: "daily",
       priority: 0.8,
     },
     {
-      url: "https://matrixtop.com/offertes",
+      url: "https://zzpershub.nl/offertes",
       lastModified: currentDate,
       changeFrequency: "daily",
       priority: 0.8,
     },
     {
-      url: "https://matrixtop.com/btw-aangifte",
+      url: "https://zzpershub.nl/btw-aangifte",
       lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: "https://matrixtop.com/support",
+      url: "https://zzpershub.nl/support",
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: "https://matrixtop.com/instellingen",
+      url: "https://zzpershub.nl/instellingen",
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.6,

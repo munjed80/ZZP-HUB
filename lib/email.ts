@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import type { ReactElement } from "react";
-import { getFromEmail } from "@/config/emails";
+import { getFromEmail, getReplyToEmail } from "@/config/emails";
 
 let resendClient: Resend | null = null;
 
@@ -26,6 +26,7 @@ interface SendEmailOptions {
   to: string;
   subject: string;
   react: ReactElement;
+  replyTo?: string;
 }
 
 interface SendEmailResult {
@@ -104,6 +105,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions): Promi
   const hasApiKey = Boolean(process.env.RESEND_API_KEY);
   const isProd = process.env.NODE_ENV === "production";
   const from = resolveFromEmail();
+  const replyTo = getReplyToEmail();
   const type = getEmailType(subject);
   
   // Log send attempt
@@ -139,6 +141,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions): Promi
     const result = await resend.emails.send({
       from,
       to,
+      replyTo,
       subject,
       html,
     });
