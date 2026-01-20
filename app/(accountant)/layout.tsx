@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { redirect } from "next/navigation";
 import { getServerAuthSession } from "@/lib/auth";
 import { isAccountantRole } from "@/lib/utils";
 import { redirect as nextRedirect } from "next/navigation";
+import { AccountantNav } from "@/components/layout/accountant-nav";
 
 export default async function AccountantLayout({ children }: { children: ReactNode }) {
   const session = await getServerAuthSession();
@@ -16,6 +16,10 @@ export default async function AccountantLayout({ children }: { children: ReactNo
     nextRedirect(accountantLoginUrl);
   }
 
-  // Keep this shell minimal to avoid duplicating the dashboard navigation on accountant pages
-  return <div className="min-h-screen bg-background">{children}</div>;
+  return (
+    <div className="min-h-screen bg-background">
+      <AccountantNav />
+      <main className="pb-20 md:pb-0">{children}</main>
+    </div>
+  );
 }

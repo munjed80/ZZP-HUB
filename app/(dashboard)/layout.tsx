@@ -13,7 +13,7 @@ import { UserRole } from "@prisma/client";
 export default async function DashboardShell({ children }: { children: ReactNode }) {
   const sessie = await getServerAuthSession();
   if (!sessie?.user) {
-    redirect("/login");
+    redirect("/login?type=zzp");
   }
 
   if (sessie.user.role === UserRole.ACCOUNTANT) {

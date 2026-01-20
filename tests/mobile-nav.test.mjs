@@ -33,10 +33,6 @@ const zzpNavItems = [
 // Accountant navigation items (copied from mobile-nav.tsx)
 const accountantNavItems = [
   { href: "/accountant-portal", label: "Portal" },
-  { href: "/facturen", label: "Facturen" },
-  { href: "/relaties", label: "Relaties" },
-  { href: "/uitgaven", label: "Uitgaven" },
-  { href: "/btw-aangifte", label: "BTW" },
 ];
 
 // Check if user has accountant role (copied from mobile-nav.tsx)
@@ -116,14 +112,6 @@ describe("Mobile Navigation Role-Based Filtering", () => {
     assert.strictEqual(portalItem.href, "/accountant-portal", "Portal should route to /accountant-portal");
   });
   
-  test("Accountant users see BTW pointing to /btw-aangifte", () => {
-    const navItems = getNavItemsForRole(UserRole.ACCOUNTANT_EDIT);
-    const btwItem = navItems.find(item => item.label === "BTW");
-    
-    assert.ok(btwItem, "Accountant user should see BTW navigation item");
-    assert.strictEqual(btwItem.href, "/btw-aangifte", "BTW should route to /btw-aangifte");
-  });
-  
   test("ZZP users do NOT see Portal", () => {
     const navItems = getNavItemsForRole(UserRole.ZZP);
     const portalItem = navItems.find(item => item.label === "Portal");
@@ -171,12 +159,7 @@ describe("Regression: Instellingen Navigation", () => {
   test("Accountant navigation items only contain allowed routes", () => {
     const allowedRoutes = [
       '/accountant-portal',
-      '/dashboard',
-      '/facturen',
-      '/relaties',
-      '/uitgaven',
-      '/btw-aangifte',
-      '/agenda',
+      '/accountant-portal/dossier',
     ];
     
     const navItems = getNavItemsForRole(UserRole.ACCOUNTANT);
