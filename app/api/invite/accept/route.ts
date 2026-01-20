@@ -362,7 +362,7 @@ export async function POST(request: NextRequest) {
     // Log invite acceptance and company access grant for audit
     await logInviteAccepted({
       userId: user.id,
-      email: invite.invitedEmail,
+      email: inviteEmail,
       companyId: invite.companyId,
       role: invite.role,
       isNewUser,
@@ -415,7 +415,7 @@ export async function POST(request: NextRequest) {
 
       try {
         await sendEmail({
-          to: invite.invitedEmail,
+          to: inviteEmail,
           subject: `Welkom bij ZZP Hub - U heeft toegang tot ${companyName}`,
           react: AccountantInviteEmail({
             acceptUrl: loginUrl,
@@ -547,14 +547,14 @@ export async function GET(request: NextRequest) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: invite.invitedEmail },
+      where: { email: inviteEmail },
     });
 
     return NextResponse.json<AcceptInviteResult>({
       success: true,
       message: "Uitnodiging is geldig.",
       companyName,
-      email: invite.invitedEmail,
+      email: inviteEmail,
       isNewUser: !existingUser,
     });
   } catch (error) {
