@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { getAccountantCompanies } from "@/app/actions/accountant-access-actions";
 import { switchCompanyContext } from "@/app/actions/company-context-actions";
 import { toast } from "sonner";
@@ -38,7 +38,7 @@ export function AccountantPortalContent() {
   const [customDateTo, setCustomDateTo] = useState("");
   const router = useRouter();
 
-  const loadCompanies = async () => {
+  const loadCompanies = useCallback(async () => {
     setLoading(true);
     const result = await getAccountantCompanies();
 
@@ -49,11 +49,11 @@ export function AccountantPortalContent() {
     }
 
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     loadCompanies();
-  }, []);
+  }, [loadCompanies]);
 
   async function handleCompanyClick(companyId: string, viewDossier = false) {
     if (viewDossier) {

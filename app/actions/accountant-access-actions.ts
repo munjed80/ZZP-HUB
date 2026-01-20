@@ -659,7 +659,6 @@ export async function getAccountantCompanies() {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
     
-    console.error("Error getting accountant companies:", error);
     return {
       success: false,
       message: "Er is een fout opgetreden bij het ophalen van de bedrijven.",
