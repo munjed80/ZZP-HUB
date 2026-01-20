@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, generateVerificationToken, hashToken } from "@/lib/email";
 import PasswordResetEmail from "@/components/emails/PasswordResetEmail";
+import { APP_BASE_URL } from "@/config/emails";
 
 // Simple in-memory rate limiting
 // Note: This is suitable for single-instance deployments or development.
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Send email with reset link
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const baseUrl = APP_BASE_URL;
     const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
     const emailResult = await sendEmail({

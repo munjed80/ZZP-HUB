@@ -4,6 +4,7 @@ import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateVerificationToken, hashToken, sendEmail } from "@/lib/email";
 import VerificationEmail from "@/components/emails/VerificationEmail";
+import { APP_BASE_URL } from "@/config/emails";
 
 const RESEND_COOLDOWN_MS = 60 * 1000; // 1 minute cooldown
 
@@ -65,7 +66,7 @@ export async function resendVerificationEmail() {
     });
 
     // Send verification email
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = APP_BASE_URL;
     const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`;
     
     const shouldLogAuth = process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";

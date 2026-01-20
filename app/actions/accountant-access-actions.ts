@@ -11,6 +11,7 @@ import { sendEmail } from "@/lib/email";
 import AccountantOTPEmail from "@/components/emails/AccountantOTPEmail";
 import { logInviteCreated } from "@/lib/auth/security-audit";
 import { clearAccountantSessionOnZZPLogin } from "@/lib/auth/accountant-session";
+import { APP_BASE_URL } from "@/config/emails";
 
 /**
  * Clear any accountant session cookie when a ZZP/COMPANY_ADMIN user logs in
@@ -271,7 +272,7 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       companyId: session.userId,
     });
 
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const baseUrl = APP_BASE_URL;
     const accessUrl = `${baseUrl}/accountant-invite?token=${token}`;
 
     // Send invitation email with OTP
@@ -402,7 +403,7 @@ export async function resendOTPCode(inviteId: string) {
       },
     });
 
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const baseUrl = APP_BASE_URL;
     const accessUrl = `${baseUrl}/accountant-invite?token=${token}`;
 
     // Send email with new OTP

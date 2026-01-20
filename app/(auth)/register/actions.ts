@@ -7,6 +7,7 @@ import { registerSchema, type RegisterInput } from "./schema";
 import { generateVerificationToken, hashToken, sendEmail } from "@/lib/email";
 import VerificationEmail from "@/components/emails/VerificationEmail";
 import { getPublicSupportEmail } from "@/lib/publicConfig";
+import { APP_BASE_URL } from "@/config/emails";
 
 export async function registerCompany(values: RegisterInput) {
   const data = registerSchema.parse(values);
@@ -51,7 +52,7 @@ export async function registerCompany(values: RegisterInput) {
     });
 
     // Send verification email
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const baseUrl = APP_BASE_URL;
     const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`;
     
     if (shouldLogAuth) {

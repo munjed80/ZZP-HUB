@@ -7,6 +7,7 @@ import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
 import { createAccountantSession } from "@/lib/auth/accountant-session";
 import { logInviteAccepted, logCompanyAccessGranted } from "@/lib/auth/security-audit";
 import { AccountantAccessStatus, InviteStatus, UserRole } from "@prisma/client";
+import { APP_BASE_URL } from "@/config/emails";
 
 // Error codes for clear error handling
 const INVITE_ERROR_CODES = {
@@ -406,11 +407,7 @@ export async function POST(request: NextRequest) {
 
     // Send welcome email to new users with their temporary password
     if (isNewUser && temporaryPassword) {
-      const baseUrl =
-        process.env.NEXTAUTH_URL ||
-        process.env.BASE_URL ||
-        process.env.NEXT_PUBLIC_APP_URL ||
-        "http://localhost:3000";
+      const baseUrl = APP_BASE_URL;
       const loginUrl = `${baseUrl}/login`;
 
       try {
@@ -547,14 +544,14 @@ export async function GET(request: NextRequest) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: inviteEmail },
+      where: { email: invite.invitedEmail },
     });
 
     return NextResponse.json<AcceptInviteResult>({
       success: true,
       message: "Uitnodiging is geldig.",
       companyName,
-      email: inviteEmail,
+      email: invite.invitedEmail,
       isNewUser: !existingUser,
     });
   } catch (error) {
