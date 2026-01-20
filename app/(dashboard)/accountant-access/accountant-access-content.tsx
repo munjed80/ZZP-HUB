@@ -78,11 +78,12 @@ export function AccountantAccessContent() {
 
     if (result.success) {
       toast.success(result.message);
-      setEmail("");
+      setEmail(""); // Clear email only on success
       setInviteUrl(result.inviteUrl || null);
       loadData();
     } else {
-      toast.error(result.message);
+      // Keep email in the input after failure for easy correction
+      toast.error(result.message || "Er is een fout opgetreden bij het versturen van de uitnodiging.");
     }
 
     setLoading(false);
