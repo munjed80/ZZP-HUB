@@ -6,7 +6,7 @@ import { sendEmail } from "@/lib/email";
 import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
 import { createAccountantSession } from "@/lib/auth/accountant-session";
 import { logInviteAccepted, logCompanyAccessGranted } from "@/lib/auth/security-audit";
-import { AccountantAccessStatus, UserRole } from "@prisma/client";
+import { AccountantAccessStatus, InviteStatus, UserRole } from "@prisma/client";
 
 // Error codes for clear error handling
 const INVITE_ERROR_CODES = {
@@ -31,7 +31,22 @@ interface AcceptInviteResult {
   userId?: string;
 }
 
-function derivePermissions(role: UserRole) {
+function derivePermissions(role: UserRole, permissionsJson?: string | null) {
+  if (permissionsJson) {
+    try {
+      const parsed = JSON.parse(permissionsJson);
+      return {
+        canRead: parsed.canRead ?? true,
+        canEdit: Boolean(parsed.canEdit),
+        canExport: Boolean(parsed.canExport),
+        canBTW: Boolean(parsed.canBTW),
+        permissionsJson: permissionsJson,
+      };
+    } catch {
+      // fall back to role-based mapping
+    }
+  }
+
   const canEdit = role === UserRole.ACCOUNTANT_EDIT || role === UserRole.ACCOUNTANT;
   const canBTW = canEdit;
   const canExport = true;
@@ -53,8 +68,9 @@ async function upsertAccountantAccess(
   accountantUserId: string,
   companyId: string,
   role: UserRole,
+  permissionsJson?: string | null,
 ) {
-  const { canRead, canEdit, canExport, canBTW, permissionsJson } = derivePermissions(role);
+  const { canRead, canEdit, canExport, canBTW, permissionsJson: finalPermissions } = derivePermissions(role, permissionsJson);
   await prisma.accountantAccess.upsert({
     where: {
       accountantUserId_companyId: {
@@ -67,7 +83,7 @@ async function upsertAccountantAccess(
       canEdit,
       canExport,
       canBTW,
-      permissions: permissionsJson,
+      permissions: finalPermissions,
       status: AccountantAccessStatus.ACTIVE,
     },
     create: {
@@ -77,7 +93,7 @@ async function upsertAccountantAccess(
       canEdit,
       canExport,
       canBTW,
-      permissions: permissionsJson,
+      permissions: finalPermissions,
       status: AccountantAccessStatus.ACTIVE,
     },
   });
@@ -147,9 +163,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the invite by token
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Find the invite by token hash
     const invite = await prisma.accountantInvite.findUnique({
-      where: { token },
+      where: { tokenHash },
       include: {
         company: {
           select: {
@@ -178,7 +196,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already used
-    if (invite.acceptedAt) {
+    if (invite.acceptedAt || invite.status === InviteStatus.ACCEPTED) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -190,7 +208,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if expired
-    if (invite.expiresAt < new Date()) {
+    if (invite.expiresAt < new Date() || invite.status === InviteStatus.REVOKED) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -203,7 +221,7 @@ export async function POST(request: NextRequest) {
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(invite.email)) {
+    if (!emailRegex.test(invite.invitedEmail)) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -222,7 +240,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user already exists
     let user = await prisma.user.findUnique({
-      where: { email: invite.email },
+      where: { email: invite.invitedEmail },
     });
 
     let isNewUser = false;
@@ -236,7 +254,7 @@ export async function POST(request: NextRequest) {
 
       user = await prisma.user.create({
         data: {
-          email: invite.email,
+          email: invite.invitedEmail,
           password: hashedPassword,
           role: invite.role,
           emailVerified: true, // Auto-verify since they came through invite link
@@ -262,7 +280,12 @@ export async function POST(request: NextRequest) {
         data: { acceptedAt: new Date() },
       });
 
-      await upsertAccountantAccess(user.id, invite.companyId, existingMember.role);
+      await upsertAccountantAccess(
+        user.id,
+        invite.companyId,
+        existingMember.role,
+        invite.permissions
+      );
 
       // Create accountant session for immediate access
       try {
@@ -281,7 +304,7 @@ export async function POST(request: NextRequest) {
         success: true,
         message: `U heeft al toegang tot ${companyName}.`,
         companyName,
-        email: invite.email,
+        email: invite.invitedEmail,
         isNewUser: false,
         userId: user.id,
       });
@@ -296,7 +319,12 @@ export async function POST(request: NextRequest) {
           role: invite.role,
         },
       });
-      await upsertAccountantAccess(user.id, invite.companyId, invite.role);
+      await upsertAccountantAccess(
+        user.id,
+        invite.companyId,
+        invite.role,
+        invite.permissions
+      );
     } catch (linkError) {
       console.error("Failed to create company member link:", linkError);
       return NextResponse.json<AcceptInviteResult>(
@@ -312,28 +340,32 @@ export async function POST(request: NextRequest) {
     // Mark invite as accepted
     await prisma.accountantInvite.update({
       where: { id: invite.id },
-      data: { acceptedAt: new Date() },
+      data: {
+        acceptedAt: new Date(),
+        status: InviteStatus.ACCEPTED,
+        acceptedByUserId: user.id,
+      },
     });
 
     // Structured log for invite acceptance
-    console.log('[ACCOUNTANT_INVITE_ACCEPTED]', {
-      timestamp: new Date().toISOString(),
-      userId: user.id.slice(-6), // Only log last 6 chars for privacy
-      email: invite.email,
-      companyId: invite.companyId.slice(-6),
-      role: invite.role,
-      isNewUser,
-      companyName,
-    });
+  console.log('[ACCOUNTANT_INVITE_ACCEPTED]', {
+    timestamp: new Date().toISOString(),
+    userId: user.id.slice(-6), // Only log last 6 chars for privacy
+    email: invite.invitedEmail,
+    companyId: invite.companyId.slice(-6),
+    role: invite.role,
+    isNewUser,
+    companyName,
+  });
 
     // Log invite acceptance and company access grant for audit
-    await logInviteAccepted({
-      userId: user.id,
-      email: invite.email,
-      companyId: invite.companyId,
-      role: invite.role,
-      isNewUser,
-    });
+await logInviteAccepted({
+  userId: user.id,
+  email: invite.invitedEmail,
+  companyId: invite.companyId,
+  role: invite.role,
+  isNewUser,
+});
 
     await logCompanyAccessGranted({
       userId: invite.companyId,
@@ -357,7 +389,7 @@ export async function POST(request: NextRequest) {
       console.log('[ACCOUNTANT_SESSION_COOKIE_SET]', {
         timestamp: new Date().toISOString(),
         userId: user.id.slice(-6), // Only log last 6 chars for privacy
-        email: invite.email,
+        email: invite.invitedEmail,
         companyId: invite.companyId.slice(-6),
         role: invite.role,
         isNewUser,
@@ -382,7 +414,7 @@ export async function POST(request: NextRequest) {
 
       try {
         await sendEmail({
-          to: invite.email,
+          to: invite.invitedEmail,
           subject: `Welkom bij Matrixtop - U heeft toegang tot ${companyName}`,
           react: AccountantInviteEmail({
             acceptUrl: loginUrl,
@@ -403,7 +435,7 @@ export async function POST(request: NextRequest) {
         ? `Welkom! Uw account is aangemaakt en u heeft nu direct toegang tot ${companyName}.`
         : `U heeft nu toegang tot ${companyName}.`,
       companyName,
-      email: invite.email,
+      email: invite.invitedEmail,
       isNewUser,
       userId: user.id,
     });
@@ -440,9 +472,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Find the invite by token
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Find the invite by token hash
     const invite = await prisma.accountantInvite.findUnique({
-      where: { token },
+      where: { tokenHash },
       include: {
         company: {
           select: {
@@ -469,7 +503,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (invite.acceptedAt) {
+    if (invite.acceptedAt || invite.status === InviteStatus.ACCEPTED) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -480,7 +514,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (invite.expiresAt < new Date()) {
+    if (invite.expiresAt < new Date() || invite.status === InviteStatus.REVOKED) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -493,7 +527,7 @@ export async function GET(request: NextRequest) {
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(invite.email)) {
+    if (!emailRegex.test(invite.invitedEmail)) {
       return NextResponse.json<AcceptInviteResult>(
         {
           success: false,
@@ -512,14 +546,14 @@ export async function GET(request: NextRequest) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: invite.email },
+      where: { email: invite.invitedEmail },
     });
 
     return NextResponse.json<AcceptInviteResult>({
       success: true,
       message: "Uitnodiging is geldig.",
       companyName,
-      email: invite.email,
+      email: invite.invitedEmail,
       isNewUser: !existingUser,
     });
   } catch (error) {

@@ -68,8 +68,7 @@ export function AccountantPortalContent() {
 
     if (result.success) {
       toast.success("Bedrijfscontext gewisseld");
-      // Redirect to dashboard after switching
-      router.push("/dashboard");
+      router.push(`/accountant-portal/dossier/${companyId}`);
     } else {
       toast.error(result.message || "Fout bij wisselen van bedrijf");
       setSwitching(false);
@@ -425,20 +424,10 @@ export function AccountantPortalContent() {
                       e.stopPropagation();
                       handleCompanyClick(company.companyId, true);
                     }}
-                    className="flex-1 px-3 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                    className="w-full px-3 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                   >
                     <Eye className="h-4 w-4" />
-                    Dossier
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCompanyClick(company.companyId, false);
-                    }}
-                    className="flex-1 px-3 py-2 border border-border text-foreground text-sm font-medium rounded-lg hover:bg-muted transition-colors flex items-center justify-center gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Dashboard
+                    Dossier bekijken
                   </button>
                 </div>
               </div>

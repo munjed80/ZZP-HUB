@@ -39,17 +39,36 @@ function generateOTPCode(): string {
   return num.toString();
 }
 
-function derivePermissions(role: UserRole) {
-  const canEdit = role === UserRole.ACCOUNTANT_EDIT || role === UserRole.ACCOUNTANT;
-  const canBTW = canEdit;
-  const canExport = true;
+type PermissionInput = {
+  canRead?: boolean;
+  canEdit?: boolean;
+  canExport?: boolean;
+  canBTW?: boolean;
+};
+
+function hashToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+function constantTimeEquals(a: string, b: string) {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
+
+function derivePermissions(permissions?: PermissionInput) {
+  const canRead = permissions?.canRead ?? true;
+  const canEdit = Boolean(permissions?.canEdit);
+  const canExport = Boolean(permissions?.canExport);
+  const canBTW = Boolean(permissions?.canBTW);
   return {
-    canRead: true,
+    canRead,
     canEdit,
     canExport,
     canBTW,
     permissionsJson: JSON.stringify({
-      canRead: true,
+      canRead,
       canEdit,
       canExport,
       canBTW,
@@ -57,8 +76,12 @@ function derivePermissions(role: UserRole) {
   };
 }
 
-async function ensureAccountantAccess(accountantUserId: string, companyId: string, role: UserRole) {
-  const { canRead, canEdit, canExport, canBTW, permissionsJson } = derivePermissions(role);
+async function ensureAccountantAccess(
+  accountantUserId: string,
+  companyId: string,
+  permissions?: PermissionInput
+) {
+  const { canRead, canEdit, canExport, canBTW, permissionsJson } = derivePermissions(permissions);
   await prisma.accountantAccess.upsert({
     where: {
       accountantUserId_companyId: {
@@ -88,7 +111,7 @@ async function ensureAccountantAccess(accountantUserId: string, companyId: strin
   console.log("[ACCOUNTANT_ACCESS_GRANTED]", {
     accountantUserId: accountantUserId.slice(-6),
     companyId: companyId.slice(-6),
-    role,
+    permissions: { canRead, canEdit, canExport, canBTW },
   });
 }
 
@@ -96,7 +119,7 @@ async function ensureAccountantAccess(accountantUserId: string, companyId: strin
  * Invite an accountant to access the company
  * Generates a secure token and 6-digit OTP code
  */
-export async function inviteAccountant(email: string, role: UserRole) {
+export async function inviteAccountant(email: string, permissions: PermissionInput) {
   try {
     const session = await requireSession();
 
@@ -108,18 +131,6 @@ export async function inviteAccountant(email: string, role: UserRole) {
       return {
         success: false,
         message: "Alleen bedrijfseigenaren kunnen accountants uitnodigen.",
-      };
-    }
-
-    // Validate role
-    if (
-      role !== UserRole.ACCOUNTANT_VIEW &&
-      role !== UserRole.ACCOUNTANT_EDIT &&
-      role !== UserRole.STAFF
-    ) {
-      return {
-        success: false,
-        message: "Ongeldige rol. Kies ACCOUNTANT_VIEW, ACCOUNTANT_EDIT, of STAFF.",
       };
     }
 
@@ -135,19 +146,19 @@ export async function inviteAccountant(email: string, role: UserRole) {
     });
 
     if (existingUser) {
-      const existingMember = await prisma.companyMember.findUnique({
+      const existingAccess = await prisma.accountantAccess.findUnique({
         where: {
-          companyId_userId: {
+          accountantUserId_companyId: {
             companyId: session.userId,
-            userId: existingUser.id,
+            accountantUserId: existingUser.id,
           },
         },
       });
 
-      if (existingMember) {
+      if (existingAccess?.status === AccountantAccessStatus.ACTIVE) {
         return {
           success: false,
-          message: "Deze gebruiker heeft al toegang tot uw bedrijf.",
+          message: "Deze accountant heeft al toegang tot uw bedrijf.",
         };
       }
     }
@@ -182,11 +193,11 @@ export async function inviteAccountant(email: string, role: UserRole) {
     });
 
     const companyName = companyProfile?.companyName || user?.naam || user?.email || "Bedrijf";
-    const { permissionsJson } = derivePermissions(role);
+    const normalizedPermissions = derivePermissions(permissions);
 
     // Generate secure token
     const token = crypto.randomBytes(32).toString("hex");
-    const tokenHash = await bcrypt.hash(token, 10);
+    const tokenHash = hashToken(token);
     
     // Generate 6-digit OTP
     const otpCode = generateOTPCode();
@@ -203,40 +214,37 @@ export async function inviteAccountant(email: string, role: UserRole) {
     const invite = await prisma.accountantInvite.create({
       data: {
         companyId: session.userId,
-        email,
-        role,
-        token,
+        invitedEmail: email,
+        role: UserRole.ACCOUNTANT,
         tokenHash,
         otpHash,
         otpExpiresAt,
         status: InviteStatus.PENDING,
         expiresAt,
         inviteType: "ACCOUNTANT_ACCESS",
-        invitedEmail: email,
-        permissions: permissionsJson,
+        permissions: normalizedPermissions.permissionsJson,
       },
     });
-    console.log("[ACCOUNTANT_INVITE_CREATED]", {
-      companyId: session.userId.slice(-6),
+    console.log("ACCOUNTANT_INVITE_CREATED", {
+      companyId: session.userId,
       inviteId: invite.id,
-      role,
-      emailMasked: email.replace(/(.).+(@.*)/, "$1***$2"),
+      invitedEmail: email,
     });
 
     // Log invite creation for audit
     await logInviteCreated({
       userId: session.userId,
       email,
-      role,
+      role: UserRole.ACCOUNTANT,
       companyId: session.userId,
     });
 
     const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const accessUrl = `${baseUrl}/accountant-verify?token=${token}`;
+    const accessUrl = `${baseUrl}/accountant-invite?token=${token}`;
 
     // Send invitation email with OTP
     try {
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: email,
         subject: `Uw toegangscode voor ${companyName}`,
         react: AccountantOTPEmail({
@@ -246,8 +254,19 @@ export async function inviteAccountant(email: string, role: UserRole) {
           validityMinutes: 10,
         }),
       });
+      if (emailResult.success) {
+        console.log("ACCOUNTANT_INVITE_EMAIL_SENT", {
+          to: email,
+          inviteId: invite.id,
+          messageId: emailResult.messageId,
+        });
+      }
     } catch (emailError) {
-      console.error("Failed to send invite email:", emailError);
+      console.error("ACCOUNTANT_INVITE_FAILED", {
+        reason: "EMAIL_SEND_FAILED",
+        inviteId: invite.id,
+        error: emailError instanceof Error ? emailError.message : "unknown",
+      });
       // Continue even if email fails - the invite is still created and URL can be shared manually
     }
 
@@ -319,7 +338,9 @@ export async function resendOTPCode(inviteId: string) {
 
     const companyName = companyProfile?.companyName || user?.naam || user?.email || "Bedrijf";
 
-    // Generate new 6-digit OTP
+    // Generate new token + 6-digit OTP
+    const token = crypto.randomBytes(32).toString("hex");
+    const tokenHash = hashToken(token);
     const otpCode = generateOTPCode();
     const otpHash = await bcrypt.hash(otpCode, 10);
     
@@ -331,18 +352,19 @@ export async function resendOTPCode(inviteId: string) {
     await prisma.accountantInvite.update({
       where: { id: invite.id },
       data: {
+        tokenHash,
         otpHash,
         otpExpiresAt,
       },
     });
 
     const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const accessUrl = `${baseUrl}/accountant-verify?token=${invite.token}`;
+    const accessUrl = `${baseUrl}/accountant-invite?token=${token}`;
 
     // Send email with new OTP
     try {
-      await sendEmail({
-        to: invite.email,
+      const emailResult = await sendEmail({
+        to: invite.invitedEmail,
         subject: `Nieuwe toegangscode voor ${companyName}`,
         react: AccountantOTPEmail({
           accessUrl,
@@ -351,8 +373,19 @@ export async function resendOTPCode(inviteId: string) {
           validityMinutes: 10,
         }),
       });
+      if (emailResult.success) {
+        console.log("ACCOUNTANT_INVITE_EMAIL_SENT", {
+          to: invite.invitedEmail,
+          inviteId: invite.id,
+          messageId: emailResult.messageId,
+        });
+      }
     } catch (emailError) {
-      console.error("Failed to send OTP email:", emailError);
+      console.error("ACCOUNTANT_INVITE_FAILED", {
+        reason: "EMAIL_SEND_FAILED",
+        inviteId: invite.id,
+        error: emailError instanceof Error ? emailError.message : "unknown",
+      });
       return {
         success: false,
         message: "Er is een fout opgetreden bij het versturen van de e-mail.",
@@ -378,106 +411,11 @@ export async function resendOTPCode(inviteId: string) {
  * Accept an accountant invitation
  */
 export async function acceptInvite(token: string) {
-  try {
-    const session = await requireSession();
-
-    // Find the invite
-    const invite = await prisma.accountantInvite.findUnique({
-      where: { token },
-      include: {
-        company: {
-          select: {
-            companyProfile: {
-              select: {
-                companyName: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!invite) {
-      return { success: false, message: "Ongeldige of verlopen uitnodiging." };
-    }
-
-    // Check if already accepted
-    if (invite.acceptedAt) {
-      return { success: false, message: "Deze uitnodiging is al geaccepteerd." };
-    }
-
-    // Check if expired
-    if (invite.expiresAt < new Date()) {
-      return { success: false, message: "Deze uitnodiging is verlopen." };
-    }
-
-    // Check if email matches
-    if (invite.email !== session.email) {
-      return {
-        success: false,
-        message: "Deze uitnodiging is voor een ander e-mailadres.",
-      };
-    }
-
-    // Check if already a member
-    const existingMember = await prisma.companyMember.findUnique({
-      where: {
-        companyId_userId: {
-          companyId: invite.companyId,
-          userId: session.userId,
-        },
-      },
-    });
-
-    if (existingMember) {
-      // Mark invite as accepted even though they're already a member
-      await prisma.accountantInvite.update({
-        where: { id: invite.id },
-        data: { acceptedAt: new Date() },
-      });
-      return {
-        success: false,
-        message: "U heeft al toegang tot dit bedrijf.",
-      };
-    }
-
-    // Create company member
-    await prisma.companyMember.create({
-      data: {
-        companyId: invite.companyId,
-        userId: session.userId,
-        role: invite.role,
-      },
-    });
-    await ensureAccountantAccess(session.userId, invite.companyId, invite.role);
-
-    // Mark invite as accepted
-    await prisma.accountantInvite.update({
-      where: { id: invite.id },
-      data: { acceptedAt: new Date() },
-    });
-    console.log("[ACCOUNTANT_INVITE_ACCEPTED]", {
-      inviteId: invite.id,
-      companyId: invite.companyId.slice(-6),
-      accountantUserId: session.userId.slice(-6),
-    });
-
-    const companyName = invite.company.companyProfile?.companyName || "Bedrijf";
-
-    revalidatePath("/accountant-portal");
-
-    return {
-      success: true,
-      message: `U heeft nu toegang tot ${companyName}.`,
-      companyId: invite.companyId,
-    };
-  } catch (error) {
-    console.error("Error accepting invite:", error);
-    return {
-      success: false,
-      message: "Er is een fout opgetreden bij het accepteren van de uitnodiging.",
-    };
-  }
+  console.warn("Deprecated acceptInvite action used. Redirect to OTP flow.");
+  return {
+    success: false,
+    message: "Gebruik de nieuwe accountant uitnodiging met verificatiecode.",
+  };
 }
 
 /**
@@ -487,18 +425,18 @@ export async function revokeAccountantAccess(memberId: string) {
   try {
     const session = await requireSession();
 
-    // Find the member
-    const member = await prisma.companyMember.findUnique({
+    // Find the access record
+    const access = await prisma.accountantAccess.findUnique({
       where: { id: memberId },
     });
 
-    if (!member) {
+    if (!access) {
       return { success: false, message: "Lid niet gevonden." };
     }
 
     // Only company owner or SUPERADMIN can revoke
     if (
-      member.companyId !== session.userId &&
+      access.companyId !== session.userId &&
       session.role !== UserRole.SUPERADMIN
     ) {
       return {
@@ -507,20 +445,13 @@ export async function revokeAccountantAccess(memberId: string) {
       };
     }
 
-    // Delete the member
-    await prisma.companyMember.delete({
+    await prisma.accountantAccess.update({
       where: { id: memberId },
-    });
-    await prisma.accountantAccess.updateMany({
-      where: {
-        accountantUserId: member.userId,
-        companyId: member.companyId,
-      },
       data: { status: AccountantAccessStatus.REVOKED },
     });
     console.log("[ACCOUNTANT_ACCESS_REVOKED]", {
-      accountantUserId: member.userId.slice(-6),
-      companyId: member.companyId.slice(-6),
+      accountantUserId: access.accountantUserId.slice(-6),
+      companyId: access.companyId.slice(-6),
       status: "REVOKED",
     });
 
@@ -561,9 +492,20 @@ export async function getAccountantCompanies() {
   try {
     const session = await requireSession();
 
-    // Get companies where user is a member
-    const memberships = await prisma.companyMember.findMany({
-      where: { userId: session.userId },
+    if (session.role !== UserRole.ACCOUNTANT) {
+      return {
+        success: false,
+        message: "Alleen accountant-accounts kunnen dit overzicht zien.",
+        companies: [],
+      };
+    }
+
+    // Get companies where user has active accountant access
+    const accesses = await prisma.accountantAccess.findMany({
+      where: {
+        accountantUserId: session.userId,
+        status: AccountantAccessStatus.ACTIVE,
+      },
       include: {
         company: {
           select: {
@@ -583,8 +525,8 @@ export async function getAccountantCompanies() {
 
     // Get stats for each company
     const companies = await Promise.all(
-      memberships.map(async (membership) => {
-        const companyId = membership.companyId;
+      accesses.map(async (access) => {
+        const companyId = access.companyId;
 
         // Count unpaid invoices
         const unpaidInvoices = await prisma.invoice.count({
@@ -624,13 +566,13 @@ export async function getAccountantCompanies() {
         const vatDueSoon = daysUntilVat <= 14;
 
         return {
-          id: membership.id,
-          companyId: membership.companyId,
-          role: membership.role,
+          id: access.id,
+          companyId: access.companyId,
+          role: UserRole.ACCOUNTANT,
           companyName:
-            membership.company.companyProfile?.companyName ||
-            membership.company.naam ||
-            membership.company.email,
+            access.company.companyProfile?.companyName ||
+            access.company.naam ||
+            access.company.email,
           stats: {
             unpaidInvoices,
             invoicesDueSoon,
@@ -703,8 +645,9 @@ export async function cancelInvite(inviteId: string) {
       };
     }
 
-    await prisma.accountantInvite.delete({
+    await prisma.accountantInvite.update({
       where: { id: inviteId },
+      data: { status: InviteStatus.REVOKED },
     });
 
     revalidatePath("/accountant-access");

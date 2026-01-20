@@ -64,6 +64,7 @@ enum SupportMessageStatus {
 enum InviteStatus {
   PENDING
   ACCEPTED
+  REVOKED
   EXPIRED
 }
 
@@ -406,31 +407,28 @@ model AccountantAccess {
 }
 
 model AccountantInvite {
-  id           String       @id @default(uuid())
-  companyId    String
-  email        String
-  invitedEmail String?
-  role         UserRole
-  token        String       @unique
-  tokenHash    String? // Hashed version of the invite token for security
-  otpHash      String? // Hashed 6-digit OTP code
-  otpExpiresAt DateTime? // OTP expiry (e.g., 10 minutes from creation)
-  status       InviteStatus @default(PENDING)
-  expiresAt    DateTime
-  acceptedAt   DateTime?
+  id              String       @id @default(uuid())
+  companyId       String
+  invitedEmail    String
+  role            UserRole
+  tokenHash       String       @unique
+  otpHash         String?
+  otpExpiresAt    DateTime?
+  status          InviteStatus @default(PENDING)
+  expiresAt       DateTime
+  acceptedAt      DateTime?
   acceptedByUserId String?
-  inviteType   String       @default("ACCOUNTANT_ACCESS")
-  permissions  String?      @db.Text
-  createdAt    DateTime     @default(now())
+  inviteType      String       @default("ACCOUNTANT_ACCESS")
+  permissions     String?      @db.Text
+  createdAt       DateTime     @default(now())
 
   company        User  @relation("AccountantInviteCompany", fields: [companyId], references: [id], onDelete: Cascade)
   acceptedByUser User? @relation("AccountantInviteAcceptedBy", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
 
   @@index([companyId])
-  @@index([token])
-  @@index([email])
-  @@index([status])
+  @@index([tokenHash])
   @@index([invitedEmail])
+  @@index([status])
 }
 
 model AccountantSession {

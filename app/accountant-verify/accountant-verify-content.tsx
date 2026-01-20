@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle, Loader2, Building2, Shield, KeyRound } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { CheckCircle2, XCircle, Loader2, Building2, Shield, KeyRound, LogOut } from "lucide-react";
 
 // Error code to friendly message mapping
 const ERROR_MESSAGES: Record<string, string> = {
@@ -23,7 +24,7 @@ interface InviteInfo {
 
 type PageStatus = "loading" | "ready" | "verifying" | "success" | "error";
 
-export function AccountantVerifyContent() {
+export function AccountantVerifyContent({ isAccountant = true }: { isAccountant?: boolean }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -175,6 +176,31 @@ export function AccountantVerifyContent() {
   }, [token, validateInvite]);
 
   const isOtpComplete = otpDigits.every(d => d !== "");
+
+  if (!isAccountant) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="bg-card border border-border rounded-xl p-8 shadow-lg text-center space-y-4">
+            <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+              <Shield className="h-8 w-8 text-primary" />
+            </div>
+            <h1 className="text-2xl font-semibold text-foreground">Boekhouder-account nodig</h1>
+            <p className="text-muted-foreground">
+              Je bent ingelogd met een ander accounttype. Log uit en kies &quot;Accountant&quot; bij het inloggen om de uitnodiging te accepteren.
+            </p>
+            <button
+              onClick={() => signOut({ callbackUrl: "/login?type=accountant" })}
+              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors flex items-center justify-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Uitloggen en wisselen
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
