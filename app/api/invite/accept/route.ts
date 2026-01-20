@@ -416,7 +416,7 @@ export async function POST(request: NextRequest) {
       try {
         await sendEmail({
           to: inviteEmail,
-          subject: `Welkom bij ZZP Hub - U heeft toegang tot ${companyName}`,
+          subject: `ZZP Hub – Welcome to ${companyName}`,
           react: AccountantInviteEmail({
             acceptUrl: loginUrl,
             companyName,

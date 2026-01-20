@@ -60,7 +60,7 @@ export async function registerCompany(values: RegisterInput) {
     
     const emailResult = await sendEmail({
       to: data.email,
-      subject: 'Verifieer je e-mailadres - ZZP Hub',
+      subject: 'ZZP Hub – Email verification',
       react: VerificationEmail({
         verificationUrl,
         userName: data.bedrijfsnaam,

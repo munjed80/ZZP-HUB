@@ -75,7 +75,7 @@ export async function resendVerificationEmail() {
     
     const emailResult = await sendEmail({
       to: user.email,
-      subject: 'Verifieer je e-mailadres - ZZP Hub',
+      subject: 'ZZP Hub – Email verification',
       react: VerificationEmail({
         verificationUrl,
         userName: user.naam || undefined,

@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
 
     const emailResult = await sendEmail({
       to: user.email,
-      subject: "Reset je wachtwoord voor ZZP Hub",
+      subject: "ZZP Hub – Password reset",
       react: PasswordResetEmail({
         resetUrl,
         userName: user.naam || undefined,

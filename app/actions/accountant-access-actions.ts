@@ -278,7 +278,7 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
     try {
       const emailResult = await sendEmail({
         to: normalizedEmail,
-        subject: `Uw toegangscode voor ${companyName}`,
+        subject: `ZZP Hub – Access code for ${companyName}`,
         react: AccountantOTPEmail({
           accessUrl,
           companyName,
@@ -409,7 +409,7 @@ export async function resendOTPCode(inviteId: string) {
     try {
       const emailResult = await sendEmail({
         to: invite.invitedEmail,
-        subject: `Nieuwe toegangscode voor ${companyName}`,
+        subject: `ZZP Hub – New access code for ${companyName}`,
         react: AccountantOTPEmail({
           accessUrl,
           companyName,
