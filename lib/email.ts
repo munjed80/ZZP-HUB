@@ -101,11 +101,11 @@ function logEmailFailure(error: Error | EmailError, to: string, from: string, su
 /**
  * Send an email using Resend or log to console in development
  */
-export async function sendEmail({ to, subject, react }: SendEmailOptions): Promise<SendEmailResult> {
+export async function sendEmail({ to, subject, react, replyTo }: SendEmailOptions): Promise<SendEmailResult> {
   const hasApiKey = Boolean(process.env.RESEND_API_KEY);
   const isProd = process.env.NODE_ENV === "production";
   const from = resolveFromEmail();
-  const replyTo = getReplyToEmail();
+  const resolvedReplyTo = replyTo || getReplyToEmail();
   const type = getEmailType(subject);
   
   // Log send attempt
@@ -141,9 +141,9 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions): Promi
     const result = await resend.emails.send({
       from,
       to,
-      replyTo,
       subject,
       html,
+      ...(resolvedReplyTo ? { replyTo: resolvedReplyTo } : {}),
     });
 
     // Check for Resend API errors (result.error is set when API returns an error)

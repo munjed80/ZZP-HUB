@@ -64,6 +64,7 @@ export function getFromEmail(): string {
     throw new Error("getFromEmail() is server-side only");
   }
 
+  // RESEND_FROM_EMAIL lets ops override only the address while keeping display name
   const envResendFrom = process.env.RESEND_FROM_EMAIL?.trim();
   const chosenFrom =
     envResendFrom && envResendFrom !== EMAIL_FROM_ADDRESS
