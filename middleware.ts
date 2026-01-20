@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { resolveAuthSecret } from '@/lib/auth/secret';
 import { shouldLogAuth } from '@/lib/auth/logging';
+import { safeNextUrl } from '@/lib/auth/safe-next';
 // Edge-safe accountant role helper (server-only variant lives in lib/auth/tenant.ts)
 import { isAccountantRole } from '@/lib/utils';
 
@@ -57,7 +58,9 @@ const logRedirect = (event: string, details: Record<string, unknown>) => {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const nextParam = `${pathname}${request.nextUrl.search}`;
+  // Construct the next parameter from the original request path (pathname + search)
+  // IMPORTANT: Do NOT read from an existing 'next' param to avoid nested next wrapping
+  const originalPath = `${pathname}${request.nextUrl.search}`;
   const isAccountantPath = isAccountantAllowedPath(pathname);
 
   // Only guard protected app routes - early return for public routes
@@ -97,7 +100,10 @@ export async function middleware(request: NextRequest) {
     } else {
       loginUrl.searchParams.set('type', 'zzp');
     }
-    loginUrl.searchParams.set('next', nextParam);
+    // Use safeNextUrl to prevent nested next parameters and validate the path
+    const defaultFallback = isAccountantPath ? '/accountant-portal' : '/dashboard';
+    const nextUrl = safeNextUrl(originalPath, defaultFallback);
+    loginUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_LOGIN_NO_SECRET', { pathname });
     return NextResponse.redirect(loginUrl);
   }
@@ -124,7 +130,10 @@ export async function middleware(request: NextRequest) {
     } else {
       loginUrl.searchParams.set('type', 'zzp');
     }
-    loginUrl.searchParams.set('next', nextParam);
+    // Use safeNextUrl to prevent nested next parameters and validate the path
+    const defaultFallback = isAccountantPath ? '/accountant-portal' : '/dashboard';
+    const nextUrl = safeNextUrl(originalPath, defaultFallback);
+    loginUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_LOGIN_NO_TOKEN', { pathname, hasAuthSecret: Boolean(authSecret), tokenError: tokenErrorReason });
     return NextResponse.redirect(loginUrl);
   }
@@ -135,7 +144,9 @@ export async function middleware(request: NextRequest) {
   if (isAccountantPath && !(isAccountantRole(userRole) || userRole === 'SUPERADMIN')) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('type', 'accountant');
-    loginUrl.searchParams.set('next', nextParam);
+    // Use safeNextUrl to prevent nested next parameters and validate the path
+    const nextUrl = safeNextUrl(originalPath, '/accountant-portal');
+    loginUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_WRONG_ROLE_LOGIN', { pathname, role: userRole });
     return NextResponse.redirect(loginUrl);
   }
@@ -143,7 +154,8 @@ export async function middleware(request: NextRequest) {
   // Accountants should never see the ZZP dashboard or related routes; redirect them to the portal
   if (!isAccountantPath && isAccountantRole(userRole)) {
     const portalUrl = new URL('/accountant-portal', request.url);
-    portalUrl.searchParams.set('next', nextParam);
+    // Don't set next parameter when redirecting accountants to their portal
+    // This prevents the loop scenario
     logRedirect('REDIRECT_ACCOUNTANT_TO_PORTAL', { pathname, role: userRole });
     return NextResponse.redirect(portalUrl);
   }
@@ -158,7 +170,10 @@ export async function middleware(request: NextRequest) {
   const requiresVerification = userRole !== 'SUPERADMIN' && !emailVerified;
   if (requiresVerification && !preVerificationRoutes.includes(pathname)) {
     const verifyUrl = new URL('/verify-required', request.url);
-    verifyUrl.searchParams.set('next', nextParam);
+    // Use safeNextUrl to prevent nested next parameters and validate the path
+    const defaultFallback = isAccountantPath ? '/accountant-portal' : '/dashboard';
+    const nextUrl = safeNextUrl(originalPath, defaultFallback);
+    verifyUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_VERIFY_EMAIL', { pathname, role: userRole });
     return NextResponse.redirect(verifyUrl);
   }
@@ -168,7 +183,10 @@ export async function middleware(request: NextRequest) {
   const onSetupRoute = setupRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
   if (emailVerified && !onboardingCompleted && !onSetupRoute) {
     const setupUrl = new URL('/setup', request.url);
-    setupUrl.searchParams.set('next', nextParam);
+    // Use safeNextUrl to prevent nested next parameters and validate the path
+    const defaultFallback = isAccountantPath ? '/accountant-portal' : '/dashboard';
+    const nextUrl = safeNextUrl(originalPath, defaultFallback);
+    setupUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_SETUP', { pathname, role: userRole });
     return NextResponse.redirect(setupUrl);
   }
