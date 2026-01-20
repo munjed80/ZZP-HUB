@@ -348,24 +348,24 @@ export async function POST(request: NextRequest) {
     });
 
     // Structured log for invite acceptance
-  console.log('[ACCOUNTANT_INVITE_ACCEPTED]', {
-    timestamp: new Date().toISOString(),
-    userId: user.id.slice(-6), // Only log last 6 chars for privacy
-    email: invite.invitedEmail,
-    companyId: invite.companyId.slice(-6),
-    role: invite.role,
-    isNewUser,
-    companyName,
-  });
+    console.log('[ACCOUNTANT_INVITE_ACCEPTED]', {
+      timestamp: new Date().toISOString(),
+      userId: user.id.slice(-6), // Only log last 6 chars for privacy
+      email: invite.invitedEmail,
+      companyId: invite.companyId.slice(-6),
+      role: invite.role,
+      isNewUser,
+      companyName,
+    });
 
     // Log invite acceptance and company access grant for audit
-await logInviteAccepted({
-  userId: user.id,
-  email: invite.invitedEmail,
-  companyId: invite.companyId,
-  role: invite.role,
-  isNewUser,
-});
+    await logInviteAccepted({
+      userId: user.id,
+      email: invite.invitedEmail,
+      companyId: invite.companyId,
+      role: invite.role,
+      isNewUser,
+    });
 
     await logCompanyAccessGranted({
       userId: invite.companyId,
@@ -386,7 +386,7 @@ await logInviteAccepted({
       );
       
       // Structured log for session creation
-      console.log('[ACCOUNTANT_SESSION_COOKIE_SET]', {
+      console.log('[ACCOUNTANT_SESSION_CREATED]', {
         timestamp: new Date().toISOString(),
         userId: user.id.slice(-6), // Only log last 6 chars for privacy
         email: invite.invitedEmail,

@@ -167,7 +167,7 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
     const pendingInvite = await prisma.accountantInvite.findFirst({
       where: {
         companyId: session.userId,
-        email,
+        invitedEmail: email,
         status: InviteStatus.PENDING,
         expiresAt: {
           gt: new Date(),

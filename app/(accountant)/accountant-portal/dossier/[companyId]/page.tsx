@@ -10,13 +10,11 @@ export const metadata: Metadata = {
   description: "Volledig overzicht van bedrijfsgegevens voor accountants",
 };
 
-interface PageProps {
-  params: Promise<{
-    companyId: string;
-  }>;
-}
-
-export default async function CompanyDossierPage({ params }: PageProps) {
+export default async function CompanyDossierPage({
+  params,
+}: {
+  params: Promise<{ companyId: string }>;
+}) {
   const { companyId } = await params;
 
   // Check authentication - either accountant session or regular session with accountant role
@@ -27,7 +25,7 @@ export default async function CompanyDossierPage({ params }: PageProps) {
   const userRole = accountantSession?.role || regularSession?.user?.role;
 
   if (!userId) {
-    redirect("/login");
+    redirect("/login?type=accountant");
   }
 
   // Verify access to this company
