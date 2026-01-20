@@ -50,6 +50,11 @@ enum UserRole {
   ACCOUNTANT
 }
 
+enum AccountantAccessStatus {
+  ACTIVE
+  REVOKED
+}
+
 enum SupportMessageStatus {
   NEW
   READ
@@ -100,9 +105,12 @@ model User {
   supportMessages           SupportMessage[]
   ownedCompanyMembers       CompanyMember[]          @relation("CompanyOwner")
   accountantMemberships     CompanyMember[]          @relation("AccountantMember")
-  sentInvites               AccountantInvite[]
+  sentInvites               AccountantInvite[]       @relation("AccountantInviteCompany")
+  acceptedInvites           AccountantInvite[]       @relation("AccountantInviteAcceptedBy")
   accountantSessions        AccountantSession[]      @relation("AccountantSessions")
   companyAccountantSessions AccountantSession[]      @relation("AccountantSessionCompany")
+  accountantAccesses        AccountantAccess[]       @relation("AccountantAccessAccountant")
+  companyAccountantAccesses AccountantAccess[]       @relation("AccountantAccessCompany")
   invoiceNotes              InvoiceNote[]            @relation("InvoiceNotes")
   expenseNotes              ExpenseNote[]            @relation("ExpenseNotes")
   notifications             Notification[]           @relation("UserNotifications")
@@ -377,10 +385,31 @@ model CompanyMember {
   @@index([userId])
 }
 
+model AccountantAccess {
+  id                 String                  @id @default(uuid())
+  accountantUserId   String
+  companyId          String
+  canRead            Boolean                 @default(true)
+  canEdit            Boolean                 @default(false)
+  canExport          Boolean                 @default(false)
+  canBTW             Boolean                 @default(false)
+  permissions        String?                 @db.Text
+  status             AccountantAccessStatus  @default(ACTIVE)
+  createdAt          DateTime                @default(now())
+
+  accountant         User                    @relation("AccountantAccessAccountant", fields: [accountantUserId], references: [id], onDelete: Cascade)
+  company            User                    @relation("AccountantAccessCompany", fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([accountantUserId, companyId])
+  @@index([companyId])
+  @@index([accountantUserId])
+}
+
 model AccountantInvite {
   id           String       @id @default(uuid())
   companyId    String
   email        String
+  invitedEmail String?
   role         UserRole
   token        String       @unique
   tokenHash    String? // Hashed version of the invite token for security
@@ -389,14 +418,19 @@ model AccountantInvite {
   status       InviteStatus @default(PENDING)
   expiresAt    DateTime
   acceptedAt   DateTime?
+  acceptedByUserId String?
+  inviteType   String       @default("ACCOUNTANT_ACCESS")
+  permissions  String?      @db.Text
   createdAt    DateTime     @default(now())
 
-  company User @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company        User  @relation("AccountantInviteCompany", fields: [companyId], references: [id], onDelete: Cascade)
+  acceptedByUser User? @relation("AccountantInviteAcceptedBy", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
 
   @@index([companyId])
   @@index([token])
   @@index([email])
   @@index([status])
+  @@index([invitedEmail])
 }
 
 model AccountantSession {

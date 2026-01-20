@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth/tenant";
 import { getCompanyMembers } from "@/lib/auth/company-access";
-import { UserRole, InviteStatus } from "@prisma/client";
+import { UserRole, InviteStatus, AccountantAccessStatus } from "@prisma/client";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { sendEmail } from "@/lib/email";
@@ -37,6 +37,59 @@ function generateOTPCode(): string {
   // Convert to number and mod by 1000000 to get 6 digits
   const num = (randomBytes.readUIntBE(0, 3) % 900000) + 100000;
   return num.toString();
+}
+
+function derivePermissions(role: UserRole) {
+  const canEdit = role === UserRole.ACCOUNTANT_EDIT || role === UserRole.ACCOUNTANT;
+  const canBTW = canEdit;
+  const canExport = true;
+  return {
+    canRead: true,
+    canEdit,
+    canExport,
+    canBTW,
+    permissionsJson: JSON.stringify({
+      canRead: true,
+      canEdit,
+      canExport,
+      canBTW,
+    }),
+  };
+}
+
+async function ensureAccountantAccess(accountantUserId: string, companyId: string, role: UserRole) {
+  const { canRead, canEdit, canExport, canBTW, permissionsJson } = derivePermissions(role);
+  await prisma.accountantAccess.upsert({
+    where: {
+      accountantUserId_companyId: {
+        accountantUserId,
+        companyId,
+      },
+    },
+    update: {
+      canRead,
+      canEdit,
+      canExport,
+      canBTW,
+      permissions: permissionsJson,
+      status: AccountantAccessStatus.ACTIVE,
+    },
+    create: {
+      accountantUserId,
+      companyId,
+      canRead,
+      canEdit,
+      canExport,
+      canBTW,
+      permissions: permissionsJson,
+      status: AccountantAccessStatus.ACTIVE,
+    },
+  });
+  console.log("[ACCOUNTANT_ACCESS_GRANTED]", {
+    accountantUserId: accountantUserId.slice(-6),
+    companyId: companyId.slice(-6),
+    role,
+  });
 }
 
 /**
@@ -129,6 +182,7 @@ export async function inviteAccountant(email: string, role: UserRole) {
     });
 
     const companyName = companyProfile?.companyName || user?.naam || user?.email || "Bedrijf";
+    const { permissionsJson } = derivePermissions(role);
 
     // Generate secure token
     const token = crypto.randomBytes(32).toString("hex");
@@ -146,7 +200,7 @@ export async function inviteAccountant(email: string, role: UserRole) {
     otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
 
     // Create invite with OTP
-    await prisma.accountantInvite.create({
+    const invite = await prisma.accountantInvite.create({
       data: {
         companyId: session.userId,
         email,
@@ -157,7 +211,16 @@ export async function inviteAccountant(email: string, role: UserRole) {
         otpExpiresAt,
         status: InviteStatus.PENDING,
         expiresAt,
+        inviteType: "ACCOUNTANT_ACCESS",
+        invitedEmail: email,
+        permissions: permissionsJson,
       },
+    });
+    console.log("[ACCOUNTANT_INVITE_CREATED]", {
+      companyId: session.userId.slice(-6),
+      inviteId: invite.id,
+      role,
+      emailMasked: email.replace(/(.).+(@.*)/, "$1***$2"),
     });
 
     // Log invite creation for audit
@@ -386,11 +449,17 @@ export async function acceptInvite(token: string) {
         role: invite.role,
       },
     });
+    await ensureAccountantAccess(session.userId, invite.companyId, invite.role);
 
     // Mark invite as accepted
     await prisma.accountantInvite.update({
       where: { id: invite.id },
       data: { acceptedAt: new Date() },
+    });
+    console.log("[ACCOUNTANT_INVITE_ACCEPTED]", {
+      inviteId: invite.id,
+      companyId: invite.companyId.slice(-6),
+      accountantUserId: session.userId.slice(-6),
     });
 
     const companyName = invite.company.companyProfile?.companyName || "Bedrijf";
@@ -441,6 +510,18 @@ export async function revokeAccountantAccess(memberId: string) {
     // Delete the member
     await prisma.companyMember.delete({
       where: { id: memberId },
+    });
+    await prisma.accountantAccess.updateMany({
+      where: {
+        accountantUserId: member.userId,
+        companyId: member.companyId,
+      },
+      data: { status: AccountantAccessStatus.REVOKED },
+    });
+    console.log("[ACCOUNTANT_ACCESS_REVOKED]", {
+      accountantUserId: member.userId.slice(-6),
+      companyId: member.companyId.slice(-6),
+      status: "REVOKED",
     });
 
     revalidatePath("/accountant-access");

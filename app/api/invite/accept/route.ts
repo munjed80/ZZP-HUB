@@ -6,6 +6,7 @@ import { sendEmail } from "@/lib/email";
 import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
 import { createAccountantSession } from "@/lib/auth/accountant-session";
 import { logInviteAccepted, logCompanyAccessGranted } from "@/lib/auth/security-audit";
+import { AccountantAccessStatus, UserRole } from "@prisma/client";
 
 // Error codes for clear error handling
 const INVITE_ERROR_CODES = {
@@ -28,6 +29,63 @@ interface AcceptInviteResult {
   email?: string;
   isNewUser?: boolean;
   userId?: string;
+}
+
+function derivePermissions(role: UserRole) {
+  const canEdit = role === UserRole.ACCOUNTANT_EDIT || role === UserRole.ACCOUNTANT;
+  const canBTW = canEdit;
+  const canExport = true;
+  return {
+    canRead: true,
+    canEdit,
+    canExport,
+    canBTW,
+    permissionsJson: JSON.stringify({
+      canRead: true,
+      canEdit,
+      canExport,
+      canBTW,
+    }),
+  };
+}
+
+async function upsertAccountantAccess(
+  accountantUserId: string,
+  companyId: string,
+  role: UserRole,
+) {
+  const { canRead, canEdit, canExport, canBTW, permissionsJson } = derivePermissions(role);
+  await prisma.accountantAccess.upsert({
+    where: {
+      accountantUserId_companyId: {
+        accountantUserId,
+        companyId,
+      },
+    },
+    update: {
+      canRead,
+      canEdit,
+      canExport,
+      canBTW,
+      permissions: permissionsJson,
+      status: AccountantAccessStatus.ACTIVE,
+    },
+    create: {
+      accountantUserId,
+      companyId,
+      canRead,
+      canEdit,
+      canExport,
+      canBTW,
+      permissions: permissionsJson,
+      status: AccountantAccessStatus.ACTIVE,
+    },
+  });
+  console.log("[ACCOUNTANT_ACCESS_GRANTED]", {
+    accountantUserId: accountantUserId.slice(-6),
+    companyId: companyId.slice(-6),
+    role,
+  });
 }
 
 /**
@@ -204,6 +262,8 @@ export async function POST(request: NextRequest) {
         data: { acceptedAt: new Date() },
       });
 
+      await upsertAccountantAccess(user.id, invite.companyId, existingMember.role);
+
       // Create accountant session for immediate access
       try {
         await createAccountantSession(
@@ -236,6 +296,7 @@ export async function POST(request: NextRequest) {
           role: invite.role,
         },
       });
+      await upsertAccountantAccess(user.id, invite.companyId, invite.role);
     } catch (linkError) {
       console.error("Failed to create company member link:", linkError);
       return NextResponse.json<AcceptInviteResult>(

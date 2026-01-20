@@ -17,6 +17,9 @@ const ACCOUNTANT_SESSION_COOKIE = "zzp-accountant-session";
 const SESSION_EXPIRY_DAYS = 30; // 30 days
 // Cookie path scoped to accountant portal only - prevents session confusion with ZZP dashboard
 const ACCOUNTANT_COOKIE_PATH = "/accountant-portal";
+const ACCOUNTANT_COOKIE_DOMAIN =
+  process.env.NODE_ENV === "production" ? "zzpershub.nl" : undefined;
+const ACCOUNTANT_COOKIE_SECURE = process.env.NODE_ENV === "production";
 
 export interface AccountantSessionData {
   sessionId: string;
@@ -34,10 +37,11 @@ export interface AccountantSessionData {
 async function clearAccountantCookie(cookieStore: Awaited<ReturnType<typeof cookies>>): Promise<void> {
   cookieStore.set(ACCOUNTANT_SESSION_COOKIE, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: ACCOUNTANT_COOKIE_SECURE,
     sameSite: "lax",
     maxAge: 0,
     path: ACCOUNTANT_COOKIE_PATH,
+    domain: ACCOUNTANT_COOKIE_DOMAIN,
   });
 }
 
@@ -74,10 +78,11 @@ export async function createAccountantSession(
   const cookieStore = await cookies();
   cookieStore.set(ACCOUNTANT_SESSION_COOKIE, sessionToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: ACCOUNTANT_COOKIE_SECURE,
     sameSite: "lax",
     maxAge: SESSION_EXPIRY_DAYS * 24 * 60 * 60, // seconds
     path: ACCOUNTANT_COOKIE_PATH,
+    domain: ACCOUNTANT_COOKIE_DOMAIN,
   });
   
   // Log session creation for audit

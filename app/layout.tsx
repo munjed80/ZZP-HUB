@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SonnerToaster } from "@/components/providers/sonner-provider";
 import { CookieBanner } from "@/components/ui/cookie-banner";
@@ -7,10 +6,7 @@ import { ServiceWorkerRegister } from "@/components/providers/service-worker-reg
 import { InstallPWA } from "@/components/ui/install-pwa";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  display: "swap",
-});
+const baseFontClass = "font-sans";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://zzp-hub.app"),
@@ -90,7 +86,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body className={`${plusJakartaSans.className} antialiased`}>
+      <body className={`${baseFontClass} antialiased`}>
         <ThemeProvider>
           {children}
           <SonnerToaster />
