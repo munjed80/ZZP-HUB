@@ -536,7 +536,22 @@ export async function getAccountantCompanies() {
   try {
     const session = await requireSession();
 
-    if (session.role !== UserRole.ACCOUNTANT) {
+    // Check if user has an accountant role (ACCOUNTANT, ACCOUNTANT_VIEW, or ACCOUNTANT_EDIT)
+    const isAccountant = session.role === UserRole.ACCOUNTANT || 
+                         session.role === UserRole.ACCOUNTANT_VIEW || 
+                         session.role === UserRole.ACCOUNTANT_EDIT;
+
+    if (!isAccountant && session.role !== UserRole.SUPERADMIN) {
+      console.log('[ACCOUNTANT_PORTAL_LOAD]', {
+        timestamp: new Date().toISOString(),
+        hasSession: true,
+        accountantUserId: session.userId.slice(-6),
+        role: session.role,
+        accessCount: 0,
+        companyCount: 0,
+        reason: 'WRONG_ROLE',
+      });
+      
       return {
         success: false,
         message: "Alleen accountant-accounts kunnen dit overzicht zien.",
@@ -565,6 +580,17 @@ export async function getAccountantCompanies() {
         },
       },
       orderBy: { createdAt: "desc" },
+    });
+
+    // Log diagnostics
+    console.log('[ACCOUNTANT_PORTAL_LOAD]', {
+      timestamp: new Date().toISOString(),
+      hasSession: true,
+      accountantUserId: session.userId.slice(-6),
+      role: session.role,
+      accessCount: accesses.length,
+      companyCount: accesses.length,
+      reason: accesses.length === 0 ? 'NO_ACCESS_FOUND' : undefined,
     });
 
     // Get stats for each company
@@ -612,7 +638,7 @@ export async function getAccountantCompanies() {
         return {
           id: access.id,
           companyId: access.companyId,
-          role: UserRole.ACCOUNTANT,
+          role: session.role,
           companyName:
             access.company.companyProfile?.companyName ||
             access.company.naam ||
@@ -628,6 +654,11 @@ export async function getAccountantCompanies() {
 
     return { success: true, companies };
   } catch (error) {
+    console.error('[ACCOUNTANT_PORTAL_LOAD_ERROR]', {
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    
     console.error("Error getting accountant companies:", error);
     return {
       success: false,

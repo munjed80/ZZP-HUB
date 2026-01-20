@@ -274,12 +274,33 @@ export function AccountantPortalContent() {
       {filteredCompanies.length === 0 ? (
         <div className="text-center py-12 bg-card border border-border rounded-xl">
           <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <p className="text-lg font-medium text-foreground">Geen bedrijven gevonden</p>
-          <p className="text-sm text-muted-foreground mt-2">
-            {searchQuery || onlyWithIssues
-              ? "Probeer de filters aan te passen"
-              : "U heeft nog geen toegang tot bedrijven"}
-          </p>
+          {companies.length === 0 ? (
+            // No companies at all - show empty state with guidance
+            <>
+              <h2 className="text-xl font-semibold text-foreground mb-2">
+                Nog geen toegang tot bedrijven
+              </h2>
+              <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
+                Je moet door een ZZP worden uitgenodigd via &quot;Accountant toegang&quot;.
+                Na het accepteren van de uitnodiging krijg je toegang tot het bedrijfsdossier.
+              </p>
+              <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg max-w-lg mx-auto">
+                <p className="text-sm text-blue-600 dark:text-blue-400">
+                  <strong>Heb je een uitnodiging ontvangen?</strong>
+                  <br />
+                  Check je e-mail voor de uitnodigingslink met verificatiecode.
+                </p>
+              </div>
+            </>
+          ) : (
+            // Has companies but filtered out - show filter message
+            <>
+              <p className="text-lg font-medium text-foreground">Geen bedrijven gevonden</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Probeer de filters aan te passen
+              </p>
+            </>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
