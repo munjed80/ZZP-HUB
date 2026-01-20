@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { getAccountantCompanies } from "@/app/actions/accountant-access-actions";
 import { switchCompanyContext } from "@/app/actions/company-context-actions";
 import { toast } from "sonner";
-import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink, Filter, Calendar, TrendingUp, Euro, Eye } from "lucide-react";
+import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink, Filter, TrendingUp, Euro, Eye } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { NotificationsPanel } from "@/components/notifications/notifications-panel";
@@ -53,7 +53,6 @@ export function AccountantPortalContent() {
 
   useEffect(() => {
     loadCompanies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleCompanyClick(companyId: string, viewDossier = false) {
