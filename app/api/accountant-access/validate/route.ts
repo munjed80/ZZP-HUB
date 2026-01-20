@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { InviteStatus } from "@prisma/client";
+import crypto from "crypto";
 
 // Error codes for clear error handling
 const ERROR_CODES = {
@@ -41,9 +42,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Find the invite by token
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Find the invite by token hash
     const invite = await prisma.accountantInvite.findUnique({
-      where: { token },
+      where: { tokenHash },
       include: {
         company: {
           select: {
@@ -82,8 +85,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if expired (status or date)
-    if (invite.status === InviteStatus.EXPIRED || invite.expiresAt < new Date()) {
+    // Check if expired or revoked
+    if (
+      invite.status === InviteStatus.EXPIRED ||
+      invite.status === InviteStatus.REVOKED ||
+      invite.expiresAt < new Date()
+    ) {
       return NextResponse.json<ValidateResult>(
         {
           success: false,
@@ -104,7 +111,7 @@ export async function GET(request: NextRequest) {
       success: true,
       message: "Uitnodiging is geldig.",
       companyName,
-      email: invite.email,
+      email: invite.invitedEmail,
     });
   } catch (error) {
     console.error("Error validating invite:", error);

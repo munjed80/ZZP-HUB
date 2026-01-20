@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { InviteStatus } from "@prisma/client";
+import { AccountantAccessStatus, InviteStatus, UserRole } from "@prisma/client";
 import { createAccountantSession } from "@/lib/auth/accountant-session";
 import { logInviteAccepted, logCompanyAccessGranted } from "@/lib/auth/security-audit";
+import { requireAccountantSession } from "@/lib/auth/tenant";
+import crypto from "crypto";
 
 // Error codes for clear error handling
 const ERROR_CODES = {
@@ -40,6 +42,7 @@ interface VerifyResult {
  */
 export async function POST(request: NextRequest) {
   try {
+    const session = await requireAccountantSession();
     const body = await request.json();
     const { token, otpCode } = body;
 
@@ -66,9 +69,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the invite by token
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Find the invite by token hash
     const invite = await prisma.accountantInvite.findUnique({
-      where: { token },
+      where: { tokenHash },
       include: {
         company: {
           select: {
@@ -98,36 +103,6 @@ export async function POST(request: NextRequest) {
     // Check if already accepted (idempotent check)
     if (invite.status === InviteStatus.ACCEPTED) {
       // If already accepted, check if we have an existing session and user
-      const existingUser = await prisma.user.findUnique({
-        where: { email: invite.email },
-      });
-
-      if (existingUser) {
-        // Create a new session for the user (idempotent re-login)
-        try {
-          await createAccountantSession(
-            existingUser.id,
-            existingUser.email,
-            invite.companyId,
-            invite.role
-          );
-
-          const companyName =
-            invite.company.companyProfile?.companyName ||
-            invite.company.naam ||
-            invite.company.email ||
-            "Bedrijf";
-
-          return NextResponse.json<VerifyResult>({
-            success: true,
-            message: `U heeft al toegang tot ${companyName}. Sessie vernieuwd.`,
-            companyName,
-          });
-        } catch (sessionError) {
-          console.error("Failed to refresh session:", sessionError);
-        }
-      }
-
       return NextResponse.json<VerifyResult>(
         {
           success: false,
@@ -139,7 +114,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if invite expired (status or date)
-    if (invite.status === InviteStatus.EXPIRED || invite.expiresAt < new Date()) {
+    if (
+      invite.status === InviteStatus.EXPIRED ||
+      invite.status === InviteStatus.REVOKED ||
+      invite.expiresAt < new Date()
+    ) {
       return NextResponse.json<VerifyResult>(
         {
           success: false,
@@ -186,56 +165,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // OTP verified! Now create/get user and grant access
+    // OTP verified! Now ensure invite email matches logged in accountant
+    const normalizedInviteEmail = invite.invitedEmail.toLowerCase();
+    const normalizedSessionEmail = session.email.toLowerCase();
+
+    if (normalizedInviteEmail !== normalizedSessionEmail) {
+      return NextResponse.json<VerifyResult>(
+        {
+          success: false,
+          errorCode: ERROR_CODES.INVITE_NOT_FOUND,
+          message: "Deze uitnodiging is gekoppeld aan een ander e-mailadres.",
+        },
+        { status: 403 }
+      );
+    }
+
+    // OTP verified! Now grant access
     const companyName =
       invite.company.companyProfile?.companyName ||
       invite.company.naam ||
       invite.company.email ||
       "Bedrijf";
 
-    // Check if user already exists
-    let user = await prisma.user.findUnique({
-      where: { email: invite.email },
-    });
-
-    const isNewUser = !user;
-
-    if (!user) {
-      // Create minimal user account (no password needed for accountant-only access)
-      // Generate a random secure password they'll never use
-      const randomPassword = await bcrypt.hash(crypto.randomUUID(), 10);
-
-      user = await prisma.user.create({
-        data: {
-          email: invite.email,
-          password: randomPassword,
-          role: invite.role,
-          emailVerified: true, // Auto-verify since they verified via OTP
-          onboardingCompleted: true, // Skip onboarding for accountants
-        },
-      });
-    }
-
-    // Check if already a member of this company
-    const existingMember = await prisma.companyMember.findUnique({
-      where: {
-        companyId_userId: {
-          companyId: invite.companyId,
-          userId: user.id,
-        },
-      },
-    });
-
-    if (!existingMember) {
-      // Create company member link
-      await prisma.companyMember.create({
-        data: {
-          companyId: invite.companyId,
-          userId: user.id,
-          role: invite.role,
-        },
-      });
-    }
+    const permissions = invite.permissions ? JSON.parse(invite.permissions) : {};
 
     // Mark invite as accepted
     await prisma.accountantInvite.update({
@@ -243,32 +195,61 @@ export async function POST(request: NextRequest) {
       data: {
         status: InviteStatus.ACCEPTED,
         acceptedAt: new Date(),
+        acceptedByUserId: session.userId,
       },
     });
 
     // Log invite acceptance and company access grant for audit
     await logInviteAccepted({
-      userId: user.id,
-      email: invite.email,
+      userId: session.userId,
+      email: invite.invitedEmail,
       companyId: invite.companyId,
-      role: invite.role,
-      isNewUser,
+      role: UserRole.ACCOUNTANT,
+      isNewUser: false,
     });
 
     await logCompanyAccessGranted({
       userId: invite.companyId,
-      targetUserId: user.id,
+      targetUserId: session.userId,
       companyId: invite.companyId,
-      role: invite.role,
+      role: UserRole.ACCOUNTANT,
     });
 
-    // Create accountant session for immediate access
+    // Create accountant access record
+    await prisma.accountantAccess.upsert({
+      where: {
+        accountantUserId_companyId: {
+          accountantUserId: session.userId,
+          companyId: invite.companyId,
+        },
+      },
+      update: {
+        canRead: permissions.canRead ?? true,
+        canEdit: Boolean(permissions.canEdit),
+        canExport: Boolean(permissions.canExport),
+        canBTW: Boolean(permissions.canBTW),
+        permissions: invite.permissions,
+        status: AccountantAccessStatus.ACTIVE,
+      },
+      create: {
+        accountantUserId: session.userId,
+        companyId: invite.companyId,
+        canRead: permissions.canRead ?? true,
+        canEdit: Boolean(permissions.canEdit),
+        canExport: Boolean(permissions.canExport),
+        canBTW: Boolean(permissions.canBTW),
+        permissions: invite.permissions,
+        status: AccountantAccessStatus.ACTIVE,
+      },
+    });
+
+    // Create accountant session for immediate access (cookie scoped to portal)
     try {
       await createAccountantSession(
-        user.id,
-        user.email,
+        session.userId,
+        session.email,
         invite.companyId,
-        invite.role
+        UserRole.ACCOUNTANT
       );
     } catch (sessionError) {
       console.error("Failed to create accountant session:", sessionError);

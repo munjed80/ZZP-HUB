@@ -1,28 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAccountantSession } from "@/lib/auth/accountant-session";
-import { getServerAuthSession } from "@/lib/auth";
+import { getAccountantAccessibleCompanyIds, requireAccountantSession } from "@/lib/auth/tenant";
 import { logAccountantMarkReviewed } from "@/lib/auth/security-audit";
+import { AccountantAccessStatus } from "@prisma/client";
 
 /**
  * Mark an item (invoice, expense, etc.) as reviewed by accountant
  * This creates an audit trail of what has been reviewed
- */
+  */
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const accountantSession = await getAccountantSession();
-    const regularSession = await getServerAuthSession();
-
-    const userId = accountantSession?.userId || regularSession?.user?.id;
-
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Niet geauthenticeerd" },
-        { status: 401 }
-      );
-    }
-
+    const session = await requireAccountantSession();
     const body = await request.json();
     const { companyId, type, id } = body;
 
@@ -33,26 +21,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify access to this company
-    const hasAccess = await prisma.companyMember.findUnique({
-      where: {
-        companyId_userId: {
-          companyId,
-          userId,
-        },
-      },
-    });
-
-    if (!hasAccess) {
+    const accessibleCompanyIds = await getAccountantAccessibleCompanyIds(session.userId);
+    if (!accessibleCompanyIds.includes(companyId)) {
       return NextResponse.json(
         { success: false, message: "Geen toegang tot dit bedrijf" },
         { status: 403 }
       );
     }
 
-    // Check if user has edit permissions (viewing alone isn't enough to mark as reviewed)
-    const permissions = JSON.parse(hasAccess.permissions || "{}");
-    if (!permissions.edit && hasAccess.role !== "ACCOUNTANT_EDIT") {
+    const access = await prisma.accountantAccess.findUnique({
+      where: {
+        accountantUserId_companyId: {
+          accountantUserId: session.userId,
+          companyId,
+        },
+      },
+    });
+
+    if (!access || access.status !== AccountantAccessStatus.ACTIVE || !access.canEdit) {
       return NextResponse.json(
         { success: false, message: "Geen bewerkingsrechten" },
         { status: 403 }
@@ -82,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     // Log the review action
     await logAccountantMarkReviewed({
-      userId,
+      userId: session.userId,
       companyId,
       itemType: type,
       itemId: id,

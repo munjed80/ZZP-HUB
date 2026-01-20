@@ -20,19 +20,23 @@ type CompanyMember = {
   naam: string | null;
   role: UserRole;
   createdAt: Date;
+  permissions?: string | null;
 };
 
 type PendingInvite = {
   id: string;
-  email: string;
-  role: UserRole;
+  invitedEmail: string;
+  permissions?: string | null;
   expiresAt: Date;
   createdAt: Date;
 };
 
 export function AccountantAccessContent() {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<UserRole>(UserRole.ACCOUNTANT_VIEW);
+  const [canRead] = useState(true);
+  const [canEdit, setCanEdit] = useState(false);
+  const [canExport, setCanExport] = useState(false);
+  const [canBTW, setCanBTW] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [members, setMembers] = useState<CompanyMember[]>([]);
@@ -63,7 +67,12 @@ export function AccountantAccessContent() {
     e.preventDefault();
     setLoading(true);
 
-    const result = await inviteAccountant(email, role);
+    const result = await inviteAccountant(email, {
+      canRead,
+      canEdit,
+      canExport,
+      canBTW,
+    });
 
     if (result.success) {
       toast.success(result.message);
@@ -121,17 +130,38 @@ export function AccountantAccessContent() {
     toast.success("Uitnodigingslink gekopieerd!");
   }
 
-  const getRoleLabel = (r: UserRole): string => {
-    switch (r) {
-      case UserRole.ACCOUNTANT_VIEW:
-        return "Accountant (Alleen lezen)";
-      case UserRole.ACCOUNTANT_EDIT:
-        return "Accountant (Bewerken)";
-      case UserRole.STAFF:
-        return "Medewerker";
-      default:
-        return r;
+  const parsePermissions = (raw?: string | null) => {
+    try {
+      const parsed = raw ? JSON.parse(raw) : {};
+      return {
+        canRead: parsed.canRead !== false,
+        canEdit: Boolean(parsed.canEdit),
+        canExport: Boolean(parsed.canExport),
+        canBTW: Boolean(parsed.canBTW),
+      };
+    } catch {
+      return { canRead: true, canEdit: false, canExport: false, canBTW: false };
     }
+  };
+
+  const getPermissionLabel = (raw?: string | null) => {
+    const perms = parsePermissions(raw);
+    const parts = [];
+    parts.push(perms.canEdit ? "Bewerken" : "Lezen");
+    if (perms.canExport) parts.push("Export");
+    if (perms.canBTW) parts.push("BTW");
+    return parts.join(" • ");
+  };
+
+  const getBadgeColor = (raw?: string | null) => {
+    const perms = parsePermissions(raw);
+    if (perms.canBTW || perms.canEdit) {
+      return "bg-green-500/10 text-green-600 dark:text-green-400";
+    }
+    if (perms.canExport) {
+      return "bg-blue-500/10 text-blue-600 dark:text-blue-400";
+    }
+    return "bg-muted text-muted-foreground";
   };
 
   return (
@@ -162,35 +192,50 @@ export function AccountantAccessContent() {
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="role"
-              className="block text-sm font-medium text-foreground mb-1.5"
-            >
-              Rol
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
+              <input type="checkbox" checked={canRead} disabled className="w-4 h-4" />
+              <div>
+                <span className="text-sm font-medium text-foreground">Lezen</span>
+                <p className="text-xs text-muted-foreground">Altijd vereist</p>
+              </div>
             </label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value={UserRole.ACCOUNTANT_VIEW}>
-                Accountant (Alleen lezen + Export)
-              </option>
-              <option value={UserRole.ACCOUNTANT_EDIT}>
-                Accountant (Bewerken + Export + BTW)
-              </option>
-              <option value={UserRole.STAFF}>Medewerker (Bewerken)</option>
-            </select>
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              {role === UserRole.ACCOUNTANT_VIEW &&
-                "Alleen lezen en exporteren van gegevens"}
-              {role === UserRole.ACCOUNTANT_EDIT &&
-                "Bewerken, exporteren en BTW-acties uitvoeren"}
-              {role === UserRole.STAFF &&
-                "Facturen, relaties en uitgaven bewerken"}
-            </p>
+            <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
+              <input
+                type="checkbox"
+                checked={canEdit}
+                onChange={(e) => setCanEdit(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <div>
+                <span className="text-sm font-medium text-foreground">Bewerken</span>
+                <p className="text-xs text-muted-foreground">Facturen, relaties, uitgaven</p>
+              </div>
+            </label>
+            <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
+              <input
+                type="checkbox"
+                checked={canExport}
+                onChange={(e) => setCanExport(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <div>
+                <span className="text-sm font-medium text-foreground">Exporteren</span>
+                <p className="text-xs text-muted-foreground">CSV/PDF downloads</p>
+              </div>
+            </label>
+            <label className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
+              <input
+                type="checkbox"
+                checked={canBTW}
+                onChange={(e) => setCanBTW(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <div>
+                <span className="text-sm font-medium text-foreground">BTW-acties</span>
+                <p className="text-xs text-muted-foreground">Aangifte & controle</p>
+              </div>
+            </label>
           </div>
 
           <button
@@ -245,10 +290,10 @@ export function AccountantAccessContent() {
                   <Mail className="h-5 w-5 text-muted-foreground shrink-0" />
                   <div className="min-w-0">
                     <p className="font-medium text-foreground truncate">
-                      {invite.email}
+                      {invite.invitedEmail}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {getRoleLabel(invite.role)} • Verloopt op{" "}
+                      {getPermissionLabel(invite.permissions)} • Verloopt op{" "}
                       {new Date(invite.expiresAt).toLocaleDateString("nl-NL")}
                     </p>
                   </div>
@@ -310,7 +355,7 @@ export function AccountantAccessContent() {
                       {member.naam || member.email}
                     </p>
                     <p className="text-sm text-muted-foreground truncate">
-                      {member.email} • {getRoleLabel(member.role)}
+                      {member.email} • {getPermissionLabel(member.permissions)}
                     </p>
                   </div>
                 </div>

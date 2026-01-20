@@ -9,7 +9,7 @@
 import "server-only";
 import { prisma } from "../prisma";
 import { requireSession, type SessionContext } from "./tenant";
-import { UserRole } from "@prisma/client";
+import { AccountantAccessStatus, UserRole } from "@prisma/client";
 
 export type Permission = "read" | "write" | "export" | "vat_actions";
 
@@ -40,6 +40,37 @@ export async function requireCompanyAccess(
   // SUPERADMIN has access to everything
   if (session.role === UserRole.SUPERADMIN) {
     logCompanyAccess(userId, companyId, permission, "SUPERADMIN_BYPASS");
+    return;
+  }
+
+  if (session.role === UserRole.ACCOUNTANT) {
+    const access = await prisma.accountantAccess.findUnique({
+      where: {
+        accountantUserId_companyId: {
+          accountantUserId: userId,
+          companyId,
+        },
+      },
+    });
+
+    if (!access || access.status !== AccountantAccessStatus.ACTIVE) {
+      logCompanyAccessDenied(userId, companyId, permission, "NOT_MEMBER");
+      throw new Error("Toegang geweigerd. U heeft geen toegang tot dit bedrijf.");
+    }
+
+    const permissionMap: Record<Permission, boolean> = {
+      read: access.canRead,
+      write: access.canEdit,
+      export: access.canExport,
+      vat_actions: access.canBTW,
+    };
+
+    if (!permissionMap[permission]) {
+      logCompanyAccessDenied(userId, companyId, permission, "INSUFFICIENT_PERMISSION");
+      throw new Error(`Toegang geweigerd. Onvoldoende rechten voor actie: ${permission}`);
+    }
+
+    logCompanyAccess(userId, companyId, permission, "ACCOUNTANT_ACCESS");
     return;
   }
 
@@ -95,6 +126,25 @@ export async function getUserCompanies(userId: string): Promise<
     return [];
   }
 
+  if (session.role === UserRole.ACCOUNTANT) {
+    const accesses = await prisma.accountantAccess.findMany({
+      where: {
+        accountantUserId: userId,
+        status: AccountantAccessStatus.ACTIVE,
+      },
+      select: {
+        companyId: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return accesses.map((access) => ({
+      companyId: access.companyId,
+      role: UserRole.ACCOUNTANT,
+      isOwner: false,
+    }));
+  }
+
   // Get owned company (self)
   const ownedCompany = {
     companyId: userId,
@@ -132,6 +182,7 @@ export async function getCompanyMembers(companyId: string): Promise<
     naam: string | null;
     role: UserRole;
     createdAt: Date;
+    permissions?: string | null;
   }>
 > {
   const session = await requireSession();
@@ -141,8 +192,8 @@ export async function getCompanyMembers(companyId: string): Promise<
     throw new Error("Toegang geweigerd. Alleen de bedrijfseigenaar kan deze lijst bekijken.");
   }
 
-  const members = await prisma.companyMember.findMany({
-    where: { companyId },
+  const members = await prisma.accountantAccess.findMany({
+    where: { companyId, status: AccountantAccessStatus.ACTIVE },
     include: {
       accountant: {
         select: {
@@ -157,11 +208,12 @@ export async function getCompanyMembers(companyId: string): Promise<
 
   return members.map((m) => ({
     id: m.id,
-    userId: m.userId,
+    userId: m.accountantUserId,
     email: m.accountant.email,
     naam: m.accountant.naam,
-    role: m.role,
+    role: UserRole.ACCOUNTANT,
     createdAt: m.createdAt,
+    permissions: m.permissions,
   }));
 }
 

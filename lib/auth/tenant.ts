@@ -7,8 +7,9 @@
 
 import "server-only";
 import { getServerAuthSession } from "../auth";
-import { UserRole } from "@prisma/client";
+import { AccountantAccessStatus, UserRole } from "@prisma/client";
 import { getAccountantSession } from "./accountant-session";
+import { prisma } from "../prisma";
 
 export interface SessionContext {
   userId: string;
@@ -89,12 +90,44 @@ export async function requireTenantContext(): Promise<{ userId: string }> {
  */
 export async function requireRole(role: UserRole): Promise<SessionContext> {
   const session = await requireSession();
-  
+
   if (session.role !== role) {
     throw new Error(`Toegang geweigerd. Deze actie vereist de rol: ${role}`);
   }
-  
+
   return session;
+}
+
+/**
+ * Require a NextAuth-backed accountant session
+ */
+export async function requireAccountantSession() {
+  const session = await getServerAuthSession();
+  if (!session?.user || session.user.role !== UserRole.ACCOUNTANT) {
+    throw new Error("Je hebt een boekhouder-account nodig om deze actie uit te voeren.");
+  }
+
+  return {
+    userId: session.user.id,
+    email: session.user.email,
+    role: session.user.role,
+  };
+}
+
+/**
+ * List company IDs the accountant can access
+ */
+export async function getAccountantAccessibleCompanyIds(accountantUserId: string) {
+  const accesses = await prisma.accountantAccess.findMany({
+    where: {
+      accountantUserId,
+      status: AccountantAccessStatus.ACTIVE,
+    },
+    select: {
+      companyId: true,
+    },
+  });
+  return accesses.map((a) => a.companyId);
 }
 
 /**
