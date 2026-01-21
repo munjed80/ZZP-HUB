@@ -1,14 +1,15 @@
 import { redirect } from "next/navigation";
 
-export default function AccountantDossierRedirect({
+export default async function AccountantDossierRedirect({
   searchParams,
 }: {
-  searchParams: { companyId?: string; id?: string };
+  searchParams: Promise<{ companyId?: string; id?: string }>;
 }) {
-  const companyId = searchParams?.companyId || searchParams?.id;
+  const { companyId, id } = await searchParams;
+  const resolvedCompanyId = companyId || id;
 
-  if (companyId) {
-    redirect(`/accountant-portal/dossier/${companyId}`);
+  if (resolvedCompanyId) {
+    redirect(`/accountant-portal/dossier/${resolvedCompanyId}`);
   }
 
   return (

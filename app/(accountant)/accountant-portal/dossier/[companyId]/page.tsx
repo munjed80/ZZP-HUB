@@ -15,28 +15,25 @@ const logDossierLoad = (payload: Record<string, unknown>) => {
   console.log("[ACCOUNTANT_DOSSIER_LOAD]", payload);
 };
 
-export const buildForbiddenDossierResponse = (message: string, companyId?: string) => {
-  const body = `
-    <!doctype html>
-    <html lang="nl">
-      <head><title>Geen toegang</title></head>
-      <body style="font-family: system-ui; padding: 2rem; color: #111;">
-        <h1>Geen toegang tot dossier</h1>
-        <p>${message}</p>
-        ${
-          companyId
-            ? `<p>Bedrijf: <code>${companyId}</code></p>`
-            : ""
-        }
-        <p><a href="/accountant-portal">Terug naar Accountant Portal</a></p>
-      </body>
-    </html>
-  `;
-  return new Response(body, {
-    status: 403,
-    headers: { "Content-Type": "text/html; charset=utf-8" },
-  });
-};
+const buildForbiddenDossierResponse = (message: string, companyId?: string) => (
+  <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+    <div className="max-w-xl space-y-4 p-6 border border-border rounded-xl bg-card shadow-sm">
+      <h1 className="text-2xl font-semibold">Geen toegang tot dossier</h1>
+      <p className="text-muted-foreground">{message}</p>
+      {companyId ? (
+        <p className="text-muted-foreground">
+          Bedrijf: <code>{companyId}</code>
+        </p>
+      ) : null}
+      <a
+        href="/accountant-portal"
+        className="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
+      >
+        Terug naar Accountant Portal
+      </a>
+    </div>
+  </div>
+);
 
 export const metadata: Metadata = {
   title: "Bedrijfsdossier",
