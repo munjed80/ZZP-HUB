@@ -46,9 +46,9 @@ export const metadata: Metadata = {
 export default async function CompanyDossierPage({
   params,
 }: {
-  params: { companyId: string };
+  params: Promise<{ companyId: string }>;
 }) {
-  const { companyId } = params;
+  const { companyId } = await params;
 
   // Check authentication - either accountant session or regular session with accountant role
   const accountantSession = await getAccountantSession();
