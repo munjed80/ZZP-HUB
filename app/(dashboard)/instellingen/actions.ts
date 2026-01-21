@@ -339,7 +339,6 @@ export async function linkAccountantToCompany(input: {
     create: {
       companyId: companyId,
       userId: accountantUser.id,
-      invitedEmail: accountantEmail,
       role: CompanyRole.ACCOUNTANT,
       status: CompanyUserStatus.ACTIVE,
       canRead: input.canRead ?? true,
