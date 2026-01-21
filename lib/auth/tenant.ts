@@ -15,6 +15,16 @@ export interface SessionContext {
   email: string;
 }
 
+const ACCOUNTANT_ROLES: UserRole[] = ["ACCOUNTANT", "ACCOUNTANT_VIEW", "ACCOUNTANT_EDIT"] as UserRole[];
+
+/**
+ * Helper to check if current user is an accountant role.
+ */
+export function isAccountantRole(role: UserRole | string | null | undefined): boolean {
+  if (!role) return false;
+  return ACCOUNTANT_ROLES.includes(role as UserRole);
+}
+
 /**
    * Get the current session or throw if not authenticated
    * @throws Error if user is not authenticated or is suspended

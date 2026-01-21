@@ -6,6 +6,7 @@ import { DistributionDonut } from "@/components/dashboard/distribution-donut";
 import { NotificationsPanel } from "@/components/dashboard/notifications-panel";
 import { getDashboardStats } from "@/actions/get-dashboard-stats";
 import { DEFAULT_VAT_RATE } from "@/lib/constants";
+import AccountantMode from "./accountant-mode";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -90,6 +91,7 @@ export default async function DashboardPagina() {
 
   return (
     <div className="space-y-8 sm:space-y-10">
+      <AccountantMode />
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <div className="h-1.5 w-14 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500"></div>
