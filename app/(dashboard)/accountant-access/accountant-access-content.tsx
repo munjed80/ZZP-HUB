@@ -43,6 +43,7 @@ export function AccountantAccessContent() {
   const [members, setMembers] = useState<CompanyMember[]>([]);
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState("");
 
   const loadData = async () => {
     const [membersResult, invitesResult] = await Promise.all([
@@ -64,17 +65,43 @@ export function AccountantAccessContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const validateEmail = (value: string) => {
+    const trimmed = value?.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!trimmed || !emailRegex.test(trimmed)) {
+      return { valid: false, message: "Vul een geldig e-mailadres in." };
+    }
+    return { valid: true, email: trimmed };
+  };
+
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault();
+
+    if (loading) return;
+
+    console.log("INVITE_SUBMIT_ATTEMPT", { emailLength: email?.length || 0 });
+
+    const validation = validateEmail(email);
+    if (!validation.valid) {
+      console.log("INVITE_SUBMIT_BLOCKED_FRONTEND", { reason: "INVALID_EMAIL" });
+      setEmailError(validation.message);
+      return;
+    }
+
+    setEmailError("");
     setLoading(true);
 
     const permissions = fullAccess
       ? { canRead: true, canEdit: true, canExport: true, canBTW: true }
       : { canRead, canEdit, canExport, canBTW };
 
-    const result = await inviteAccountant(email, {
-      ...permissions,
+    console.log("INVITE_PAYLOAD_DEBUG", {
+      email: validation.email,
+      permissions,
+      fullAccess,
     });
+
+    const result = await inviteAccountant(validation.email, permissions);
 
     if (result.success) {
       toast.success(result.message);
@@ -82,8 +109,17 @@ export function AccountantAccessContent() {
       setInviteUrl(result.inviteUrl || null);
       loadData();
     } else {
-      // Keep email in the input after failure for easy correction
-      toast.error(result.message || "Er is een fout opgetreden bij het versturen van de uitnodiging.");
+      const backendEmailError =
+        result.error === "EMAIL_REQUIRED" || result.error === "EMAIL_MISSING_OR_INVALID";
+      if (backendEmailError) {
+        setEmailError("Vul een geldig e-mailadres in.");
+        toast.error("Vul een geldig e-mailadres in.");
+      } else {
+        // Keep email in the input after failure for easy correction
+        toast.error(
+          result.message || "Er is een fout opgetreden bij het versturen van de uitnodiging."
+        );
+      }
     }
 
     setLoading(false);
@@ -193,6 +229,11 @@ export function AccountantAccessContent() {
               placeholder="accountant@voorbeeld.nl"
               className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
+            {emailError && (
+              <p className="mt-1 text-sm text-destructive" role="alert">
+                {emailError}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
