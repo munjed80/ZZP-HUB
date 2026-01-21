@@ -5,6 +5,39 @@ import { getAccountantSession } from "@/lib/auth/accountant-session";
 import { getServerAuthSession } from "@/lib/auth";
 import { CompanyDossierContent } from "./dossier-content";
 
+const maskId = (value?: string | null) => {
+  if (!value) return null;
+  if (value.length <= 6) return `${value[0]}***${value[value.length - 1]}`;
+  return `${value.slice(0, 3)}***${value.slice(-2)}`;
+};
+
+const logDossierLoad = (payload: Record<string, unknown>) => {
+  console.log("[ACCOUNTANT_DOSSIER_LOAD]", payload);
+};
+
+export const buildForbiddenDossierResponse = (message: string, companyId?: string) => {
+  const body = `
+    <!doctype html>
+    <html lang="nl">
+      <head><title>Geen toegang</title></head>
+      <body style="font-family: system-ui; padding: 2rem; color: #111;">
+        <h1>Geen toegang tot dossier</h1>
+        <p>${message}</p>
+        ${
+          companyId
+            ? `<p>Bedrijf: <code>${companyId}</code></p>`
+            : ""
+        }
+        <p><a href="/accountant-portal">Terug naar Accountant Portal</a></p>
+      </body>
+    </html>
+  `;
+  return new Response(body, {
+    status: 403,
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+};
+
 export const metadata: Metadata = {
   title: "Bedrijfsdossier",
   description: "Volledig overzicht van bedrijfsgegevens voor accountants",
@@ -25,6 +58,13 @@ export default async function CompanyDossierPage({
   const userRole = accountantSession?.role || regularSession?.user?.role;
 
   if (!userId) {
+    logDossierLoad({
+      hasSession: false,
+      accountantUserIdMasked: maskId(userId),
+      companyIdMasked: maskId(companyId),
+      allowed: false,
+      reason: "NO_SESSION",
+    });
     redirect("/login?type=accountant");
   }
 
@@ -39,7 +79,14 @@ export default async function CompanyDossierPage({
   });
 
   if (!hasAccess) {
-    notFound();
+    logDossierLoad({
+      hasSession: true,
+      accountantUserIdMasked: maskId(userId),
+      companyIdMasked: maskId(companyId),
+      allowed: false,
+      reason: "NO_ACCESS",
+    });
+    return buildForbiddenDossierResponse("Je hebt geen toegang tot dit dossier.", maskId(companyId) ?? companyId);
   }
 
   // Get company details
@@ -51,8 +98,23 @@ export default async function CompanyDossierPage({
   });
 
   if (!company) {
+    logDossierLoad({
+      hasSession: true,
+      accountantUserIdMasked: maskId(userId),
+      companyIdMasked: maskId(companyId),
+      allowed: false,
+      reason: "COMPANY_NOT_FOUND",
+    });
     notFound();
   }
+
+  logDossierLoad({
+    hasSession: true,
+    accountantUserIdMasked: maskId(userId),
+    companyIdMasked: maskId(companyId),
+    allowed: true,
+    reason: "ALLOWED",
+  });
 
   // Get invoices
   const invoices = await prisma.invoice.findMany({

@@ -8,6 +8,7 @@ import { Building2, AlertCircle, Clock, FileText, Search, ExternalLink, Filter, 
 import { UserRole } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { NotificationsPanel } from "@/components/notifications/notifications-panel";
+import Link from "next/link";
 
 type Company = {
   id: string;
@@ -25,6 +26,9 @@ type Company = {
 };
 
 type FilterPeriod = "custom" | "month" | "quarter" | "year";
+
+export const buildDossierHref = (companyId: string) =>
+  `/accountant-portal/dossier/${companyId}`;
 
 export function AccountantPortalContent() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -58,7 +62,7 @@ export function AccountantPortalContent() {
   async function handleCompanyClick(companyId: string, viewDossier = false) {
     if (viewDossier) {
       // Navigate directly to dossier
-      router.push(`/accountant-portal/dossier/${companyId}`);
+      router.push(buildDossierHref(companyId));
       return;
     }
 
@@ -67,7 +71,7 @@ export function AccountantPortalContent() {
 
     if (result.success) {
       toast.success("Bedrijfscontext gewisseld");
-      router.push(`/accountant-portal/dossier/${companyId}`);
+      router.push(buildDossierHref(companyId));
     } else {
       toast.error(result.message || "Fout bij wisselen van bedrijf");
       setSwitching(false);
@@ -439,16 +443,14 @@ export function AccountantPortalContent() {
 
                 {/* Action Buttons */}
                 <div className="mt-4 pt-4 border-t border-border flex gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCompanyClick(company.companyId, true);
-                    }}
+                  <Link
+                    href={buildDossierHref(company.companyId)}
+                    onClick={(e) => e.stopPropagation()}
                     className="w-full px-3 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                   >
                     <Eye className="h-4 w-4" />
                     Dossier bekijken
-                  </button>
+                  </Link>
                 </div>
               </div>
             </button>
