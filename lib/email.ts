@@ -55,9 +55,18 @@ interface EmailError {
  * Determine email type based on subject
  */
 function getEmailType(subject: string): string {
-  if (subject.includes("Verifieer")) return "verification";
-  if (subject.includes("Factuur")) return "invoice";
+  const lower = subject.toLowerCase();
+  if (lower.includes("uitnod")) return "invite";
+  if (lower.includes("verifieer")) return "verification";
+  if (lower.includes("factuur")) return "invoice";
   return "support";
+}
+
+function maskRecipient(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return "***";
+  if (local.length <= 2) return `${local[0] || "*"}***@${domain}`;
+  return `${local[0]}***${local.slice(-1)}@${domain}`;
 }
 
 /**
@@ -65,9 +74,9 @@ function getEmailType(subject: string): string {
  */
 function logEmailAttempt(type: string, to: string, from: string, subject: string) {
   console.log(JSON.stringify({
-    event: "email_send_attempt",
+    event: "EMAIL_SEND_ATTEMPT",
     type,
-    to,
+    toMasked: maskRecipient(to),
     from,
     subject,
   }));
@@ -78,9 +87,9 @@ function logEmailAttempt(type: string, to: string, from: string, subject: string
  */
 export function logEmailSuccess(messageId: string, to: string, subject: string, from: string) {
   console.log(JSON.stringify({
-    event: "email_send_success",
+    event: "EMAIL_SEND_SUCCESS",
     messageId,
-    to,
+    toMasked: maskRecipient(to),
     subject,
     from,
   }));
@@ -92,7 +101,7 @@ export function logEmailSuccess(messageId: string, to: string, subject: string, 
 function logDeliverabilityCheck(to: string, from: string, authStatus: EmailAuthStatus) {
   console.log(JSON.stringify({
     event: "EMAIL_DELIVERABILITY_CHECK",
-    to,
+    toMasked: maskRecipient(to),
     from,
     spf: authStatus.spf || "unknown",
     dkim: authStatus.dkim || "unknown",
@@ -186,8 +195,8 @@ async function throttleEmailSend(): Promise<void> {
  */
 function logEmailFailure(error: Error | EmailError, to: string, from: string, subject: string) {
   const logData: Record<string, unknown> = {
-    event: "email_send_failure",
-    to,
+    event: "EMAIL_SEND_FAIL",
+    toMasked: maskRecipient(to),
     from,
     subject,
     error: error.message,
@@ -259,6 +268,9 @@ export async function sendEmail({ to, subject, react, replyTo }: SendEmailOption
       replyTo: resolvedReplyTo,
       headers: {
         'X-Entity-Ref-ID': randomUUID(),
+        'Reply-To': resolvedReplyTo,
+        'List-Unsubscribe': '<mailto:support@zzpershub.nl?subject=unsubscribe>',
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
       },
     });
 
@@ -290,7 +302,7 @@ export async function sendEmail({ to, subject, react, replyTo }: SendEmailOption
     logDeliverabilityCheck(to, from, authStatus);
 
     // Log success with real message ID
-    logEmailSuccess(result.data.id, to, subject, from);
+      logEmailSuccess(result.data.id, to, subject, from);
 
     return { success: true, messageId: result.data.id };
   } catch (error) {

@@ -17,6 +17,10 @@ export const EMAIL_FROM =
   process.env.EMAIL_FROM?.trim() || `${EMAIL_FROM_NAME} <${EMAIL_FROM_ADDRESS}>`;
 export const EMAIL_REPLY_TO =
   process.env.EMAIL_REPLY_TO?.trim() || "support@zzpershub.nl";
+export const MAIL_FROM =
+  process.env.MAIL_FROM?.trim() || EMAIL_FROM;
+export const MAIL_REPLY_TO =
+  process.env.MAIL_REPLY_TO?.trim() || EMAIL_REPLY_TO;
 
 export const SUPPORT_EMAIL = EMAIL_REPLY_TO;
 export const NO_REPLY_EMAIL = EMAIL_FROM_ADDRESS;

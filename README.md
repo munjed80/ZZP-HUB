@@ -113,6 +113,7 @@ WHERE email = 'test@example.com';
    - `RESEND_FROM_EMAIL` of `EMAIL_FROM` (optioneel): Afzendernaam/e-mail voor alle uitgaande mails
    - `APP_URL` of `NEXT_PUBLIC_APP_URL`: Basis-URL voor links in e-mails
    - `KVK_API_KEY` (optioneel): Voor echte KVK integratie
+   - DNS: stel SPF, DKIM en DMARC records in voor `zzpershub.nl` (Cloudflare) voor deliverability
 
 2. Build en start + migrations:
    ```bash
@@ -239,4 +240,3 @@ Schakel debug mode in door op het bug-icoon rechtsboven te klikken. Dit toont:
 - **Audit logging**: Elke actie gelogd met requestId
 - **Input validation**: Zod schemas op alle lagen
 - **Friendly errors**: Geen raw Prisma errors naar gebruiker
-
