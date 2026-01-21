@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const companyIdSchema = z.string().uuid();
+const REVIEW_STATUS_NEEDS_REVIEW = "needs_review";
 
 async function loadDossier(companyId: string) {
   const company = await prisma.user.findUnique({
@@ -17,9 +18,9 @@ async function loadDossier(companyId: string) {
 
   const [invoicesCount, invoicesUnpaid, expensesCount, expensesNeedsReview] = await Promise.all([
     prisma.invoice.count({ where: { userId: companyId } }),
-    prisma.invoice.count({ where: { userId: companyId, reviewStatus: "needs_review" } }),
+    prisma.invoice.count({ where: { userId: companyId, reviewStatus: REVIEW_STATUS_NEEDS_REVIEW } }),
     prisma.expense.count({ where: { userId: companyId } }),
-    prisma.expense.count({ where: { userId: companyId, reviewStatus: "needs_review" } }),
+    prisma.expense.count({ where: { userId: companyId, reviewStatus: REVIEW_STATUS_NEEDS_REVIEW } }),
   ]);
 
   return {
