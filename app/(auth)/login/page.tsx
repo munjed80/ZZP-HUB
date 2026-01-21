@@ -8,8 +8,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, Lock, Mail, Sparkles, Home } from "lucide-react";
-import { Suspense, useEffect, useState } from "react";
-import { resolveLoginRedirect } from "@/lib/auth/role-redirect";
+import { Suspense, useState } from "react";
+import { safeNextUrl } from "@/lib/auth/safe-next";
 
 const schema = z.object({
   email: z.string().email("Voer een geldig e-mailadres in"),
@@ -31,26 +31,10 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const typeParam = searchParams.get("type");
-  const loginType = typeParam === "accountant" ? "accountant" : "zzp";
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { email: "", password: "" },
   });
-
-  useEffect(() => {
-    if (typeParam === "zzp" || typeParam === "accountant") return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("type", "zzp");
-    router.replace(`?${params.toString()}`, { scroll: false });
-  }, [router, searchParams, typeParam]);
-
-  const handleTypeChange = (type: "zzp" | "accountant") => {
-    if (type === loginType) return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("type", type);
-    router.replace(`?${params.toString()}`, { scroll: false });
-  };
 
   const onSubmit = async (data: FormData) => {
     setError(null);
@@ -66,74 +50,22 @@ function LoginContent() {
       setLoading(false);
       return;
     }
-
-    // Fetch session to get user role
-    const response = await fetch("/api/auth/session");
-    const session = await response.json();
-    
     const requestedRedirect = searchParams.get("next") ?? searchParams.get("callbackUrl");
-    const target = resolveLoginRedirect({
-      role: session?.user?.role,
-      selectedType: loginType,
-      requestedRedirect,
-    });
-    console.log("[AUTH_REDIRECT_BY_ROLE]", {
-      role: session?.user?.role,
-      selectedType: loginType,
-      target,
-    });
-    
-    const isAccountant = session?.user?.role === "ACCOUNTANT" || session?.user?.role === "ACCOUNTANT_EDIT" || session?.user?.role === "ACCOUNTANT_VIEW";
-    if (loginType === "zzp" && isAccountant) {
-      setError("Dit account is een boekhouder. Gebruik de boekhouder-login.");
-      setLoading(false);
-      return;
-    }
-
+    const target = safeNextUrl(requestedRedirect, "/dashboard");
     router.push(target);
     router.refresh();
   };
 
   return (
     <div className="space-y-8 rounded-[32px] bg-card/70 p-8 shadow-[0_24px_80px_-60px_rgba(15,23,42,0.45)] backdrop-blur-xl ring-1 ring-border">
-      <div className="space-y-4">
-        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-          <Sparkles className="h-4 w-4" aria-hidden />
-          ZZP-HUB Dashboard
-        </div>
+        <div className="space-y-4">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
+            <Sparkles className="h-4 w-4" aria-hidden />
+            ZZP-HUB Dashboard
+          </div>
 
         <div className="flex flex-col gap-2">
-          <div className="grid grid-cols-2 rounded-full border border-border bg-muted p-1 text-sm font-medium">
-            <button
-              type="button"
-              onClick={() => handleTypeChange("zzp")}
-              className={`rounded-full px-4 py-2 transition ${
-                loginType === "zzp"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              aria-pressed={loginType === "zzp"}
-            >
-              Voor ZZP
-            </button>
-            <button
-              type="button"
-              onClick={() => handleTypeChange("accountant")}
-              className={`rounded-full px-4 py-2 transition ${
-                loginType === "accountant"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              aria-pressed={loginType === "accountant"}
-            >
-              Voor Boekhouders
-            </button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {loginType === "accountant"
-              ? "Inloggen voor accountants en boekhouders."
-              : "Inloggen voor ZZP’ers en bedrijfseigenaren."}
-          </p>
+          <p className="text-xs text-muted-foreground">Inloggen voor ZZP’ers en bedrijfseigenaren.</p>
         </div>
 
         <div className="space-y-2">

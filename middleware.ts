@@ -4,14 +4,6 @@ import { getToken } from 'next-auth/jwt';
 import { resolveAuthSecret } from '@/lib/auth/secret';
 import { shouldLogAuth } from '@/lib/auth/logging';
 import { safeNextUrl } from '@/lib/auth/safe-next';
-// Edge-safe accountant role helper (server-only variant lives in lib/auth/tenant.ts)
-import { isAccountantRole } from '@/lib/utils';
-
-// Cookie name for accountant sessions
-// Note: This cookie is scoped to path="/accountant-portal" - it will ONLY be sent by the browser
-// for requests to /accountant-portal/* routes. This prevents session confusion where accountants
-// could accidentally access ZZP-only pages like /instellingen.
-const ACCOUNTANT_SESSION_COOKIE = 'zzp-accountant-session';
 
 // Routes that should be accessible even without email verification
 const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-required', '/resend-verification'];
@@ -30,20 +22,10 @@ const protectedPrefixes = [
   '/agenda',
   '/instellingen',
   '/admin',
-  '/accountant-portal',
 ];
 
 const isProtectedPath = (pathname: string) =>
   protectedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
-
-// Routes that accountants can access when they have an accountant session cookie
-// Note: Since the cookie is scoped to path="/accountant-portal", the browser will only send it
-// for /accountant-portal/* routes. This list is intentionally limited to the portal to avoid
-// accidental access to ZZP-only areas like /dashboard.
-const accountantAllowedPrefixes = ['/accountant-portal', '/accountant-portal/dossier'];
-
-const isAccountantAllowedPath = (pathname: string) =>
-  accountantAllowedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
 const authSecret = resolveAuthSecret();
 
@@ -61,7 +43,6 @@ export async function middleware(request: NextRequest) {
   // Construct the next parameter from the original request path (pathname + search)
   // IMPORTANT: Do NOT read from an existing 'next' param to avoid nested next wrapping
   const originalPath = `${pathname}${request.nextUrl.search}`;
-  const isAccountantPath = isAccountantAllowedPath(pathname);
 
   // Only guard protected app routes - early return for public routes
   // This prevents unnecessary session lookups on public pages
@@ -69,39 +50,11 @@ export async function middleware(request: NextRequest) {
     logRedirect('PUBLIC_ROUTE_ALLOWED', { pathname });
     return NextResponse.next();
   }
-
-  // EDGE-COMPATIBLE: Check for accountant session cookie presence via request.cookies
-  // 
-  // IMPORTANT: The accountant session cookie is scoped to path="/accountant-portal", meaning:
-  // - The browser will ONLY send this cookie for requests to /accountant-portal/* routes
-  // - For all other routes (like /instellingen, /facturen, etc.), the cookie is NOT sent
-  // - This prevents the bug where accountants could accidentally access ZZP-only pages
-  // 
-  // Deep validation (session lookup, expiry, permissions, tenant isolation) 
-  // is done server-side in API routes and server components
-  const accountantSessionCookie = request.cookies.get(ACCOUNTANT_SESSION_COOKIE)?.value;
-  
-  if (accountantSessionCookie) {
-    // Log that we detected an accountant session cookie (structured log)
-    // This should only happen for /accountant-portal/* routes due to cookie path scoping
-    if (shouldLogAuth || process.env.SECURITY_DEBUG === 'true') {
-      console.log('[MIDDLEWARE] ACCOUNTANT_SESSION_COOKIE_DETECTED', {
-        timestamp: new Date().toISOString(),
-        pathname,
-      });
-    }
-    return NextResponse.next();
-  }
   
   if (!authSecret) {
     const loginUrl = new URL('/login', request.url);
-    if (isAccountantPath) {
-      loginUrl.searchParams.set('type', 'accountant');
-    } else {
-      loginUrl.searchParams.set('type', 'zzp');
-    }
     // Use safeNextUrl to prevent nested next parameters and validate the path
-    const defaultFallback = isAccountantPath ? '/accountant-portal' : '/dashboard';
+    const defaultFallback = '/dashboard';
     const nextUrl = safeNextUrl(originalPath, defaultFallback);
     loginUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_LOGIN_NO_SECRET', { pathname });
@@ -125,13 +78,8 @@ export async function middleware(request: NextRequest) {
   // If not logged in, redirect to login
   if (!token) {
     const loginUrl = new URL('/login', request.url);
-    if (isAccountantPath) {
-      loginUrl.searchParams.set('type', 'accountant');
-    } else {
-      loginUrl.searchParams.set('type', 'zzp');
-    }
     // Use safeNextUrl to prevent nested next parameters and validate the path
-    const defaultFallback = isAccountantPath ? '/accountant-portal' : '/dashboard';
+    const defaultFallback = '/dashboard';
     const nextUrl = safeNextUrl(originalPath, defaultFallback);
     loginUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_LOGIN_NO_TOKEN', { pathname, hasAuthSecret: Boolean(authSecret), tokenError: tokenErrorReason });
@@ -139,26 +87,6 @@ export async function middleware(request: NextRequest) {
   }
 
   const userRole = token.role as string | undefined;
-
-  // Non-accountants visiting accountant-specific routes get routed to the accountant login
-  if (isAccountantPath && !(isAccountantRole(userRole) || userRole === 'SUPERADMIN')) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('type', 'accountant');
-    // Use safeNextUrl to prevent nested next parameters and validate the path
-    const nextUrl = safeNextUrl(originalPath, '/accountant-portal');
-    loginUrl.searchParams.set('next', nextUrl);
-    logRedirect('REDIRECT_WRONG_ROLE_LOGIN', { pathname, role: userRole });
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Accountants should never see the ZZP dashboard or related routes; redirect them to the portal
-  if (!isAccountantPath && isAccountantRole(userRole)) {
-    const portalUrl = new URL('/accountant-portal', request.url);
-    // Don't set next parameter when redirecting accountants to their portal
-    // This prevents the loop scenario
-    logRedirect('REDIRECT_ACCOUNTANT_TO_PORTAL', { pathname, role: userRole });
-    return NextResponse.redirect(portalUrl);
-  }
 
   const emailVerified = Boolean(token.emailVerified);
   const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';
@@ -171,7 +99,7 @@ export async function middleware(request: NextRequest) {
   if (requiresVerification && !preVerificationRoutes.includes(pathname)) {
     const verifyUrl = new URL('/verify-required', request.url);
     // Use safeNextUrl to prevent nested next parameters and validate the path
-    const defaultFallback = isAccountantPath ? '/accountant-portal' : '/dashboard';
+    const defaultFallback = '/dashboard';
     const nextUrl = safeNextUrl(originalPath, defaultFallback);
     verifyUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_VERIFY_EMAIL', { pathname, role: userRole });
@@ -184,7 +112,7 @@ export async function middleware(request: NextRequest) {
   if (emailVerified && !onboardingCompleted && !onSetupRoute) {
     const setupUrl = new URL('/setup', request.url);
     // Use safeNextUrl to prevent nested next parameters and validate the path
-    const defaultFallback = isAccountantPath ? '/accountant-portal' : '/dashboard';
+    const defaultFallback = '/dashboard';
     const nextUrl = safeNextUrl(originalPath, defaultFallback);
     setupUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_SETUP', { pathname, role: userRole });
@@ -215,6 +143,5 @@ export const config = {
     '/agenda/:path*',
     '/instellingen/:path*',
     '/admin/:path*',
-    '/accountant-portal/:path*',
   ],
 };

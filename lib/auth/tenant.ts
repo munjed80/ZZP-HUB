@@ -8,7 +8,6 @@
 import "server-only";
 import { getServerAuthSession } from "../auth";
 import { AccountantAccessStatus, UserRole } from "@prisma/client";
-import { getAccountantSession } from "./accountant-session";
 import { prisma } from "../prisma";
 
 export interface SessionContext {
@@ -20,10 +19,9 @@ export interface SessionContext {
 }
 
 /**
- * Get the current session or throw if not authenticated
- * Supports both NextAuth sessions and accountant sessions
- * @throws Error if user is not authenticated or is suspended
- */
+   * Get the current session or throw if not authenticated
+   * @throws Error if user is not authenticated or is suspended
+   */
 export async function requireSession(): Promise<SessionContext> {
   // First try NextAuth session
   const session = await getServerAuthSession();
@@ -41,19 +39,6 @@ export async function requireSession(): Promise<SessionContext> {
     };
   }
   
-  // Try accountant session
-  const accountantSession = await getAccountantSession();
-  
-  if (accountantSession) {
-    return {
-      userId: accountantSession.userId,
-      role: accountantSession.role,
-      email: accountantSession.email,
-      isAccountantSession: true,
-      companyId: accountantSession.companyId,
-    };
-  }
-  
   throw new Error("Niet geauthenticeerd. Log in om door te gaan.");
 }
 
@@ -66,22 +51,12 @@ export async function requireSession(): Promise<SessionContext> {
 export async function requireTenantContext(): Promise<{ userId: string }> {
   const session = await requireSession();
   
-  // For accountant sessions, use the companyId directly
-  if (session.isAccountantSession && session.companyId) {
-    return { userId: session.companyId };
-  }
-  
-  // Import dynamically to avoid circular dependency
-  const { getActiveCompanyId } = await import("./company-context");
-  
   // For SUPERADMIN and COMPANY_ADMIN, always use their own userId
   if (session.role === "SUPERADMIN" || session.role === "COMPANY_ADMIN") {
     return { userId: session.userId };
   }
   
-  // For accountants and staff with NextAuth session, use the active company context
-  const companyId = await getActiveCompanyId();
-  return { userId: companyId };
+  return { userId: session.userId };
 }
 
 /**
@@ -96,38 +71,6 @@ export async function requireRole(role: UserRole): Promise<SessionContext> {
   }
 
   return session;
-}
-
-/**
- * Require a NextAuth-backed accountant session
- */
-export async function requireAccountantSession() {
-  const session = await getServerAuthSession();
-  if (!session?.user || session.user.role !== UserRole.ACCOUNTANT) {
-    throw new Error("Je hebt een boekhouder-account nodig om deze actie uit te voeren.");
-  }
-
-  return {
-    userId: session.user.id,
-    email: session.user.email,
-    role: session.user.role,
-  };
-}
-
-/**
- * List company IDs the accountant can access
- */
-export async function getAccountantAccessibleCompanyIds(accountantUserId: string) {
-  const accesses = await prisma.accountantAccess.findMany({
-    where: {
-      accountantUserId,
-      status: AccountantAccessStatus.ACTIVE,
-    },
-    select: {
-      companyId: true,
-    },
-  });
-  return accesses.map((a) => a.companyId);
 }
 
 /**
@@ -243,21 +186,6 @@ function logTenantViolation(
  * Roles that are considered "accountant" roles
  * These users should be redirected to /accountant-portal instead of /dashboard
  */
-export const ACCOUNTANT_ROLES: UserRole[] = [
-  UserRole.ACCOUNTANT,
-  UserRole.ACCOUNTANT_VIEW,
-  UserRole.ACCOUNTANT_EDIT,
-];
-
-/**
- * Check if a role is an accountant role
- * Use this utility for consistent role checking throughout the app
- */
-export function isAccountantRole(role: string | UserRole | undefined): boolean {
-  if (!role) return false;
-  return ACCOUNTANT_ROLES.includes(role as UserRole);
-}
-
 /**
  * Helper to validate that a query result belongs to the current tenant
  * Use this after fetching data to double-check ownership
