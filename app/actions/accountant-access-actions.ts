@@ -135,23 +135,22 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       };
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const rawEmail = (email ?? "").toString();
+    const normalizedEmail = rawEmail.trim().toLowerCase();
+
     // Safe debug logging (no PII)
     console.log("[ACCOUNTANT_INVITE_REQUEST]", {
-      hasEmail: Boolean(email),
-      emailLength: email?.length || 0,
+      hasEmail: Boolean(rawEmail),
+      emailLength: rawEmail.length,
       companyId: session.userId.slice(-6),
     });
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     // Validate email - strict checks before Prisma call
-    if (!email || typeof email !== "string" || !email.trim()) {
+    if (!normalizedEmail) {
       console.log("INVITE_SUBMIT_BLOCKED_BACKEND", { reason: "EMAIL_REQUIRED" });
       return { success: false, error: "EMAIL_REQUIRED", message: "E-mailadres is verplicht." };
     }
-
-    // Trim and normalize email
-    const normalizedEmail = email.trim().toLowerCase();
 
     if (!emailRegex.test(normalizedEmail)) {
       console.log("INVITE_SUBMIT_BLOCKED_BACKEND", { reason: "EMAIL_INVALID" });
@@ -232,11 +231,22 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
     const otpExpiresAt = new Date();
     otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
 
+    if (process.env.NODE_ENV !== "production" && !normalizedEmail) {
+      throw new Error("Invariant: email must be present before prisma.create");
+    }
+
+    console.log("[ACCOUNTANT_INVITE_PRISMA_INPUT]", {
+      emailPresent: Boolean(normalizedEmail),
+      emailValue: normalizedEmail,
+      emailLength: normalizedEmail.length,
+      companyId: session.userId,
+    });
+
     // Create invite with OTP - email is guaranteed non-null here
     const invite = await prisma.accountantInvite.create({
       data: {
         companyId: session.userId,
-        invitedEmail: normalizedEmail.trim(),
+        invitedEmail: normalizedEmail,
         role: UserRole.ACCOUNTANT,
         tokenHash,
         otpHash,

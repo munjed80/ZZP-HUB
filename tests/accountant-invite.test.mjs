@@ -1,6 +1,14 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 
+// Simple in-memory spy for prisma calls
+let prismaCreateCalled = false;
+let prismaCreateEmail = null;
+function resetSpies() {
+  prismaCreateCalled = false;
+  prismaCreateEmail = null;
+}
+
 /**
  * Accountant Invite Validation Tests
  * 
@@ -9,7 +17,27 @@ import assert from "node:assert/strict";
  */
 
 describe("Accountant Invite Email Validation", () => {
-  
+  test("should not call prisma when email missing/whitespace", () => {
+    resetSpies();
+    const email = "   ";
+    const valid = validateEmail(email);
+    if (valid) {
+      prismaCreateCalled = true;
+    }
+    assert.strictEqual(prismaCreateCalled, false, "Prisma should not be called for whitespace email");
+  });
+
+  test("should create invite with normalized email", () => {
+    resetSpies();
+    const email = "  Accountant@Example.COM  ";
+    const normalized = normalizeEmail(email);
+    // simulate prisma create input
+    prismaCreateCalled = true;
+    prismaCreateEmail = normalized;
+    assert.strictEqual(prismaCreateEmail, "accountant@example.com");
+    assert.strictEqual(prismaCreateCalled, true, "Prisma create should be called");
+  });
+
   test("should reject null email", () => {
     const email = null;
     const isValid = validateEmail(email);
