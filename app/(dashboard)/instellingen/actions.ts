@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { requireTenantContext, requireSession } from "@/lib/auth/tenant";
+import { CompanyRole } from "@prisma/client";
 import {
   companySettingsSchema,
   emailSettingsSchema,
@@ -109,6 +110,37 @@ export async function fetchUserAccount() {
     name: user.naam ?? "",
     email: user.email,
   };
+}
+
+export async function fetchAccountantInvites() {
+  const { userId } = await requireTenantContext();
+  const invites = await prisma.companyUser.findMany({
+    where: {
+      companyId: userId,
+      role: CompanyRole.ACCOUNTANT,
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      invitedEmail: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          email: true,
+        },
+      },
+    },
+  });
+
+  return invites.map((invite) => ({
+    id: invite.id,
+    email: invite.invitedEmail ?? invite.user?.email ?? "Onbekend",
+    status: invite.status,
+    createdAt: invite.createdAt,
+    updatedAt: invite.updatedAt,
+  }));
 }
 
 export async function saveProfileBasics(values: ProfileBasicsInput) {

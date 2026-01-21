@@ -58,6 +58,21 @@ export async function POST(request: Request) {
     },
   });
 
+  const companies = await prisma.companyUser.findMany({
+    where: {
+      userId: session.user.id,
+      status: CompanyUserStatus.ACTIVE,
+    },
+    select: {
+      companyId: true,
+      company: {
+        select: {
+          companyProfile: { select: { companyName: true } },
+        },
+      },
+    },
+  });
+
   await logInviteAccepted({
     userId: session.user.id,
     email,
@@ -66,5 +81,12 @@ export async function POST(request: Request) {
     isNewUser: false,
   });
 
-  return NextResponse.json({ success: true, companyUserId: updated.id });
+  return NextResponse.json({
+    success: true,
+    companyUserId: updated.id,
+    companies: companies.map((c) => ({
+      id: c.companyId,
+      name: c.company?.companyProfile?.companyName || "Bedrijf",
+    })),
+  });
 }

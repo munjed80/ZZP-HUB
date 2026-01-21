@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useTransition, type ChangeEvent, type Form
 import { 
   User, Building2, FileText, CreditCard, Bell, Shield, 
   Database, Download, Lock, RefreshCw, Check, Globe, Palette,
-  Monitor, Sun, Moon
+  Monitor, Sun, Moon, Users
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { changePassword, downloadBackup, saveProfileAvatar, saveProfileBasics, u
 import { SettingsForm, type CompanyProfileData } from "./settings-form";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/providers/theme-provider";
+import { AccountantInvites } from "./accountant-invites";
 
 const LANGUAGE_KEY = "zzp-hub-language";
 const MAX_AVATAR_BYTES = 3 * 1024 * 1024;
@@ -167,7 +168,12 @@ function Toggle({
   );
 }
 
-export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsProps) {
+export function SettingsTabs({
+  initialProfile,
+  abonnement,
+  user,
+  invites = [],
+}: SettingsTabsProps & { invites?: Array<{ id: string; email: string; status: "PENDING" | "ACTIVE"; createdAt: string; updatedAt: string }> }) {
   const profileSeed = buildProfileSeed(initialProfile, user);
   const { theme, setTheme } = useTheme();
   
@@ -529,6 +535,14 @@ export function SettingsTabs({ initialProfile, abonnement, user }: SettingsTabsP
             </Button>
           </div>
         </form>
+      </SectionCard>
+
+      <SectionCard
+        icon={Users}
+        title="Accountant uitnodigingen"
+        description="Pending en geaccepteerde accountant-toegang."
+      >
+        <AccountantInvites invites={invites} />
       </SectionCard>
 
       {/* Integrations Section */}
