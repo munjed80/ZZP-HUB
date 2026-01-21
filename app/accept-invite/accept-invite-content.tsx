@@ -90,9 +90,9 @@ export function AcceptInviteContent() {
         }));
         toast.success(data.message);
 
-        // Redirect to dashboard after accept
+        // Redirect to accountant portal after accept
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/accountant-portal");
         }, 1500);
       } else {
         setStatus("error");
