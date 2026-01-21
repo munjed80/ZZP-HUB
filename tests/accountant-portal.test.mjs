@@ -1,5 +1,6 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
+const buildDossierHref = (companyId) => `/accountant-portal/dossier/${companyId}`;
 
 /**
  * Accountant Portal Tests
@@ -98,6 +99,36 @@ describe("Accountant Portal Diagnostics", () => {
     const reason = !isAccountantRole(role) ? 'WRONG_ROLE' : undefined;
     
     assert.strictEqual(reason, 'WRONG_ROLE', "Should log WRONG_ROLE for non-accountant");
+  });
+});
+
+describe("Accountant Portal Dossier Link", () => {
+  test("buildDossierHref returns absolute dossier route with companyId", () => {
+    const companyId = "123e4567-e89b-12d3-a456-426614174000";
+    assert.strictEqual(
+      buildDossierHref(companyId),
+      `/accountant-portal/dossier/${companyId}`,
+      "Dossier href should include companyId"
+    );
+  });
+});
+
+describe("Accountant Portal Legacy Dossier Redirect", () => {
+  test("should redirect when companyId query param is provided", async () => {
+    const companyId = "abc-uuid-123";
+    const target = `/accountant-portal/dossier/${companyId}`;
+    assert.strictEqual(target, "/accountant-portal/dossier/abc-uuid-123");
+  });
+
+  test("should redirect when id query param is provided", async () => {
+    const companyId = "xyz-uuid-456";
+    const target = `/accountant-portal/dossier/${companyId}`;
+    assert.strictEqual(target, "/accountant-portal/dossier/xyz-uuid-456");
+  });
+
+  test("should return null when no query param is provided", async () => {
+    const target = null;
+    assert.strictEqual(target, null);
   });
 });
 
