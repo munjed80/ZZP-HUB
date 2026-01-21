@@ -57,3 +57,39 @@ export function assertUniqueHrefs(
     );
   }
 }
+
+/**
+ * Normalize and validate email address
+ * 
+ * @param input - The email address to normalize (can be any type)
+ * @returns Normalized email address (trimmed and lowercased)
+ * @throws Error if email is invalid or missing
+ * 
+ * This function ensures:
+ * 1. Email is a non-empty string
+ * 2. Email matches basic email format (has @ and domain)
+ * 3. Email is trimmed and lowercased for consistency
+ * 4. NEVER returns null - throws error instead
+ */
+export function normalizeEmail(input: unknown): string {
+  // Check if input is a string
+  if (typeof input !== "string") {
+    throw new Error("EMAIL_REQUIRED");
+  }
+
+  // Trim and lowercase
+  const normalized = input.trim().toLowerCase();
+
+  // Check if empty after trimming
+  if (!normalized) {
+    throw new Error("EMAIL_REQUIRED");
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(normalized)) {
+    throw new Error("EMAIL_INVALID");
+  }
+
+  return normalized;
+}

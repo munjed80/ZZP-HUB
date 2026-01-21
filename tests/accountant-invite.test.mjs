@@ -113,6 +113,29 @@ describe("Accountant Invite Email Validation", () => {
     const isValid = validateEmail(email);
     assert.strictEqual(isValid, true, "Existing accountant email should be accepted as valid");
   });
+
+  test("should normalize and accept hotmail.com email (regression test for abo-joud80)", () => {
+    const email = "abo-joud80@hotmail.com";
+    const normalized = normalizeEmail(email);
+    const isValid = validateEmail(email);
+    
+    assert.strictEqual(normalized, "abo-joud80@hotmail.com", "Hotmail email should be normalized correctly");
+    assert.strictEqual(isValid, true, "Hotmail.com email should be accepted as valid");
+  });
+
+  test("should accept email with hyphens in username", () => {
+    const email = "test-user-123@example.com";
+    const isValid = validateEmail(email);
+    
+    assert.strictEqual(isValid, true, "Email with hyphens should be accepted");
+  });
+
+  test("should accept email with numbers in username", () => {
+    const email = "user123@example.com";
+    const isValid = validateEmail(email);
+    
+    assert.strictEqual(isValid, true, "Email with numbers should be accepted");
+  });
 });
 
 /**
