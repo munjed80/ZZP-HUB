@@ -108,7 +108,7 @@ export function AcceptInviteContent() {
         {status === "success" && (
           <div className="space-y-4">
             {companies.length === 0 && (
-              <p className="text-sm text-card-foreground">No access yet</p>
+              <p className="text-sm text-card-foreground">Nog geen toegang</p>
             )}
             {companies.length > 1 && (
               <div className="space-y-3">

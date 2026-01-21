@@ -113,10 +113,10 @@ export async function fetchUserAccount() {
 }
 
 export async function fetchAccountantInvites() {
-  const { userId } = await requireTenantContext();
+  const { userId: companyId } = await requireTenantContext();
   const invites = await prisma.companyUser.findMany({
     where: {
-      companyId: userId,
+      companyId,
       role: CompanyRole.ACCOUNTANT,
     },
     orderBy: { createdAt: "desc" },
