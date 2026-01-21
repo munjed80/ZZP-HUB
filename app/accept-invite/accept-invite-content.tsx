@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle, Loader2, XCircle, Sparkles, ArrowRight } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, Sparkles, ArrowRight, LogOut, Building2 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { safeNextUrl } from "@/lib/auth/safe-next";
+import { signOut } from "next-auth/react";
 
 type Status = "loading" | "success" | "error";
 
@@ -17,6 +17,7 @@ export function AcceptInviteContent() {
 
   const [status, setStatus] = useState<Status>("loading");
   const [message, setMessage] = useState<string>("");
+  const [companies, setCompanies] = useState<Array<{ id: string; name: string }>>([]);
 
   useEffect(() => {
     async function acceptInvite() {
@@ -45,11 +46,26 @@ export function AcceptInviteContent() {
         return;
       }
 
+      const data = await response.json();
+      if (Array.isArray(data?.companies)) {
+        setCompanies(data.companies);
+      }
       setStatus("success");
     }
 
     acceptInvite();
   }, [pathname, router, token]);
+
+  const hasSingleCompany = useMemo(() => companies.length === 1, [companies.length]);
+
+  useEffect(() => {
+    if (status === "success" && hasSingleCompany) {
+      const companyId = companies[0]?.id;
+      if (companyId) {
+        router.replace(`/switch-company?companyId=${companyId}&next=/dashboard`);
+      }
+    }
+  }, [companies, hasSingleCompany, router, status]);
 
   return (
     <div className="space-y-8 rounded-[32px] bg-card/70 p-8 shadow-[0_24px_80px_-60px_rgba(15,23,42,0.45)] backdrop-blur-xl ring-1 ring-border">
@@ -90,20 +106,41 @@ export function AcceptInviteContent() {
           </p>
         )}
         {status === "success" && (
-          <div className="space-y-3">
-            <p className="text-sm text-card-foreground">
-              Je hebt nu toegang tot het dashboard.
-            </p>
-            <Link
-              href="/dashboard"
-              className={buttonVariants(
-                "primary",
-                "inline-flex items-center justify-center text-base py-3"
-              )}
-            >
-              Ga naar dashboard
-              <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
-            </Link>
+          <div className="space-y-4">
+            {companies.length === 0 && (
+              <p className="text-sm text-card-foreground">Nog geen toegang</p>
+            )}
+            {companies.length > 1 && (
+              <div className="space-y-3">
+                <p className="text-sm text-card-foreground">Kies een bedrijf om te openen.</p>
+                <div className="grid gap-3">
+                  {companies.map((company) => (
+                    <button
+                      key={company.id}
+                      onClick={() => router.push(`/switch-company?companyId=${company.id}&next=/dashboard`)}
+                      className={buttonVariants(
+                        "secondary",
+                        "w-full justify-between py-3 px-4 text-sm font-semibold"
+                      )}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4" aria-hidden />
+                        {company.name}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-primary">
+                        Open dashboard
+                        <ArrowRight className="h-3 w-3" aria-hidden />
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {companies.length === 1 && (
+              <p className="text-sm text-card-foreground">
+                We openen je dashboard...
+              </p>
+            )}
           </div>
         )}
         {status === "error" && (
@@ -115,6 +152,18 @@ export function AcceptInviteContent() {
           </div>
         )}
       </div>
+
+      {(status === "success" || status === "error") && (
+        <div className="flex justify-center">
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className={buttonVariants("ghost", "inline-flex items-center gap-2 text-sm font-semibold")}
+          >
+            <LogOut className="h-4 w-4" aria-hidden />
+            Uitloggen
+          </button>
+        </div>
+      )}
     </div>
   );
 }

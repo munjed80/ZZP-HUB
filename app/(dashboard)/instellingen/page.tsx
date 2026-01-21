@@ -1,5 +1,5 @@
 import { SettingsTabs } from "./settings-tabs";
-import { fetchCompanyProfile, fetchUserAccount } from "./actions";
+import { fetchAccountantInvites, fetchCompanyProfile, fetchUserAccount } from "./actions";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,6 +16,7 @@ const abonnement = {
 export default async function InstellingenPagina() {
   const profiel = await fetchCompanyProfile();
   const user = await fetchUserAccount();
+  const invites = await fetchAccountantInvites();
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,7 +32,7 @@ export default async function InstellingenPagina() {
         </div>
       </div>
 
-      <SettingsTabs initialProfile={profiel} abonnement={abonnement} user={user} />
+      <SettingsTabs initialProfile={profiel} abonnement={abonnement} user={user} invites={invites} />
     </div>
   );
 }
