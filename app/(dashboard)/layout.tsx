@@ -7,7 +7,6 @@ import { CompanySwitcher } from "@/components/layout/company-switcher";
 import { DashboardClientShell } from "@/components/layout/dashboard-client-shell";
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getActiveCompanyId } from "@/lib/auth/company-context";
 import { UserRole } from "@prisma/client";
 
 export default async function DashboardShell({ children }: { children: ReactNode }) {
@@ -16,27 +15,15 @@ export default async function DashboardShell({ children }: { children: ReactNode
     redirect("/login?type=zzp");
   }
 
-  if (sessie.user.role === UserRole.ACCOUNTANT) {
-    redirect("/accountant-portal");
-  }
-
   const userName = sessie.user.name || sessie.user.email || "Gebruiker";
   
-  // Get active company ID (for accountants, this may differ from their userId)
-  const activeCompanyId = await getActiveCompanyId();
-  
-  // Fetch profile for the active company
   const profile = await prisma.companyProfile.findUnique({
-    where: { userId: activeCompanyId },
+    where: { userId: sessie.user.id },
     select: { logoUrl: true, companyName: true },
   });
   const avatarUrl = profile?.logoUrl ?? null;
   
-  // Check if user is an accountant/staff who can switch companies
-  const showCompanySwitcher = 
-    sessie.user.role === UserRole.ACCOUNTANT_VIEW ||
-    sessie.user.role === UserRole.ACCOUNTANT_EDIT ||
-    sessie.user.role === UserRole.STAFF;
+  const showCompanySwitcher = false;
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";

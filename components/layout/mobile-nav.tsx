@@ -9,10 +9,9 @@ import {
   Wallet,
   Settings,
   Menu,
-  Briefcase,
   FileText,
 } from "lucide-react";
-import { assertUniqueHrefs, cn, isAccountantRole } from "@/lib/utils";
+import { assertUniqueHrefs, cn } from "@/lib/utils";
 import { UserRole } from "@prisma/client";
 
 // Bottom navigation for ZZP/COMPANY_ADMIN users
@@ -24,13 +23,7 @@ const zzpNavItems = [
   { href: "/instellingen", label: "Instellingen", icon: Settings },
 ];
 
-// Bottom navigation for ACCOUNTANT users (portal only)
-const accountantNavItems = [
-  { href: "/accountant-portal", label: "Portal", icon: Briefcase },
-];
-
 assertUniqueHrefs(zzpNavItems, "MobileNav ZZP");
-assertUniqueHrefs(accountantNavItems, "MobileNav Accountant");
 
 type MobileNavProps = {
   onMenuClick?: () => void;
@@ -40,9 +33,7 @@ type MobileNavProps = {
 export function MobileNav({ onMenuClick, userRole }: MobileNavProps) {
   const pathname = usePathname();
   
-  // Select navigation items based on user role
-  // Default to ZZP nav if role is unknown/undefined (defensive check)
-  const navItems = isAccountantRole(userRole) ? accountantNavItems : zzpNavItems;
+  const navItems = zzpNavItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 shadow-[0_-10px_28px_-20px_rgba(15,23,42,0.18)] backdrop-blur-md md:hidden pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))]">

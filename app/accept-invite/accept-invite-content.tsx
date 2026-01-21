@@ -90,10 +90,9 @@ export function AcceptInviteContent() {
         }));
         toast.success(data.message);
 
-        // Redirect to accountant portal for all users
-        // New users will have a session created automatically
+        // Redirect to dashboard after accept
         setTimeout(() => {
-          router.push("/accountant-portal");
+          router.push("/dashboard");
         }, 1500);
       } else {
         setStatus("error");

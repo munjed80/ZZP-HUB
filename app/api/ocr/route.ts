@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAccountantSession } from "@/lib/auth/accountant-session";
 import { getServerAuthSession } from "@/lib/auth";
 
 /**
@@ -13,9 +12,8 @@ import { getServerAuthSession } from "@/lib/auth";
  */
 export async function POST(request: NextRequest) {
   try {
-    const accountantSession = await getAccountantSession();
     const regularSession = await getServerAuthSession();
-    const userId = accountantSession?.userId || regularSession?.user?.id;
+    const userId = regularSession?.user?.id;
 
     if (!userId) {
       return NextResponse.json(

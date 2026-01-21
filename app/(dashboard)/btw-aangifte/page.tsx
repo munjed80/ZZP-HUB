@@ -4,8 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { getVatReport } from "./actions";
-import { ExportButton } from "@/components/export/export-button";
-import { getActiveCompanyId } from "@/lib/auth/company-context";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -45,8 +43,7 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Promi
   const report = await getVatReport(selectedYear, selectedQuarter);
   const years = [currentYear, currentYear - 1, currentYear - 2];
   
-  // Get active company for export button
-  const activeCompanyId = await getActiveCompanyId();
+  const activeCompanyId = undefined;
 
   const finalLabel = report.totalDue >= 0 ? "Te betalen" : "Terug te vragen";
   const finalVariant = report.totalDue > 0 ? "warning" : "success";
@@ -87,7 +84,6 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Promi
             <div className="h-1.5 w-12 rounded-full bg-gradient-to-r from-warning via-accent to-primary"></div>
             <h1 className="text-3xl font-bold text-foreground">BTW-aangifte</h1>
           </div>
-          <ExportButton companyId={activeCompanyId} />
         </div>
         <p className="text-sm text-muted-foreground font-medium">
           Bereken je aangifte per kwartaal met officiële rubrieken zoals bij de Belastingdienst.
