@@ -21,7 +21,12 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null) as { email?: unknown } | null;
-  const email = normalizeEmail(body?.email);
+  let email: string;
+  try {
+    email = normalizeEmail(body?.email);
+  } catch (error) {
+    return NextResponse.json({ error: "Ongeldig e-mailadres" }, { status: 400 });
+  }
   const token = crypto.randomBytes(32).toString("hex");
   const tokenHash = hashToken(token);
 
@@ -47,6 +52,7 @@ export async function POST(request: Request) {
       },
     });
   } else {
+    console.log("[accountant-invite] create.email", email);
     await prisma.companyUser.create({
       data: {
         companyId: session.user.id,

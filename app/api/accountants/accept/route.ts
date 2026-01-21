@@ -20,7 +20,13 @@ export async function POST(request: Request) {
   if (!body?.token) {
     return NextResponse.json({ error: "Token vereist" }, { status: 400 });
   }
-  const email = body.email ? normalizeEmail(body.email) : session.user.email;
+  let email: string;
+  try {
+    email = body.email ? normalizeEmail(body.email) : normalizeEmail(session.user.email);
+  } catch {
+    return NextResponse.json({ error: "Ongeldig e-mailadres" }, { status: 400 });
+  }
+  console.log("[accountant-accept] create.email", email);
   const tokenHash = hashToken(String(body.token));
 
   const companyUser = await prisma.companyUser.findUnique({
