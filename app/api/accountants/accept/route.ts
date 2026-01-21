@@ -22,11 +22,18 @@ export async function POST(request: Request) {
   }
   let email: string;
   try {
-    email = body.email ? normalizeEmail(body.email) : normalizeEmail(session.user.email);
-  } catch {
-    return NextResponse.json({ error: "Ongeldig e-mailadres" }, { status: 400 });
+    if (!body.email && !session.user.email) {
+      throw new Error("EMAIL_REQUIRED");
+    }
+    const sourceEmail = body.email ?? session.user.email;
+    email = normalizeEmail(sourceEmail);
+  } catch (error) {
+    const message =
+      error instanceof Error && (error.message === "EMAIL_REQUIRED" || error.message === "EMAIL_INVALID")
+        ? "Ongeldig e-mailadres"
+        : "Ongeldige aanvraag";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
-  console.log("[accountant-accept] create.email", email);
   const tokenHash = hashToken(String(body.token));
 
   const companyUser = await prisma.companyUser.findUnique({
