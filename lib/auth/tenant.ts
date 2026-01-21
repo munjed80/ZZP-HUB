@@ -7,15 +7,12 @@
 
 import "server-only";
 import { getServerAuthSession } from "../auth";
-import { AccountantAccessStatus, UserRole } from "@prisma/client";
-import { prisma } from "../prisma";
+import { UserRole } from "@prisma/client";
 
 export interface SessionContext {
   userId: string;
   role: UserRole;
   email: string;
-  isAccountantSession?: boolean;
-  companyId?: string;
 }
 
 /**
@@ -34,8 +31,7 @@ export async function requireSession(): Promise<SessionContext> {
     return {
       userId: session.user.id,
       role: session.user.role,
-      email: session.user.email,
-      isAccountantSession: false,
+        email: session.user.email,
     };
   }
   

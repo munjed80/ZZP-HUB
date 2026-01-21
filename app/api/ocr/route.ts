@@ -47,13 +47,12 @@ export async function POST(request: NextRequest) {
 
     // Verify access - either user owns the expense or is an accountant with access
     if (expense.userId !== userId) {
-      // Check if user is an accountant with access
-      const hasAccess = await prisma.companyMember.findUnique({
+      const hasAccess = await prisma.companyUser.findFirst({
         where: {
-          companyId_userId: {
-            companyId: expense.userId,
-            userId,
-          },
+          companyId: expense.userId,
+          userId,
+          role: "ACCOUNTANT",
+          status: "ACTIVE",
         },
       });
 

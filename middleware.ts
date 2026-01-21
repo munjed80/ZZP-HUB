@@ -22,7 +22,6 @@ const protectedPrefixes = [
   '/agenda',
   '/instellingen',
   '/admin',
-  '/accountant-portal',
 ];
 
 const isProtectedPath = (pathname: string) =>
@@ -77,7 +76,7 @@ export async function middleware(request: NextRequest) {
   const setupRoutes = ['/setup', '/onboarding'];
 
   // If not logged in, redirect to login
-  const loginPath = pathname.startsWith('/accountant-portal') ? '/login?type=accountant' : '/login';
+  const loginPath = '/login';
 
   if (!token) {
     const loginUrl = new URL(loginPath, request.url);
@@ -90,21 +89,6 @@ export async function middleware(request: NextRequest) {
   }
 
   const userRole = token.role as string | undefined;
-
-  if (pathname.startsWith('/accountant-portal') && userRole !== 'ACCOUNTANT') {
-    const loginUrl = new URL('/login?type=accountant', request.url);
-    const defaultFallback = '/accountant-portal';
-    const nextUrl = safeNextUrl(originalPath, defaultFallback);
-    loginUrl.searchParams.set('next', nextUrl);
-    logRedirect('REDIRECT_ACCOUNTANT_ONLY', { pathname, role: userRole });
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (!pathname.startsWith('/accountant-portal') && userRole === 'ACCOUNTANT') {
-    const portalUrl = new URL('/accountant-portal', request.url);
-    logRedirect('REDIRECT_ACCOUNTANT_TO_PORTAL', { pathname });
-    return NextResponse.redirect(portalUrl);
-  }
 
   const emailVerified = Boolean(token.emailVerified);
   const onboardingCookie = request.cookies.get('zzp-hub-onboarding-completed')?.value === 'true';

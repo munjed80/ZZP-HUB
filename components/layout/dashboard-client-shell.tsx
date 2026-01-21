@@ -17,9 +17,10 @@ type DashboardClientShellProps = {
   userRole?: UserRole;
   avatarUrl?: string | null;
   userId: string;
+  disableActions?: boolean;
 };
 
-export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl, userId }: DashboardClientShellProps) {
+export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl, userId, disableActions }: DashboardClientShellProps) {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const avatarUrl = useSyncExternalStore(
@@ -59,7 +60,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
 
   return (
     <AvatarContext.Provider value={avatarUrl}>
-      <Sidebar userRole={userRole} />
+      <Sidebar userRole={userRole} disableActions={disableActions} />
       {/* Mobile hamburger menu button */}
       <button
         type="button"
