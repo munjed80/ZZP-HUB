@@ -173,7 +173,7 @@ export function SettingsTabs({
   abonnement,
   user,
   invites = [],
-}: SettingsTabsProps & { invites?: Array<{ id: string; email: string; status: "PENDING" | "ACTIVE"; createdAt: string; updatedAt: string }> }) {
+}: SettingsTabsProps & { invites?: Array<{ id: string; email: string; status: "PENDING" | "ACTIVE"; canRead: boolean; canEdit: boolean; canExport: boolean; canBTW: boolean; createdAt: string | Date; updatedAt: string | Date }> }) {
   const profileSeed = buildProfileSeed(initialProfile, user);
   const { theme, setTheme } = useTheme();
   
