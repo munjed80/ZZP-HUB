@@ -71,10 +71,12 @@ export function AccountantAccessContent() {
     if (!trimmed) {
       return { valid: false, message: "E-mail is verplicht." };
     }
-    if (!emailRegex.test(trimmed)) {
+    // Lowercase before validation to match server-side normalization
+    const normalized = trimmed.toLowerCase();
+    if (!emailRegex.test(normalized)) {
       return { valid: false, message: "Ongeldig e-mailadres." };
     }
-    return { valid: true, email: trimmed };
+    return { valid: true, email: normalized };
   };
 
   async function handleInvite(e: React.FormEvent) {

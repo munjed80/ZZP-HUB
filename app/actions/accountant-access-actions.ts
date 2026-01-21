@@ -12,6 +12,7 @@ import AccountantOTPEmail from "@/components/emails/AccountantOTPEmail";
 import { logInviteCreated } from "@/lib/auth/security-audit";
 import { clearAccountantSessionOnZZPLogin } from "@/lib/auth/accountant-session";
 import { APP_BASE_URL } from "@/config/emails";
+import { normalizeEmail } from "@/lib/utils";
 
 /**
  * Clear any accountant session cookie when a ZZP/COMPANY_ADMIN user logs in
@@ -135,28 +136,29 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       };
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const rawEmail = (email ?? "").toString();
-    const normalizedEmail = rawEmail.trim().toLowerCase();
-
-    // Safe debug logging (no PII)
-    console.log("[ACCOUNTANT_INVITE_REQUEST]", {
-      hasEmail: Boolean(rawEmail),
-      emailLength: rawEmail.length,
-      companyId: session.userId.slice(-6),
-    });
-
-    // Validate email - strict checks before Prisma call
-    if (!normalizedEmail) {
-      console.log("INVITE_SUBMIT_BLOCKED_BACKEND", { reason: "EMAIL_REQUIRED" });
-      return { success: false, error: "EMAIL_REQUIRED", message: "E-mailadres is verplicht." };
-    }
-
-    if (!emailRegex.test(normalizedEmail)) {
-      console.log("INVITE_SUBMIT_BLOCKED_BACKEND", { reason: "EMAIL_INVALID" });
+    // Normalize and validate email - this will throw if invalid
+    let normalizedEmail: string;
+    try {
+      normalizedEmail = normalizeEmail(email);
+      console.log("[ACCOUNTANT_INVITE_EMAIL_NORMALIZED]", {
+        emailLength: normalizedEmail.length,
+        companyId: session.userId.slice(-6),
+      });
+    } catch (error) {
+      const errorCode = error instanceof Error ? error.message : "UNKNOWN";
+      console.log("[ACCOUNTANT_INVITE_BLOCKED]", { reason: errorCode });
+      
+      if (errorCode === "EMAIL_REQUIRED") {
+        return { 
+          success: false, 
+          error: "EMAIL_REQUIRED", 
+          message: "E-mailadres is verplicht." 
+        };
+      }
+      
       return {
         success: false,
-        error: "EMAIL_MISSING_OR_INVALID",
+        error: "EMAIL_INVALID",
         message: "Vul een geldig e-mailadres in.",
       };
     }
@@ -218,33 +220,47 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
     const otpExpiresAt = new Date();
     otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
 
-    if (process.env.NODE_ENV !== "production" && !normalizedEmail) {
-      throw new Error("Invariant: email must be present before prisma.create");
+    // Runtime guard: Ensure email is present before Prisma call
+    if (!normalizedEmail) {
+      console.error("[ACCOUNTANT_INVITE_CRITICAL_ERROR]", {
+        reason: "EMAIL_NORMALIZATION_FAILED",
+        originalEmail: typeof email,
+        hasEmail: Boolean(email),
+      });
+      throw new Error("EMAIL_NORMALIZATION_FAILED");
     }
 
-    console.log("[ACCOUNTANT_INVITE_PRISMA_INPUT]", {
-      emailPresent: Boolean(normalizedEmail),
-      emailValue: normalizedEmail,
-      emailLength: normalizedEmail.length,
+    // Build the exact data object we'll send to Prisma
+    const createData = {
       companyId: session.userId,
+      invitedEmail: normalizedEmail,
+      role: UserRole.ACCOUNTANT,
+      tokenHash,
+      otpHash,
+      otpExpiresAt,
+      status: InviteStatus.PENDING,
+      expiresAt,
+      inviteType: "ACCOUNTANT_ACCESS",
+      permissions: normalizedPermissions.permissionsJson,
+      acceptedByUserId: accountantUserId || undefined,
+    };
+
+    // Log the EXACT data being sent to Prisma (excluding hashes)
+    console.log("[ACCOUNTANT_INVITE_CREATE_DATA]", {
+      hasEmail: Boolean(createData.invitedEmail),
+      emailLength: createData.invitedEmail.length,
+      companyId: createData.companyId.slice(-6),
+      hasTokenHash: Boolean(createData.tokenHash),
+      hasOtpHash: Boolean(createData.otpHash),
+      hasPermissions: Boolean(createData.permissions),
+      acceptedByUserId: createData.acceptedByUserId?.slice(-6) || null,
     });
 
     // Create invite with OTP - email is guaranteed non-null here
     const invite = await prisma.accountantInvite.create({
-      data: {
-        companyId: session.userId,
-        invitedEmail: normalizedEmail,
-        role: UserRole.ACCOUNTANT,
-        tokenHash,
-        otpHash,
-        otpExpiresAt,
-        status: InviteStatus.PENDING,
-        expiresAt,
-        inviteType: "ACCOUNTANT_ACCESS",
-        permissions: normalizedPermissions.permissionsJson,
-        acceptedByUserId: accountantUserId || undefined,
-      },
+      data: createData,
     });
+    
     console.log("[ACCOUNTANT_INVITE_CREATED]", {
       companyId: session.userId.slice(-6),
       inviteId: invite.id.slice(-6),
