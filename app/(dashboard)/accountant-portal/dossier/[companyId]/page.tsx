@@ -15,7 +15,7 @@ async function loadDossier(companyId: string) {
     },
   });
 
-  const [invoicesCount, invoicesUnpaid, expensesCount, expensesTotal] = await Promise.all([
+  const [invoicesCount, invoicesUnpaid, expensesCount, expensesNeedsReview] = await Promise.all([
     prisma.invoice.count({ where: { userId: companyId } }),
     prisma.invoice.count({ where: { userId: companyId, reviewStatus: "needs_review" } }),
     prisma.expense.count({ where: { userId: companyId } }),
@@ -28,7 +28,7 @@ async function loadDossier(companyId: string) {
       invoicesCount,
       invoicesNeedsReview: invoicesUnpaid,
       expensesCount,
-      expensesNeedsReview: expensesTotal,
+      expensesNeedsReview,
     },
   };
 }
