@@ -135,42 +135,30 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       };
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const rawEmail = (email ?? "").toString();
+    const normalizedEmail = rawEmail.trim().toLowerCase();
+
     // Safe debug logging (no PII)
     console.log("[ACCOUNTANT_INVITE_REQUEST]", {
-      hasEmail: Boolean(email),
-      emailLength: email?.length || 0,
+      hasEmail: Boolean(rawEmail),
+      emailLength: rawEmail.length,
       companyId: session.userId.slice(-6),
     });
 
     // Validate email - strict checks before Prisma call
-    if (!email || typeof email !== 'string') {
-      console.error("[ACCOUNTANT_INVITE_FAILED]", {
-        reason: "EMAIL_MISSING",
-        hasEmail: Boolean(email),
-        emailType: typeof email,
-      });
-      return { success: false, message: "E-mailadres is verplicht." };
-    }
-
-    // Trim and normalize email
-    const normalizedEmail = email.trim().toLowerCase();
-
     if (!normalizedEmail) {
-      console.error("[ACCOUNTANT_INVITE_FAILED]", {
-        reason: "EMAIL_EMPTY_AFTER_TRIM",
-        originalLength: email.length,
-      });
-      return { success: false, message: "E-mailadres mag niet leeg zijn." };
+      console.log("INVITE_SUBMIT_BLOCKED_BACKEND", { reason: "EMAIL_REQUIRED" });
+      return { success: false, error: "EMAIL_REQUIRED", message: "E-mailadres is verplicht." };
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(normalizedEmail)) {
-      console.error("[ACCOUNTANT_INVITE_FAILED]", {
-        reason: "EMAIL_INVALID_FORMAT",
-        emailLength: normalizedEmail.length,
-      });
-      return { success: false, message: "Ongeldig e-mailadres formaat." };
+      console.log("INVITE_SUBMIT_BLOCKED_BACKEND", { reason: "EMAIL_INVALID" });
+      return {
+        success: false,
+        error: "EMAIL_MISSING_OR_INVALID",
+        message: "Vul een geldig e-mailadres in.",
+      };
     }
 
     // Check if already a member
@@ -243,6 +231,17 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
     const otpExpiresAt = new Date();
     otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
 
+    if (process.env.NODE_ENV !== "production" && !normalizedEmail) {
+      throw new Error("Invariant: email must be present before prisma.create");
+    }
+
+    console.log("[ACCOUNTANT_INVITE_PRISMA_INPUT]", {
+      emailPresent: Boolean(normalizedEmail),
+      emailValue: normalizedEmail,
+      emailLength: normalizedEmail.length,
+      companyId: session.userId,
+    });
+
     // Create invite with OTP - email is guaranteed non-null here
     const invite = await prisma.accountantInvite.create({
       data: {
@@ -263,6 +262,7 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       inviteId: invite.id.slice(-6),
       emailLength: normalizedEmail.length,
     });
+    console.log("INVITE_CREATED_SUCCESS", { inviteId: invite.id.slice(-6) });
 
     // Log invite creation for audit
     await logInviteCreated({
@@ -311,12 +311,22 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       inviteUrl: accessUrl,
     };
   } catch (error) {
+    if (error && typeof error === "object" && "code" in error) {
+      const code = (error as { code?: string }).code;
+      if (code === "P2011") {
+        return {
+          success: false,
+          error: "EMAIL_MISSING_OR_INVALID",
+          message: "Vul een geldig e-mailadres in.",
+        };
+      }
+    }
     // Extract error code safely for logging
-    const errorCode = 
-      error && typeof error === 'object' && 'code' in error 
+    const errorCode =
+      error && typeof error === "object" && "code" in error
         ? String((error as { code?: string }).code)
-        : 'UNKNOWN';
-    
+        : "UNKNOWN";
+
     console.error("[ACCOUNTANT_INVITE_FAILED]", {
       reason: "UNEXPECTED_ERROR",
       errorCode,
