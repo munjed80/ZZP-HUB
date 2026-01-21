@@ -166,22 +166,9 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
       where: { email: normalizedEmail },
     });
 
+    let accountantUserId: string | null = null;
     if (existingUser) {
-      const existingAccess = await prisma.accountantAccess.findUnique({
-        where: {
-          accountantUserId_companyId: {
-            companyId: session.userId,
-            accountantUserId: existingUser.id,
-          },
-        },
-      });
-
-      if (existingAccess?.status === AccountantAccessStatus.ACTIVE) {
-        return {
-          success: false,
-          message: "Deze accountant heeft al toegang tot uw bedrijf.",
-        };
-      }
+      accountantUserId = existingUser.id;
     }
 
     // Check for pending invite - if exists, invalidate it
@@ -255,6 +242,7 @@ export async function inviteAccountant(email: string, permissions: PermissionInp
         expiresAt,
         inviteType: "ACCOUNTANT_ACCESS",
         permissions: normalizedPermissions.permissionsJson,
+        acceptedByUserId: accountantUserId || undefined,
       },
     });
     console.log("[ACCOUNTANT_INVITE_CREATED]", {

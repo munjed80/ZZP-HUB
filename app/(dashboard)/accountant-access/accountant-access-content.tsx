@@ -68,8 +68,11 @@ export function AccountantAccessContent() {
   const validateEmail = (value: string) => {
     const trimmed = value?.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!trimmed || !emailRegex.test(trimmed)) {
-      return { valid: false, message: "Vul een geldig e-mailadres in." };
+    if (!trimmed) {
+      return { valid: false, message: "E-mail is verplicht." };
+    }
+    if (!emailRegex.test(trimmed)) {
+      return { valid: false, message: "Ongeldig e-mailadres." };
     }
     return { valid: true, email: trimmed };
   };
@@ -84,7 +87,7 @@ export function AccountantAccessContent() {
     const validation = validateEmail(email);
     if (!validation.valid) {
       console.log("INVITE_SUBMIT_BLOCKED_FRONTEND", { reason: "INVALID_EMAIL" });
-      setEmailError(validation.message || "Vul een geldig e-mailadres in.");
+      setEmailError(validation.message || "Ongeldig e-mailadres");
       return;
     }
 
@@ -112,8 +115,10 @@ export function AccountantAccessContent() {
       const backendEmailError =
         result.error === "EMAIL_REQUIRED" || result.error === "EMAIL_MISSING_OR_INVALID";
       if (backendEmailError) {
-        setEmailError("Vul een geldig e-mailadres in.");
-        toast.error("Vul een geldig e-mailadres in.");
+        const message =
+          result.error === "EMAIL_REQUIRED" ? "E-mail is verplicht" : "Ongeldig e-mailadres";
+        setEmailError(message);
+        toast.error(message);
       } else {
         // Keep email in the input after failure for easy correction
         toast.error(

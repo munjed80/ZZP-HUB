@@ -107,6 +107,12 @@ describe("Accountant Invite Email Validation", () => {
     
     assert.strictEqual(normalized, "testuser@example.com", "Mixed case email should be normalized");
   });
+
+  test("should allow inviting existing accountant email", () => {
+    const email = "accountant@example.com";
+    const isValid = validateEmail(email);
+    assert.strictEqual(isValid, true, "Existing accountant email should be accepted as valid");
+  });
 });
 
 /**
