@@ -21,7 +21,16 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null) as { email?: unknown } | null;
-  const email = normalizeEmail(body?.email);
+  let email: string;
+  try {
+    email = normalizeEmail(body?.email);
+  } catch (error) {
+    const message =
+      error instanceof Error && (error.message === "EMAIL_REQUIRED" || error.message === "EMAIL_INVALID")
+        ? "Ongeldig e-mailadres"
+        : "Ongeldige aanvraag";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
   const token = crypto.randomBytes(32).toString("hex");
   const tokenHash = hashToken(token);
 
