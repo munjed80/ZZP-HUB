@@ -1,15 +1,30 @@
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/auth/tenant";
 import { getAccessForAccountant } from "@/lib/accountant/access";
+import { z } from "zod";
 
-export default async function DossierPage({ params }: { params: { companyId: string } }) {
+const companyIdSchema = z.string().uuid();
+
+export default async function DossierPage({ params }: { params: Promise<{ companyId: string }> }) {
+  const { companyId } = await params;
+
+  if (!companyIdSchema.safeParse(companyId).success) {
+    notFound();
+  }
+
   const session = await requireSession();
   if (session.role !== "ACCOUNTANT") {
     notFound();
   }
 
-  const access = await getAccessForAccountant(session.userId, params.companyId);
-  if (!access || access.status !== "ACTIVE") {
+  const access = await getAccessForAccountant(session.userId, companyId);
+  const hasAccess = !!access && access.status === "ACTIVE";
+  console.info("ACCOUNTANT_DOSSIER_LOAD", {
+    companyId,
+    hasAccess,
+    reason: hasAccess ? "access_granted" : "no_accountant_access",
+  });
+  if (!hasAccess) {
     return (
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold text-foreground">Geen toegang</h1>

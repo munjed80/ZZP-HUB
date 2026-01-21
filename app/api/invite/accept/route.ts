@@ -6,9 +6,9 @@ import { prisma } from "@/lib/prisma";
 import { generateVerificationToken, hashToken, sendEmail } from "@/lib/email";
 import VerificationEmail from "@/components/emails/VerificationEmail";
 import { APP_BASE_URL } from "@/config/emails";
-import { acceptInvite } from "@/lib/accountant/access";
+import { acceptInvite, hashInviteToken } from "@/lib/accountant/access";
 import { getServerAuthSession } from "@/lib/auth";
-import { validateInvitedEmail } from "@/lib/accountant/invite";
+import { validateInvitedEmail } from "@/lib/accountant/access";
 import bcrypt from "bcryptjs";
 
 export async function GET(req: Request) {
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ success: false, message: "Token ontbreekt.", errorCode: "MISSING_TOKEN" }, { status: 400 });
   }
   const invite = await prisma.accountantInvite.findFirst({
-    where: { tokenHash: hashToken(token), status: "PENDING" },
+    where: { tokenHash: hashInviteToken(token), status: "PENDING" },
     select: { invitedEmail: true, company: { select: { naam: true } } },
   });
   if (!invite) {
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, message: "Token ontbreekt.", errorCode: "MISSING_TOKEN" }, { status: 400 });
   }
 
-  const tokenHash = hashToken(token);
+  const tokenHash = hashInviteToken(token);
   const invite = await prisma.accountantInvite.findFirst({
     where: { tokenHash, status: "PENDING" },
   });

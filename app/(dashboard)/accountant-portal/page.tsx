@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/auth/tenant";
 import { listCompaniesForAccountant } from "@/lib/accountant/access";
 import Link from "next/link";
+import { AccountantDossierLink } from "./dossier-link";
 
 export default async function AccountantPortalPage() {
   const session = await requireSession();
@@ -18,11 +19,16 @@ export default async function AccountantPortalPage() {
           <p className="text-sm text-muted-foreground">Accountant portal</p>
           <h1 className="text-2xl font-semibold text-foreground">Jouw dossiers</h1>
         </div>
-        <form action="/api/auth/signout" method="post">
-          <button className="text-sm text-primary hover:underline" type="submit">
-            Uitloggen
-          </button>
-        </form>
+        <nav className="flex items-center gap-4">
+          <Link href="/accountant-portal" className="text-sm text-foreground hover:underline">
+            ZZP’ers
+          </Link>
+          <form action="/api/auth/signout" method="post">
+            <button className="text-sm text-primary hover:underline" type="submit">
+              Uitloggen
+            </button>
+          </form>
+        </nav>
       </div>
 
       {companies.length === 0 ? (
@@ -32,14 +38,7 @@ export default async function AccountantPortalPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {companies.map((company) => (
-            <Link
-              key={company.companyId}
-              href={`/accountant-portal/dossier/${company.companyId}`}
-              className="rounded-lg border border-border p-4 hover:border-primary hover:shadow-sm transition"
-            >
-              <p className="text-sm text-muted-foreground">Dossier</p>
-              <p className="text-lg font-semibold text-foreground">{company.companyName}</p>
-            </Link>
+            <AccountantDossierLink key={company.companyId} companyId={company.companyId} companyName={company.companyName} />
           ))}
         </div>
       )}
