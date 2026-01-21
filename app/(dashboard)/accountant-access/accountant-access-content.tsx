@@ -84,7 +84,7 @@ export function AccountantAccessContent() {
     const validation = validateEmail(email);
     if (!validation.valid) {
       console.log("INVITE_SUBMIT_BLOCKED_FRONTEND", { reason: "INVALID_EMAIL" });
-      setEmailError(validation.message);
+      setEmailError(validation.message || "Vul een geldig e-mailadres in.");
       return;
     }
 
@@ -101,7 +101,7 @@ export function AccountantAccessContent() {
       fullAccess,
     });
 
-    const result = await inviteAccountant(validation.email, permissions);
+    const result = await inviteAccountant(validation.email as string, permissions);
 
     if (result.success) {
       toast.success(result.message);
