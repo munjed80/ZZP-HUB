@@ -16,7 +16,7 @@ const createActions = [
 
 assertUniqueHrefs(createActions, "NewActionMenu");
 
-export function NewActionMenu() {
+export function NewActionMenu({ disabled = false }: { disabled?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -45,6 +45,7 @@ export function NewActionMenu() {
   }, [open]);
 
   const handleActionClick = (href: string) => {
+    if (disabled) return;
     setOpen(false);
     router.push(href);
   };
@@ -67,6 +68,7 @@ export function NewActionMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen(!open)}
+        disabled={disabled}
         className={cn(
           "flex h-11 w-11 items-center justify-center rounded-xl",
           "bg-primary text-primary-foreground",

@@ -31,7 +31,6 @@ type NavigatieItem = {
   label: string;
   icon: typeof LayoutDashboard;
   superAdminOnly?: boolean;
-  accountantOnly?: boolean;
   companyAdminOnly?: boolean;
   onClick?: () => void;
 };
@@ -59,7 +58,8 @@ assertUniqueHrefs(navigatie, "Sidebar navigation");
 export function Sidebar({
   userRole,
   collapsed = false,
-}: { userRole?: UserRole; collapsed?: boolean }) {
+  disableActions = false,
+}: { userRole?: UserRole; collapsed?: boolean; disableActions?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -83,16 +83,18 @@ export function Sidebar({
           const Icon = item.icon;
           
           
-          return (
+           return (
             <Link
               key={item.href}
               href={item.href}
               data-tour={item.href === "/instellingen" ? "profile-link" : item.href === "/relaties" ? "relations-link" : undefined}
               className={cn(
-                "flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
-                actief
-                  ? "bg-gradient-to-r from-primary/15 to-primary/10 text-primary font-bold border-2 border-primary/30 shadow-lg shadow-primary/10"
-                  : "text-muted-foreground font-semibold hover:bg-muted hover:text-foreground hover:scale-[1.02]"
+                 "flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
+                 actief
+                   ? "bg-gradient-to-r from-primary/15 to-primary/10 text-primary font-bold border-2 border-primary/30 shadow-lg shadow-primary/10"
+                   : disableActions
+                     ? "text-muted-foreground/70 pointer-events-none cursor-not-allowed"
+                     : "text-muted-foreground font-semibold hover:bg-muted hover:text-foreground hover:scale-[1.02]"
               )}
               aria-current={actief ? "page" : undefined}
             >

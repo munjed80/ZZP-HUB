@@ -44,28 +44,12 @@ enum UserRole {
   SUPERADMIN
   COMPANY_ADMIN
   STAFF
-  ACCOUNTANT_VIEW
-  ACCOUNTANT_EDIT
-  ZZP
-  ACCOUNTANT
-}
-
-enum AccountantAccessStatus {
-  ACTIVE
-  REVOKED
 }
 
 enum SupportMessageStatus {
   NEW
   READ
   CLOSED
-}
-
-enum InviteStatus {
-  PENDING
-  ACCEPTED
-  REVOKED
-  EXPIRED
 }
 
 model User {
@@ -104,17 +88,10 @@ model User {
   verificationTokens        EmailVerificationToken[]
   passwordResetTokens       PasswordResetToken[]
   supportMessages           SupportMessage[]
-  ownedCompanyMembers       CompanyMember[]          @relation("CompanyOwner")
-  accountantMemberships     CompanyMember[]          @relation("AccountantMember")
-  sentInvites               AccountantInvite[]       @relation("AccountantInviteCompany")
-  acceptedInvites           AccountantInvite[]       @relation("AccountantInviteAcceptedBy")
-  accountantSessions        AccountantSession[]      @relation("AccountantSessions")
-  companyAccountantSessions AccountantSession[]      @relation("AccountantSessionCompany")
-  accountantAccesses        AccountantAccess[]       @relation("AccountantAccessAccountant")
-  companyAccountantAccesses AccountantAccess[]       @relation("AccountantAccessCompany")
   invoiceNotes              InvoiceNote[]            @relation("InvoiceNotes")
   expenseNotes              ExpenseNote[]            @relation("ExpenseNotes")
   notifications             Notification[]           @relation("UserNotifications")
+  companies                 CompanyUser[]
 }
 
 model CompanyProfile {
@@ -369,86 +346,35 @@ model ConversationDraft {
   @@index([status])
 }
 
-model CompanyMember {
-  id          String   @id @default(uuid())
-  companyId   String
-  userId      String
-  role        UserRole
-  permissions String?  @db.Text // JSON: {read: true, edit: true, export: true, btw: true}
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model CompanyUser {
+  id           String   @id @default(uuid())
+  companyId    String
+  userId       String?
+  invitedEmail String?
+  role         CompanyRole
+  status       CompanyUserStatus @default(PENDING)
+  tokenHash    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  company    User @relation("CompanyOwner", fields: [companyId], references: [id], onDelete: Cascade)
-  accountant User @relation("AccountantMember", fields: [userId], references: [id], onDelete: Cascade)
+  company User  @relation("CompanyUserCompany", fields: [companyId], references: [id], onDelete: Cascade)
+  user    User? @relation("CompanyUserUser", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, userId])
+  @@unique([tokenHash])
   @@index([companyId])
   @@index([userId])
-}
-
-model AccountantAccess {
-  id                 String                  @id @default(uuid())
-  accountantUserId   String
-  companyId          String
-  canRead            Boolean                 @default(true)
-  canEdit            Boolean                 @default(false)
-  canExport          Boolean                 @default(false)
-  canBTW             Boolean                 @default(false)
-  permissions        String?                 @db.Text
-  status             AccountantAccessStatus  @default(ACTIVE)
-  createdAt          DateTime                @default(now())
-
-  accountant         User                    @relation("AccountantAccessAccountant", fields: [accountantUserId], references: [id], onDelete: Cascade)
-  company            User                    @relation("AccountantAccessCompany", fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@unique([accountantUserId, companyId])
-  @@index([companyId])
-  @@index([accountantUserId])
-}
-
-model AccountantInvite {
-  id              String       @id @default(uuid())
-  companyId       String
-  invitedEmail    String
-  role            UserRole
-  tokenHash       String       @unique
-  otpHash         String?
-  otpExpiresAt    DateTime?
-  status          InviteStatus @default(PENDING)
-  expiresAt       DateTime
-  acceptedAt      DateTime?
-  acceptedByUserId String?
-  inviteType      String       @default("ACCOUNTANT_ACCESS")
-  permissions     String?      @db.Text
-  createdAt       DateTime     @default(now())
-
-  company        User  @relation("AccountantInviteCompany", fields: [companyId], references: [id], onDelete: Cascade)
-  acceptedByUser User? @relation("AccountantInviteAcceptedBy", fields: [acceptedByUserId], references: [id], onDelete: SetNull)
-
-  @@index([companyId])
-  @@index([tokenHash])
   @@index([invitedEmail])
-  @@index([status])
 }
 
-model AccountantSession {
-  id           String   @id @default(uuid())
-  sessionToken String   @unique
-  userId       String
-  email        String
-  companyId    String
-  role         UserRole
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-  lastAccessAt DateTime @default(now())
+enum CompanyRole {
+  OWNER
+  ACCOUNTANT
+}
 
-  user    User @relation("AccountantSessions", fields: [userId], references: [id], onDelete: Cascade)
-  company User @relation("AccountantSessionCompany", fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@index([sessionToken])
-  @@index([userId])
-  @@index([companyId])
-  @@index([expiresAt])
+enum CompanyUserStatus {
+  PENDING
+  ACTIVE
 }
 
 model InvoiceNote {

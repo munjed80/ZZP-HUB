@@ -23,7 +23,22 @@ export default async function DashboardShell({ children }: { children: ReactNode
   });
   const avatarUrl = profile?.logoUrl ?? null;
   
-  const showCompanySwitcher = false;
+  const memberships = await prisma.companyUser.findMany({
+    where: {
+      userId: sessie.user.id,
+      status: "ACTIVE",
+    },
+    select: {
+      companyId: true,
+      company: {
+        select: {
+          companyProfile: { select: { companyName: true } },
+        },
+      },
+    },
+  });
+
+  const showCompanySwitcher = memberships.length > 0 && sessie.user.role === UserRole.ACCOUNTANT;
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";
@@ -36,10 +51,12 @@ export default async function DashboardShell({ children }: { children: ReactNode
     userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
+  const disableActions = sessie.user.role === UserRole.ACCOUNTANT;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="flex min-h-screen">
-        <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl} userId={sessie.user.id}>
+        <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl} userId={sessie.user.id} disableActions={disableActions}>
           <div className="flex flex-1 flex-col">
             <header className="sticky top-0 z-30 border-b border-border bg-card/80 shadow-sm backdrop-blur-xl">
               <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 pt-[env(safe-area-inset-top)] md:h-16 md:px-6">
@@ -64,9 +81,15 @@ export default async function DashboardShell({ children }: { children: ReactNode
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2">
                   {showCompanySwitcher && (
-                    <CompanySwitcher currentCompanyName={profile?.companyName || "ZZP HUB"} />
+                    <CompanySwitcher
+                      currentCompanyName={profile?.companyName || "ZZP HUB"}
+                      companies={memberships.map((m) => ({
+                        id: m.companyId,
+                        name: m.company?.companyProfile?.companyName || "Bedrijf",
+                      }))}
+                    />
                   )}
-                  <NewActionMenu />
+                  <NewActionMenu disabled={disableActions} />
                   <UserAvatarMenu userName={userName} userInitials={userInitials} avatarUrl={avatarUrl} />
                 </div>
               </div>
