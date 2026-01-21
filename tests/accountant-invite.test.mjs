@@ -40,30 +40,46 @@ describe("Accountant Invite Email Validation", () => {
 
   test("should reject null email", () => {
     const email = null;
-    const isValid = validateEmail(email);
     
-    assert.strictEqual(isValid, false, "Null email should be rejected");
+    try {
+      normalizeEmail(email);
+      assert.fail("Should have thrown EMAIL_REQUIRED error");
+    } catch (error) {
+      assert.strictEqual(error.message, "EMAIL_REQUIRED", "Should throw EMAIL_REQUIRED for null");
+    }
   });
 
   test("should reject undefined email", () => {
     const email = undefined;
-    const isValid = validateEmail(email);
     
-    assert.strictEqual(isValid, false, "Undefined email should be rejected");
+    try {
+      normalizeEmail(email);
+      assert.fail("Should have thrown EMAIL_REQUIRED error");
+    } catch (error) {
+      assert.strictEqual(error.message, "EMAIL_REQUIRED", "Should throw EMAIL_REQUIRED for undefined");
+    }
   });
 
   test("should reject empty string", () => {
     const email = "";
-    const isValid = validateEmail(email);
     
-    assert.strictEqual(isValid, false, "Empty string should be rejected");
+    try {
+      normalizeEmail(email);
+      assert.fail("Should have thrown EMAIL_REQUIRED error");
+    } catch (error) {
+      assert.strictEqual(error.message, "EMAIL_REQUIRED", "Should throw EMAIL_REQUIRED for empty string");
+    }
   });
 
   test("should reject whitespace-only string", () => {
     const email = "   ";
-    const isValid = validateEmail(email);
     
-    assert.strictEqual(isValid, false, "Whitespace-only string should be rejected");
+    try {
+      normalizeEmail(email);
+      assert.fail("Should have thrown EMAIL_REQUIRED error");
+    } catch (error) {
+      assert.strictEqual(error.message, "EMAIL_REQUIRED", "Should throw EMAIL_REQUIRED for whitespace");
+    }
   });
 
   test("should reject invalid email format (no @)", () => {
@@ -162,8 +178,24 @@ function validateEmail(email) {
  * Helper function to normalize email (mirrors server-side logic)
  */
 function normalizeEmail(email) {
-  if (!email || typeof email !== 'string') {
-    return '';
+  // Check for null/undefined/non-string
+  if (typeof email !== 'string') {
+    throw new Error('EMAIL_REQUIRED');
   }
-  return email.trim().toLowerCase();
+
+  // Trim and lowercase
+  const normalized = email.trim().toLowerCase();
+
+  // Check if empty after trimming
+  if (!normalized) {
+    throw new Error('EMAIL_REQUIRED');
+  }
+
+  // Validate format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(normalized)) {
+    throw new Error('EMAIL_INVALID');
+  }
+
+  return normalized;
 }
