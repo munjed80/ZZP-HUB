@@ -1,0 +1,16 @@
+# Nixpacks configuration for Coolify deployments
+# Pins Node.js to version 20 to match package.json engines requirement
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "npm-9_x"]
+
+[phases.build]
+# Verify Node version and run build
+cmds = [
+  "node scripts/check-node-version.mjs",
+  "npm ci",
+  "npm run build"
+]
+
+[start]
+cmd = "npm run start"
