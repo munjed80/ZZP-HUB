@@ -112,11 +112,15 @@ export function AccountantInvites({ invites }: { invites: Invite[] }) {
 
     startTransition(async () => {
       try {
-        await linkAccountantToCompany({
+        const result = await linkAccountantToCompany({
           accountantEmail: email.trim(),
           ...permissions,
         });
-        toast.success("Accountant succesvol gekoppeld");
+        if (result.status === "PENDING") {
+          toast.success("Uitnodiging verstuurd. De accountant kan zich nog registreren.");
+        } else {
+          toast.success("Accountant succesvol gekoppeld");
+        }
         setEmail("");
         setPermissions({
           canRead: true,
