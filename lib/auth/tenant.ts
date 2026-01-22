@@ -8,10 +8,11 @@
 import "server-only";
 import { getServerAuthSession } from "../auth";
 import { UserRole } from "@prisma/client";
+import type { ExtendedUserRole } from "@/types/roles";
 
 export interface SessionContext {
   userId: string;
-  role: UserRole;
+  role: ExtendedUserRole;
   email: string;
 }
 
@@ -59,7 +60,7 @@ export async function requireTenantContext(): Promise<{ userId: string }> {
  * Require that the current user has a specific role
  * @throws Error if user doesn't have the required role
  */
-export async function requireRole(role: UserRole): Promise<SessionContext> {
+export async function requireRole(role: ExtendedUserRole): Promise<SessionContext> {
   const session = await requireSession();
 
   if (session.role !== role) {
