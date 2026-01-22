@@ -101,7 +101,9 @@ async function startServer() {
 
   // Force binding to all interfaces for containerized deployments (e.g., Coolify).
   const host = DEFAULT_HOST;
-  const port = DEFAULT_PORT;
+  // Platform-as-a-Service providers (Railway, Heroku, Render, etc.) inject the PORT env var
+  // to tell the app which port to bind to. We must respect this or the app won't be reachable.
+  const port = process.env.PORT || DEFAULT_PORT;
   const { HOSTNAME: _ignoredHostname, ...passthroughEnv } = process.env;
   // Do not forward HOSTNAME in standalone mode or Next.js will bind to the container hostname instead of 0.0.0.0.
   const serverEnv = { ...passthroughEnv, HOST: host, PORT: port };
@@ -126,7 +128,7 @@ async function startServer() {
 async function migrateDeployWithFallback() {
   try {
     console.log("[start-prod] Running prisma migrate deploy");
-    await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+    await runCommand("npx", ["prisma", "migrate", "deploy"]);
     console.log("[start-prod] Prisma migrate deploy completed");
     return;
   } catch (error) {
@@ -140,7 +142,8 @@ async function migrateDeployWithFallback() {
       `[start-prod] Prisma migrate failed with P3009 (migration already applied or history out of sync). Marking ${FAILED_MIGRATION_ID} as applied and retrying.`,
     );
 
-    await runCommand("./node_modules/.bin/prisma", [
+    await runCommand("npx", [
+      "prisma",
       "migrate",
       "resolve",
       "--applied",
@@ -149,7 +152,7 @@ async function migrateDeployWithFallback() {
 
     console.log("[start-prod] Retrying prisma migrate deploy after resolving");
     try {
-      await runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+      await runCommand("npx", ["prisma", "migrate", "deploy"]);
       console.log("[start-prod] Prisma migrate deploy completed after resolve");
     } catch (retryError) {
       const retryMessage = getErrorMessage(

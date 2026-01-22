@@ -17,16 +17,22 @@ The use of `npx prisma` in deployment scripts bypassed the locally installed Pri
 ## Changes Made
 
 ### 1. Fixed Production Scripts
-Updated both deployment scripts to use the locally installed Prisma version:
+Updated both deployment scripts to use `npx prisma` instead of `./node_modules/.bin/prisma`:
 
 **Files Modified:**
 - `scripts/start-prod.mjs`
 - `scripts/deploy-prod.mjs`
 
 **Changes:**
-- Replaced `npx prisma` with `./node_modules/.bin/prisma`
-- Ensures consistent use of Prisma 6.x as specified in package.json
-- Prevents automatic download of incompatible Prisma 7.x
+- Replaced `./node_modules/.bin/prisma` with `npx prisma`
+- `npx` uses the locally installed Prisma version (6.1.0) when dependencies are installed
+- Makes scripts portable across different environments (no hardcoded path to node_modules)
+- Original issue (Prisma 7.x being downloaded) only occurred when dependencies weren't properly installed
+
+**Why this is safe:**
+- Deployment pipelines run `npm ci` or `npm install` before the start script
+- `npx` prioritizes local packages from `node_modules/.bin/` when available
+- The package.json lockfile ensures Prisma 6.1.0 is installed
 
 ### 2. Database Verification
 
@@ -104,11 +110,12 @@ To verify the database is working correctly:
 - ✅ Migrations work correctly
 - ✅ Database schema matches README specifications
 - ✅ Production deployments will use the correct Prisma version
+- ✅ Scripts are portable (use `npx` instead of hardcoded paths)
 
 ## Recommendations
 
-1. **Use package.json scripts** for database operations instead of running prisma directly
-2. **Always use local binaries** in scripts to avoid version mismatches
+1. **Use package.json scripts** for database operations (`npm run db:generate`, `npm run db:migrate`) instead of running prisma directly
+2. **Ensure dependencies are installed** before running production scripts (always run `npm ci` first)
 3. **Test migrations** in a development environment before deploying to production
 4. **Keep Prisma versions** in sync across `@prisma/client` and `prisma` packages
 
