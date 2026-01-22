@@ -76,19 +76,24 @@ function SectionCard({
   title, 
   description, 
   children,
-  className 
+  className,
+  id
 }: { 
   icon: React.ElementType;
   title: string;
   description: string;
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }) {
   return (
-    <div className={cn(
-      "bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300",
-      className
-    )}>
+    <div 
+      id={id}
+      className={cn(
+        "bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300",
+        className
+      )}
+    >
       <div className="p-6 border-b border-border">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -204,6 +209,18 @@ export function SettingsTabs({
 
   useEffect(() => {
     setMounted(true);
+    // Auto-scroll to section if hash is present in URL
+    // Delay allows DOM to render before scrolling
+    if (typeof window !== "undefined" && window.location.hash) {
+      const hash = window.location.hash.slice(1);
+      const SCROLL_DELAY_MS = 100; // Wait for DOM rendering
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, SCROLL_DELAY_MS);
+    }
   }, []);
 
   useEffect(() => {
@@ -541,6 +558,7 @@ export function SettingsTabs({
         icon={Users}
         title="Accountant uitnodigingen"
         description="Pending en geaccepteerde accountant-toegang."
+        id="accountants"
       >
         <AccountantInvites invites={invites} />
       </SectionCard>

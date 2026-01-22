@@ -23,6 +23,7 @@ import {
   LogOut,
   Rocket,
   Inbox,
+  UserPlus,
 } from "lucide-react";
 import { assertUniqueHrefs, cn } from "@/lib/utils";
 import { SidebarBrand } from "@/components/sidebar/sidebar-brand";
@@ -50,6 +51,7 @@ export const navigatie: NavigatieItem[] = [
   { href: "/ai-assist", label: "AI Assist", icon: Sparkles },
   { href: "/support", label: "Support", icon: LifeBuoy },
   { href: "/instellingen", label: "Instellingen", icon: Settings },
+  { href: "/instellingen#accountants", label: "Accountant uitnodigen", icon: UserPlus, companyAdminOnly: true },
   { href: "/admin/companies", label: "Companies", icon: Building2, superAdminOnly: true },
   { href: "/admin/releases", label: "Releases", icon: Rocket, superAdminOnly: true },
   { href: "/admin/support", label: "Support Inbox", icon: Inbox, superAdminOnly: true },
