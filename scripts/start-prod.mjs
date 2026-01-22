@@ -13,7 +13,6 @@ const OPTIONAL_ENV = [
 ];
 const DEFAULT_HOST = "0.0.0.0";
 const DEFAULT_PORT = "3000";
-const FAILED_MIGRATION_ID = "20260107172021_add_onboarding_and_email_verification";
 
 function getErrorMessage(error, fallback = "[unknown error]") {
   return error instanceof Error ? error.message : fallback;
@@ -125,6 +124,60 @@ async function startServer() {
   });
 }
 
+/**
+ * Validate migration name to ensure it's safe for use in shell commands.
+ * Prisma migration names are alphanumeric with underscores only.
+ */
+function isValidMigrationName(name) {
+  return /^[a-zA-Z0-9_]+$/.test(name);
+}
+
+/**
+ * Extract failed migration name from P3009 error message.
+ * Prisma outputs: "The `<migration_name>` migration"
+ */
+function extractFailedMigrationName(errorMessage) {
+  const match = errorMessage.match(/The `(.*?)` migration/);
+  if (!match) return null;
+  const name = match[1];
+  // Validate the extracted name to prevent potential injection
+  return isValidMigrationName(name) ? name : null;
+}
+
+/**
+ * Print recovery instructions for a failed migration.
+ */
+function printMigrationRecoveryHelp(migrationName) {
+  console.error("\n========================================");
+  console.error("PRISMA MIGRATION FAILURE - MANUAL INTERVENTION REQUIRED");
+  console.error("========================================\n");
+  console.error(`Prisma has a FAILED migration: ${migrationName}`);
+  console.error("You must resolve it manually before the application can start.\n");
+  console.error("STEP 1: Diagnose the issue");
+  console.error("  Check _prisma_migrations table for the failed migration status:");
+  console.error(`    psql "$DATABASE_URL" -c "SELECT migration_name, started_at, finished_at, rolled_back_at FROM _prisma_migrations WHERE migration_name = '${migrationName}';"`);
+  console.error("");
+  
+  // If this is the company_user_permissions migration, provide specific column checks
+  if (migrationName.includes("add_company_user_permissions")) {
+    console.error("  Check if CompanyUser permission columns exist:");
+    console.error(`    psql "$DATABASE_URL" -c "SELECT column_name FROM information_schema.columns WHERE table_name = 'CompanyUser' AND column_name IN ('canRead', 'canEdit', 'canExport', 'canBTW');"`);
+    console.error("");
+  }
+  
+  console.error("STEP 2: Choose ONE of the following resolutions:\n");
+  console.error("  Option A - If the migration changes were NOT applied to the database:");
+  console.error(`    npx prisma migrate resolve --rolled-back ${migrationName}`);
+  console.error("    (This marks the migration as rolled back so it will be retried)\n");
+  console.error("  Option B - If the migration changes WERE applied (columns/tables exist):");
+  console.error(`    npx prisma migrate resolve --applied ${migrationName}`);
+  console.error("    (This marks the migration as applied so Prisma skips it)\n");
+  console.error("STEP 3: Re-run migrations:");
+  console.error("    npx prisma migrate deploy\n");
+  console.error("STEP 4: Restart the application\n");
+  console.error("========================================\n");
+}
+
 async function migrateDeployWithFallback() {
   try {
     console.log("[start-prod] Running prisma migrate deploy");
@@ -134,35 +187,22 @@ async function migrateDeployWithFallback() {
   } catch (error) {
     const message = getErrorMessage(error, "[unknown migrate error]");
 
-    if (!message.includes("P3009")) {
-      throw error;
+    // Check for P3009: Failed migration exists in the database
+    if (message.includes("P3009")) {
+      const migrationName = extractFailedMigrationName(message);
+      if (migrationName) {
+        printMigrationRecoveryHelp(migrationName);
+      } else {
+        console.error("\n[start-prod] Prisma migrate failed with P3009 (failed migration exists).");
+        console.error("[start-prod] Could not extract migration name from error. Check _prisma_migrations table manually.");
+        console.error(`[start-prod] Error details: ${message}\n`);
+      }
+      console.error("[start-prod] Exiting. Do NOT auto-resolve migrations in production.");
+      process.exit(1);
     }
 
-    console.warn(
-      `[start-prod] Prisma migrate failed with P3009 (migration already applied or history out of sync). Marking ${FAILED_MIGRATION_ID} as applied and retrying.`,
-    );
-
-    await runCommand("npx", [
-      "prisma",
-      "migrate",
-      "resolve",
-      "--applied",
-      FAILED_MIGRATION_ID,
-    ]);
-
-    console.log("[start-prod] Retrying prisma migrate deploy after resolving");
-    try {
-      await runCommand("npx", ["prisma", "migrate", "deploy"]);
-      console.log("[start-prod] Prisma migrate deploy completed after resolve");
-    } catch (retryError) {
-      const retryMessage = getErrorMessage(
-        retryError,
-        "[unknown migrate retry error]",
-      );
-      throw new Error(
-        `[start-prod] Prisma migrate deploy failed after resolving P3009 (migration history may still be out of sync). Inspect the database_migrations table and rerun prisma migrate resolve/deploy manually. Details: ${retryMessage}`,
-      );
-    }
+    // Re-throw other errors
+    throw error;
   }
 }
 
