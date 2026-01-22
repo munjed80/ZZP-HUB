@@ -299,60 +299,70 @@ export async function linkAccountantToCompany(input: {
     throw new Error("Ongeldig e-mailadres");
   }
 
-  // Find the accountant user by email
+  // Find the accountant user by email (optional - may not exist yet)
   const accountantUser = await prisma.user.findUnique({
     where: { email: accountantEmail },
     select: { id: true, email: true },
   });
 
-  if (!accountantUser) {
-    throw new Error("Accountant gebruiker niet gevonden");
+  // Prevent self-assignment as accountant
+  if (accountantUser && accountantUser.id === companyId) {
+    throw new Error("U kunt uzelf niet als accountant toevoegen");
   }
 
-  // Check if user is already an accountant for any company
-  const existingAccountantRole = await prisma.companyUser.findFirst({
+  // Check if there's already an existing invite for this email
+  const existingInvite = await prisma.companyUser.findFirst({
     where: {
-      userId: accountantUser.id,
+      companyId,
       role: CompanyRole.ACCOUNTANT,
+      OR: [
+        { invitedEmail: accountantEmail },
+        ...(accountantUser ? [{ userId: accountantUser.id }] : []),
+      ],
     },
   });
 
-  if (!existingAccountantRole) {
-    throw new Error("Gebruiker is geen accountant");
+  if (existingInvite?.status === CompanyUserStatus.ACTIVE) {
+    throw new Error("Deze accountant is al gekoppeld aan uw bedrijf");
   }
 
-  // Create or upsert the CompanyUser record
-  await prisma.companyUser.upsert({
-    where: {
-      companyId_userId: {
-        companyId: companyId,
-        userId: accountantUser.id,
+  if (existingInvite) {
+    // Update existing invite with new permissions
+    await prisma.companyUser.update({
+      where: { id: existingInvite.id },
+      data: {
+        userId: accountantUser?.id ?? null,
+        invitedEmail: accountantEmail,
+        status: accountantUser ? CompanyUserStatus.ACTIVE : CompanyUserStatus.PENDING,
+        canRead: input.canRead ?? true,
+        canEdit: input.canEdit ?? false,
+        canExport: input.canExport ?? false,
+        canBTW: input.canBTW ?? false,
       },
-    },
-    update: {
-      status: CompanyUserStatus.ACTIVE,
-      canRead: input.canRead ?? true,
-      canEdit: input.canEdit ?? false,
-      canExport: input.canExport ?? false,
-      canBTW: input.canBTW ?? false,
-    },
-    create: {
-      companyId: companyId,
-      userId: accountantUser.id,
-      role: CompanyRole.ACCOUNTANT,
-      status: CompanyUserStatus.ACTIVE,
-      canRead: input.canRead ?? true,
-      canEdit: input.canEdit ?? false,
-      canExport: input.canExport ?? false,
-      canBTW: input.canBTW ?? false,
-    },
-  });
+    });
+  } else {
+    // Create new invite/link
+    await prisma.companyUser.create({
+      data: {
+        companyId,
+        userId: accountantUser?.id ?? null,
+        invitedEmail: accountantEmail,
+        role: CompanyRole.ACCOUNTANT,
+        status: accountantUser ? CompanyUserStatus.ACTIVE : CompanyUserStatus.PENDING,
+        canRead: input.canRead ?? true,
+        canEdit: input.canEdit ?? false,
+        canExport: input.canExport ?? false,
+        canBTW: input.canBTW ?? false,
+      },
+    });
+  }
 
   revalidatePath("/instellingen");
 
   return {
     ok: true,
     companyId,
-    accountantUserId: accountantUser.id,
+    accountantUserId: accountantUser?.id ?? null,
+    status: accountantUser ? "ACTIVE" : "PENDING",
   };
 }

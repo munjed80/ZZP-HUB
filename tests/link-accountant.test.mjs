@@ -6,8 +6,8 @@ import assert from "node:assert/strict";
  * 
  * Tests the core logic for:
  * - Validating accountantEmail (non-empty, normalized)
- * - Finding user by email (404 if not found)
- * - Checking user is an accountant (400 if not)
+ * - Creating invites for non-registered users (PENDING status)
+ * - Linking registered users directly (ACTIVE status)
  * - Creating/upserting CompanyUser record with default permissions
  */
 
@@ -36,12 +36,11 @@ const mockDB = {
   ],
   companyUsers: [
     // User 1 is an accountant for company-1
-    { id: "cu-1", companyId: "company-1", userId: "user-1", role: "ACCOUNTANT", status: "ACTIVE", canRead: true },
-    // User 2 is NOT an accountant
+    { id: "cu-1", companyId: "company-1", userId: "user-1", invitedEmail: "accountant@example.com", role: "ACCOUNTANT", status: "ACTIVE", canRead: true },
   ],
 };
 
-// Mock link accountant logic
+// Mock link accountant logic (now supports invites for non-registered users)
 async function linkAccountantToCompany(companyId, accountantEmail) {
   // Validate companyId
   if (!companyId || typeof companyId !== "string") {
@@ -56,16 +55,12 @@ async function linkAccountantToCompany(companyId, accountantEmail) {
     return { status: 400, error: "accountantEmail is required and must be a valid email" };
   }
 
-  // Find user by email
+  // Find user by email (optional - may not exist yet)
   const user = mockDB.users.find(u => u.email === normalizedEmail);
-  if (!user) {
-    return { status: 404, error: "Accountant user not found" };
-  }
 
-  // Check if user is an accountant (has any CompanyUser record with role ACCOUNTANT)
-  const isAccountant = mockDB.companyUsers.some(cu => cu.userId === user.id && cu.role === "ACCOUNTANT");
-  if (!isAccountant) {
-    return { status: 400, error: "User is not an accountant" };
+  // Prevent self-assignment as accountant
+  if (user && user.id === companyId) {
+    return { status: 400, error: "Cannot add yourself as accountant" };
   }
 
   // Check company exists
@@ -74,21 +69,31 @@ async function linkAccountantToCompany(companyId, accountantEmail) {
     return { status: 404, error: "Company not found" };
   }
 
-  // Upsert CompanyUser record
-  const existingLink = mockDB.companyUsers.find(cu => cu.companyId === companyId && cu.userId === user.id);
+  // Check for existing invite
+  const existingLink = mockDB.companyUsers.find(cu => 
+    cu.companyId === companyId && 
+    (cu.invitedEmail === normalizedEmail || (user && cu.userId === user.id))
+  );
+
+  if (existingLink?.status === "ACTIVE") {
+    return { status: 400, error: "This accountant is already linked to your company" };
+  }
+
   if (existingLink) {
-    // Update existing
-    existingLink.status = "ACTIVE";
+    // Update existing invite
+    existingLink.userId = user?.id ?? null;
+    existingLink.invitedEmail = normalizedEmail;
+    existingLink.status = user ? "ACTIVE" : "PENDING";
     existingLink.canRead = true;
   } else {
-    // Create new
+    // Create new invite/link
     mockDB.companyUsers.push({
       id: `cu-${Date.now()}`,
       companyId: companyId,
-      userId: user.id,
+      userId: user?.id ?? null,
       invitedEmail: normalizedEmail,
       role: "ACCOUNTANT",
-      status: "ACTIVE",
+      status: user ? "ACTIVE" : "PENDING",
       canRead: true,
       canEdit: false,
       canExport: false,
@@ -100,7 +105,8 @@ async function linkAccountantToCompany(companyId, accountantEmail) {
     status: 200,
     ok: true,
     companyId: companyId,
-    accountantUserId: user.id,
+    accountantUserId: user?.id ?? null,
+    inviteStatus: user ? "ACTIVE" : "PENDING",
   };
 }
 
@@ -125,24 +131,28 @@ describe("Link Accountant to Company", () => {
     });
 
     test("normalizes email with whitespace and case", async () => {
-      // Using a non-existent email to trigger the 404 path (email is normalized correctly)
+      // Using a non-existent email now creates a PENDING invite
       const result = await linkAccountantToCompany("company-1", "  UNKNOWN@EXAMPLE.COM  ");
-      assert.strictEqual(result.status, 404);
-      assert.strictEqual(result.error, "Accountant user not found");
+      assert.strictEqual(result.status, 200);
+      assert.strictEqual(result.inviteStatus, "PENDING");
     });
   });
 
-  describe("User Lookup", () => {
-    test("returns 404 when user email is not found", async () => {
+  describe("Invite Flow for Non-Registered Users", () => {
+    test("creates PENDING invite when user email is not found", async () => {
       const result = await linkAccountantToCompany("company-1", "notfound@example.com");
-      assert.strictEqual(result.status, 404);
-      assert.strictEqual(result.error, "Accountant user not found");
+      assert.strictEqual(result.status, 200);
+      assert.strictEqual(result.ok, true);
+      assert.strictEqual(result.accountantUserId, null);
+      assert.strictEqual(result.inviteStatus, "PENDING");
     });
 
-    test("returns 400 when user is not an accountant", async () => {
+    test("creates ACTIVE link when user exists", async () => {
       const result = await linkAccountantToCompany("company-1", "normaluser@example.com");
-      assert.strictEqual(result.status, 400);
-      assert.strictEqual(result.error, "User is not an accountant");
+      assert.strictEqual(result.status, 200);
+      assert.strictEqual(result.ok, true);
+      assert.strictEqual(result.accountantUserId, "user-2");
+      assert.strictEqual(result.inviteStatus, "ACTIVE");
     });
   });
 
@@ -152,21 +162,22 @@ describe("Link Accountant to Company", () => {
       assert.strictEqual(result.status, 404);
       assert.strictEqual(result.error, "Company not found");
     });
+
+    test("prevents self-assignment as accountant", async () => {
+      const result = await linkAccountantToCompany("company-1", "company@example.com");
+      assert.strictEqual(result.status, 400);
+      assert.strictEqual(result.error, "Cannot add yourself as accountant");
+    });
   });
 
   describe("Successful Linking", () => {
-    test("links accountant to company and returns success", async () => {
+    test("returns already linked error for active accountant", async () => {
       const result = await linkAccountantToCompany("company-1", "accountant@example.com");
-      assert.strictEqual(result.status, 200);
-      assert.strictEqual(result.ok, true);
-      assert.strictEqual(result.companyId, "company-1");
-      assert.strictEqual(result.accountantUserId, "user-1");
+      assert.strictEqual(result.status, 400);
+      assert.strictEqual(result.error, "This accountant is already linked to your company");
     });
 
     test("creates CompanyUser record with default canRead=true", async () => {
-      // First, reset the mock state
-      const initialLength = mockDB.companyUsers.length;
-      
       // Add a new company that doesn't have the accountant linked yet
       mockDB.users.push({ id: "company-2", email: "newcompany@example.com" });
       
@@ -183,7 +194,7 @@ describe("Link Accountant to Company", () => {
       assert.strictEqual(newLink.canEdit, false, "canEdit should default to false");
       assert.strictEqual(newLink.canExport, false, "canExport should default to false");
       assert.strictEqual(newLink.canBTW, false, "canBTW should default to false");
-      assert.strictEqual(newLink.status, "ACTIVE", "status should be ACTIVE");
+      assert.strictEqual(newLink.status, "ACTIVE", "status should be ACTIVE for existing user");
     });
   });
 });
