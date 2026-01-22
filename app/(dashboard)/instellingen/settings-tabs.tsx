@@ -209,15 +209,17 @@ export function SettingsTabs({
 
   useEffect(() => {
     setMounted(true);
-    // Auto-scroll to section if hash is present
+    // Auto-scroll to section if hash is present in URL
+    // Delay allows DOM to render before scrolling
     if (typeof window !== "undefined" && window.location.hash) {
       const hash = window.location.hash.slice(1);
+      const SCROLL_DELAY_MS = 100; // Wait for DOM rendering
       setTimeout(() => {
         const element = document.getElementById(hash);
         if (element) {
           element.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-      }, 100);
+      }, SCROLL_DELAY_MS);
     }
   }, []);
 
