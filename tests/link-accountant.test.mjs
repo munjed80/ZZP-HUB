@@ -59,13 +59,12 @@ async function linkAccountantToCompany(companyId, accountantEmail) {
   // Find user by email
   const user = mockDB.users.find(u => u.email === normalizedEmail);
   if (!user) {
-    return { status: 404, error: "Accountant user not found" };
+    return { status: 404, error: "User not found" };
   }
 
-  // Check if user is an accountant (has any CompanyUser record with role ACCOUNTANT)
-  const isAccountant = mockDB.companyUsers.some(cu => cu.userId === user.id && cu.role === "ACCOUNTANT");
-  if (!isAccountant) {
-    return { status: 400, error: "User is not an accountant" };
+  // Prevent self-assignment as accountant
+  if (user.id === companyId) {
+    return { status: 400, error: "Cannot add yourself as accountant" };
   }
 
   // Check company exists
@@ -128,7 +127,7 @@ describe("Link Accountant to Company", () => {
       // Using a non-existent email to trigger the 404 path (email is normalized correctly)
       const result = await linkAccountantToCompany("company-1", "  UNKNOWN@EXAMPLE.COM  ");
       assert.strictEqual(result.status, 404);
-      assert.strictEqual(result.error, "Accountant user not found");
+      assert.strictEqual(result.error, "User not found");
     });
   });
 
@@ -136,13 +135,15 @@ describe("Link Accountant to Company", () => {
     test("returns 404 when user email is not found", async () => {
       const result = await linkAccountantToCompany("company-1", "notfound@example.com");
       assert.strictEqual(result.status, 404);
-      assert.strictEqual(result.error, "Accountant user not found");
+      assert.strictEqual(result.error, "User not found");
     });
 
-    test("returns 400 when user is not an accountant", async () => {
+    test("can link a normal user as accountant to a company", async () => {
       const result = await linkAccountantToCompany("company-1", "normaluser@example.com");
-      assert.strictEqual(result.status, 400);
-      assert.strictEqual(result.error, "User is not an accountant");
+      assert.strictEqual(result.status, 200);
+      assert.strictEqual(result.ok, true);
+      assert.strictEqual(result.companyId, "company-1");
+      assert.strictEqual(result.accountantUserId, "user-2");
     });
   });
 
@@ -151,6 +152,12 @@ describe("Link Accountant to Company", () => {
       const result = await linkAccountantToCompany("unknown-company", "accountant@example.com");
       assert.strictEqual(result.status, 404);
       assert.strictEqual(result.error, "Company not found");
+    });
+
+    test("prevents self-assignment as accountant", async () => {
+      const result = await linkAccountantToCompany("company-1", "company@example.com");
+      assert.strictEqual(result.status, 400);
+      assert.strictEqual(result.error, "Cannot add yourself as accountant");
     });
   });
 

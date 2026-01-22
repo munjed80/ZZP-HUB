@@ -306,19 +306,12 @@ export async function linkAccountantToCompany(input: {
   });
 
   if (!accountantUser) {
-    throw new Error("Accountant gebruiker niet gevonden");
+    throw new Error("Gebruiker niet gevonden");
   }
 
-  // Check if user is already an accountant for any company
-  const existingAccountantRole = await prisma.companyUser.findFirst({
-    where: {
-      userId: accountantUser.id,
-      role: CompanyRole.ACCOUNTANT,
-    },
-  });
-
-  if (!existingAccountantRole) {
-    throw new Error("Gebruiker is geen accountant");
+  // Prevent self-assignment as accountant
+  if (accountantUser.id === companyId) {
+    throw new Error("U kunt uzelf niet als accountant toevoegen");
   }
 
   // Create or upsert the CompanyUser record
