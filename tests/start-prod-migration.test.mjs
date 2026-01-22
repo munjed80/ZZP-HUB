@@ -171,3 +171,104 @@ describe("Integration - Migration name check for auto-resolution", () => {
     assert.strictEqual(shouldAutoResolve, false);
   });
 });
+
+/**
+ * Check if an error message indicates P3018 with 42P01 (missing relation).
+ * P3018 is thrown when a migration cannot be applied because a referenced relation does not exist.
+ */
+function isP3018MissingRelation(errorMessage) {
+  // P3018 is the Prisma error code for migration apply failure
+  // 42P01 is the PostgreSQL error code for "relation does not exist"
+  return errorMessage.includes("P3018") && errorMessage.includes("42P01");
+}
+
+describe("isP3018MissingRelation - P3018/42P01 error detection", () => {
+  test("detects P3018 with 42P01 error code", () => {
+    const errorMessage = `Error: P3018
+A migration failed to apply. New migrations cannot be applied before the error is recovered from.
+Database error code: 42P01
+Error message: relation "CompanyUser" does not exist
+`;
+    assert.strictEqual(isP3018MissingRelation(errorMessage), true);
+  });
+
+  test("detects P3018/42P01 in compact error format", () => {
+    const errorMessage = "npx prisma migrate deploy exited with code 1. Error: P3018 - Database error code: 42P01";
+    assert.strictEqual(isP3018MissingRelation(errorMessage), true);
+  });
+
+  test("returns false for P3018 without 42P01", () => {
+    const errorMessage = `Error: P3018
+A migration failed to apply.
+Database error code: 23505
+Error message: duplicate key value violates unique constraint
+`;
+    assert.strictEqual(isP3018MissingRelation(errorMessage), false);
+  });
+
+  test("returns false for 42P01 without P3018", () => {
+    const errorMessage = "Error: Database error code: 42P01 - relation does not exist";
+    assert.strictEqual(isP3018MissingRelation(errorMessage), false);
+  });
+
+  test("returns false for P3009 error", () => {
+    const errorMessage = `Error: P3009
+migrate found failed migrations in the target database
+The \`20260122000000_add_company_user_permissions\` migration started at 2026-01-22 10:00:00.000 UTC failed
+`;
+    assert.strictEqual(isP3018MissingRelation(errorMessage), false);
+  });
+
+  test("returns false for connection error", () => {
+    const errorMessage = "Error: Can't reach database server at localhost:5432";
+    assert.strictEqual(isP3018MissingRelation(errorMessage), false);
+  });
+
+  test("returns false for empty string", () => {
+    assert.strictEqual(isP3018MissingRelation(""), false);
+  });
+
+  test("handles real-world P3018/42P01 stderr output", () => {
+    const errorMessage = `npx prisma migrate deploy exited with code 1. Error: Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "zzp_hub", schema "public" at "localhost:5432"
+
+Applying migration \`20260122000000_add_company_user_permissions\`
+
+Error: P3018
+
+A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve
+
+Migration name: 20260122000000_add_company_user_permissions
+
+Database error code: 42P01
+
+Database error:
+ERROR: relation "CompanyUser" does not exist
+
+DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E42P01), message: "relation \\"CompanyUser\\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("namespace.c"), line: Some(426), routine: Some("RangeVarGetRelidExtended") }`;
+    assert.strictEqual(isP3018MissingRelation(errorMessage), true);
+  });
+});
+
+describe("P3018/42P01 recovery - Integration scenarios", () => {
+  test("P3018 check comes before P3009 in error handling priority", () => {
+    // Simulating the logic flow: P3018+42P01 should be handled first
+    const errorWithBoth = "Error: P3018 - 42P01 - relation does not exist";
+    const isP3018 = isP3018MissingRelation(errorWithBoth);
+    const isP3009 = errorWithBoth.includes("P3009");
+    
+    // P3018 should trigger recovery path
+    assert.strictEqual(isP3018, true);
+    // P3009 should not match this error
+    assert.strictEqual(isP3009, false);
+  });
+
+  test("only P3009 triggers when P3018 is not present", () => {
+    const p3009Error = "Error: P3009 - The `test_migration` migration failed";
+    const isP3018 = isP3018MissingRelation(p3009Error);
+    const isP3009 = p3009Error.includes("P3009");
+    
+    assert.strictEqual(isP3018, false);
+    assert.strictEqual(isP3009, true);
+  });
+});

@@ -203,56 +203,97 @@ function printMigrationRecoveryHelp(migrationName) {
   console.error("========================================\n");
 }
 
+/**
+ * Check if an error message indicates P3018 with 42P01 (missing relation).
+ * P3018 is thrown when a migration cannot be applied because a referenced relation does not exist.
+ */
+function isP3018MissingRelation(errorMessage) {
+  // P3018 is the Prisma error code for migration apply failure
+  // 42P01 is the PostgreSQL error code for "relation does not exist"
+  return errorMessage.includes("P3018") && errorMessage.includes("42P01");
+}
+
 async function migrateDeployWithFallback() {
-  try {
-    console.log("[start-prod] Running prisma migrate deploy");
-    await runCommand("npx", ["prisma", "migrate", "deploy"]);
-    console.log("[start-prod] Prisma migrate deploy completed");
-    return;
-  } catch (error) {
-    const message = getErrorMessage(error, "[unknown migrate error]");
+  // Track if we've already attempted recovery to prevent infinite loops
+  let recoveryAttempted = false;
 
-    // Check for P3009: Failed migration exists in the database
-    if (message.includes("P3009")) {
-      const migrationName = extractFailedMigrationName(message);
-      if (!migrationName) {
-        console.error("\n[start-prod] Prisma migrate failed with P3009 (failed migration exists).");
-        console.error("[start-prod] Could not extract migration name from error. Check _prisma_migrations table manually.");
-        console.error(`[start-prod] Error details: ${message}\n`);
-        process.exit(1);
-      }
+  async function attemptMigration() {
+    try {
+      console.log("[start-prod] Running prisma migrate deploy");
+      await runCommand("npx", ["prisma", "migrate", "deploy"]);
+      console.log("[start-prod] Prisma migrate deploy completed");
+      return;
+    } catch (error) {
+      const message = getErrorMessage(error, "[unknown migrate error]");
 
-      console.log(`[start-prod] Detected failed migration: ${migrationName}`);
+      // Check for P3018 with 42P01: Missing relation (base tables don't exist)
+      if (isP3018MissingRelation(message)) {
+        if (recoveryAttempted) {
+          console.error("\n[start-prod] P3018/42P01 recovery already attempted. Failing to prevent infinite loop.");
+          throw error;
+        }
+        recoveryAttempted = true;
 
-      // Check if this is the company_user_permissions migration
-      if (migrationName.includes("add_company_user_permissions")) {
-        console.log("[start-prod] Checking if CompanyUser permission columns exist...");
-        const columnsExist = await checkCompanyUserPermissionColumnsExist();
+        console.log("[start-prod] Missing base tables detected (42P01). Running prisma db push to recover...");
 
-        if (columnsExist) {
-          console.log("[start-prod] Columns exist - marking migration as applied");
-          await runCommand("npx", ["prisma", "migrate", "resolve", "--applied", migrationName]);
-        } else {
-          console.log("[start-prod] Columns do not exist - marking migration as rolled-back for retry");
-          await runCommand("npx", ["prisma", "migrate", "resolve", "--rolled-back", migrationName]);
+        try {
+          await runCommand("npx", ["prisma", "db", "push"]);
+          console.log("[start-prod] prisma db push completed successfully");
+        } catch (pushError) {
+          console.error("[start-prod] prisma db push failed:", getErrorMessage(pushError));
+          throw pushError;
         }
 
-        // Re-run migrations after resolution
-        console.log("[start-prod] Re-running prisma migrate deploy after resolution...");
-        await runCommand("npx", ["prisma", "migrate", "deploy"]);
-        console.log("[start-prod] Prisma migrate deploy completed after auto-resolution");
+        // Re-run migrate deploy after successful db push
+        console.log("[start-prod] Re-running prisma migrate deploy after db push...");
+        await attemptMigration();
         return;
       }
 
-      // For other migrations, print recovery help and exit
-      printMigrationRecoveryHelp(migrationName);
-      console.error("[start-prod] Exiting. Manual intervention required for this migration.");
-      process.exit(1);
-    }
+      // Check for P3009: Failed migration exists in the database
+      if (message.includes("P3009")) {
+        const migrationName = extractFailedMigrationName(message);
+        if (!migrationName) {
+          console.error("\n[start-prod] Prisma migrate failed with P3009 (failed migration exists).");
+          console.error("[start-prod] Could not extract migration name from error. Check _prisma_migrations table manually.");
+          console.error(`[start-prod] Error details: ${message}\n`);
+          process.exit(1);
+        }
 
-    // Re-throw other errors
-    throw error;
+        console.log(`[start-prod] Detected failed migration: ${migrationName}`);
+
+        // Check if this is the company_user_permissions migration
+        if (migrationName.includes("add_company_user_permissions")) {
+          console.log("[start-prod] Checking if CompanyUser permission columns exist...");
+          const columnsExist = await checkCompanyUserPermissionColumnsExist();
+
+          if (columnsExist) {
+            console.log("[start-prod] Columns exist - marking migration as applied");
+            await runCommand("npx", ["prisma", "migrate", "resolve", "--applied", migrationName]);
+          } else {
+            console.log("[start-prod] Columns do not exist - marking migration as rolled-back for retry");
+            await runCommand("npx", ["prisma", "migrate", "resolve", "--rolled-back", migrationName]);
+          }
+
+          // Re-run migrations after resolution
+          console.log("[start-prod] Re-running prisma migrate deploy after resolution...");
+          await runCommand("npx", ["prisma", "migrate", "deploy"]);
+          console.log("[start-prod] Prisma migrate deploy completed after auto-resolution");
+          return;
+        }
+
+        // For other migrations, print recovery help and exit
+        printMigrationRecoveryHelp(migrationName);
+        console.error("[start-prod] Exiting. Manual intervention required for this migration.");
+        process.exit(1);
+      }
+
+      // Re-throw other errors
+      throw error;
+    }
   }
+
+  await attemptMigration();
 }
 
 async function main() {
