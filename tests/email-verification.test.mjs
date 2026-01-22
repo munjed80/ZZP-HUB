@@ -12,9 +12,15 @@ import bcrypt from "bcryptjs";
  * - Token verification with bcrypt works correctly
  * - URL encoding does not affect tokens
  * - Expired tokens are rejected
+ * 
+ * Note: We replicate the token functions here rather than importing them because:
+ * 1. lib/email.ts uses dynamic imports and has Node.js-specific dependencies
+ * 2. These functions are the exact algorithm we want to verify works correctly
+ * 3. Any drift between these and the source would be caught by integration tests
  */
 
 // Replicate the generateVerificationToken function from lib/email.ts
+// This uses the same algorithm: cryptographically random alphanumeric chars
 function generateVerificationToken() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charsLength = chars.length;
@@ -39,12 +45,12 @@ function generateVerificationToken() {
   return token;
 }
 
-// Replicate hashToken from lib/email.ts
+// Replicate hashToken from lib/email.ts - bcrypt with cost factor 10
 async function hashToken(token) {
   return bcrypt.hash(token, 10);
 }
 
-// Replicate verifyToken from lib/email.ts
+// Replicate verifyToken from lib/email.ts - bcrypt compare
 async function verifyToken(token, hash) {
   return bcrypt.compare(token, hash);
 }

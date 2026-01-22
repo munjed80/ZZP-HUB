@@ -15,21 +15,27 @@ function logVerification(event: string, details: Record<string, unknown>) {
 
 export async function verifyEmailToken(token: string) {
   try {
-    // Trim and normalize the token
-    const cleanToken = token?.trim();
+    // Validate token exists and normalize it
+    if (!token || typeof token !== 'string') {
+      logVerification("MISSING_TOKEN", {});
+      return { success: false, message: "Geen token opgegeven." };
+    }
+
+    const cleanToken = token.trim();
     
     if (!cleanToken) {
-      logVerification("MISSING_TOKEN", {});
+      logVerification("EMPTY_TOKEN", {});
       return { success: false, message: "Geen token opgegeven." };
     }
 
     // Log token prefix for debugging (safe - only first 8 chars)
     const tokenPrefix = cleanToken.substring(0, 8);
+    const hadWhitespace = token.length !== cleanToken.length;
     logVerification("ATTEMPT", { 
       tokenPrefix, 
       tokenLength: cleanToken.length,
-      originalLength: token?.length,
-      hadWhitespace: token?.length !== cleanToken.length,
+      originalLength: token.length,
+      hadWhitespace,
     });
 
     // First, find all non-expired tokens (this reduces the search space)
