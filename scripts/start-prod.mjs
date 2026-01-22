@@ -235,8 +235,7 @@ async function migrateDeployWithFallback() {
         }
         recoveryAttempted = true;
 
-        console.log("[start-prod] Missing base tables detected (42P01). Running prisma db push to recover...");
-        console.log("[start-prod] WARNING: prisma db push will sync the database schema with the Prisma schema.");
+        console.log("[start-prod] 42P01 missing relation detected. Running prisma db push (no accept-data-loss) once...");
 
         try {
           await runCommand("npx", ["prisma", "db", "push"]);
