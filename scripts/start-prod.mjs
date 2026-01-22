@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { PrismaClient } from "@prisma/client";
 
 const REQUIRED_ENV = [
   "DATABASE_URL",
@@ -145,6 +146,30 @@ function extractFailedMigrationName(errorMessage) {
 }
 
 /**
+ * Check if the CompanyUser permission columns exist in the database.
+ * Returns true if all columns exist, false otherwise.
+ */
+async function checkCompanyUserPermissionColumnsExist() {
+  const prisma = new PrismaClient();
+  try {
+    // Query information_schema to check if columns exist
+    const result = await prisma.$queryRaw`
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'CompanyUser'
+        AND column_name IN ('canRead', 'canEdit', 'canExport', 'canBTW')
+    `;
+    // If all 4 columns exist, the migration was applied
+    return Array.isArray(result) && result.length === 4;
+  } catch (error) {
+    console.error("[start-prod] Error checking column existence:", error.message);
+    return false;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+/**
  * Print recovery instructions for a failed migration.
  */
 function printMigrationRecoveryHelp(migrationName) {
@@ -190,14 +215,38 @@ async function migrateDeployWithFallback() {
     // Check for P3009: Failed migration exists in the database
     if (message.includes("P3009")) {
       const migrationName = extractFailedMigrationName(message);
-      if (migrationName) {
-        printMigrationRecoveryHelp(migrationName);
-      } else {
+      if (!migrationName) {
         console.error("\n[start-prod] Prisma migrate failed with P3009 (failed migration exists).");
         console.error("[start-prod] Could not extract migration name from error. Check _prisma_migrations table manually.");
         console.error(`[start-prod] Error details: ${message}\n`);
+        process.exit(1);
       }
-      console.error("[start-prod] Exiting. Do NOT auto-resolve migrations in production.");
+
+      console.log(`[start-prod] Detected failed migration: ${migrationName}`);
+
+      // Check if this is the company_user_permissions migration
+      if (migrationName.includes("add_company_user_permissions")) {
+        console.log("[start-prod] Checking if CompanyUser permission columns exist...");
+        const columnsExist = await checkCompanyUserPermissionColumnsExist();
+
+        if (columnsExist) {
+          console.log("[start-prod] Columns exist - marking migration as applied");
+          await runCommand("npx", ["prisma", "migrate", "resolve", "--applied", migrationName]);
+        } else {
+          console.log("[start-prod] Columns do not exist - marking migration as rolled-back for retry");
+          await runCommand("npx", ["prisma", "migrate", "resolve", "--rolled-back", migrationName]);
+        }
+
+        // Re-run migrations after resolution
+        console.log("[start-prod] Re-running prisma migrate deploy after resolution...");
+        await runCommand("npx", ["prisma", "migrate", "deploy"]);
+        console.log("[start-prod] Prisma migrate deploy completed after auto-resolution");
+        return;
+      }
+
+      // For other migrations, print recovery help and exit
+      printMigrationRecoveryHelp(migrationName);
+      console.error("[start-prod] Exiting. Manual intervention required for this migration.");
       process.exit(1);
     }
 
