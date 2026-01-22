@@ -5,7 +5,7 @@ import { Sidebar, MobileSidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { AssistantDrawer } from "@/components/assistant/assistant-drawer";
 import { AssistantWidget } from "@/components/assistant/assistant-widget";
-import { UserRole } from "@prisma/client";
+import type { ExtendedUserRole } from "@/types/roles";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LOCAL_PROFILE_STORAGE_KEY } from "@/lib/constants";
@@ -14,7 +14,7 @@ export const AvatarContext = createContext<string | null>(null);
 
 type DashboardClientShellProps = {
   children: ReactNode;
-  userRole?: UserRole;
+  userRole?: ExtendedUserRole;
   avatarUrl?: string | null;
   userId: string;
   disableActions?: boolean;

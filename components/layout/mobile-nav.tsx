@@ -12,7 +12,7 @@ import {
   FileText,
 } from "lucide-react";
 import { assertUniqueHrefs, cn } from "@/lib/utils";
-import { UserRole } from "@prisma/client";
+import type { ExtendedUserRole } from "@/types/roles";
 
 // Bottom navigation for ZZP/COMPANY_ADMIN users
 const zzpNavItems = [
@@ -27,7 +27,7 @@ assertUniqueHrefs(zzpNavItems, "MobileNav ZZP");
 
 type MobileNavProps = {
   onMenuClick?: () => void;
-  userRole?: UserRole;
+  userRole?: ExtendedUserRole;
 };
 
 export function MobileNav({ onMenuClick, userRole }: MobileNavProps) {

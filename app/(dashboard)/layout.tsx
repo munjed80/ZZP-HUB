@@ -7,8 +7,6 @@ import { CompanySwitcher } from "@/components/layout/company-switcher";
 import { DashboardClientShell } from "@/components/layout/dashboard-client-shell";
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { UserRole } from "@prisma/client";
-
 export default async function DashboardShell({ children }: { children: ReactNode }) {
   const sessie = await getServerAuthSession();
   if (!sessie?.user) {
@@ -38,7 +36,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
     },
   });
 
-  const showCompanySwitcher = memberships.length > 0 && sessie.user.role === UserRole.ACCOUNTANT;
+  const showCompanySwitcher = memberships.length > 0 && sessie.user.role === "ACCOUNTANT";
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";
@@ -51,7 +49,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
     userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  const disableActions = sessie.user.role === UserRole.ACCOUNTANT;
+  const disableActions = sessie.user.role === "ACCOUNTANT";
 
   return (
     <div className="min-h-screen bg-background">

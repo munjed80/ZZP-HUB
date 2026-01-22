@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { UserRole } from "@prisma/client";
+import type { ExtendedUserRole } from "@/types/roles";
 import { buttonVariants } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -32,6 +33,7 @@ type NavigatieItem = {
   icon: typeof LayoutDashboard;
   superAdminOnly?: boolean;
   companyAdminOnly?: boolean;
+  accountantOnly?: boolean;
   onClick?: () => void;
 };
 
@@ -59,7 +61,7 @@ export function Sidebar({
   userRole,
   collapsed = false,
   disableActions = false,
-}: { userRole?: UserRole; collapsed?: boolean; disableActions?: boolean }) {
+}: { userRole?: ExtendedUserRole; collapsed?: boolean; disableActions?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -140,7 +142,7 @@ export function MobileSidebar({
   open = false,
   onOpenChange
 }: { 
-  userRole?: UserRole; 
+  userRole?: ExtendedUserRole; 
   onAssistantClick?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
