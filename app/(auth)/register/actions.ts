@@ -10,15 +10,13 @@ import { getPublicSupportEmail } from "@/lib/publicConfig";
 import { APP_BASE_URL } from "@/config/emails";
 
 // Structured logging helper for registration events
+// Always log registration events for debugging (server-side only, safe output)
 function logRegistration(event: string, details: Record<string, unknown>) {
-  const shouldLog = process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
-  if (shouldLog) {
-    console.log(JSON.stringify({
-      event: `REGISTER_${event}`,
-      timestamp: new Date().toISOString(),
-      ...details,
-    }));
-  }
+  console.log(JSON.stringify({
+    event: `REGISTER_${event}`,
+    timestamp: new Date().toISOString(),
+    ...details,
+  }));
 }
 
 export async function registerCompany(values: RegisterInput) {

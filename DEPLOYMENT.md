@@ -176,8 +176,25 @@ Render uses the `engines` field from `package.json`. Configure in the Render das
 |----------|-------------|---------|
 | `PORT` | Port to bind the server to | `3000` |
 | `RESEND_API_KEY` | Resend API key for emails | — |
-| `APP_URL` | Base URL for email links | Falls back to `NEXTAUTH_URL` |
+| `APP_BASE_URL` | Base URL for email verification links | `https://zzpershub.nl` |
+| `APP_URL` | Base URL for email links (fallback) | Falls back to `NEXTAUTH_URL` |
 | `EXPECTED_NEXTAUTH_URL` | Strict URL validation (deploy-prod.mjs only) | — |
+| `AUTH_DEBUG` | Enable debug logging for authentication | `false` |
+
+### Email Verification Configuration
+
+For email verification to work correctly in production, ensure:
+
+1. **`APP_BASE_URL`** is set to your production domain with HTTPS:
+   ```
+   APP_BASE_URL=https://zzpershub.nl
+   ```
+
+2. **`RESEND_API_KEY`** is set with a valid Resend API key
+
+3. **Domain Configuration**: Ensure your domain's DNS has proper SPF, DKIM, and DMARC records configured for email deliverability
+
+4. **Coolify/Nginx Proxy**: If behind a reverse proxy, ensure the `APP_BASE_URL` matches the external URL users access, not the internal container URL
 
 ### PORT Behavior
 
@@ -343,3 +360,30 @@ Run `npm run build` before starting the server. The standalone output is require
 ### PORT not being respected
 
 Verify no hardcoded ports in your deployment config. The app reads `process.env.PORT` at runtime.
+
+### Email verification always fails
+
+If users always see "Ongeldige of verlopen verificatielink" when clicking verification links:
+
+1. **Check `APP_BASE_URL`**: Ensure it matches your production domain
+   ```bash
+   echo $APP_BASE_URL
+   # Should be: https://zzpershub.nl (or your domain)
+   ```
+
+2. **Check server logs** for `EMAIL_VERIFY_*` events:
+   ```
+   EMAIL_VERIFY_ATTEMPT - Shows token being verified
+   EMAIL_VERIFY_TOKEN_LOOKUP - Shows how many tokens found in DB
+   EMAIL_VERIFY_NO_VALID_TOKENS - No tokens found (tokens expired or not created)
+   EMAIL_VERIFY_NO_MATCH - Token hash mismatch
+   ```
+
+3. **Verify tokens are being created** during registration:
+   ```
+   REGISTER_TOKEN_STORED - Shows token was stored in DB
+   ```
+
+4. **Check database connection**: Ensure the same database is used for registration and verification
+
+5. **Check token expiry**: Tokens expire after 24 hours. If there's a timezone mismatch, tokens might appear expired immediately.

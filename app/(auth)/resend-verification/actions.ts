@@ -9,15 +9,13 @@ import { APP_BASE_URL } from "@/config/emails";
 const RESEND_COOLDOWN_MS = 60 * 1000; // 1 minute cooldown
 
 // Structured logging helper for resend events
+// Always log resend events for debugging (server-side only, safe output)
 function logResend(event: string, details: Record<string, unknown>) {
-  const shouldLog = process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
-  if (shouldLog) {
-    console.log(JSON.stringify({
-      event: `RESEND_VERIFY_${event}`,
-      timestamp: new Date().toISOString(),
-      ...details,
-    }));
-  }
+  console.log(JSON.stringify({
+    event: `RESEND_VERIFY_${event}`,
+    timestamp: new Date().toISOString(),
+    ...details,
+  }));
 }
 
 export async function resendVerificationEmail() {

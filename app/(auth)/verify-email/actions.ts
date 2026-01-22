@@ -4,27 +4,33 @@ import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/email";
 
 // Structured logging helper for verification events
+// Always log verification events for debugging (server-side only, safe output)
 function logVerification(event: string, details: Record<string, unknown>) {
-  const shouldLog = process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
-  if (shouldLog) {
-    console.log(JSON.stringify({
-      event: `EMAIL_VERIFY_${event}`,
-      timestamp: new Date().toISOString(),
-      ...details,
-    }));
-  }
+  console.log(JSON.stringify({
+    event: `EMAIL_VERIFY_${event}`,
+    timestamp: new Date().toISOString(),
+    ...details,
+  }));
 }
 
 export async function verifyEmailToken(token: string) {
   try {
-    if (!token) {
+    // Trim and normalize the token
+    const cleanToken = token?.trim();
+    
+    if (!cleanToken) {
       logVerification("MISSING_TOKEN", {});
       return { success: false, message: "Geen token opgegeven." };
     }
 
     // Log token prefix for debugging (safe - only first 8 chars)
-    const tokenPrefix = token.substring(0, 8);
-    logVerification("ATTEMPT", { tokenPrefix, tokenLength: token.length });
+    const tokenPrefix = cleanToken.substring(0, 8);
+    logVerification("ATTEMPT", { 
+      tokenPrefix, 
+      tokenLength: cleanToken.length,
+      originalLength: token?.length,
+      hadWhitespace: token?.length !== cleanToken.length,
+    });
 
     // First, find all non-expired tokens (this reduces the search space)
     const now = new Date();
@@ -46,11 +52,22 @@ export async function verifyEmailToken(token: string) {
       },
     });
 
+    // Log details about found tokens (without exposing full hashes)
+    const tokenInfo = tokens.map((t) => ({
+      id: t.id,
+      userId: t.userId,
+      hashPrefix: t.token.substring(0, 10),
+      hashLength: t.token.length,
+      expiresAt: t.expiresAt.toISOString(),
+      createdAt: t.createdAt.toISOString(),
+    }));
+
     logVerification("TOKEN_LOOKUP", {
       totalTokensInDb: totalTokenCount,
       expiredTokens: expiredTokenCount,
       validTokensFound: tokens.length,
       now: now.toISOString(),
+      tokens: tokenInfo,
     });
 
     if (tokens.length === 0) {
@@ -67,7 +84,7 @@ export async function verifyEmailToken(token: string) {
     
     for (const dbToken of tokens) {
       comparisonCount++;
-      const isValid = await verifyToken(token, dbToken.token);
+      const isValid = await verifyToken(cleanToken, dbToken.token);
       // Always check all tokens (constant time) but only store the first match
       if (isValid && !hasMatch) {
         matchedToken = dbToken;
