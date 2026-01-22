@@ -28,6 +28,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
     },
     select: {
       companyId: true,
+      role: true,
       company: {
         select: {
           companyProfile: { select: { companyName: true } },
@@ -36,7 +37,8 @@ export default async function DashboardShell({ children }: { children: ReactNode
     },
   });
 
-  const showCompanySwitcher = memberships.length > 0 && sessie.user.role === "ACCOUNTANT";
+  // Show company switcher for users who have at least one ACCOUNTANT membership
+  const showCompanySwitcher = memberships.some((m) => m.role === "ACCOUNTANT");
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";
