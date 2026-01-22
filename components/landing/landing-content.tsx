@@ -4,7 +4,6 @@ import Link from "next/link";
 import { type ReactNode } from "react";
 import { motion, type MotionProps, type TargetAndTransition, type Transition } from "framer-motion";
 import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, ShieldCheck, LineChart, Infinity, LifeBuoy, MailCheck } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SupportForm } from "@/components/support/support-form";
 import { AssistantDemo } from "@/components/assistant/assistant-demo";
@@ -249,21 +248,13 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 Support
               </Link>
             </nav>
+            {/* "Naar Dashboard" button routing logic:
+                - Unauthenticated users → /login (must log in first)
+                - Authenticated users → /dashboard (middleware handles onboarding redirects if needed) */}
             <div className="flex items-center gap-3">
-              {isLoggedIn ? (
-                <LandingCtaButton href="/dashboard" paddingClass="px-6 py-2.5" className="text-sm tracking-tight">
-                  Naar Dashboard
-                </LandingCtaButton>
-              ) : (
-                <>
-                  <Link href="/login" className={buttonVariants("ghost", "hidden md:inline-flex text-slate-700 hover:text-slate-900 hover:bg-slate-100/80")}>
-                    Inloggen
-                  </Link>
-                  <LandingCtaButton href="/register" paddingClass="px-6 py-2.5">
-                    Gratis starten
-                  </LandingCtaButton>
-                </>
-              )}
+              <LandingCtaButton href={isLoggedIn ? "/dashboard" : "/login"} paddingClass="px-6 py-2.5" className="text-sm tracking-tight">
+                Naar Dashboard
+              </LandingCtaButton>
             </div>
           </motion.div>
         </div>
