@@ -235,15 +235,17 @@ node -e "console.log('PORT:', process.env.PORT || '3000')"
 ### 4. Verify Prisma Migrations
 
 ```bash
-# Generate Prisma client
-npx prisma generate
+# Generate Prisma client (uses project-specified version)
+npm run db:generate
 
 # Check pending migrations (dry run)
 npx prisma migrate status
 
-# Apply migrations
-npx prisma migrate deploy
+# Apply migrations (uses project-specified version)
+npm run db:migrate
 ```
+
+> **Note:** Use `npm run db:generate` and `npm run db:migrate` instead of running `npx prisma` directly. This ensures the project-specified Prisma version (6.1.0) is used, preventing version mismatch issues.
 
 ### 5. Full Sanity Check Script
 
