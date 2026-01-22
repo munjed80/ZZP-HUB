@@ -217,7 +217,8 @@ async function migrateDeployWithFallback() {
   // Track if we've already attempted recovery to prevent infinite loops
   let recoveryAttempted = false;
 
-  async function attemptMigration() {
+  // Use iterative approach instead of recursion to avoid potential stack issues
+  while (true) {
     try {
       console.log("[start-prod] Running prisma migrate deploy");
       await runCommand("npx", ["prisma", "migrate", "deploy"]);
@@ -235,6 +236,7 @@ async function migrateDeployWithFallback() {
         recoveryAttempted = true;
 
         console.log("[start-prod] Missing base tables detected (42P01). Running prisma db push to recover...");
+        console.log("[start-prod] WARNING: prisma db push will sync the database schema with the Prisma schema.");
 
         try {
           await runCommand("npx", ["prisma", "db", "push"]);
@@ -244,10 +246,9 @@ async function migrateDeployWithFallback() {
           throw pushError;
         }
 
-        // Re-run migrate deploy after successful db push
+        // Continue the loop to re-run migrate deploy after successful db push
         console.log("[start-prod] Re-running prisma migrate deploy after db push...");
-        await attemptMigration();
-        return;
+        continue;
       }
 
       // Check for P3009: Failed migration exists in the database
@@ -292,8 +293,6 @@ async function migrateDeployWithFallback() {
       throw error;
     }
   }
-
-  await attemptMigration();
 }
 
 async function main() {
