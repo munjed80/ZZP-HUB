@@ -25,6 +25,8 @@ const navigatie = [
   { href: "/admin/companies", label: "Companies", icon: "Building2", superAdminOnly: true },
   { href: "/admin/releases", label: "Releases", icon: "Rocket", superAdminOnly: true },
   { href: "/admin/support", label: "Support Inbox", icon: "Inbox", superAdminOnly: true },
+  // Test item for accountantOnly visibility
+  { href: "/test-accountant-only", label: "Test Accountant Only", icon: "Test", accountantOnly: true },
 ];
 
 /**
@@ -80,5 +82,19 @@ describe("Accountant invite menu visibility", () => {
   test("menu icon is UserPlus", () => {
     const accountantMenuItem = navigatie.find((item) => item.href === "/accountant-uitnodigen");
     assert.strictEqual(accountantMenuItem?.icon, "UserPlus", "Menu item should use UserPlus icon");
+  });
+
+  test("accountantOnly items are hidden from all roles in mobile sidebar", () => {
+    // The accountantOnly flag is used to hide items in mobile sidebar (see sidebar.tsx MobileSidebar)
+    // This test ensures the filtering logic works correctly
+    const accountantOnlyItem = navigatie.find((item) => item.accountantOnly === true);
+    assert.ok(accountantOnlyItem, "Test requires an accountantOnly item to exist");
+    
+    // All roles should NOT see accountantOnly items in mobile sidebar
+    ["COMPANY_ADMIN", "SUPERADMIN", "STAFF", "ACCOUNTANT"].forEach((role) => {
+      const visibleItems = getVisibleNavItems(role);
+      const foundItem = visibleItems.find((item) => item.href === accountantOnlyItem.href);
+      assert.strictEqual(foundItem, undefined, `${role} should NOT see accountantOnly items`);
+    });
   });
 });

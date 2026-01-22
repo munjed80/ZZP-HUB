@@ -36,6 +36,7 @@ export default async function AccountantUitnodigenPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32">
+        {/* pb-32 provides space for mobile bottom navigation bar */}
         <AccountantInvites invites={invites} />
       </div>
     </div>
