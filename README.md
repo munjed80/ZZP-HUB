@@ -105,6 +105,9 @@ WHERE email = 'test@example.com';
 - [ ] Client record bestaat
 
 ### Productie Deployment
+
+> **Uitgebreide documentatie:** Zie [DEPLOYMENT.md](DEPLOYMENT.md) voor complete instructies inclusief Node.js 20 pinning op Railway, Coolify, Docker en VPS.
+
 1. Zorg voor environment variables:
    - `DATABASE_URL`: PostgreSQL connection string
    - `NEXTAUTH_SECRET`: Random secret voor sessie-encryptie
@@ -120,7 +123,7 @@ WHERE email = 'test@example.com';
    npm run build
    npm start
    ```
-   `npm start` gebruikt `scripts/start-prod.mjs`: valideert verplichte env vars, draait `prisma migrate deploy` + `prisma generate`, doet een DB-connectivity check (`SELECT 1`) en start vervolgens de standalone server (`node .next/standalone/server.js`) op `HOST=0.0.0.0`.
+   `npm start` gebruikt `scripts/start-prod.mjs`: valideert verplichte env vars, draait `prisma migrate deploy`, en start vervolgens de standalone server (`node .next/standalone/server.js`) op `HOST=0.0.0.0`. De poort wordt bepaald door `process.env.PORT` (standaard 3000). Platform-as-a-Service providers (Railway, Heroku, Render, etc.) injecteren automatisch de `PORT` env var.
    Als de database al tabellen heeft maar geen `_prisma_migrations` tabel bevat, markeert het startscript automatisch de baseline-migratie als toegepast via `prisma migrate resolve` en controleert het dat de onboarding- en emailkolommen aanwezig zijn.
    Coolify start command: **`npm start`** (migraties worden automatisch vóór de serverstart uitgevoerd).
    Capacitor bundling: na `npm run build` staat de complete webbundle in **`.next/standalone`**. De postbuild stap kopieert `public/` en `.next/static` naar deze map; gebruik dit pad als WebView payload voor Android/iOS (entrypoint: `server.js` in `.next/standalone`).

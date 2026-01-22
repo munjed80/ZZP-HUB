@@ -193,7 +193,8 @@ async function deployMigrations(migrationFolders) {
     log(
       `_prisma_migrations missing, but database has tables -> marking baseline ${baselineMigration} as applied.`,
     );
-    runCommand("./node_modules/.bin/prisma", [
+    runCommand("npx", [
+      "prisma",
       "migrate",
       "resolve",
       "--applied",
@@ -204,7 +205,7 @@ async function deployMigrations(migrationFolders) {
   }
 
   log("Running pending migrations via prisma migrate deploy.");
-  runCommand("./node_modules/.bin/prisma", ["migrate", "deploy"]);
+  runCommand("npx", ["prisma", "migrate", "deploy"]);
 }
 
 async function main() {
@@ -212,7 +213,7 @@ async function main() {
   validateRuntimeEnvironment();
 
   logStep("Prisma generate");
-  runCommand("./node_modules/.bin/prisma", ["generate"]);
+  runCommand("npx", ["prisma", "generate"]);
 
   logStep("Inspecting migrations and database state");
   const migrationFolders = getMigrationFolders();
