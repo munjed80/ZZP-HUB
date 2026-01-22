@@ -19,6 +19,14 @@ const KNOWN_MIGRATIONS = {
   },
 };
 
+/**
+ * Validate migration name to ensure it's safe for use in shell commands.
+ * Prisma migration names are alphanumeric with underscores only.
+ */
+function isValidMigrationName(name) {
+  return /^[a-zA-Z0-9_]+$/.test(name);
+}
+
 function printUsage() {
   console.log("Usage: node scripts/print-migration-recovery.mjs <migration_name>");
   console.log("");
@@ -27,6 +35,12 @@ function printUsage() {
 }
 
 function printRecoveryCommands(migrationName) {
+  // Validate migration name before using in shell commands
+  if (!isValidMigrationName(migrationName)) {
+    console.error(`Error: Invalid migration name "${migrationName}". Migration names must be alphanumeric with underscores only.`);
+    process.exit(1);
+  }
+
   const knownMigration = KNOWN_MIGRATIONS[migrationName];
   
   console.log("========================================");

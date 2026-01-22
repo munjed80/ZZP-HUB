@@ -125,12 +125,23 @@ async function startServer() {
 }
 
 /**
+ * Validate migration name to ensure it's safe for use in shell commands.
+ * Prisma migration names are alphanumeric with underscores only.
+ */
+function isValidMigrationName(name) {
+  return /^[a-zA-Z0-9_]+$/.test(name);
+}
+
+/**
  * Extract failed migration name from P3009 error message.
  * Prisma outputs: "The `<migration_name>` migration"
  */
 function extractFailedMigrationName(errorMessage) {
   const match = errorMessage.match(/The `(.*?)` migration/);
-  return match ? match[1] : null;
+  if (!match) return null;
+  const name = match[1];
+  // Validate the extracted name to prevent potential injection
+  return isValidMigrationName(name) ? name : null;
 }
 
 /**
