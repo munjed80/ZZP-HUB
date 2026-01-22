@@ -18,6 +18,11 @@ export const VALID_USER_ROLES: readonly UserRole[] = [
 ] as const;
 
 /**
+ * Set of valid roles for O(1) lookup performance.
+ */
+const VALID_USER_ROLES_SET = new Set<string>(VALID_USER_ROLES);
+
+/**
  * Default fallback role for invalid role strings.
  */
 export const DEFAULT_ROLE: UserRole = "STAFF";
@@ -30,7 +35,7 @@ export const DEFAULT_ROLE: UserRole = "STAFF";
  * @returns A valid UserRole, defaulting to STAFF if the input is invalid
  */
 export function validateUserRole(role: unknown): UserRole {
-  if (typeof role === "string" && VALID_USER_ROLES.includes(role as UserRole)) {
+  if (typeof role === "string" && VALID_USER_ROLES_SET.has(role)) {
     return role as UserRole;
   }
   
@@ -49,5 +54,5 @@ export function validateUserRole(role: unknown): UserRole {
  * @returns True if the value is a valid UserRole
  */
 export function isValidUserRole(role: unknown): role is UserRole {
-  return typeof role === "string" && VALID_USER_ROLES.includes(role as UserRole);
+  return typeof role === "string" && VALID_USER_ROLES_SET.has(role);
 }
