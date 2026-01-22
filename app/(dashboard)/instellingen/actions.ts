@@ -124,6 +124,10 @@ export async function fetchAccountantInvites() {
       id: true,
       invitedEmail: true,
       status: true,
+      canRead: true,
+      canEdit: true,
+      canExport: true,
+      canBTW: true,
       createdAt: true,
       updatedAt: true,
       user: {
@@ -138,6 +142,10 @@ export async function fetchAccountantInvites() {
     id: invite.id,
     email: invite.invitedEmail ?? invite.user?.email ?? "Onbekend",
     status: invite.status,
+    canRead: invite.canRead,
+    canEdit: invite.canEdit,
+    canExport: invite.canExport,
+    canBTW: invite.canBTW,
     createdAt: invite.createdAt,
     updatedAt: invite.updatedAt,
   }));
@@ -267,5 +275,84 @@ export async function downloadBackup() {
       date: expense.date.toISOString(),
       createdAt: expense.createdAt.toISOString(),
     })),
+  };
+}
+
+export async function linkAccountantToCompany(input: {
+  accountantEmail: string;
+  canRead?: boolean;
+  canEdit?: boolean;
+  canExport?: boolean;
+  canBTW?: boolean;
+}) {
+  "use server";
+
+  const { userId: companyId } = await requireTenantContext();
+  const { normalizeEmail } = await import("@/lib/utils");
+  const { CompanyUserStatus } = await import("@prisma/client");
+
+  // Validate and normalize email
+  let accountantEmail: string;
+  try {
+    accountantEmail = normalizeEmail(input.accountantEmail);
+  } catch {
+    throw new Error("Ongeldig e-mailadres");
+  }
+
+  // Find the accountant user by email
+  const accountantUser = await prisma.user.findUnique({
+    where: { email: accountantEmail },
+    select: { id: true, email: true },
+  });
+
+  if (!accountantUser) {
+    throw new Error("Accountant gebruiker niet gevonden");
+  }
+
+  // Check if user is already an accountant for any company
+  const existingAccountantRole = await prisma.companyUser.findFirst({
+    where: {
+      userId: accountantUser.id,
+      role: CompanyRole.ACCOUNTANT,
+    },
+  });
+
+  if (!existingAccountantRole) {
+    throw new Error("Gebruiker is geen accountant");
+  }
+
+  // Create or upsert the CompanyUser record
+  await prisma.companyUser.upsert({
+    where: {
+      companyId_userId: {
+        companyId: companyId,
+        userId: accountantUser.id,
+      },
+    },
+    update: {
+      status: CompanyUserStatus.ACTIVE,
+      canRead: input.canRead ?? true,
+      canEdit: input.canEdit ?? false,
+      canExport: input.canExport ?? false,
+      canBTW: input.canBTW ?? false,
+    },
+    create: {
+      companyId: companyId,
+      userId: accountantUser.id,
+      role: CompanyRole.ACCOUNTANT,
+      status: CompanyUserStatus.ACTIVE,
+      canRead: input.canRead ?? true,
+      canEdit: input.canEdit ?? false,
+      canExport: input.canExport ?? false,
+      canBTW: input.canBTW ?? false,
+    },
+  });
+
+  revalidatePath("/instellingen");
+
+  return {
+    ok: true,
+    companyId,
+    accountantUserId: accountantUser.id,
   };
 }

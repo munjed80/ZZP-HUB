@@ -78,20 +78,21 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  companyProfile            CompanyProfile?
-  clients                   Client[]
-  invoices                  Invoice[]
-  quotations                Quotation[]
-  expenses                  Expense[]
-  timeEntries               TimeEntry[]
-  events                    Event[]
-  verificationTokens        EmailVerificationToken[]
-  passwordResetTokens       PasswordResetToken[]
-  supportMessages           SupportMessage[]
-  invoiceNotes              InvoiceNote[]            @relation("InvoiceNotes")
-  expenseNotes              ExpenseNote[]            @relation("ExpenseNotes")
-  notifications             Notification[]           @relation("UserNotifications")
-  companies                 CompanyUser[]
+  companyProfile      CompanyProfile?
+  clients             Client[]
+  invoices            Invoice[]
+  quotations          Quotation[]
+  expenses            Expense[]
+  timeEntries         TimeEntry[]
+  events              Event[]
+  verificationTokens  EmailVerificationToken[]
+  passwordResetTokens PasswordResetToken[]
+  supportMessages     SupportMessage[]
+  invoiceNotes        InvoiceNote[]            @relation("InvoiceNotes")
+  expenseNotes        ExpenseNote[]            @relation("ExpenseNotes")
+  notifications       Notification[]           @relation("UserNotifications")
+  companyAccesses     CompanyUser[]            @relation("CompanyUserCompany")
+  linkedCompanies     CompanyUser[]            @relation("CompanyUserUser")
 }
 
 model CompanyProfile {
@@ -206,7 +207,7 @@ model Expense {
   vatRate       BtwTarief
   date          DateTime
   receiptUrl    String?
-  ocrStatus     String?       // "pending", "completed", "failed"
+  ocrStatus     String? // "pending", "completed", "failed"
   ocrData       String?       @db.Text // JSON: {vendor, amount, date, category}
   extractedData String?       @db.Text // Raw OCR result
   reviewedAt    DateTime?
@@ -347,15 +348,19 @@ model ConversationDraft {
 }
 
 model CompanyUser {
-  id           String   @id @default(uuid())
+  id           String            @id @default(uuid())
   companyId    String
   userId       String?
   invitedEmail String?
   role         CompanyRole
   status       CompanyUserStatus @default(PENDING)
   tokenHash    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  canRead      Boolean           @default(true)
+  canEdit      Boolean           @default(false)
+  canExport    Boolean           @default(false)
+  canBTW       Boolean           @default(false)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   company User  @relation("CompanyUserCompany", fields: [companyId], references: [id], onDelete: Cascade)
   user    User? @relation("CompanyUserUser", fields: [userId], references: [id], onDelete: Cascade)
@@ -412,10 +417,10 @@ model ExpenseNote {
 model Notification {
   id         String   @id @default(uuid())
   userId     String
-  type       String   // "invoice_review", "expense_flagged", "invoice_due", etc.
+  type       String // "invoice_review", "expense_flagged", "invoice_due", etc.
   title      String
   message    String
-  entityType String?  // "invoice", "expense", "event"
+  entityType String? // "invoice", "expense", "event"
   entityId   String?
   isRead     Boolean  @default(false)
   createdAt  DateTime @default(now())
