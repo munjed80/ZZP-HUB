@@ -3,11 +3,24 @@
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/email";
 
+// Debug flag for enhanced email verification logging
+const DEBUG_EMAIL_VERIFY = process.env.DEBUG_EMAIL_VERIFY === "1";
+
 // Structured logging helper for verification events
 // Always log verification events for debugging (server-side only, safe output)
 function logVerification(event: string, details: Record<string, unknown>) {
   console.log(JSON.stringify({
     event: `EMAIL_VERIFY_${event}`,
+    timestamp: new Date().toISOString(),
+    ...details,
+  }));
+}
+
+// Enhanced debug logging for token validation (only when DEBUG_EMAIL_VERIFY=1)
+function debugLogTokenValidation(details: Record<string, unknown>) {
+  if (!DEBUG_EMAIL_VERIFY) return;
+  console.log(JSON.stringify({
+    event: "DEBUG_TOKEN_VALIDATE",
     timestamp: new Date().toISOString(),
     ...details,
   }));
@@ -45,6 +58,34 @@ export async function verifyEmailToken(token: string) {
     const totalTokenCount = await prisma.emailVerificationToken.count();
     const expiredTokenCount = await prisma.emailVerificationToken.count({
       where: { expiresAt: { lt: now } },
+    });
+
+    // For debugging, also fetch ALL tokens to see their actual expiresAt values
+    const allTokensForDebug = DEBUG_EMAIL_VERIFY 
+      ? await prisma.emailVerificationToken.findMany({
+          select: {
+            id: true,
+            expiresAt: true,
+            createdAt: true,
+          },
+          take: 10, // Limit for safety
+        })
+      : [];
+    
+    // Enhanced debug logging for diagnosing expiration issues
+    debugLogTokenValidation({
+      nowIso: now.toISOString(),
+      nowTimestamp: now.getTime(),
+      totalTokensInDb: totalTokenCount,
+      expiredTokenCount: expiredTokenCount,
+      allTokensExpiryInfo: allTokensForDebug.map((t) => ({
+        id: t.id,
+        expiresAtIso: t.expiresAt.toISOString(),
+        expiresAtTimestamp: t.expiresAt.getTime(),
+        createdAtIso: t.createdAt.toISOString(),
+        isExpired: t.expiresAt < now,
+        timeDiffMs: t.expiresAt.getTime() - now.getTime(),
+      })),
     });
     
     const tokens = await prisma.emailVerificationToken.findMany({

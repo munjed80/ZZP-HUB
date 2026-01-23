@@ -12,6 +12,8 @@ import bcrypt from "bcryptjs";
  * - Token verification with bcrypt works correctly
  * - URL encoding does not affect tokens
  * - Expired tokens are rejected
+ * - TTL calculations use milliseconds (not seconds) correctly
+ * - Token expiry comparison handles future and past dates
  * 
  * Note: We replicate the token functions here rather than importing them because:
  * 1. lib/email.ts uses dynamic imports and has Node.js-specific dependencies
@@ -53,6 +55,30 @@ async function hashToken(token) {
 // Replicate verifyToken from lib/email.ts - bcrypt compare
 async function verifyToken(token, hash) {
   return bcrypt.compare(token, hash);
+}
+
+// Simulate token creation like in register/actions.ts
+function createMockToken() {
+  const TTL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + TTL_MS);
+  return {
+    token: generateVerificationToken(),
+    expiresAt,
+    createdAt: now,
+  };
+}
+
+// Simulate token expiry check like in verify-email/actions.ts
+function isTokenExpired(tokenExpiresAt) {
+  const now = new Date();
+  return tokenExpiresAt < now;
+}
+
+// Simulate token validity check (Prisma query equivalent)
+function isTokenValid(tokenExpiresAt) {
+  const now = new Date();
+  return tokenExpiresAt >= now;
 }
 
 test("Token generation produces 32-character alphanumeric string", () => {
@@ -189,4 +215,172 @@ test("Verification URL format is correct", () => {
   assert.ok(verificationUrl.startsWith("https://"), "URL should use HTTPS");
   assert.ok(verificationUrl.includes("/verify-email?token="), "URL should have correct path and query");
   assert.ok(verificationUrl.includes(token), "URL should contain the token");
+});
+
+// ============================================================================
+// TTL and Expiration Tests - Root cause investigation
+// ============================================================================
+
+test("TTL_MS is correctly computed as 24 hours in milliseconds", () => {
+  const TTL_MS = 24 * 60 * 60 * 1000;
+  
+  // 24 hours = 86,400,000 milliseconds
+  assert.equal(TTL_MS, 86400000, "TTL should be 86,400,000 milliseconds");
+  
+  // Not the common bug of using seconds instead
+  const TTL_SECONDS = 24 * 60 * 60;
+  assert.notEqual(TTL_MS, TTL_SECONDS, "TTL in ms should NOT equal TTL in seconds");
+});
+
+test("Token expiry is correctly set in the future using Date.getTime() + TTL_MS", () => {
+  const TTL_MS = 24 * 60 * 60 * 1000;
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + TTL_MS);
+  
+  // expiresAt should be ~24 hours ahead
+  const diffMs = expiresAt.getTime() - now.getTime();
+  assert.equal(diffMs, TTL_MS, "Difference should exactly equal TTL_MS");
+  
+  // Token should NOT be expired immediately
+  assert.ok(expiresAt > now, "Expiry should be after now");
+  assert.ok(!isTokenExpired(expiresAt), "Newly created token should NOT be expired");
+  assert.ok(isTokenValid(expiresAt), "Newly created token should be valid");
+});
+
+test("Token created with Date.now() + TTL_MS is NOT immediately expired", () => {
+  // This is the exact pattern used in register/actions.ts
+  const TTL_MS = 24 * 60 * 60 * 1000;
+  const expiresAt = new Date(Date.now() + TTL_MS);
+  
+  // Should NOT be expired
+  assert.ok(!isTokenExpired(expiresAt), "Token should not be expired immediately after creation");
+});
+
+test("Simulating the BUG: using seconds instead of milliseconds causes immediate expiry", () => {
+  // Common bug: Using seconds instead of milliseconds
+  const TTL_SECONDS = 24 * 60 * 60; // This is WRONG if added to Date.now()
+  const now = new Date();
+  const wrongExpiresAt = new Date(now.getTime() + TTL_SECONDS); // Only ~86 seconds ahead!
+  
+  const diffMs = wrongExpiresAt.getTime() - now.getTime();
+  const diffSeconds = diffMs / 1000;
+  
+  // With the bug, it's only ~86 seconds in the future, not 24 hours
+  assert.ok(diffSeconds < 90, "Bug would result in only ~86 seconds TTL");
+  assert.ok(diffSeconds > 80, "Bug would result in only ~86 seconds TTL");
+  
+  // The token would still be valid immediately, but expire in ~86 seconds
+  // This test shows WHY the bug exists and what it looks like
+});
+
+test("createMockToken creates a valid future expiry date", () => {
+  const mockToken = createMockToken();
+  
+  // Token should be valid immediately
+  assert.ok(isTokenValid(mockToken.expiresAt), "Mock token should be valid");
+  assert.ok(!isTokenExpired(mockToken.expiresAt), "Mock token should not be expired");
+  
+  // expiresAt should be ~24 hours after createdAt
+  const diffMs = mockToken.expiresAt.getTime() - mockToken.createdAt.getTime();
+  const diffHours = diffMs / (60 * 60 * 1000);
+  
+  assert.ok(diffHours >= 23.99 && diffHours <= 24.01, 
+    `Token should expire in ~24 hours, got ${diffHours.toFixed(2)} hours`);
+});
+
+test("Token expiry simulation: fresh token -> immediate verify -> success", async () => {
+  // Step 1: Create token (registration)
+  const rawToken = generateVerificationToken();
+  const hashedToken = await hashToken(rawToken);
+  const TTL_MS = 24 * 60 * 60 * 1000;
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + TTL_MS);
+  
+  // Step 2: Immediately verify (user clicks link right away)
+  const verifyNow = new Date();
+  const tokenNotExpired = expiresAt >= verifyNow;
+  const tokenMatches = await verifyToken(rawToken, hashedToken);
+  
+  assert.ok(tokenNotExpired, "Token should not be expired yet");
+  assert.ok(tokenMatches, "Token should match hash");
+  
+  // Both conditions must be true for successful verification
+  const verificationSuccess = tokenNotExpired && tokenMatches;
+  assert.ok(verificationSuccess, "Verification should succeed");
+});
+
+test("Token expiry simulation: expired token -> verify -> fail", async () => {
+  // Step 1: Create token with past expiry (simulating expired token)
+  const rawToken = generateVerificationToken();
+  const hashedToken = await hashToken(rawToken);
+  const expiresAt = new Date(Date.now() - 1000); // Expired 1 second ago
+  
+  // Step 2: Try to verify
+  const verifyNow = new Date();
+  const tokenNotExpired = expiresAt >= verifyNow;
+  const tokenMatches = await verifyToken(rawToken, hashedToken);
+  
+  assert.ok(!tokenNotExpired, "Token should be expired");
+  assert.ok(tokenMatches, "Token hash should still match (but token is expired)");
+  
+  // Verification should fail because token is expired
+  const verificationSuccess = tokenNotExpired && tokenMatches;
+  assert.ok(!verificationSuccess, "Verification should fail for expired token");
+});
+
+test("Token expiry simulation: wrong token -> verify -> fail", async () => {
+  // Step 1: Create valid token
+  const rawToken = generateVerificationToken();
+  const hashedToken = await hashToken(rawToken);
+  const TTL_MS = 24 * 60 * 60 * 1000;
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + TTL_MS);
+  
+  // Step 2: Try to verify with wrong token
+  const wrongToken = generateVerificationToken(); // Different token
+  const tokenNotExpired = expiresAt >= new Date();
+  const tokenMatches = await verifyToken(wrongToken, hashedToken);
+  
+  assert.ok(tokenNotExpired, "Token should not be expired");
+  assert.ok(!tokenMatches, "Token should NOT match (wrong token)");
+  
+  // Verification should fail because token doesn't match
+  const verificationSuccess = tokenNotExpired && tokenMatches;
+  assert.ok(!verificationSuccess, "Verification should fail for wrong token");
+});
+
+test("Prisma Date handling: JS Date object serializes to valid DateTime", () => {
+  const now = new Date();
+  const TTL_MS = 24 * 60 * 60 * 1000;
+  const expiresAt = new Date(now.getTime() + TTL_MS);
+  
+  // Prisma expects Date objects which it converts to DateTime
+  // Verify the Date is a valid instance
+  assert.ok(expiresAt instanceof Date, "expiresAt should be a Date instance");
+  assert.ok(!isNaN(expiresAt.getTime()), "expiresAt should be a valid date");
+  
+  // The ISO string should be parseable back to the same date
+  const isoString = expiresAt.toISOString();
+  const parsedBack = new Date(isoString);
+  assert.equal(parsedBack.getTime(), expiresAt.getTime(), 
+    "Date should roundtrip through ISO string");
+});
+
+test("Date comparison: expiresAt >= now for valid token", () => {
+  const now = new Date();
+  const TTL_MS = 24 * 60 * 60 * 1000;
+  const expiresAt = new Date(now.getTime() + TTL_MS);
+  
+  // This is the Prisma query condition
+  const prismaCondition = expiresAt >= now; // gte: now
+  assert.ok(prismaCondition, "expiresAt should be >= now for valid token");
+});
+
+test("Date comparison: expiresAt < now for expired token", () => {
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() - 1000); // 1 second in past
+  
+  // This is the Prisma query condition for expired tokens
+  const prismaCondition = expiresAt < now; // lt: now
+  assert.ok(prismaCondition, "expiresAt should be < now for expired token");
 });
