@@ -484,8 +484,22 @@ export async function linkAccountantToCompany(input: {
     },
   });
 
+  // IDEMPOTENT: If already linked/active, return success with alreadyLinked flag instead of throwing
   if (existingInvite?.status === CompanyUserStatus.ACTIVE) {
-    throw new Error("Deze accountant is al gekoppeld aan uw bedrijf");
+    logInviteEvent("CREATE_ALREADY_LINKED", {
+      companyId: companyId.slice(-6),
+      emailMasked,
+      existingId: existingInvite.id.slice(-6),
+    });
+    return {
+      ok: true,
+      alreadyLinked: true,
+      companyId,
+      companyUserId: existingInvite.id,
+      accountantUserId: existingInvite.userId ?? null,
+      status: "ACTIVE",
+      emailSent: false,
+    };
   }
 
   // Generate invite token (always needed for PENDING status, or for sending email even if user exists)
