@@ -444,6 +444,16 @@ export function AccountantInvites({ invites }: { invites: Invite[] }) {
           ...permissions,
         });
         
+        // Handle idempotent "already linked" case
+        if (result.alreadyLinked) {
+          toast.info("Deze accountant is al gekoppeld aan uw bedrijf.", {
+            description: "Geen actie vereist.",
+            duration: 5000,
+          });
+          setEmail("");
+          return;
+        }
+        
         if (result.emailSent) {
           toast.success("Uitnodiging verstuurd per e-mail. De accountant moet de uitnodiging accepteren.");
         } else if (result.inviteUrl) {

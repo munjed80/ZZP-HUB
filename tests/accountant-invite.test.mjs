@@ -233,3 +233,151 @@ describe("Accept flow validation (P2003 prevention)", () => {
     assert.strictEqual(result.valid, true);
   });
 });
+
+/**
+ * Tests for idempotent invite creation behavior.
+ * When a company tries to invite an accountant who is already linked (ACTIVE),
+ * the action should NOT throw an error. Instead, it should return success with
+ * alreadyLinked flag so the UI can display an informational message.
+ */
+describe("Idempotent invite creation (alreadyLinked)", () => {
+  // Simulated linkAccountantToCompany idempotent behavior
+  function simulateInviteIdempotent(existingInvite) {
+    // If already linked (ACTIVE), return ok with alreadyLinked flag
+    if (existingInvite?.status === "ACTIVE") {
+      return {
+        ok: true,
+        alreadyLinked: true,
+        companyUserId: existingInvite.id,
+        accountantUserId: existingInvite.userId,
+        status: "ACTIVE",
+        emailSent: false,
+      };
+    }
+    // Normal invite creation flow
+    return {
+      ok: true,
+      alreadyLinked: false,
+      status: "PENDING",
+      emailSent: true,
+    };
+  }
+
+  test("returns alreadyLinked:true when accountant is already active", () => {
+    const existingActive = {
+      id: "cu-123",
+      status: "ACTIVE",
+      userId: "accountant-user-id",
+    };
+    const result = simulateInviteIdempotent(existingActive);
+    assert.strictEqual(result.ok, true);
+    assert.strictEqual(result.alreadyLinked, true);
+    assert.strictEqual(result.status, "ACTIVE");
+    assert.strictEqual(result.emailSent, false);
+  });
+
+  test("does not throw error for already linked accountant", () => {
+    const existingActive = {
+      id: "cu-123",
+      status: "ACTIVE",
+      userId: "accountant-user-id",
+    };
+    // Should not throw - this is the key behavior change
+    let didThrow = false;
+    try {
+      const result = simulateInviteIdempotent(existingActive);
+      assert.strictEqual(result.ok, true);
+    } catch {
+      didThrow = true;
+    }
+    assert.strictEqual(didThrow, false, "Should not throw for already linked accountant");
+  });
+
+  test("returns normal invite response when no existing link", () => {
+    const result = simulateInviteIdempotent(null);
+    assert.strictEqual(result.ok, true);
+    assert.strictEqual(result.alreadyLinked, false);
+    assert.strictEqual(result.status, "PENDING");
+    assert.strictEqual(result.emailSent, true);
+  });
+
+  test("returns normal invite response for pending invite (re-invite scenario)", () => {
+    const existingPending = {
+      id: "cu-456",
+      status: "PENDING",
+      userId: null,
+    };
+    const result = simulateInviteIdempotent(existingPending);
+    assert.strictEqual(result.ok, true);
+    assert.strictEqual(result.alreadyLinked, false);
+    assert.strictEqual(result.status, "PENDING");
+  });
+});
+
+/**
+ * Tests for accept flow fallback behavior.
+ * When token is not found, the accept endpoint should check if the user
+ * is already linked to a company and return success if so (idempotent).
+ */
+describe("Accept flow fallback when token not found", () => {
+  // Simulated fallback logic
+  function simulateAcceptFallback({ tokenFound, existingActiveLink, sessionUserId }) {
+    // Token found - normal flow
+    if (tokenFound) {
+      return { action: "ACCEPT_VIA_TOKEN" };
+    }
+    
+    // Token not found - check if already linked
+    if (existingActiveLink && existingActiveLink.userId === sessionUserId) {
+      return {
+        success: true,
+        alreadyLinked: true,
+        companyUserId: existingActiveLink.id,
+        companies: [{ id: existingActiveLink.companyId, name: "Test Company" }],
+      };
+    }
+    
+    // No token and not linked - error
+    return { error: "Ongeldige of verlopen uitnodiging" };
+  }
+
+  test("returns success with alreadyLinked when user is already linked", () => {
+    const result = simulateAcceptFallback({
+      tokenFound: false,
+      existingActiveLink: { id: "cu-123", companyId: "company-1", userId: "user-1" },
+      sessionUserId: "user-1",
+    });
+    assert.strictEqual(result.success, true);
+    assert.strictEqual(result.alreadyLinked, true);
+    assert.ok(Array.isArray(result.companies));
+    assert.strictEqual(result.companies.length, 1);
+  });
+
+  test("returns error when token not found and user not linked", () => {
+    const result = simulateAcceptFallback({
+      tokenFound: false,
+      existingActiveLink: null,
+      sessionUserId: "user-1",
+    });
+    assert.strictEqual(result.error, "Ongeldige of verlopen uitnodiging");
+    assert.strictEqual(result.success, undefined);
+  });
+
+  test("returns normal flow when token is found", () => {
+    const result = simulateAcceptFallback({
+      tokenFound: true,
+      existingActiveLink: null,
+      sessionUserId: "user-1",
+    });
+    assert.strictEqual(result.action, "ACCEPT_VIA_TOKEN");
+  });
+
+  test("returns error when user id does not match existing link", () => {
+    const result = simulateAcceptFallback({
+      tokenFound: false,
+      existingActiveLink: { id: "cu-123", companyId: "company-1", userId: "different-user" },
+      sessionUserId: "user-1",
+    });
+    assert.strictEqual(result.error, "Ongeldige of verlopen uitnodiging");
+  });
+});

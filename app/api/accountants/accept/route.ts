@@ -83,12 +83,68 @@ export async function POST(request: Request) {
     where: { tokenHash },
   });
 
+  // IDEMPOTENT: If token not found, fallback to check if user is already linked
+  // This handles cases where:
+  // 1. Token was already used (cleared after successful accept)
+  // 2. Token expired but user manually linked
+  // 3. Double-click on accept link
   if (!companyUser) {
+    logAcceptEvent("TOKEN_NOT_FOUND_FALLBACK", {
+      sessionUserId: sessionUserId?.slice(-6),
+      emailMasked: maskEmail(email),
+    });
+
+    // Check if there's an existing active link for this user/email
+    const existingLink = await prisma.companyUser.findFirst({
+      where: {
+        OR: [
+          { userId: sessionUserId },
+          { invitedEmail: email },
+        ],
+        status: CompanyUserStatus.ACTIVE,
+      },
+    });
+
+    if (existingLink) {
+      logAcceptEvent("FALLBACK_ALREADY_LINKED", {
+        sessionUserId: sessionUserId?.slice(-6),
+        emailMasked: maskEmail(email),
+        companyId: existingLink.companyId.slice(-6),
+      });
+
+      // Return success - user is already linked (idempotent behavior)
+      const companies = await prisma.companyUser.findMany({
+        where: {
+          userId: sessionUserId,
+          status: CompanyUserStatus.ACTIVE,
+        },
+        select: {
+          companyId: true,
+          company: {
+            select: {
+              companyProfile: { select: { companyName: true } },
+            },
+          },
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        alreadyLinked: true,
+        companyUserId: existingLink.id,
+        companies: companies.map((c) => ({
+          id: c.companyId,
+          name: c.company?.companyProfile?.companyName || "Bedrijf",
+        })),
+      });
+    }
+
+    // No active link found - token truly invalid
     logAcceptEvent("TOKEN_NOT_FOUND", {
       sessionUserId: sessionUserId?.slice(-6),
       emailMasked: maskEmail(email),
     });
-    return NextResponse.json({ error: "Ongeldige of gebruikte uitnodiging" }, { status: 400 });
+    return NextResponse.json({ error: "Ongeldige of verlopen uitnodiging" }, { status: 400 });
   }
 
   logAcceptEvent("INVITE_FOUND", {
