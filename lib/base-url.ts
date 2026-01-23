@@ -5,7 +5,7 @@ const NON_PRODUCTION_PATTERNS = [
   /localhost/i,
   /127\.0\.0\.1/,
   /0\.0\.0\.0/,
-  /:\d{4,5}$/, // URLs with ports like :3000, :8080
+  /:\d+$/, // URLs with any port (e.g., :80, :443, :3000, :8080)
 ];
 
 function sanitize(url: string): string {
@@ -24,8 +24,18 @@ function isNonProductionUrl(url: string): boolean {
  */
 function logBaseUrlWarning(reason: string, url?: string): void {
   if (process.env.NODE_ENV === "production") {
+    // Only log the domain/host part for security (avoid exposing full URL/paths)
+    let domain = "unknown";
+    if (url) {
+      try {
+        const parsed = new URL(url);
+        domain = parsed.host;
+      } catch {
+        domain = "unparseable";
+      }
+    }
     console.warn(`[BASE_URL_WARNING] ${reason}`, {
-      url: url?.substring(0, 50),
+      domain,
       timestamp: new Date().toISOString(),
       hint: "Set NEXT_PUBLIC_APP_URL or APP_URL environment variable in deployment",
     });

@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const url = new URL(request.url);
     origin = url.origin;
   } catch {
-    // Ignore URL parsing errors
+    // URL parsing can fail in edge cases (malformed URLs); log as unknown
   }
 
   const session = await getServerAuthSession();
