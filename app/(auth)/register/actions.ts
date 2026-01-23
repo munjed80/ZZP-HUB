@@ -9,17 +9,26 @@ import VerificationEmail from "@/components/emails/VerificationEmail";
 import { getPublicSupportEmail } from "@/lib/publicConfig";
 import { APP_BASE_URL } from "@/config/emails";
 
+// Structured logging helper for registration events
+// Always log registration events for debugging (server-side only, safe output)
+function logRegistration(event: string, details: Record<string, unknown>) {
+  console.log(JSON.stringify({
+    event: `REGISTER_${event}`,
+    timestamp: new Date().toISOString(),
+    ...details,
+  }));
+}
+
 export async function registerCompany(values: RegisterInput) {
   const data = registerSchema.parse(values);
 
   try {
-    const shouldLogAuth = process.env.AUTH_DEBUG === "true" || process.env.NODE_ENV !== "production";
-    if (shouldLogAuth) {
-      console.log("Register attempt", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
-    }
+    const emailMasked = data.email.replace(/(.).+(@.*)/, "$1***$2");
+    logRegistration("ATTEMPT", { emailMasked });
 
     const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (existingUser) {
+      logRegistration("USER_EXISTS", { emailMasked });
       return { success: false, message: "E-mailadres is al in gebruik." };
     }
 
@@ -29,6 +38,14 @@ export async function registerCompany(values: RegisterInput) {
     const verificationToken = generateVerificationToken();
     const hashedToken = await hashToken(verificationToken);
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Log token generation (prefix only for security)
+    logRegistration("TOKEN_GENERATED", {
+      tokenPrefix: verificationToken.substring(0, 8),
+      tokenLength: verificationToken.length,
+      hashPrefix: hashedToken.substring(0, 10),
+      expiresAt: expiresAt.toISOString(),
+    });
 
     // Create user with emailVerified=false
     const user = await prisma.user.create({
@@ -41,9 +58,11 @@ export async function registerCompany(values: RegisterInput) {
         emailVerificationSentAt: new Date(),
       },
     });
+
+    logRegistration("USER_CREATED", { userId: user.id, emailMasked });
     
     // Create verification token record
-    await prisma.emailVerificationToken.create({
+    const tokenRecord = await prisma.emailVerificationToken.create({
       data: {
         userId: user.id,
         token: hashedToken,
@@ -51,13 +70,20 @@ export async function registerCompany(values: RegisterInput) {
       },
     });
 
+    logRegistration("TOKEN_STORED", {
+      tokenRecordId: tokenRecord.id,
+      userId: user.id,
+      expiresAt: expiresAt.toISOString(),
+    });
+
     // Send verification email
     const baseUrl = APP_BASE_URL;
     const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`;
     
-    if (shouldLogAuth) {
-      console.log("Verification link (DEV):", verificationUrl);
-    }
+    logRegistration("EMAIL_SENDING", {
+      baseUrl,
+      urlPreview: `${baseUrl}/verify-email?token=${verificationToken.substring(0, 8)}...`,
+    });
     
     const emailResult = await sendEmail({
       to: data.email,
@@ -69,9 +95,9 @@ export async function registerCompany(values: RegisterInput) {
     });
 
     if (!emailResult.success) {
-      console.error("Verification email send failed", {
-        email: data.email,
-        error: emailResult.error,
+      logRegistration("EMAIL_FAILED", {
+        emailMasked,
+        error: emailResult.error?.message,
       });
       // Use imported support email for user-friendly error
       const supportEmail = getPublicSupportEmail();
@@ -82,12 +108,12 @@ export async function registerCompany(values: RegisterInput) {
       };
     }
 
-    if (shouldLogAuth) {
-      console.log("Register success - verification email sent", { emailMasked: data.email.replace(/(.).+(@.*)/, "$1***$2") });
-    }
+    logRegistration("SUCCESS", { emailMasked, messageId: emailResult.messageId });
     
     return { success: true };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    logRegistration("ERROR", { error: errorMessage });
     console.error("Register failed", error);
     return { success: false, message: "Er ging iets mis. Probeer opnieuw." };
   }
