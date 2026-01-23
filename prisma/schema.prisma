@@ -381,6 +381,8 @@ enum CompanyRole {
 enum CompanyUserStatus {
   PENDING
   ACTIVE
+  REVOKED
+  EXPIRED
 }
 
 model InvoiceNote {
