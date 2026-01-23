@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { safeNextUrl } from "@/lib/auth/safe-next";
+import { CompanyUserStatus } from "@prisma/client";
 
 // UUID v4 validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -67,7 +68,7 @@ export default async function SwitchCompanyPage({
     where: {
       userId: session.user.id,
       companyId: validCompanyId,
-      status: "ACTIVE",
+      status: CompanyUserStatus.ACTIVE,
     },
     select: {
       id: true,
