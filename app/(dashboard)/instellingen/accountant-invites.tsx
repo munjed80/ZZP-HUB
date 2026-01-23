@@ -83,7 +83,7 @@ function Toggle({
   );
 }
 
-function InviteActions({ invite, onAction }: { invite: Invite; onAction: () => void }) {
+function InviteActions({ invite }: { invite: Invite }) {
   const [isPending, startTransition] = useTransition();
 
   const handleResend = useCallback(() => {
@@ -101,13 +101,13 @@ function InviteActions({ invite, onAction }: { invite: Invite; onAction: () => v
         } else {
           toast.error(`E-mail verzenden mislukt: ${result.emailError}`);
         }
-        onAction();
+        // Server action calls revalidatePath, component will re-render automatically
       } catch (error) {
         const message = error instanceof Error ? error.message : "Kon uitnodiging niet opnieuw verzenden";
         toast.error(message);
       }
     });
-  }, [invite.id, onAction]);
+  }, [invite.id]);
 
   const handleCopyLink = useCallback(() => {
     startTransition(async () => {
@@ -117,13 +117,13 @@ function InviteActions({ invite, onAction }: { invite: Invite; onAction: () => v
           await navigator.clipboard.writeText(result.inviteUrl);
           toast.success("Uitnodigingslink gekopieerd naar klembord");
         }
-        onAction();
+        // Server action calls revalidatePath, component will re-render automatically
       } catch (error) {
         const message = error instanceof Error ? error.message : "Kon link niet ophalen";
         toast.error(message);
       }
     });
-  }, [invite.id, onAction]);
+  }, [invite.id]);
 
   if (invite.status !== "PENDING") {
     return null;
@@ -168,7 +168,6 @@ export function AccountantInvites({ invites }: { invites: Invite[] }) {
     canExport: false,
     canBTW: false,
   });
-  const [, forceUpdate] = useState(0);
 
   const hasItems = invites.length > 0;
 
@@ -221,10 +220,6 @@ export function AccountantInvites({ invites }: { invites: Invite[] }) {
       }
     });
   };
-
-  const handleInviteAction = useCallback(() => {
-    forceUpdate((n) => n + 1);
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -311,7 +306,7 @@ export function AccountantInvites({ invites }: { invites: Invite[] }) {
                   <PermissionBadge label="BTW" enabled={invite.canBTW} />
                 </div>
                 <div>
-                  <InviteActions invite={invite} onAction={handleInviteAction} />
+                  <InviteActions invite={invite} />
                 </div>
               </div>
             ))}

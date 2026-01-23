@@ -19,6 +19,14 @@ import {
   type ProfileBasicsInput,
 } from "./schema";
 
+/**
+ * Mask an email address for safe logging (e.g., "j***n@example.com")
+ * Preserves first and last character of local part + full domain
+ */
+function maskEmail(email: string): string {
+  return email.replace(/(.).+(@.*)/, "$1***$2");
+}
+
 // Structured logging helper for invite events
 function logInviteEvent(event: string, details: Record<string, unknown>) {
   console.log(JSON.stringify({
@@ -28,8 +36,13 @@ function logInviteEvent(event: string, details: Record<string, unknown>) {
   }));
 }
 
-// Hash token for secure storage (same as in /api/accountants/invite)
-function hashToken(token: string) {
+/**
+ * Hash a token using SHA-256 for secure storage.
+ * This creates a one-way hash that can be stored in the database.
+ * The original token is sent to the user via email and compared
+ * by hashing and matching against the stored hash.
+ */
+function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
@@ -193,7 +206,7 @@ export async function resendAccountantInvite(companyUserId: string) {
     throw new Error("E-mailadres ontbreekt voor deze uitnodiging");
   }
 
-  const emailMasked = companyUser.invitedEmail.replace(/(.).+(@.*)/, "$1***$2");
+  const emailMasked = maskEmail(companyUser.invitedEmail);
   logInviteEvent("RESEND_ATTEMPT", { companyUserId: companyUserId.slice(-6), emailMasked });
 
   // Generate new token
@@ -268,11 +281,14 @@ export async function getAccountantInviteLink(companyUserId: string) {
     throw new Error("Uitnodiging niet gevonden of al geaccepteerd");
   }
 
-  // Generate new token (we regenerate for security - old link is invalidated)
+  // SECURITY: We regenerate the token each time to prevent token reuse attacks.
+  // This invalidates any previously shared links. If the accountant has multiple
+  // tabs open or bookmarked an old link, they will need to use the new one.
+  // This is intentional - the company owner controls when new links are generated.
   const token = crypto.randomBytes(32).toString("hex");
   const tokenHash = hashToken(token);
 
-  // Update with new token
+  // Update with new token (updatedAt is automatically set by Prisma @updatedAt)
   await prisma.companyUser.update({
     where: { id: companyUserId },
     data: { tokenHash },
@@ -282,7 +298,7 @@ export async function getAccountantInviteLink(companyUserId: string) {
   const baseUrl = getAppBaseUrl();
   const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
 
-  const emailMasked = companyUser.invitedEmail?.replace(/(.).+(@.*)/, "$1***$2") || "unknown";
+  const emailMasked = companyUser.invitedEmail ? maskEmail(companyUser.invitedEmail) : "unknown";
   logInviteEvent("LINK_GENERATED", { companyUserId: companyUserId.slice(-6), emailMasked });
 
   return { ok: true, inviteUrl };
@@ -435,7 +451,7 @@ export async function linkAccountantToCompany(input: {
     throw new Error("Ongeldig e-mailadres");
   }
 
-  const emailMasked = accountantEmail.replace(/(.).+(@.*)/, "$1***$2");
+  const emailMasked = maskEmail(accountantEmail);
   logInviteEvent("CREATE_ATTEMPT", { companyId: companyId.slice(-6), emailMasked });
 
   // Find the accountant user by email (optional - may not exist yet)
