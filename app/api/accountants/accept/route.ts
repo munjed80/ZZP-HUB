@@ -28,6 +28,16 @@ function logAcceptEvent(event: string, details: Record<string, unknown>) {
   }));
 }
 
+/**
+ * Extract Prisma error code from an error object
+ */
+function getPrismaErrorCode(error: unknown): string | undefined {
+  if (error && typeof error === "object" && "code" in error) {
+    return String((error as { code: unknown }).code);
+  }
+  return undefined;
+}
+
 export async function POST(request: Request) {
   const session = await getServerAuthSession();
   if (!session?.user) {
@@ -228,7 +238,7 @@ export async function POST(request: Request) {
   } catch (error) {
     // Log any unexpected errors during update
     const errorMsg = error instanceof Error ? error.message : "Unknown error";
-    const errorCode = error && typeof error === "object" && "code" in error ? (error as { code: string }).code : undefined;
+    const errorCode = getPrismaErrorCode(error);
     
     logAcceptEvent("UPDATE_ERROR", {
       inviteId: companyUser.id.slice(-6),
