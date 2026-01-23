@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { linkAccountantToCompany } from "./actions";
+import { Copy, Mail, RefreshCw } from "lucide-react";
+import { linkAccountantToCompany, resendAccountantInvite, getAccountantInviteLink } from "./actions";
 
 type Invite = {
   id: string;
@@ -82,6 +83,82 @@ function Toggle({
   );
 }
 
+function InviteActions({ invite }: { invite: Invite }) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleResend = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const result = await resendAccountantInvite(invite.id);
+        if (result.emailSent) {
+          toast.success("Uitnodiging opnieuw verzonden");
+        } else if (result.inviteUrl) {
+          // Email failed but we have the link
+          await navigator.clipboard.writeText(result.inviteUrl);
+          toast.warning("E-mail verzenden mislukt. Link gekopieerd naar klembord.", {
+            description: result.emailError,
+          });
+        } else {
+          toast.error(`E-mail verzenden mislukt: ${result.emailError}`);
+        }
+        // Server action calls revalidatePath, component will re-render automatically
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Kon uitnodiging niet opnieuw verzenden";
+        toast.error(message);
+      }
+    });
+  }, [invite.id]);
+
+  const handleCopyLink = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const result = await getAccountantInviteLink(invite.id);
+        if (result.inviteUrl) {
+          await navigator.clipboard.writeText(result.inviteUrl);
+          toast.success("Uitnodigingslink gekopieerd naar klembord");
+        }
+        // Server action calls revalidatePath, component will re-render automatically
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Kon link niet ophalen";
+        toast.error(message);
+      }
+    });
+  }, [invite.id]);
+
+  if (invite.status !== "PENDING") {
+    return null;
+  }
+
+  return (
+    <div className="flex gap-1">
+      <Button
+        type="button"
+        variant="ghost"
+        className="min-h-[36px] px-2 py-1"
+        onClick={handleResend}
+        disabled={isPending}
+        title="Uitnodiging opnieuw versturen"
+      >
+        {isPending ? (
+          <RefreshCw className="h-4 w-4 animate-spin" />
+        ) : (
+          <Mail className="h-4 w-4" />
+        )}
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        className="min-h-[36px] px-2 py-1"
+        onClick={handleCopyLink}
+        disabled={isPending}
+        title="Kopieer uitnodigingslink"
+      >
+        <Copy className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
+
 export function AccountantInvites({ invites }: { invites: Invite[] }) {
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
@@ -116,11 +193,20 @@ export function AccountantInvites({ invites }: { invites: Invite[] }) {
           accountantEmail: email.trim(),
           ...permissions,
         });
-        if (result.status === "PENDING") {
-          toast.success("Uitnodiging verstuurd. De accountant kan zich nog registreren.");
+        
+        if (result.emailSent) {
+          toast.success("Uitnodiging verstuurd per e-mail. De accountant moet de uitnodiging accepteren.");
+        } else if (result.inviteUrl) {
+          // Email failed, show warning and copy link
+          await navigator.clipboard.writeText(result.inviteUrl);
+          toast.warning("E-mail verzenden mislukt. Uitnodigingslink gekopieerd naar klembord.", {
+            description: result.emailError ? `Fout: ${result.emailError}` : "Deel de link handmatig met de accountant.",
+            duration: 8000,
+          });
         } else {
-          toast.success("Accountant succesvol gekoppeld");
+          toast.success("Uitnodiging aangemaakt. Controleer de logs voor email status.");
         }
+        
         setEmail("");
         setPermissions({
           canRead: true,
@@ -197,17 +283,18 @@ export function AccountantInvites({ invites }: { invites: Invite[] }) {
       ) : (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-foreground">Gekoppelde accountants</h3>
-          <div className="grid grid-cols-4 gap-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4">
+          <div className="grid grid-cols-5 gap-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground px-4">
             <span>Email</span>
             <span>Status</span>
             <span>Aangemaakt</span>
             <span>Permissies</span>
+            <span>Acties</span>
           </div>
           <div className="space-y-2">
             {sorted.map((invite) => (
               <div
                 key={invite.id}
-                className="grid grid-cols-4 gap-3 items-center rounded-lg border border-border bg-card px-4 py-3 text-sm"
+                className="grid grid-cols-5 gap-3 items-center rounded-lg border border-border bg-card px-4 py-3 text-sm"
               >
                 <div className="font-medium text-foreground truncate">{invite.email}</div>
                 <div>{statusBadge(invite.status)}</div>
@@ -217,6 +304,9 @@ export function AccountantInvites({ invites }: { invites: Invite[] }) {
                   <PermissionBadge label="Bewerken" enabled={invite.canEdit} />
                   <PermissionBadge label="Export" enabled={invite.canExport} />
                   <PermissionBadge label="BTW" enabled={invite.canBTW} />
+                </div>
+                <div>
+                  <InviteActions invite={invite} />
                 </div>
               </div>
             ))}
