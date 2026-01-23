@@ -99,6 +99,24 @@ function Toggle({
   );
 }
 
+/**
+ * InviteActions component provides a comprehensive actions menu for accountant invites.
+ * 
+ * HISTORICAL NOTE: Previously, the actions column only showed actions for PENDING status
+ * (Resend Email + Copy Link) and had no actions for ACTIVE accountants. This was because:
+ * 1. The initial implementation focused only on the invite flow (sending and resending)
+ * 2. There was no concept of revoking invites or removing active access
+ * 3. The status enum only had PENDING and ACTIVE (no REVOKED or EXPIRED)
+ * 4. Permission editing was not implemented for active accountants
+ * 
+ * This implementation adds:
+ * - PENDING: Resend invite, Copy link, Revoke invite
+ * - ACTIVE: Edit permissions (via modal), Remove access
+ * - REVOKED/EXPIRED: Re-invite, Remove (delete record)
+ * 
+ * All actions have server-side authorization via requireTenantContext() ensuring only
+ * the company owner can manage accountant access.
+ */
 function InviteActions({ invite }: { invite: Invite }) {
   const [isPending, startTransition] = useTransition();
   const [showPermissionsEditor, setShowPermissionsEditor] = useState(false);
@@ -330,37 +348,53 @@ function PermissionsEditorDialog({
     });
   };
 
+  // Handle Escape key to close dialog
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      onOpenChange(false);
+    }
+  };
+
   if (!open) return null;
 
+  const permissionFields = [
+    { key: "canRead" as const, label: "Lezen" },
+    { key: "canEdit" as const, label: "Bewerken" },
+    { key: "canExport" as const, label: "Exporteren" },
+    { key: "canBTW" as const, label: "BTW" },
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/50" onClick={() => onOpenChange(false)} />
-      <div className="relative z-50 w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Permissies aanpassen</h3>
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      onKeyDown={handleKeyDown}
+    >
+      <div 
+        className="fixed inset-0 bg-black/50" 
+        onClick={() => onOpenChange(false)}
+        aria-hidden="true"
+      />
+      <div 
+        className="relative z-50 w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="permissions-dialog-title"
+      >
+        <h3 id="permissions-dialog-title" className="text-lg font-semibold text-foreground mb-4">
+          Permissies aanpassen
+        </h3>
         <p className="text-sm text-muted-foreground mb-4">
           Accountant: {invite.email}
         </p>
         <div className="space-y-3 mb-6">
-          <Toggle
-            checked={permissions.canRead}
-            onChange={(checked) => setPermissions((prev) => ({ ...prev, canRead: checked }))}
-            label="Lezen"
-          />
-          <Toggle
-            checked={permissions.canEdit}
-            onChange={(checked) => setPermissions((prev) => ({ ...prev, canEdit: checked }))}
-            label="Bewerken"
-          />
-          <Toggle
-            checked={permissions.canExport}
-            onChange={(checked) => setPermissions((prev) => ({ ...prev, canExport: checked }))}
-            label="Exporteren"
-          />
-          <Toggle
-            checked={permissions.canBTW}
-            onChange={(checked) => setPermissions((prev) => ({ ...prev, canBTW: checked }))}
-            label="BTW"
-          />
+          {permissionFields.map(({ key, label }) => (
+            <Toggle
+              key={key}
+              checked={permissions[key]}
+              onChange={(checked) => setPermissions((prev) => ({ ...prev, [key]: checked }))}
+              label={label}
+            />
+          ))}
         </div>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={isPending}>
