@@ -4,13 +4,23 @@ import { useMemo, useState, useTransition, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Copy, Mail, RefreshCw } from "lucide-react";
-import { linkAccountantToCompany, resendAccountantInvite, getAccountantInviteLink } from "./actions";
+import { Copy, Mail, RefreshCw, Trash2, UserX, Settings, RotateCcw } from "lucide-react";
+import { EntityActionsMenu } from "@/components/ui/entity-actions-menu";
+import { 
+  linkAccountantToCompany, 
+  resendAccountantInvite, 
+  getAccountantInviteLink,
+  revokeAccountantInvite,
+  removeAccountantAccess,
+  updateAccountantPermissions,
+  reInviteAccountant,
+  deleteAccountantInvite,
+} from "./actions";
 
 type Invite = {
   id: string;
   email: string;
-  status: "PENDING" | "ACTIVE";
+  status: "PENDING" | "ACTIVE" | "REVOKED" | "EXPIRED";
   canRead: boolean;
   canEdit: boolean;
   canExport: boolean;
@@ -31,6 +41,12 @@ function formatDate(value: string | Date) {
 function statusBadge(status: Invite["status"]) {
   if (status === "ACTIVE") {
     return <Badge variant="success">ACTIEF</Badge>;
+  }
+  if (status === "REVOKED") {
+    return <Badge variant="destructive">INGETROKKEN</Badge>;
+  }
+  if (status === "EXPIRED") {
+    return <Badge variant="secondary">VERLOPEN</Badge>;
   }
   return <Badge variant="warning">PENDING</Badge>;
 }
@@ -85,6 +101,7 @@ function Toggle({
 
 function InviteActions({ invite }: { invite: Invite }) {
   const [isPending, startTransition] = useTransition();
+  const [showPermissionsEditor, setShowPermissionsEditor] = useState(false);
 
   const handleResend = useCallback(() => {
     startTransition(async () => {
@@ -101,7 +118,6 @@ function InviteActions({ invite }: { invite: Invite }) {
         } else {
           toast.error(`E-mail verzenden mislukt: ${result.emailError}`);
         }
-        // Server action calls revalidatePath, component will re-render automatically
       } catch (error) {
         const message = error instanceof Error ? error.message : "Kon uitnodiging niet opnieuw verzenden";
         toast.error(message);
@@ -117,7 +133,6 @@ function InviteActions({ invite }: { invite: Invite }) {
           await navigator.clipboard.writeText(result.inviteUrl);
           toast.success("Uitnodigingslink gekopieerd naar klembord");
         }
-        // Server action calls revalidatePath, component will re-render automatically
       } catch (error) {
         const message = error instanceof Error ? error.message : "Kon link niet ophalen";
         toast.error(message);
@@ -125,36 +140,237 @@ function InviteActions({ invite }: { invite: Invite }) {
     });
   }, [invite.id]);
 
-  if (invite.status !== "PENDING") {
-    return null;
+  const handleRevoke = useCallback(() => {
+    startTransition(async () => {
+      try {
+        await revokeAccountantInvite(invite.id);
+        toast.success("Uitnodiging ingetrokken");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Kon uitnodiging niet intrekken";
+        toast.error(message);
+      }
+    });
+  }, [invite.id]);
+
+  const handleRemoveAccess = useCallback(() => {
+    startTransition(async () => {
+      try {
+        await removeAccountantAccess(invite.id);
+        toast.success("Toegang verwijderd");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Kon toegang niet verwijderen";
+        toast.error(message);
+      }
+    });
+  }, [invite.id]);
+
+  const handleReInvite = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const result = await reInviteAccountant(invite.id);
+        if (result.emailSent) {
+          toast.success("Nieuwe uitnodiging verzonden");
+        } else if (result.inviteUrl) {
+          await navigator.clipboard.writeText(result.inviteUrl);
+          toast.warning("E-mail verzenden mislukt. Link gekopieerd naar klembord.", {
+            description: result.emailError,
+          });
+        } else {
+          toast.error(`E-mail verzenden mislukt: ${result.emailError}`);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Kon opnieuw uitnodigen niet verzenden";
+        toast.error(message);
+      }
+    });
+  }, [invite.id]);
+
+  const handleDelete = useCallback(() => {
+    startTransition(async () => {
+      try {
+        await deleteAccountantInvite(invite.id);
+        toast.success("Uitnodiging verwijderd");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Kon uitnodiging niet verwijderen";
+        toast.error(message);
+      }
+    });
+  }, [invite.id]);
+
+  // PENDING status actions
+  if (invite.status === "PENDING") {
+    return (
+      <EntityActionsMenu iconOnly ariaLabel="Acties voor uitnodiging">
+        <div className="space-y-1">
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={isPending}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50"
+          >
+            <Mail className="h-4 w-4" />
+            Opnieuw versturen
+          </button>
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            disabled={isPending}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50"
+          >
+            <Copy className="h-4 w-4" />
+            Link kopiëren
+          </button>
+          <button
+            type="button"
+            onClick={handleRevoke}
+            disabled={isPending}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-destructive transition hover:bg-destructive/10 disabled:opacity-50"
+          >
+            <UserX className="h-4 w-4" />
+            Uitnodiging intrekken
+          </button>
+        </div>
+      </EntityActionsMenu>
+    );
   }
 
+  // ACTIVE status actions
+  if (invite.status === "ACTIVE") {
+    return (
+      <>
+        <EntityActionsMenu iconOnly ariaLabel="Acties voor accountant">
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => setShowPermissionsEditor(true)}
+              disabled={isPending}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50"
+            >
+              <Settings className="h-4 w-4" />
+              Permissies aanpassen
+            </button>
+            <button
+              type="button"
+              onClick={handleRemoveAccess}
+              disabled={isPending}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-destructive transition hover:bg-destructive/10 disabled:opacity-50"
+            >
+              <UserX className="h-4 w-4" />
+              Toegang verwijderen
+            </button>
+          </div>
+        </EntityActionsMenu>
+        <PermissionsEditorDialog
+          invite={invite}
+          open={showPermissionsEditor}
+          onOpenChange={setShowPermissionsEditor}
+        />
+      </>
+    );
+  }
+
+  // REVOKED or EXPIRED status actions
+  if (invite.status === "REVOKED" || invite.status === "EXPIRED") {
+    return (
+      <EntityActionsMenu iconOnly ariaLabel="Acties voor uitnodiging">
+        <div className="space-y-1">
+          <button
+            type="button"
+            onClick={handleReInvite}
+            disabled={isPending}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted disabled:opacity-50"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Opnieuw uitnodigen
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isPending}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-destructive transition hover:bg-destructive/10 disabled:opacity-50"
+          >
+            <Trash2 className="h-4 w-4" />
+            Verwijderen
+          </button>
+        </div>
+      </EntityActionsMenu>
+    );
+  }
+
+  return null;
+}
+
+function PermissionsEditorDialog({
+  invite,
+  open,
+  onOpenChange,
+}: {
+  invite: Invite;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [permissions, setPermissions] = useState({
+    canRead: invite.canRead,
+    canEdit: invite.canEdit,
+    canExport: invite.canExport,
+    canBTW: invite.canBTW,
+  });
+
+  const handleSave = () => {
+    startTransition(async () => {
+      try {
+        await updateAccountantPermissions(invite.id, permissions);
+        toast.success("Permissies bijgewerkt");
+        onOpenChange(false);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Kon permissies niet bijwerken";
+        toast.error(message);
+      }
+    });
+  };
+
+  if (!open) return null;
+
   return (
-    <div className="flex gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        className="min-h-[36px] px-2 py-1"
-        onClick={handleResend}
-        disabled={isPending}
-        title="Uitnodiging opnieuw versturen"
-      >
-        {isPending ? (
-          <RefreshCw className="h-4 w-4 animate-spin" />
-        ) : (
-          <Mail className="h-4 w-4" />
-        )}
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        className="min-h-[36px] px-2 py-1"
-        onClick={handleCopyLink}
-        disabled={isPending}
-        title="Kopieer uitnodigingslink"
-      >
-        <Copy className="h-4 w-4" />
-      </Button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/50" onClick={() => onOpenChange(false)} />
+      <div className="relative z-50 w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Permissies aanpassen</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Accountant: {invite.email}
+        </p>
+        <div className="space-y-3 mb-6">
+          <Toggle
+            checked={permissions.canRead}
+            onChange={(checked) => setPermissions((prev) => ({ ...prev, canRead: checked }))}
+            label="Lezen"
+          />
+          <Toggle
+            checked={permissions.canEdit}
+            onChange={(checked) => setPermissions((prev) => ({ ...prev, canEdit: checked }))}
+            label="Bewerken"
+          />
+          <Toggle
+            checked={permissions.canExport}
+            onChange={(checked) => setPermissions((prev) => ({ ...prev, canExport: checked }))}
+            label="Exporteren"
+          />
+          <Toggle
+            checked={permissions.canBTW}
+            onChange={(checked) => setPermissions((prev) => ({ ...prev, canBTW: checked }))}
+            label="BTW"
+          />
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} disabled={isPending}>
+            Annuleren
+          </Button>
+          <Button type="button" onClick={handleSave} disabled={isPending}>
+            {isPending ? "Opslaan..." : "Opslaan"}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

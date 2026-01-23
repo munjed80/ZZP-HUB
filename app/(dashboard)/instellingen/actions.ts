@@ -601,3 +601,272 @@ export async function linkAccountantToCompany(input: {
     inviteUrl: !emailSent ? inviteUrl : undefined,
   };
 }
+
+/**
+ * Revoke a pending invite - prevents the invite from being accepted.
+ * Sets status to REVOKED and clears the tokenHash so the token can't be used.
+ * Only works on PENDING invites. Authorization: only company owner.
+ */
+export async function revokeAccountantInvite(companyUserId: string) {
+  "use server";
+
+  const { userId: companyId } = await requireTenantContext();
+
+  // Find the invite
+  const companyUser = await prisma.companyUser.findFirst({
+    where: {
+      id: companyUserId,
+      companyId,
+      role: CompanyRole.ACCOUNTANT,
+      status: CompanyUserStatus.PENDING,
+    },
+  });
+
+  if (!companyUser) {
+    throw new Error("Uitnodiging niet gevonden of al verwerkt");
+  }
+
+  const emailMasked = companyUser.invitedEmail ? maskEmail(companyUser.invitedEmail) : "unknown";
+  logInviteEvent("REVOKE_ATTEMPT", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  // Update status to REVOKED and clear tokenHash
+  await prisma.companyUser.update({
+    where: { id: companyUserId },
+    data: {
+      status: CompanyUserStatus.REVOKED,
+      tokenHash: null, // Invalidate the token
+    },
+  });
+
+  logInviteEvent("REVOKE_SUCCESS", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  revalidatePath("/instellingen");
+  return { ok: true };
+}
+
+/**
+ * Remove access for an active accountant - unlinks them from the company.
+ * Sets status to REVOKED and clears userId to break the link.
+ * Only works on ACTIVE accountants. Authorization: only company owner.
+ */
+export async function removeAccountantAccess(companyUserId: string) {
+  "use server";
+
+  const { userId: companyId } = await requireTenantContext();
+
+  // Find the active accountant link
+  const companyUser = await prisma.companyUser.findFirst({
+    where: {
+      id: companyUserId,
+      companyId,
+      role: CompanyRole.ACCOUNTANT,
+      status: CompanyUserStatus.ACTIVE,
+    },
+    include: {
+      user: {
+        select: { email: true },
+      },
+    },
+  });
+
+  if (!companyUser) {
+    throw new Error("Accountant koppeling niet gevonden of niet actief");
+  }
+
+  const emailMasked = companyUser.user?.email ? maskEmail(companyUser.user.email) : "unknown";
+  logInviteEvent("REMOVE_ACCESS_ATTEMPT", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  // Update to REVOKED and clear userId to unlink
+  await prisma.companyUser.update({
+    where: { id: companyUserId },
+    data: {
+      status: CompanyUserStatus.REVOKED,
+      userId: null, // Unlink the accountant
+    },
+  });
+
+  logInviteEvent("REMOVE_ACCESS_SUCCESS", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  revalidatePath("/instellingen");
+  return { ok: true };
+}
+
+/**
+ * Update permissions for an active accountant.
+ * Only works on ACTIVE accountants. Authorization: only company owner.
+ */
+export async function updateAccountantPermissions(
+  companyUserId: string,
+  permissions: {
+    canRead: boolean;
+    canEdit: boolean;
+    canExport: boolean;
+    canBTW: boolean;
+  }
+) {
+  "use server";
+
+  const { userId: companyId } = await requireTenantContext();
+
+  // Find the active accountant link
+  const companyUser = await prisma.companyUser.findFirst({
+    where: {
+      id: companyUserId,
+      companyId,
+      role: CompanyRole.ACCOUNTANT,
+      status: CompanyUserStatus.ACTIVE,
+    },
+  });
+
+  if (!companyUser) {
+    throw new Error("Accountant koppeling niet gevonden of niet actief");
+  }
+
+  logInviteEvent("UPDATE_PERMISSIONS_ATTEMPT", { companyUserId: companyUserId.slice(-6) });
+
+  // Update permissions
+  await prisma.companyUser.update({
+    where: { id: companyUserId },
+    data: {
+      canRead: permissions.canRead,
+      canEdit: permissions.canEdit,
+      canExport: permissions.canExport,
+      canBTW: permissions.canBTW,
+    },
+  });
+
+  logInviteEvent("UPDATE_PERMISSIONS_SUCCESS", { companyUserId: companyUserId.slice(-6) });
+
+  revalidatePath("/instellingen");
+  return { ok: true };
+}
+
+/**
+ * Re-invite an accountant by creating a new PENDING invite.
+ * Works on REVOKED or EXPIRED invites. Creates a fresh token and sends email.
+ * Authorization: only company owner.
+ */
+export async function reInviteAccountant(companyUserId: string) {
+  "use server";
+
+  const { userId: companyId } = await requireTenantContext();
+
+  // Find the invite (REVOKED or EXPIRED)
+  const companyUser = await prisma.companyUser.findFirst({
+    where: {
+      id: companyUserId,
+      companyId,
+      role: CompanyRole.ACCOUNTANT,
+      status: {
+        in: [CompanyUserStatus.REVOKED, CompanyUserStatus.EXPIRED],
+      },
+    },
+  });
+
+  if (!companyUser) {
+    throw new Error("Uitnodiging niet gevonden");
+  }
+
+  if (!companyUser.invitedEmail) {
+    throw new Error("E-mailadres ontbreekt voor deze uitnodiging");
+  }
+
+  const emailMasked = maskEmail(companyUser.invitedEmail);
+  logInviteEvent("REINVITE_ATTEMPT", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  // Generate new token
+  const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+
+  // Update to PENDING with new token
+  await prisma.companyUser.update({
+    where: { id: companyUserId },
+    data: {
+      tokenHash,
+      status: CompanyUserStatus.PENDING,
+      userId: null, // Clear userId if it was set
+    },
+  });
+
+  // Get company profile for email
+  const companyProfile = await prisma.companyProfile.findUnique({
+    where: { userId: companyId },
+    select: { companyName: true },
+  });
+  const companyName = companyProfile?.companyName || "Uw bedrijf";
+
+  // Build invite URL
+  const baseUrl = getAppBaseUrl();
+  const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
+
+  // Send invitation email
+  logInviteEvent("REINVITE_EMAIL_ATTEMPT", { emailMasked });
+
+  try {
+    const emailResult = await sendEmail({
+      to: companyUser.invitedEmail,
+      subject: `Uitnodiging: Accountant toegang tot ${companyName}`,
+      react: AccountantInviteEmail({
+        inviteUrl,
+        companyName,
+      }),
+    });
+
+    if (emailResult.success) {
+      logInviteEvent("REINVITE_EMAIL_SUCCESS", {
+        emailMasked,
+        messageId: emailResult.messageId,
+      });
+      revalidatePath("/instellingen");
+      return { ok: true, emailSent: true };
+    } else {
+      const errorMsg = emailResult.error?.message || "Unknown error";
+      logInviteEvent("REINVITE_EMAIL_FAIL", { emailMasked, error: errorMsg });
+      return { ok: true, emailSent: false, emailError: errorMsg, inviteUrl };
+    }
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : "Unknown error";
+    logInviteEvent("REINVITE_EMAIL_FAIL", { emailMasked, error: errorMsg });
+    return { ok: true, emailSent: false, emailError: errorMsg, inviteUrl };
+  }
+}
+
+/**
+ * Delete/remove an invite record (REVOKED or EXPIRED only).
+ * Soft-delete by removing from the database (audit trail maintained in logs).
+ * Authorization: only company owner.
+ */
+export async function deleteAccountantInvite(companyUserId: string) {
+  "use server";
+
+  const { userId: companyId } = await requireTenantContext();
+
+  // Find the invite (REVOKED or EXPIRED only)
+  const companyUser = await prisma.companyUser.findFirst({
+    where: {
+      id: companyUserId,
+      companyId,
+      role: CompanyRole.ACCOUNTANT,
+      status: {
+        in: [CompanyUserStatus.REVOKED, CompanyUserStatus.EXPIRED],
+      },
+    },
+  });
+
+  if (!companyUser) {
+    throw new Error("Uitnodiging niet gevonden of kan niet verwijderd worden");
+  }
+
+  const emailMasked = companyUser.invitedEmail ? maskEmail(companyUser.invitedEmail) : "unknown";
+  logInviteEvent("DELETE_ATTEMPT", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  // Delete the record
+  await prisma.companyUser.delete({
+    where: { id: companyUserId },
+  });
+
+  logInviteEvent("DELETE_SUCCESS", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  revalidatePath("/instellingen");
+  return { ok: true };
+}
