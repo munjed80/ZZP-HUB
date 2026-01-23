@@ -46,7 +46,7 @@ function statusBadge(status: Invite["status"]) {
     return <Badge variant="destructive">INGETROKKEN</Badge>;
   }
   if (status === "EXPIRED") {
-    return <Badge variant="secondary">VERLOPEN</Badge>;
+    return <Badge variant="muted">VERLOPEN</Badge>;
   }
   return <Badge variant="warning">PENDING</Badge>;
 }
