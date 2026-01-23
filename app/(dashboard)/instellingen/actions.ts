@@ -2,9 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext, requireSession } from "@/lib/auth/tenant";
-import { CompanyRole } from "@prisma/client";
+import { requireTenantContext } from "@/lib/auth/tenant";
+import { CompanyRole, CompanyUserStatus } from "@prisma/client";
+import { sendEmail } from "@/lib/email";
+import AccountantInviteEmail from "@/components/emails/AccountantInviteEmail";
+import { getAppBaseUrl } from "@/lib/base-url";
+import { logInviteCreated } from "@/lib/auth/security-audit";
 import {
   companySettingsSchema,
   emailSettingsSchema,
@@ -13,6 +18,20 @@ import {
   type EmailSettingsInput,
   type ProfileBasicsInput,
 } from "./schema";
+
+// Structured logging helper for invite events
+function logInviteEvent(event: string, details: Record<string, unknown>) {
+  console.log(JSON.stringify({
+    event: `INVITE_${event}`,
+    timestamp: new Date().toISOString(),
+    ...details,
+  }));
+}
+
+// Hash token for secure storage (same as in /api/accountants/invite)
+function hashToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
 
 export async function fetchCompanyProfile() {
   const { userId } = await requireTenantContext();
@@ -149,6 +168,124 @@ export async function fetchAccountantInvites() {
     createdAt: invite.createdAt,
     updatedAt: invite.updatedAt,
   }));
+}
+
+export async function resendAccountantInvite(companyUserId: string) {
+  "use server";
+
+  const { userId: companyId } = await requireTenantContext();
+
+  // Find the invite
+  const companyUser = await prisma.companyUser.findFirst({
+    where: {
+      id: companyUserId,
+      companyId,
+      role: CompanyRole.ACCOUNTANT,
+      status: CompanyUserStatus.PENDING,
+    },
+  });
+
+  if (!companyUser) {
+    throw new Error("Uitnodiging niet gevonden of al geaccepteerd");
+  }
+
+  if (!companyUser.invitedEmail) {
+    throw new Error("E-mailadres ontbreekt voor deze uitnodiging");
+  }
+
+  const emailMasked = companyUser.invitedEmail.replace(/(.).+(@.*)/, "$1***$2");
+  logInviteEvent("RESEND_ATTEMPT", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  // Generate new token
+  const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+
+  // Update with new token
+  await prisma.companyUser.update({
+    where: { id: companyUserId },
+    data: { tokenHash },
+  });
+
+  // Get company profile for email
+  const companyProfile = await prisma.companyProfile.findUnique({
+    where: { userId: companyId },
+    select: { companyName: true },
+  });
+  const companyName = companyProfile?.companyName || "Uw bedrijf";
+
+  // Build invite URL
+  const baseUrl = getAppBaseUrl();
+  const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
+
+  // Send invitation email
+  logInviteEvent("RESEND_EMAIL_ATTEMPT", { emailMasked });
+
+  try {
+    const emailResult = await sendEmail({
+      to: companyUser.invitedEmail,
+      subject: `Herinnering: Uitnodiging accountant toegang tot ${companyName}`,
+      react: AccountantInviteEmail({
+        inviteUrl,
+        companyName,
+      }),
+    });
+
+    if (emailResult.success) {
+      logInviteEvent("RESEND_EMAIL_SUCCESS", { 
+        emailMasked, 
+        messageId: emailResult.messageId,
+      });
+      revalidatePath("/instellingen");
+      return { ok: true, emailSent: true };
+    } else {
+      const errorMsg = emailResult.error?.message || "Unknown error";
+      logInviteEvent("RESEND_EMAIL_FAIL", { emailMasked, error: errorMsg });
+      return { ok: true, emailSent: false, emailError: errorMsg, inviteUrl };
+    }
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : "Unknown error";
+    logInviteEvent("RESEND_EMAIL_FAIL", { emailMasked, error: errorMsg });
+    return { ok: true, emailSent: false, emailError: errorMsg, inviteUrl };
+  }
+}
+
+export async function getAccountantInviteLink(companyUserId: string) {
+  "use server";
+
+  const { userId: companyId } = await requireTenantContext();
+
+  // Find the invite
+  const companyUser = await prisma.companyUser.findFirst({
+    where: {
+      id: companyUserId,
+      companyId,
+      role: CompanyRole.ACCOUNTANT,
+      status: CompanyUserStatus.PENDING,
+    },
+  });
+
+  if (!companyUser || !companyUser.tokenHash) {
+    throw new Error("Uitnodiging niet gevonden of al geaccepteerd");
+  }
+
+  // Generate new token (we regenerate for security - old link is invalidated)
+  const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+
+  // Update with new token
+  await prisma.companyUser.update({
+    where: { id: companyUserId },
+    data: { tokenHash },
+  });
+
+  // Build invite URL
+  const baseUrl = getAppBaseUrl();
+  const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
+
+  const emailMasked = companyUser.invitedEmail?.replace(/(.).+(@.*)/, "$1***$2") || "unknown";
+  logInviteEvent("LINK_GENERATED", { companyUserId: companyUserId.slice(-6), emailMasked });
+
+  return { ok: true, inviteUrl };
 }
 
 export async function saveProfileBasics(values: ProfileBasicsInput) {
@@ -289,7 +426,6 @@ export async function linkAccountantToCompany(input: {
 
   const { userId: companyId } = await requireTenantContext();
   const { normalizeEmail } = await import("@/lib/utils");
-  const { CompanyUserStatus } = await import("@prisma/client");
 
   // Validate and normalize email
   let accountantEmail: string;
@@ -298,6 +434,9 @@ export async function linkAccountantToCompany(input: {
   } catch {
     throw new Error("Ongeldig e-mailadres");
   }
+
+  const emailMasked = accountantEmail.replace(/(.).+(@.*)/, "$1***$2");
+  logInviteEvent("CREATE_ATTEMPT", { companyId: companyId.slice(-6), emailMasked });
 
   // Find the accountant user by email (optional - may not exist yet)
   const accountantUser = await prisma.user.findUnique({
@@ -309,6 +448,13 @@ export async function linkAccountantToCompany(input: {
   if (accountantUser && accountantUser.id === companyId) {
     throw new Error("U kunt uzelf niet als accountant toevoegen");
   }
+
+  // Get company profile for email
+  const companyProfile = await prisma.companyProfile.findUnique({
+    where: { userId: companyId },
+    select: { companyName: true },
+  });
+  const companyName = companyProfile?.companyName || "Uw bedrijf";
 
   // Check if there's already an existing invite for this email
   const existingInvite = await prisma.companyUser.findFirst({
@@ -326,34 +472,102 @@ export async function linkAccountantToCompany(input: {
     throw new Error("Deze accountant is al gekoppeld aan uw bedrijf");
   }
 
+  // Generate invite token (always needed for PENDING status, or for sending email even if user exists)
+  const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = hashToken(token);
+
+  let companyUser;
+  // NOTE: Even if the user exists, we create a PENDING invite and require them to accept
+  // This is the SnelStart-style flow: always require explicit acceptance
   if (existingInvite) {
-    // Update existing invite with new permissions
-    await prisma.companyUser.update({
+    // Update existing invite with new token and permissions
+    companyUser = await prisma.companyUser.update({
       where: { id: existingInvite.id },
       data: {
-        userId: accountantUser?.id ?? null,
+        userId: null, // Reset until accepted
         invitedEmail: accountantEmail,
-        status: accountantUser ? CompanyUserStatus.ACTIVE : CompanyUserStatus.PENDING,
+        tokenHash,
+        status: CompanyUserStatus.PENDING, // Always PENDING until accepted
         canRead: input.canRead ?? true,
         canEdit: input.canEdit ?? false,
         canExport: input.canExport ?? false,
         canBTW: input.canBTW ?? false,
       },
     });
+    logInviteEvent("CREATE_UPDATED_EXISTING", { 
+      companyUserId: companyUser.id.slice(-6), 
+      emailMasked,
+      hadExistingUser: Boolean(accountantUser),
+    });
   } else {
-    // Create new invite/link
-    await prisma.companyUser.create({
+    // Create new invite
+    companyUser = await prisma.companyUser.create({
       data: {
         companyId,
-        userId: accountantUser?.id ?? null,
+        userId: null, // Set when accepted
         invitedEmail: accountantEmail,
+        tokenHash,
         role: CompanyRole.ACCOUNTANT,
-        status: accountantUser ? CompanyUserStatus.ACTIVE : CompanyUserStatus.PENDING,
+        status: CompanyUserStatus.PENDING, // Always PENDING until accepted
         canRead: input.canRead ?? true,
         canEdit: input.canEdit ?? false,
         canExport: input.canExport ?? false,
         canBTW: input.canBTW ?? false,
       },
+    });
+    logInviteEvent("CREATE_NEW", { 
+      companyUserId: companyUser.id.slice(-6), 
+      emailMasked,
+      userExists: Boolean(accountantUser),
+    });
+  }
+
+  // Log invite creation for security audit
+  await logInviteCreated({
+    userId: companyId,
+    email: accountantEmail,
+    role: "ACCOUNTANT",
+    companyId,
+  });
+
+  // Build invite URL
+  const baseUrl = getAppBaseUrl();
+  const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
+
+  // Send invitation email
+  logInviteEvent("EMAIL_SEND_ATTEMPT", { emailMasked, baseUrl });
+
+  let emailSent = false;
+  let emailError: string | undefined;
+  
+  try {
+    const emailResult = await sendEmail({
+      to: accountantEmail,
+      subject: `Uitnodiging: Accountant toegang tot ${companyName}`,
+      react: AccountantInviteEmail({
+        inviteUrl,
+        companyName,
+      }),
+    });
+
+    if (emailResult.success) {
+      emailSent = true;
+      logInviteEvent("EMAIL_SEND_SUCCESS", { 
+        emailMasked, 
+        messageId: emailResult.messageId,
+      });
+    } else {
+      emailError = emailResult.error?.message || "Unknown error";
+      logInviteEvent("EMAIL_SEND_FAIL", { 
+        emailMasked, 
+        error: emailError,
+      });
+    }
+  } catch (error) {
+    emailError = error instanceof Error ? error.message : "Unknown error";
+    logInviteEvent("EMAIL_SEND_FAIL", { 
+      emailMasked, 
+      error: emailError,
     });
   }
 
@@ -362,7 +576,12 @@ export async function linkAccountantToCompany(input: {
   return {
     ok: true,
     companyId,
+    companyUserId: companyUser.id,
     accountantUserId: accountantUser?.id ?? null,
-    status: accountantUser ? "ACTIVE" : "PENDING",
+    status: "PENDING", // Always PENDING - requires acceptance
+    emailSent,
+    emailError,
+    // Include invite URL for fallback "copy link" functionality when email fails
+    inviteUrl: !emailSent ? inviteUrl : undefined,
   };
 }
