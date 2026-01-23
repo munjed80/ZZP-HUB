@@ -69,7 +69,7 @@ export default function ResendVerificationPage() {
           </p>
         </div>
       ) : (
-        <form onSubmit={handleResend} className="space-y-4">
+        <form id="resend-form" onSubmit={handleResend} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium text-foreground">
               E-mailadres
@@ -100,7 +100,8 @@ export default function ResendVerificationPage() {
       <div className="space-y-3">
         {!success && (
           <button
-            onClick={handleResend}
+            type="submit"
+            form="resend-form"
             disabled={isPending || !email.trim()}
             className={buttonVariants(
               "primary",

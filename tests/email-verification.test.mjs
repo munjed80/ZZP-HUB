@@ -12,7 +12,8 @@ import bcrypt from "bcryptjs";
  * - Token verification with bcrypt works correctly
  * - URL encoding does not affect tokens
  * - Expired tokens are rejected
- * - TTL calculations use milliseconds correctly
+ * - TTL calculations use milliseconds (not seconds) correctly
+ * - Token expiry comparison handles future and past dates
  * 
  * Note: We replicate the token functions here rather than importing them because:
  * 1. lib/email.ts uses dynamic imports and has Node.js-specific dependencies
