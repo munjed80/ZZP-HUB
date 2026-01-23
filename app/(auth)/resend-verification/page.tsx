@@ -1,26 +1,35 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Mail, Sparkles, ArrowRight } from "lucide-react";
-import { resendVerificationEmail } from "./actions";
+import { resendVerificationEmailPublic } from "./actions";
 
 export default function ResendVerificationPage() {
-  const router = useRouter();
+  const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const handleResend = () => {
+  const handleResend = (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
     setSuccess(false);
+    setSuccessMessage(null);
+
+    if (!email.trim()) {
+      setError("Vul je e-mailadres in.");
+      return;
+    }
+
     startTransition(async () => {
-      const result = await resendVerificationEmail();
+      const result = await resendVerificationEmailPublic(email.trim());
       
       if (result.success) {
         setSuccess(true);
+        setSuccessMessage(result.message || null);
       } else {
         setError(result.message || "Er ging iets mis.");
       }
@@ -39,8 +48,8 @@ export default function ResendVerificationPage() {
         </h1>
         <p className="text-sm text-muted-foreground">
           {success
-            ? "E-mail succesvol verstuurd!"
-            : "Klik op de knop om een nieuwe verificatie-e-mail te ontvangen."}
+            ? "Controleer je inbox!"
+            : "Vul je e-mailadres in om een nieuwe verificatielink te ontvangen."}
         </p>
       </div>
 
@@ -53,23 +62,33 @@ export default function ResendVerificationPage() {
       {success ? (
         <div className="space-y-4">
           <p className="text-sm text-card-foreground">
-            We hebben een nieuwe verificatielink naar je e-mailadres gestuurd.
-            Controleer je inbox en klik op de link om je account te activeren.
+            {successMessage || "Als dit e-mailadres bij ons bekend is, ontvang je binnenkort een verificatie-e-mail."}
           </p>
           <p className="text-xs text-muted-foreground">
-            Als je geen e-mail ontvangt, controleer dan je spam-map.
+            Controleer ook je spam-map als je geen e-mail ziet.
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          <p className="text-sm text-card-foreground">
-            Als je geen verificatie-e-mail hebt ontvangen of als de link is
-            verlopen, kun je hier een nieuwe aanvragen.
-          </p>
+        <form onSubmit={handleResend} className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium text-foreground">
+              E-mailadres
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="je@email.nl"
+              className="w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              disabled={isPending}
+              autoComplete="email"
+            />
+          </div>
           <p className="text-xs text-muted-foreground">
-            Let op: je kunt maximaal 1 e-mail per minuut aanvragen.
+            Je kunt maximaal 1 e-mail per minuut aanvragen.
           </p>
-        </div>
+        </form>
       )}
 
       {error && (
@@ -82,13 +101,13 @@ export default function ResendVerificationPage() {
         {!success && (
           <button
             onClick={handleResend}
-            disabled={isPending}
+            disabled={isPending || !email.trim()}
             className={buttonVariants(
               "primary",
               "w-full justify-center text-base py-3"
             )}
           >
-            {isPending ? "Bezig met versturen..." : "Nieuwe e-mail versturen"}
+            {isPending ? "Bezig met versturen..." : "Verificatie-e-mail versturen"}
             <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
           </button>
         )}
