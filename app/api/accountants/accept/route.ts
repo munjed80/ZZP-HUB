@@ -39,9 +39,18 @@ function getPrismaErrorCode(error: unknown): string | undefined {
 }
 
 export async function POST(request: Request) {
+  // Extract origin from request URL for logging
+  let origin = "unknown";
+  try {
+    const url = new URL(request.url);
+    origin = url.origin;
+  } catch {
+    // URL parsing can fail in edge cases (malformed URLs); log as unknown
+  }
+
   const session = await getServerAuthSession();
   if (!session?.user) {
-    logAcceptEvent("NO_SESSION", {});
+    logAcceptEvent("NO_SESSION", { origin });
     return NextResponse.json({ error: "Niet geauthenticeerd" }, { status: 401 });
   }
 
@@ -49,13 +58,14 @@ export async function POST(request: Request) {
   const sessionEmail = session.user.email;
 
   logAcceptEvent("START", {
+    origin,
     sessionUserId: sessionUserId?.slice(-6),
     sessionEmailMasked: sessionEmail ? maskEmail(sessionEmail) : "missing",
   });
 
   const body = await request.json().catch(() => null) as { token?: unknown; email?: unknown } | null;
   if (!body?.token) {
-    logAcceptEvent("TOKEN_MISSING", { sessionUserId: sessionUserId?.slice(-6) });
+    logAcceptEvent("TOKEN_MISSING", { origin, sessionUserId: sessionUserId?.slice(-6) });
     return NextResponse.json({ error: "Token vereist" }, { status: 400 });
   }
 

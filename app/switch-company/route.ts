@@ -15,14 +15,16 @@ function isValidUUID(value: string | undefined): value is string {
 }
 
 /**
- * Log switch-company events for debugging (non-production only)
+ * Log switch-company events for debugging.
+ * Always logs in non-production; in production only when AUTH_DEBUG=true.
  */
 function logSwitchEvent(event: string, details: Record<string, unknown>) {
   if (process.env.NODE_ENV !== "production" || process.env.AUTH_DEBUG === "true") {
-    console.log(`[SWITCH_COMPANY_ROUTE] ${event}`, {
+    console.log(JSON.stringify({
+      event: `SWITCH_COMPANY_${event}`,
       ...details,
       timestamp: new Date().toISOString(),
-    });
+    }));
   }
 }
 
@@ -38,11 +40,13 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const companyId = searchParams.get("companyId") ?? undefined;
   const nextParam = searchParams.get("next") ?? undefined;
+  const origin = request.nextUrl.origin;
 
   // Validate and sanitize the next URL (prevent open redirects)
   const nextUrl = safeNextUrl(nextParam, "/dashboard");
 
   logSwitchEvent("REQUEST", {
+    origin,
     companyId: companyId?.slice(-6),
     nextParam,
     nextUrl,
@@ -100,10 +104,12 @@ export async function GET(request: NextRequest) {
   });
 
   logSwitchEvent("SUCCESS", {
+    origin,
     userId: session.user.id.slice(-6),
     companyId: companyId.slice(-6),
     role: membership.role,
     redirectTo: nextUrl,
+    cookieSet: true,
   });
 
   return response;
