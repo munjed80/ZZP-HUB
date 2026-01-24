@@ -59,15 +59,10 @@ export async function GET(request: NextRequest) {
     nextPath,
   });
 
-  // Build secure redirect URL using trusted base URL from env
-  const buildRedirectUrl = (path: string): string => {
-    return buildSecureRedirectUrl(path);
-  };
-
   // Validate companyId is a valid UUID
   if (!isValidUUID(companyId)) {
     logSwitchEvent("INVALID_COMPANY_ID", { companyId: companyId ? String(companyId).slice(-6) : undefined });
-    const redirectUrl = buildRedirectUrl("/dashboard");
+    const redirectUrl = buildSecureRedirectUrl("/dashboard");
     logSwitchEvent("REDIRECT", { to: redirectUrl, reason: "invalid_company_id" });
     return NextResponse.redirect(redirectUrl);
   }
@@ -79,7 +74,7 @@ export async function GET(request: NextRequest) {
     const returnUrl = encodeURIComponent(
       `/switch-company?companyId=${companyId}&next=${encodeURIComponent(nextPath)}`
     );
-    const loginRedirect = buildRedirectUrl(`/login?next=${returnUrl}`);
+    const loginRedirect = buildSecureRedirectUrl(`/login?next=${returnUrl}`);
     logSwitchEvent("NO_SESSION", { redirectTo: loginRedirect });
     return NextResponse.redirect(loginRedirect);
   }
@@ -104,13 +99,13 @@ export async function GET(request: NextRequest) {
       userId: session.user.id.slice(-6),
       companyId: companyId.slice(-6),
     });
-    const redirectUrl = buildRedirectUrl("/dashboard");
+    const redirectUrl = buildSecureRedirectUrl("/dashboard");
     logSwitchEvent("REDIRECT", { to: redirectUrl, reason: "no_access" });
     return NextResponse.redirect(redirectUrl);
   }
 
   // Build final redirect URL using trusted base URL
-  const finalRedirectUrl = buildRedirectUrl(nextPath);
+  const finalRedirectUrl = buildSecureRedirectUrl(nextPath);
 
   // Set the active company cookie via NextResponse redirect
   const response = NextResponse.redirect(finalRedirectUrl);

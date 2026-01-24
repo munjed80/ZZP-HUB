@@ -7,7 +7,8 @@ const NON_PRODUCTION_PATTERNS = [
   /localhost/i,
   /127\.0\.0\.1/,
   /0\.0\.0\.0/,
-  /:\d+$/, // URLs with any port (e.g., :80, :443, :3000, :8080)
+  // URLs with non-standard ports (exclude 80 and 443 which are standard)
+  /:(?!80$|443$)\d+$/,
 ];
 
 function sanitize(url: string): string {

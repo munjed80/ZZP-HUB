@@ -9,7 +9,8 @@ const NON_PRODUCTION_PATTERNS = [
   /localhost/i,
   /127\.0\.0\.1/,
   /0\.0\.0\.0/,
-  /:\d+$/, // URLs with any port
+  // URLs with non-standard ports (exclude 80 and 443 which are standard)
+  /:(?!80$|443$)\d+$/,
 ];
 
 function sanitize(url) {
@@ -108,15 +109,19 @@ describe("isNonProductionUrl", () => {
     assert.strictEqual(isNonProductionUrl("https://0.0.0.0:8080"), true);
   });
 
-  test("detects URLs with any port", () => {
+  test("detects URLs with non-standard ports", () => {
     assert.strictEqual(isNonProductionUrl("https://example.com:3000"), true);
     assert.strictEqual(isNonProductionUrl("https://example.com:8080"), true);
-    assert.strictEqual(isNonProductionUrl("https://example.com:443"), true);
   });
 
   test("allows production URLs without port", () => {
     assert.strictEqual(isNonProductionUrl("https://zzpershub.nl"), false);
     assert.strictEqual(isNonProductionUrl("https://example.com"), false);
+  });
+
+  test("allows production URLs with standard ports (80, 443)", () => {
+    assert.strictEqual(isNonProductionUrl("http://example.com:80"), false);
+    assert.strictEqual(isNonProductionUrl("https://example.com:443"), false);
   });
 });
 
