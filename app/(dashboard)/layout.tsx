@@ -7,38 +7,33 @@ import { CompanySwitcher } from "@/components/layout/company-switcher";
 import { DashboardClientShell } from "@/components/layout/dashboard-client-shell";
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getActiveCompanyContext } from "@/lib/auth/company-context";
+import { CompanyRole } from "@prisma/client";
+
 export default async function DashboardShell({ children }: { children: ReactNode }) {
   const sessie = await getServerAuthSession();
   if (!sessie?.user) {
     redirect("/login?type=zzp");
   }
 
+  // Get active company context
+  const companyContext = await getActiveCompanyContext();
+  const activeCompanyId = companyContext.activeCompanyId;
+  const isAccountantMode = !companyContext.isOwnerContext && companyContext.activeMembership?.role === CompanyRole.ACCOUNTANT;
+
   const userName = sessie.user.name || sessie.user.email || "Gebruiker";
   
+  // Get profile for the active company (not the current user's profile)
   const profile = await prisma.companyProfile.findUnique({
-    where: { userId: sessie.user.id },
+    where: { userId: activeCompanyId },
     select: { logoUrl: true, companyName: true },
   });
   const avatarUrl = profile?.logoUrl ?? null;
   
-  const memberships = await prisma.companyUser.findMany({
-    where: {
-      userId: sessie.user.id,
-      status: "ACTIVE",
-    },
-    select: {
-      companyId: true,
-      role: true,
-      company: {
-        select: {
-          companyProfile: { select: { companyName: true } },
-        },
-      },
-    },
-  });
+  const memberships = companyContext.memberships;
 
   // Show company switcher for users who have at least one ACCOUNTANT membership
-  const showCompanySwitcher = memberships.some((m) => m.role === "ACCOUNTANT");
+  const showCompanySwitcher = memberships.some((m) => m.role === CompanyRole.ACCOUNTANT);
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";
@@ -51,12 +46,13 @@ export default async function DashboardShell({ children }: { children: ReactNode
     userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  const disableActions = sessie.user.role === "ACCOUNTANT";
+  // Disable actions for accountants (they have limited permissions)
+  const disableActions = isAccountantMode;
 
   return (
     <div className="min-h-screen bg-background">
       <div className="flex min-h-screen">
-        <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl} userId={sessie.user.id} disableActions={disableActions}>
+        <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl} userId={sessie.user.id} disableActions={disableActions} isAccountantMode={isAccountantMode}>
           <div className="flex flex-1 flex-col">
             <header className="sticky top-0 z-30 border-b border-border bg-card/80 shadow-sm backdrop-blur-xl">
               <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 pt-[env(safe-area-inset-top)] md:h-16 md:px-6">
@@ -75,6 +71,12 @@ export default async function DashboardShell({ children }: { children: ReactNode
                     <span className="truncate text-sm font-semibold text-foreground">
                       {profile?.companyName || "ZZP HUB"}
                     </span>
+                    {/* Accountant Mode Badge */}
+                    {isAccountantMode && (
+                      <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        Accountant
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -85,7 +87,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
                       currentCompanyName={profile?.companyName || "ZZP HUB"}
                       companies={memberships.map((m) => ({
                         id: m.companyId,
-                        name: m.company?.companyProfile?.companyName || "Bedrijf",
+                        name: m.companyName || "Bedrijf",
                       }))}
                     />
                   )}

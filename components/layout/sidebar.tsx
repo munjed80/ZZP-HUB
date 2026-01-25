@@ -35,6 +35,8 @@ type NavigatieItem = {
   superAdminOnly?: boolean;
   companyAdminOnly?: boolean;
   accountantOnly?: boolean;
+  /** Hide from accountants (show only to owners) */
+  ownerOnly?: boolean;
   onClick?: () => void;
 };
 
@@ -42,15 +44,15 @@ type NavigatieItem = {
 export const navigatie: NavigatieItem[] = [
   { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
   { href: "/facturen", label: "Facturen", icon: Receipt },
-  { href: "/relaties", label: "Relaties", icon: Users },
-  { href: "/offertes", label: "Offertes", icon: FileSignature },
+  { href: "/relaties", label: "Relaties", icon: Users, ownerOnly: true },
+  { href: "/offertes", label: "Offertes", icon: FileSignature, ownerOnly: true },
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
   { href: "/btw-aangifte", label: "BTW-aangifte", icon: FileText },
-  { href: "/agenda", label: "Agenda", icon: CalendarDays },
-  { href: "/uren", label: "Uren", icon: Clock3 },
-  { href: "/ai-assist", label: "AI Assist", icon: Sparkles },
+  { href: "/agenda", label: "Agenda", icon: CalendarDays, ownerOnly: true },
+  { href: "/uren", label: "Uren", icon: Clock3, ownerOnly: true },
+  { href: "/ai-assist", label: "AI Assist", icon: Sparkles, ownerOnly: true },
   { href: "/support", label: "Support", icon: LifeBuoy },
-  { href: "/instellingen", label: "Instellingen", icon: Settings },
+  { href: "/instellingen", label: "Instellingen", icon: Settings, ownerOnly: true },
   { href: "/instellingen#accountants", label: "Accountant uitnodigen", icon: UserPlus, companyAdminOnly: true },
   { href: "/admin/companies", label: "Companies", icon: Building2, superAdminOnly: true },
   { href: "/admin/releases", label: "Releases", icon: Rocket, superAdminOnly: true },
@@ -63,7 +65,8 @@ export function Sidebar({
   userRole,
   collapsed = false,
   disableActions = false,
-}: { userRole?: ExtendedUserRole; collapsed?: boolean; disableActions?: boolean }) {
+  isAccountantMode = false,
+}: { userRole?: ExtendedUserRole; collapsed?: boolean; disableActions?: boolean; isAccountantMode?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -80,6 +83,10 @@ export function Sidebar({
             return null;
           }
           if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
+            return null;
+          }
+          // Hide owner-only items when in accountant mode
+          if (item.ownerOnly && isAccountantMode) {
             return null;
           }
           const actief =
@@ -142,12 +149,14 @@ export function MobileSidebar({
   userRole, 
   onAssistantClick,
   open = false,
-  onOpenChange
+  onOpenChange,
+  isAccountantMode = false,
 }: { 
   userRole?: ExtendedUserRole; 
   onAssistantClick?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  isAccountantMode?: boolean;
 }) {
   const pathname = usePathname();
 
@@ -191,6 +200,10 @@ export function MobileSidebar({
              return null;
            }
               if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
+                return null;
+              }
+              // Hide owner-only items when in accountant mode
+              if (item.ownerOnly && isAccountantMode) {
                 return null;
               }
               const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);

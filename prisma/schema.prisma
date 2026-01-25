@@ -375,6 +375,7 @@ model CompanyUser {
 
 enum CompanyRole {
   OWNER
+  STAFF
   ACCOUNTANT
 }
 

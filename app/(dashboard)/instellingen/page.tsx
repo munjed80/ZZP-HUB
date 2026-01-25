@@ -1,5 +1,6 @@
 import { SettingsTabs } from "./settings-tabs";
 import { fetchAccountantInvites, fetchCompanyProfile, fetchUserAccount } from "./actions";
+import { requireOwnerPage } from "@/lib/auth/route-guards";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,6 +15,9 @@ const abonnement = {
 };
 
 export default async function InstellingenPagina() {
+  // Owner-only page guard
+  await requireOwnerPage();
+
   const profiel = await fetchCompanyProfile();
   const user = await fetchUserAccount();
   const invites = await fetchAccountantInvites();
