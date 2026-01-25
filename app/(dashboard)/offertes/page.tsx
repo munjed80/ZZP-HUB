@@ -9,6 +9,7 @@ import { getQuotations } from "./actions";
 import { QuotationActionsMenu } from "./_components/quotation-actions-menu";
 import { type InvoicePdfData } from "@/components/pdf/InvoicePDF";
 import { ExportButton } from "@/components/ui/export-button";
+import { requireOwnerPage } from "@/lib/auth/route-guards";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -54,6 +55,9 @@ function mapQuotationToPdfData(offerte: Awaited<ReturnType<typeof getQuotations>
 }
 
 export default async function OffertesPagina() {
+  // Owner-only page guard
+  await requireOwnerPage();
+  
   const offertes = await getQuotations();
 
   return (

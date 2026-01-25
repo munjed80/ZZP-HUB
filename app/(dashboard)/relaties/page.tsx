@@ -1,7 +1,11 @@
 import { getClients } from "./actions";
 import { RelatiesClient } from "./relaties-client";
+import { requireOwnerPage } from "@/lib/auth/route-guards";
 
 export default async function RelatiesPagina() {
+  // Owner-only page guard
+  await requireOwnerPage();
+  
   const clients = await getClients();
 
   return (

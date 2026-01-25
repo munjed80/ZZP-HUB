@@ -18,9 +18,10 @@ type DashboardClientShellProps = {
   avatarUrl?: string | null;
   userId: string;
   disableActions?: boolean;
+  isAccountantMode?: boolean;
 };
 
-export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl, userId, disableActions }: DashboardClientShellProps) {
+export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl, disableActions, isAccountantMode = false }: DashboardClientShellProps) {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const avatarUrl = useSyncExternalStore(
@@ -60,7 +61,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
 
   return (
     <AvatarContext.Provider value={avatarUrl}>
-      <Sidebar userRole={userRole} disableActions={disableActions} />
+      <Sidebar userRole={userRole} disableActions={disableActions} isAccountantMode={isAccountantMode} />
       {/* Mobile hamburger menu button */}
       <button
         type="button"
@@ -85,6 +86,7 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
           setMobileMenuOpen(false);
           setAssistantOpen(true);
         }}
+        isAccountantMode={isAccountantMode}
       />
       <button
         type="button"
