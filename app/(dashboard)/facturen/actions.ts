@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext } from "@/lib/auth/tenant";
+import { getActiveCompanyContext } from "@/lib/auth/company-context";
 import { invoiceSchema, type InvoiceFormValues, type InvoiceLineValues } from "./schema";
 import { BtwTarief, Eenheid, Prisma } from "@prisma/client";
 
@@ -32,7 +32,15 @@ function mapUnit(unit: InvoiceLineValues["unit"]) {
 export async function createInvoice(values: InvoiceFormValues) {
   "use server";
 
-  const { userId } = await requireTenantContext();
+  // For creating invoices, check if user has edit permission
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId;
+  
+  // Check edit permission for accountants
+  if (!context.isOwnerContext && !context.activeMembership?.permissions.canEdit) {
+    throw new Error("Geen toestemming om facturen aan te maken.");
+  }
+  
   const data = invoiceSchema.parse(values);
 
   const invoice = await prisma.$transaction(async (tx) => {
@@ -69,7 +77,15 @@ export async function createInvoice(values: InvoiceFormValues) {
 export async function updateInvoice(invoiceId: string, values: InvoiceFormValues) {
   "use server";
 
-  const { userId } = await requireTenantContext();
+  // For updating invoices, check if user has edit permission
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId;
+  
+  // Check edit permission for accountants
+  if (!context.isOwnerContext && !context.activeMembership?.permissions.canEdit) {
+    throw new Error("Geen toestemming om facturen te bewerken.");
+  }
+  
   const data = invoiceSchema.parse(values);
 
   await prisma.$transaction(async (tx) => {

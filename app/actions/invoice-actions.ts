@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { InvoiceEmailStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext, verifyTenantOwnership } from "@/lib/auth/tenant";
+import { getActiveCompanyContext } from "@/lib/auth/company-context";
 
 type PdfGeneratorModule = typeof import("@/lib/pdf-generator");
 type SendInvoiceModule = typeof import("./send-invoice");
@@ -48,7 +48,15 @@ export async function markAsPaid(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { userId } = await requireTenantContext();
+    // Use active company context for accountant support
+    const context = await getActiveCompanyContext();
+    const userId = context.activeCompanyId;
+    
+    // Check edit permission for accountants
+    if (!context.isOwnerContext && !context.activeMembership?.permissions.canEdit) {
+      return { success: false, message: "Geen toestemming om factuurstatus te wijzigen." };
+    }
+    
     const invoice = await prisma.invoice.findFirst({
       where: { id: sanitizedInvoiceId, userId },
     });
@@ -56,9 +64,6 @@ export async function markAsPaid(invoiceId: string) {
     if (!invoice) {
       return { success: false, message: "Factuur niet gevonden." };
     }
-
-    // Verify ownership (redundant here but good practice)
-    await verifyTenantOwnership(invoice.userId, "markAsPaid");
 
     await prisma.invoice.update({
       where: { id: invoice.id },
@@ -83,7 +88,15 @@ export async function markAsUnpaid(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { userId } = await requireTenantContext();
+    // Use active company context for accountant support
+    const context = await getActiveCompanyContext();
+    const userId = context.activeCompanyId;
+    
+    // Check edit permission for accountants
+    if (!context.isOwnerContext && !context.activeMembership?.permissions.canEdit) {
+      return { success: false, message: "Geen toestemming om factuurstatus te wijzigen." };
+    }
+    
     const invoice = await prisma.invoice.findFirst({
       where: { id: sanitizedInvoiceId, userId },
     });
@@ -91,9 +104,6 @@ export async function markAsUnpaid(invoiceId: string) {
     if (!invoice) {
       return { success: false, message: "Factuur niet gevonden." };
     }
-
-    // Verify ownership
-    await verifyTenantOwnership(invoice.userId, "markAsUnpaid");
 
     await prisma.invoice.update({
       where: { id: invoice.id },
@@ -118,7 +128,15 @@ export async function deleteInvoice(invoiceId: string) {
       return { success: false, message: "Ongeldig factuurnummer." };
     }
 
-    const { userId } = await requireTenantContext();
+    // Use active company context for accountant support
+    const context = await getActiveCompanyContext();
+    const userId = context.activeCompanyId;
+    
+    // Check edit permission for accountants
+    if (!context.isOwnerContext && !context.activeMembership?.permissions.canEdit) {
+      return { success: false, message: "Geen toestemming om facturen te verwijderen." };
+    }
+    
     const invoice = await prisma.invoice.findFirst({
       where: { id: sanitizedInvoiceId, userId },
     });
@@ -126,9 +144,6 @@ export async function deleteInvoice(invoiceId: string) {
     if (!invoice) {
       return { success: false, message: "Factuur niet gevonden." };
     }
-
-    // Verify ownership
-    await verifyTenantOwnership(invoice.userId, "deleteInvoice");
 
     await prisma.invoice.delete({ where: { id: invoice.id } });
 

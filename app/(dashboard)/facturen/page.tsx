@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { mapInvoiceToPdfData, type InvoiceWithRelations } from "@/lib/pdf-generator";
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext } from "@/lib/auth/tenant";
+import { getActiveCompanyContext } from "@/lib/auth/company-context";
 import { InvoiceList } from "./_components/invoice-list";
 import { InvoiceEmailStatus, Prisma } from "@prisma/client";
 import type { Metadata } from "next";
@@ -27,8 +27,9 @@ function invoiceAmount(
 }
 
 async function fetchInvoices(): Promise<InvoiceWithRelations[]> {
-  // Facturen page is NOT an admin page - always scope by tenant
-  const { userId } = await requireTenantContext();
+  // Use active company context for accountant support
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId;
 
   return prisma.invoice.findMany({
     where: { userId },
