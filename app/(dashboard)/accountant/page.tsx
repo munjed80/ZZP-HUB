@@ -134,8 +134,7 @@ export default async function AccountantPortalPage() {
             <div className="space-y-1">
               <h3 className="font-semibold text-foreground">Accountant toegang</h3>
               <p className="text-sm text-muted-foreground">
-                U heeft toegang tot {clientMemberships.length} bedrijf
-                {clientMemberships.length !== 1 ? "en" : ""}. 
+                U heeft toegang tot {clientMemberships.length} {clientMemberships.length === 1 ? "bedrijf" : "bedrijven"}. 
                 Klik op &quot;Open dashboard&quot; om de administratie van een klant te bekijken. 
                 U kunt op elk moment wisselen naar een ander bedrijf via het menu.
               </p>
