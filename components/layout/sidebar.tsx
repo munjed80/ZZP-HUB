@@ -24,6 +24,7 @@ import {
   Rocket,
   Inbox,
   UserPlus,
+  LogOut as ExitIcon,
 } from "lucide-react";
 import { assertUniqueHrefs, cn } from "@/lib/utils";
 import { SidebarBrand } from "@/components/sidebar/sidebar-brand";
@@ -124,6 +125,27 @@ export function Sidebar({
         })}
       </nav>
       <div className="mt-auto space-y-3 border-t border-border pt-4">
+        {/* Exit context button for accountants viewing a client company */}
+        {isAccountantMode && (
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch("/api/context/clear-company", {
+                  method: "POST",
+                });
+                if (response.ok) {
+                  window.location.href = "/accountant";
+                }
+              } catch (error) {
+                console.error("Failed to exit context:", error);
+              }
+            }}
+            className="flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-sm font-semibold text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-500/20"
+          >
+            <ExitIcon className="h-4 w-4" aria-hidden />
+            Uit context
+          </button>
+        )}
         <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
           <p className="font-semibold text-foreground">Beveiliging</p>
           <p className="text-muted-foreground">
@@ -252,6 +274,28 @@ export function MobileSidebar({
             })}
           </nav>
           <div className="space-y-3 border-t border-border pt-4">
+            {/* Exit context button for accountants viewing a client company */}
+            {isAccountantMode && (
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/context/clear-company", {
+                      method: "POST",
+                    });
+                    if (response.ok) {
+                      onOpenChange?.(false);
+                      window.location.href = "/accountant";
+                    }
+                  } catch (error) {
+                    console.error("Failed to exit context:", error);
+                  }
+                }}
+                className="flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-sm font-semibold text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-500/20"
+              >
+                <ExitIcon className="h-4 w-4" aria-hidden />
+                Uit context
+              </button>
+            )}
             <button
               onClick={() => {
                 onOpenChange?.(false);

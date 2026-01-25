@@ -5,6 +5,9 @@ import { resolveAuthSecret } from '@/lib/auth/secret';
 import { shouldLogAuth } from '@/lib/auth/logging';
 import { safeNextUrl } from '@/lib/auth/safe-next';
 
+// Cookie name for active company (must match lib/auth/company-context.ts)
+const ACTIVE_COMPANY_COOKIE = 'zzp-hub-active-company';
+
 // Routes that should be accessible even without email verification
 const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-required', '/resend-verification'];
 
@@ -25,8 +28,24 @@ const protectedPrefixes = [
   '/accountant',
 ];
 
+// Company-scoped routes - these require an active company context for accountants
+const companyScopedPrefixes = [
+  '/dashboard',
+  '/facturen',
+  '/offertes',
+  '/relaties',
+  '/uren',
+  '/uitgaven',
+  '/btw-aangifte',
+  '/agenda',
+  '/instellingen',
+];
+
 const isProtectedPath = (pathname: string) =>
   protectedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+
+const isCompanyScopedPath = (pathname: string) =>
+  companyScopedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
 const authSecret = resolveAuthSecret();
 
@@ -120,6 +139,24 @@ export async function middleware(request: NextRequest) {
     setupUrl.searchParams.set('next', nextUrl);
     logRedirect('REDIRECT_SETUP', { pathname, role: userRole });
     return NextResponse.redirect(setupUrl);
+  }
+
+  // For ACCOUNTANT role users: if accessing company-scoped pages without an active company cookie,
+  // redirect them to the accountant portal to select a client
+  // This ensures accountants always have an explicit company context before accessing data
+  if (userRole === 'ACCOUNTANT' && isCompanyScopedPath(pathname)) {
+    const activeCompanyCookie = request.cookies.get(ACTIVE_COMPANY_COOKIE)?.value;
+    const hasActiveCompany = activeCompanyCookie && activeCompanyCookie.length > 0;
+    
+    if (!hasActiveCompany) {
+      const accountantUrl = new URL('/accountant', request.url);
+      logRedirect('REDIRECT_ACCOUNTANT_NO_CONTEXT', { 
+        pathname, 
+        role: userRole,
+        reason: 'No active company cookie set' 
+      });
+      return NextResponse.redirect(accountantUrl);
+    }
   }
 
   logRedirect('ALLOW_ROUTE', {

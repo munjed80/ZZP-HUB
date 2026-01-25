@@ -1,8 +1,7 @@
-import { redirect } from "next/navigation";
-import { Building2, Eye, Edit, FileDown, Receipt } from "lucide-react";
+import { Building2, Eye, Edit, FileDown, Receipt, UserPlus, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getActiveCompanyContext, getUserMemberships, type CompanyMembership } from "@/lib/auth/company-context";
+import { getUserMemberships, type CompanyMembership } from "@/lib/auth/company-context";
 import { requireSession } from "@/lib/auth/tenant";
 import type { Metadata } from "next";
 
@@ -92,15 +91,61 @@ export default async function AccountantPortalPage() {
     (m) => m.role === "ACCOUNTANT" || m.role === "STAFF"
   );
   
-  // If no client memberships, redirect to dashboard
+  // If no client memberships, show empty state with instructions
   if (clientMemberships.length === 0) {
-    redirect("/dashboard");
-  }
-  
-  // If only one client, redirect directly to switch-company
-  if (clientMemberships.length === 1) {
-    const onlyClient = clientMemberships[0];
-    redirect(`/switch-company?companyId=${onlyClient.companyId}&next=/dashboard`);
+    return (
+      <div className="space-y-8 sm:space-y-10">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-1.5 w-14 rounded-full bg-gradient-to-r from-primary via-primary/80 to-primary"></div>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+              Mijn Klanten
+            </h1>
+          </div>
+          <p className="text-sm text-muted-foreground font-medium">
+            Overzicht van bedrijven waar u als accountant toegang toe heeft
+          </p>
+        </div>
+
+        {/* Empty state */}
+        <Card className="border-dashed">
+          <CardContent className="py-12">
+            <div className="flex flex-col items-center justify-center text-center space-y-4">
+              <div className="rounded-xl bg-muted p-4">
+                <UserPlus className="h-10 w-10 text-muted-foreground" aria-hidden />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold text-foreground">Geen klanten gekoppeld</h3>
+                <p className="text-sm text-muted-foreground max-w-md">
+                  U heeft nog geen toegang tot klantbedrijven. Vraag een klant om u uit te nodigen 
+                  als accountant via de instellingen van hun bedrijf.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Instructions */}
+        <Card className="bg-muted/30 border-dashed">
+          <CardContent className="py-6">
+            <div className="flex items-start gap-4">
+              <div className="rounded-xl bg-primary/10 p-3">
+                <ArrowRight className="h-6 w-6 text-primary" aria-hidden />
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-semibold text-foreground">Hoe werkt het?</h3>
+                <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                  <li>Uw klant gaat naar <strong>Instellingen &gt; Accountant</strong> in hun dashboard</li>
+                  <li>Zij voeren uw e-mailadres in en versturen een uitnodiging</li>
+                  <li>U ontvangt een e-mail met een link om de toegang te accepteren</li>
+                  <li>Na acceptatie verschijnt het bedrijf hier in uw klantenlijst</li>
+                </ol>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
