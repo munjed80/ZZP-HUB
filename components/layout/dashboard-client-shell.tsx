@@ -3,11 +3,7 @@
 import { createContext, useSyncExternalStore, useState, type ReactNode } from "react";
 import { Sidebar, MobileSidebar } from "@/components/layout/sidebar";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { AssistantDrawer } from "@/components/assistant/assistant-drawer";
-import { AssistantWidget } from "@/components/assistant/assistant-widget";
 import type { ExtendedUserRole } from "@/types/roles";
-import { Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { LOCAL_PROFILE_STORAGE_KEY } from "@/lib/constants";
 
 export const AvatarContext = createContext<string | null>(null);
@@ -22,7 +18,6 @@ type DashboardClientShellProps = {
 };
 
 export function DashboardClientShell({ children, userRole, avatarUrl: serverAvatarUrl, disableActions, isAccountantMode = false }: DashboardClientShellProps) {
-  const [assistantOpen, setAssistantOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const avatarUrl = useSyncExternalStore(
     (callback) => {
@@ -82,25 +77,8 @@ export function DashboardClientShell({ children, userRole, avatarUrl: serverAvat
         userRole={userRole}
         open={mobileMenuOpen}
         onOpenChange={setMobileMenuOpen}
-        onAssistantClick={() => {
-          setMobileMenuOpen(false);
-          setAssistantOpen(true);
-        }}
         isAccountantMode={isAccountantMode}
       />
-      <button
-        type="button"
-        onClick={() => setAssistantOpen(true)}
-        className={cn(
-          "fixed right-3 z-40 hidden h-11 w-11 items-center justify-center rounded-full border border-[rgb(var(--brand-primary))/0.35] bg-[rgb(var(--brand-primary))/0.12] text-[rgb(var(--brand-primary))] shadow-lg shadow-[0_12px_32px_-18px_rgba(var(--brand-primary),0.65)] backdrop-blur transition hover:-translate-y-0.5 hover:border-[rgb(var(--brand-primary))] md:inline-flex md:right-6",
-          "md:bottom-8"
-        )}
-        aria-label="Open AI assistent"
-      >
-        <Sparkles className="h-5 w-5" aria-hidden />
-      </button>
-      <AssistantDrawer open={assistantOpen} onOpenChange={setAssistantOpen} />
-      <AssistantWidget />
     </AvatarContext.Provider>
   );
 }

@@ -1,5 +1,4 @@
 import { LifeBuoy, MailCheck, ShieldCheck } from "lucide-react";
-import { assistantGuide } from "@/lib/assistant/guide";
 import { SupportForm } from "@/components/support/support-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Metadata } from "next";
@@ -8,6 +7,26 @@ export const metadata: Metadata = {
   title: "Support",
   description: "Hulp en ondersteuning voor ZZP-HUB. Neem contact met ons op voor vragen en problemen.",
 };
+
+// Static FAQ data
+const faqItems = [
+  {
+    question: "Hoe maak ik mijn eerste factuur?",
+    answer: "Ga naar Facturen → Nieuwe factuur en vul de gegevens in. Je kunt ook een klant selecteren of een nieuwe aanmaken.",
+  },
+  {
+    question: "Hoe bereken ik mijn BTW-aangifte?",
+    answer: "Ga naar BTW-aangifte om een overzicht te krijgen van je inkopen en verkopen per kwartaal.",
+  },
+  {
+    question: "Wat is het 1225-urencriterium?",
+    answer: "Dit criterium bepaalt of je als ondernemer wordt gezien voor de fiscale voordelen. Registreer je uren in het Uren-overzicht.",
+  },
+  {
+    question: "Hoe nodig ik mijn accountant uit?",
+    answer: "Ga naar Instellingen → Accountant en voer het e-mailadres van je accountant in om een uitnodiging te versturen.",
+  },
+];
 
 export default function SupportPage() {
   return (
@@ -61,7 +80,7 @@ export default function SupportPage() {
               <CardTitle>FAQ</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {assistantGuide.faq.slice(0, 4).map((item) => (
+              {faqItems.map((item) => (
                 <div key={item.question} className="rounded-lg border border-border bg-muted px-3 py-2">
                   <p className="text-sm font-semibold text-foreground">{item.question}</p>
                   <p className="text-sm text-muted-foreground">{item.answer}</p>

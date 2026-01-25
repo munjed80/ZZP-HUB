@@ -18,7 +18,6 @@ import {
   Clock3,
   Settings,
   LifeBuoy,
-  Sparkles,
   X,
   LogOut,
   Rocket,
@@ -68,8 +67,7 @@ export const navigatie: NavigatieItem[] = [
   { href: "/uitgaven", label: "Uitgaven", icon: Wallet },
   { href: "/btw-aangifte", label: "BTW-aangifte", icon: FileText },
   { href: "/agenda", label: "Agenda", icon: CalendarDays, ownerOnly: true },
-  { href: "/uren", label: "Uren", icon: Clock3, ownerOnly: true },
-  { href: "/ai-assist", label: "AI Assist", icon: Sparkles, ownerOnly: true },
+  { href: "/uren", label: "Uren", icon: Clock3 },
   { href: "/support", label: "Support", icon: LifeBuoy },
   { href: "/instellingen", label: "Instellingen", icon: Settings, ownerOnly: true },
   { href: "/instellingen#accountants", label: "Accountant uitnodigen", icon: UserPlus, companyAdminOnly: true },
@@ -180,26 +178,19 @@ export function Sidebar({
 
 export function MobileSidebar({ 
   userRole, 
-  onAssistantClick,
   open = false,
   onOpenChange,
   isAccountantMode = false,
 }: { 
   userRole?: ExtendedUserRole; 
-  onAssistantClick?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   isAccountantMode?: boolean;
 }) {
   const pathname = usePathname();
 
-  const handleItemClick = (href: string) => {
-    if (href === "#ai-assistant") {
-      onOpenChange?.(false);
-      onAssistantClick?.();
-    } else {
-      onOpenChange?.(false);
-    }
+  const handleItemClick = () => {
+    onOpenChange?.(false);
   };
 
   if (!open) return null;
@@ -243,25 +234,11 @@ export function MobileSidebar({
               const actief = pathname === item.href || pathname?.startsWith(`${item.href}/`);
               const Icon = item.icon;
               
-              // Handle AI Assistant click
-              if (item.href === "#ai-assistant") {
-                return (
-                  <button
-                    key={item.href}
-                    onClick={() => handleItemClick(item.href)}
-                    className={cn(buttonVariants("ghost", "w-full justify-start px-3 py-2.5 text-sm font-semibold text-left"))}
-                  >
-                    <Icon className="h-5 w-5 text-[rgb(var(--brand-primary))]" aria-hidden />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              }
-              
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => handleItemClick(item.href)}
+                  onClick={handleItemClick}
                   data-tour={item.href === "/instellingen" ? "profile-link" : item.href === "/relaties" ? "relations-link" : undefined}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",

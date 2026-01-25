@@ -6,7 +6,6 @@ import { motion, type MotionProps, type TargetAndTransition, type Transition } f
 import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, ShieldCheck, LineChart, Infinity, LifeBuoy, MailCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SupportForm } from "@/components/support/support-form";
-import { AssistantDemo } from "@/components/assistant/assistant-demo";
 import { cn } from "@/lib/utils";
 
 const BrandZ = ({ className }: { className?: string }) => (
@@ -527,54 +526,6 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   );
                 })}
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="assistant" className="relative overflow-hidden bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/30 py-24 sm:py-28">
-          {/* Subtle background decoration */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(16,185,129,0.04),transparent_60%)]" />
-          
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-              <div className="space-y-6">
-                <motion.div
-                  className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-emerald-700 ring-1 ring-emerald-200/50 shadow-sm"
-                  {...fadeUp}
-                >
-                  <ShieldCheck className="h-4 w-4" aria-hidden />
-                  Guided AI
-                </motion.div>
-                <motion.h2 
-                  className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
-                  {...fadeUp}
-                  transition={fadeUpTransition(0.05)}
-                >
-                  AI assistent binnen veilige scope
-                </motion.h2>
-                <motion.p 
-                  className="text-lg leading-relaxed text-slate-700"
-                  {...fadeUp}
-                  transition={fadeUpTransition(0.1)}
-                >
-                  Gericht op ZZP HUB: wat we doen, starten, facturen, BTW, uren en abonnement. Geen open chat, alleen gerichte antwoorden.
-                </motion.p>
-                <motion.div 
-                  className="grid gap-3 text-sm"
-                  {...fadeUp}
-                  transition={fadeUpTransition(0.15)}
-                >
-                  <div className="flex items-center gap-3 rounded-2xl border border-emerald-200/60 bg-white/80 px-4 py-3 shadow-sm">
-                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-600" aria-hidden />
-                    <span className="text-slate-700">Vraag & antwoord per onderwerp, geen vrije chat.</span>
-                  </div>
-                  <div className="flex items-center gap-3 rounded-2xl border border-emerald-200/60 bg-white/80 px-4 py-3 shadow-sm">
-                    <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-600" aria-hidden />
-                    <span className="text-slate-700">Buiten scope? Automatisch doorverwijzen naar support.</span>
-                  </div>
-                </motion.div>
-              </div>
-              <AssistantDemo className="backdrop-blur-md" />
             </div>
           </div>
         </section>
