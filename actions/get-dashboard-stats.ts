@@ -2,7 +2,7 @@
 
 import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext } from "@/lib/auth/tenant";
+import { getActiveCompanyContext } from "@/lib/auth/company-context";
 import { DEFAULT_VAT_RATE } from "@/lib/constants";
 import {
   getInvoiceNotificationType,
@@ -31,8 +31,10 @@ function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; qua
 }
 
 export async function getDashboardStats() {
-  // Dashboard is NOT an admin page - always scope by tenant, even for SUPERADMIN
-  const { userId } = await requireTenantContext();
+  // Use active company context - for accountants this returns the client company ID
+  // For owners, this returns their own user ID
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId; // Use activeCompanyId instead of session userId
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const endOfYear = new Date(now.getFullYear() + 1, 0, 1);

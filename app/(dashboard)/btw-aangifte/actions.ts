@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext } from "@/lib/auth/tenant";
+import { getActiveCompanyContext } from "@/lib/auth/company-context";
 import { BtwTarief, InvoiceEmailStatus, Prisma } from "@prisma/client";
 
 export type VatReport = {
@@ -42,7 +42,9 @@ function calculateLineAmount(line: { amount: Prisma.Decimal | number | null; qua
 }
 
 export async function getVatReport(year: number, quarter: number): Promise<VatReport> {
-  const { userId } = await requireTenantContext();
+  // Use active company context for accountant support
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId;
   const { start, end } = quarterRange(year, quarter);
 
   let invoices: InvoiceWithLines[] = [];

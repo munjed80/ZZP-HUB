@@ -22,6 +22,7 @@ const protectedPrefixes = [
   '/agenda',
   '/instellingen',
   '/admin',
+  '/accountant',
 ];
 
 const isProtectedPath = (pathname: string) =>
@@ -145,5 +146,6 @@ export const config = {
     '/agenda/:path*',
     '/instellingen/:path*',
     '/admin/:path*',
+    '/accountant/:path*',
   ],
 };

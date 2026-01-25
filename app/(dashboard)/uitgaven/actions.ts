@@ -2,12 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext } from "@/lib/auth/tenant";
+import { getActiveCompanyContext } from "@/lib/auth/company-context";
 import { expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { Prisma } from "@prisma/client";
 
 export async function getExpenses(): Promise<ExpenseClientShape[]> {
-  const { userId } = await requireTenantContext();
+  // Use active company context for accountant support
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId;
 
   try {
     const expenses = await prisma.expense.findMany({
@@ -32,7 +34,15 @@ export async function getExpenses(): Promise<ExpenseClientShape[]> {
 }
 
 export async function createExpense(values: ExpenseFormValues) {
-  const { userId } = await requireTenantContext();
+  // For creating expenses, check if user has edit permission
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId;
+  
+  // Check edit permission for accountants
+  if (!context.isOwnerContext && !context.activeMembership?.permissions.canEdit) {
+    throw new Error("Geen toestemming om uitgaven aan te maken.");
+  }
+  
   const data = expenseSchema.parse(values);
 
   try {
@@ -58,7 +68,14 @@ export async function createExpense(values: ExpenseFormValues) {
 }
 
 export async function deleteExpense(expenseId: string) {
-  const { userId } = await requireTenantContext();
+  // For deleting expenses, check if user has edit permission
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId;
+  
+  // Check edit permission for accountants
+  if (!context.isOwnerContext && !context.activeMembership?.permissions.canEdit) {
+    return { success: false, message: "Geen toestemming om uitgaven te verwijderen." };
+  }
 
   try {
     const deleted = await prisma.expense.deleteMany({
@@ -76,7 +93,14 @@ export async function deleteExpense(expenseId: string) {
 }
 
 export async function duplicateExpense(expenseId: string) {
-  const { userId } = await requireTenantContext();
+  // For duplicating expenses, check if user has edit permission
+  const context = await getActiveCompanyContext();
+  const userId = context.activeCompanyId;
+  
+  // Check edit permission for accountants
+  if (!context.isOwnerContext && !context.activeMembership?.permissions.canEdit) {
+    return { success: false, message: "Geen toestemming om uitgaven te dupliceren." };
+  }
 
   const expense = await prisma.expense.findFirst({ where: { id: expenseId, userId } });
   if (!expense) {

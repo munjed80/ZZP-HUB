@@ -43,6 +43,7 @@ type NavigatieItem = {
 // Menu order as per requirement: Facturen, Relaties, Offertes, Uitgaven, BTW, Agenda
 export const navigatie: NavigatieItem[] = [
   { href: "/dashboard", label: "Overzicht", icon: LayoutDashboard },
+  { href: "/accountant", label: "Mijn Klanten", icon: Building2, accountantOnly: true },
   { href: "/facturen", label: "Facturen", icon: Receipt },
   { href: "/relaties", label: "Relaties", icon: Users, ownerOnly: true },
   { href: "/offertes", label: "Offertes", icon: FileSignature, ownerOnly: true },
@@ -83,6 +84,10 @@ export function Sidebar({
             return null;
           }
           if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
+            return null;
+          }
+          // Show accountant-only items only when in accountant mode
+          if (item.accountantOnly && !isAccountantMode) {
             return null;
           }
           // Hide owner-only items when in accountant mode
@@ -196,9 +201,10 @@ export function MobileSidebar({
               if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
                 return null;
               }
-           if (item.accountantOnly) {
-             return null;
-           }
+              // Show accountant-only items only when in accountant mode
+              if (item.accountantOnly && !isAccountantMode) {
+                return null;
+              }
               if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
                 return null;
               }
