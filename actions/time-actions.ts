@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireTenantContext, verifyTenantOwnership } from "@/lib/auth/tenant";
+import { isTimeAfter, isBreakValid, calculateHoursFromTimes } from "@/lib/time-constants";
 
 const timeEntrySchema = z.object({
   date: z.string().min(1, "Datum is verplicht"),
@@ -17,9 +18,9 @@ const timeEntrySchema = z.object({
   notes: z.string().optional(),
 }).refine(
   (data) => {
-    // If both start and end time are provided, validate end > start
+    // If both start and end time are provided, validate end > start using proper time comparison
     if (data.startTime && data.endTime) {
-      return data.endTime > data.startTime;
+      return isTimeAfter(data.startTime, data.endTime);
     }
     return true;
   },
@@ -28,10 +29,7 @@ const timeEntrySchema = z.object({
   (data) => {
     // If times and break are provided, validate break doesn't exceed interval
     if (data.startTime && data.endTime && data.breakMinutes) {
-      const [startH, startM] = data.startTime.split(":").map(Number);
-      const [endH, endM] = data.endTime.split(":").map(Number);
-      const totalMinutes = (endH * 60 + endM) - (startH * 60 + startM);
-      return data.breakMinutes < totalMinutes;
+      return isBreakValid(data.startTime, data.endTime, data.breakMinutes);
     }
     return true;
   },
@@ -72,14 +70,6 @@ function getWeekNumber(date: Date): number {
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-}
-
-// Calculate hours from start/end time and break (internal helper)
-function calculateHoursFromTimes(startTime: string, endTime: string, breakMinutes: number = 0): number {
-  const [startH, startM] = startTime.split(":").map(Number);
-  const [endH, endM] = endTime.split(":").map(Number);
-  const totalMinutes = (endH * 60 + endM) - (startH * 60 + startM) - breakMinutes;
-  return Math.max(0, totalMinutes / 60);
 }
 
 export async function logTimeEntry(values: TimeEntryInput) {

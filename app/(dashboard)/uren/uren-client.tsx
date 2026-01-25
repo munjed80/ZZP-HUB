@@ -12,7 +12,7 @@ import {
   type TimeEntryDto,
   type WeekSummary,
 } from "@/actions/time-actions";
-import { WORK_TYPES } from "@/lib/time-constants";
+import { WORK_TYPES, calculateHoursFromTimes, isTimeAfter, isBreakValid } from "@/lib/time-constants";
 import {
   CalendarDays,
   CheckCircle2,
@@ -59,13 +59,6 @@ function formatDateShort(value: string) {
     weekday: "short",
     day: "numeric",
   }).format(date);
-}
-
-function calculateHoursFromTimes(startTime: string, endTime: string, breakMinutes: number = 0): number {
-  const [startH, startM] = startTime.split(":").map(Number);
-  const [endH, endM] = endTime.split(":").map(Number);
-  const totalMinutes = (endH * 60 + endM) - (startH * 60 + startM) - breakMinutes;
-  return Math.max(0, totalMinutes / 60);
 }
 
 type FormState = {
@@ -154,21 +147,18 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit }: Uren
       return;
     }
 
-    // Validation
+    // Validation using shared utility functions
     if (formState.useTimeRange) {
       if (!formState.startTime || !formState.endTime) {
         setFormError("Vul start- en eindtijd in.");
         return;
       }
-      if (formState.endTime <= formState.startTime) {
+      if (!isTimeAfter(formState.startTime, formState.endTime)) {
         setFormError("Eindtijd moet na starttijd liggen.");
         return;
       }
       const breakMins = Number.parseInt(formState.breakMinutes) || 0;
-      const [startH, startM] = formState.startTime.split(":").map(Number);
-      const [endH, endM] = formState.endTime.split(":").map(Number);
-      const totalMinutes = (endH * 60 + endM) - (startH * 60 + startM);
-      if (breakMins >= totalMinutes) {
+      if (!isBreakValid(formState.startTime, formState.endTime, breakMins)) {
         setFormError("Pauze kan niet langer zijn dan de gewerkte periode.");
         return;
       }
