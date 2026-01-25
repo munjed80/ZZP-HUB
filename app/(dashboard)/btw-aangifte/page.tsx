@@ -182,13 +182,14 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Promi
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.6fr_0.9fr]">
+      {/* Detail Cards */}
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle>Omzet (Prestaties)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-3">
               {omzetRubrieken.map((rubriek) => (
                 <div
                   key={rubriek.key}
@@ -222,51 +223,27 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Promi
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle>Voorbelasting</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between rounded-xl border border-border bg-muted p-3">
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Rubriek 5b</p>
-                  <p className="text-xs text-muted-foreground">Aftrekbare BTW op uitgaven</p>
-                </div>
-                <p className="text-sm font-semibold text-foreground">{formatBedrag(report.deductibleVat)}</p>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Totale kosten (excl. BTW): {formatBedrag(report.expenseTotal)}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle>Voorbelasting (5b)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-muted p-3">
               <div>
-                <CardTitle>Controlepunten</CardTitle>
-                <p className="text-sm text-muted-foreground">Align met Belastingdienst rubrieken</p>
+                <p className="text-sm font-semibold text-foreground">Aftrekbare BTW</p>
+                <p className="text-xs text-muted-foreground">BTW op ingevoerde uitgaven</p>
               </div>
-              <Badge variant="info">Checklist</Badge>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-primary/80" />
-                  <span>Controleer intracommunautaire prestaties en verlegde BTW (rubriek 3 & 4 indien van toepassing).</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-primary/80" />
-                  <span>Controleer correcties privégebruik en eventuele kleine ondernemersregeling (KOR).</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-primary/80" />
-                  <span>Bewaar onderbouwing van omzet, uitgaven en BTW-tarieven voor audit trail.</span>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+              <p className="text-lg font-bold text-foreground">{formatBedrag(report.deductibleVat)}</p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Totale kosten (excl. BTW): {formatBedrag(report.expenseTotal)}
+            </p>
+            <div className="flex items-start gap-2 rounded-xl bg-muted px-3 py-2 text-xs text-muted-foreground ring-1 ring-border">
+              <Info className="h-4 w-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
+              <p>Controleer intracommunautaire prestaties en verlegde BTW indien van toepassing.</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ import { formatBedrag } from "@/lib/utils";
 import { createExpense, deleteExpense, duplicateExpense } from "./actions";
 import { categories, expenseSchema, type ExpenseClientShape, type ExpenseFormValues } from "./schema";
 import { type BtwTarief } from "@prisma/client";
-import { CalendarClock, Euro, Loader2, PieChart, Plus, ReceiptText, UploadCloud } from "lucide-react";
+import { CalendarClock, Euro, Loader2, Plus, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { EntityActionsMenu } from "@/components/ui/entity-actions-menu";
 import { ExportButton } from "@/components/ui/export-button";
@@ -218,55 +218,22 @@ export function UitgavenClient({ expenses, errorMessage, forceOpen }: UitgavenCl
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="group border-2 hover:shadow-xl hover:border-primary/20 transition-all duration-300">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 p-2.5 shadow-lg ring-2 ring-primary/30 group-hover:scale-105 transition-transform duration-300">
-                <Euro className="h-5 w-5 text-primary" aria-hidden />
-              </div>
-              <CardTitle>Totaal deze maand</CardTitle>
+      {/* Single monthly total card */}
+      <Card className="group border-2 hover:shadow-xl hover:border-primary/20 transition-all duration-300">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 p-2.5 shadow-lg ring-2 ring-primary/30 group-hover:scale-105 transition-transform duration-300">
+              <Euro className="h-5 w-5 text-primary" aria-hidden />
             </div>
-            <Badge variant="info">Live</Badge>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-foreground">{formatBedrag(totals.monthTotal)}</p>
-            <p className="text-xs text-muted-foreground font-medium">Inclusief BTW op basis van gekozen tarieven.</p>
-          </CardContent>
-        </Card>
-
-        <Card className="group border-2 hover:shadow-xl hover:border-success/20 transition-all duration-300">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="rounded-2xl bg-gradient-to-br from-success/20 to-success/10 p-2.5 shadow-lg ring-2 ring-success/30 group-hover:scale-105 transition-transform duration-300">
-                <ReceiptText className="h-5 w-5 text-success" aria-hidden />
-              </div>
-              <CardTitle>Te vorderen BTW</CardTitle>
-            </div>
-            <Badge variant="success">Recente periode</Badge>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-foreground">{formatBedrag(totals.vatRecoverable)}</p>
-            <p className="text-xs text-muted-foreground font-medium">Gebaseerd op ingevoerde uitgaven.</p>
-          </CardContent>
-        </Card>
-
-        <Card className="group border-2 hover:shadow-xl hover:border-accent/20 transition-all duration-300">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 p-2.5 shadow-lg ring-2 ring-accent/30 group-hover:scale-105 transition-transform duration-300">
-                <PieChart className="h-5 w-5 text-accent" aria-hidden />
-              </div>
-              <CardTitle>Grootste kostenpost</CardTitle>
-            </div>
-            <Badge variant="warning">Realtime</Badge>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-foreground">{totals.largestCategory}</p>
-            <p className="text-xs text-muted-foreground font-medium">Op basis van huidige lijst.</p>
-          </CardContent>
-        </Card>
-      </div>
+            <CardTitle>Totaal deze maand</CardTitle>
+          </div>
+          <Badge variant="info">Live</Badge>
+        </CardHeader>
+        <CardContent>
+          <p className="text-2xl font-bold text-foreground">{formatBedrag(totals.monthTotal)}</p>
+          <p className="text-xs text-muted-foreground font-medium">Inclusief BTW op basis van gekozen tarieven.</p>
+        </CardContent>
+      </Card>
 
       <Card className="shadow-lg border-2">
         <CardHeader>
