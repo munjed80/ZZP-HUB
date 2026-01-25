@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext, requireRole } from "@/lib/auth/tenant";
+import { requireRole } from "@/lib/auth/tenant";
+import { getActiveCompanyContext, requirePermission } from "@/lib/auth/company-context";
 import { UserRole, InvoiceEmailStatus, Prisma } from "@prisma/client";
 import {
   generateXLSX,
@@ -21,6 +22,10 @@ type RouteContext = {
 /**
  * Export API endpoint
  * GET /api/export/[resource]?format=csv|xlsx|pdf&search=...&status=...
+ * 
+ * Supports multi-tenant access:
+ * - Owners can export their own data
+ * - Accountants with canExport permission can export client data
  */
 export async function GET(request: NextRequest, context: RouteContext) {
   try {
@@ -30,41 +35,50 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const search = searchParams.get("search") || "";
     const status = searchParams.get("status") || "";
 
-    // Get tenant context
-    const { userId } = await requireTenantContext();
+    // Require export permission for non-admin resources
+    // This handles both owners (who have all permissions) and accountants with canExport
+    let activeCompanyId: string;
+    
+    if (resource === "companies") {
+      // Admin only - companies export
+      await requireRole(UserRole.SUPERADMIN);
+      activeCompanyId = ""; // Not used for companies export
+    } else {
+      const exportContext = await requirePermission("canExport");
+      activeCompanyId = exportContext.activeCompanyId;
+    }
 
     let data;
     let filename: string;
 
     switch (resource) {
       case "invoices":
-        data = await exportInvoices(userId, search, status);
+        data = await exportInvoices(activeCompanyId, search, status);
         filename = `facturen-${new Date().toISOString().split("T")[0]}`;
         break;
 
       case "quotations":
-        data = await exportQuotations(userId, search, status);
+        data = await exportQuotations(activeCompanyId, search, status);
         filename = `offertes-${new Date().toISOString().split("T")[0]}`;
         break;
 
       case "clients":
-        data = await exportClients(userId, search);
+        data = await exportClients(activeCompanyId, search);
         filename = `relaties-${new Date().toISOString().split("T")[0]}`;
         break;
 
       case "expenses":
-        data = await exportExpenses(userId, search);
+        data = await exportExpenses(activeCompanyId, search);
         filename = `uitgaven-${new Date().toISOString().split("T")[0]}`;
         break;
 
       case "time-entries":
-        data = await exportTimeEntries(userId, search);
+        data = await exportTimeEntries(activeCompanyId, search);
         filename = `uren-${new Date().toISOString().split("T")[0]}`;
         break;
 
       case "companies":
-        // Admin only
-        await requireRole(UserRole.SUPERADMIN);
+        // Already verified admin role above
         data = await exportCompanies();
         filename = `bedrijven-${new Date().toISOString().split("T")[0]}`;
         break;
@@ -110,7 +124,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     if (error instanceof Error && error.message.includes("Niet geauthenticeerd")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    if (error instanceof Error && error.message.includes("Toegang geweigerd")) {
+    if (error instanceof Error && (error.message.includes("Toegang geweigerd") || error.message.includes("Geen toestemming"))) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     return NextResponse.json(
