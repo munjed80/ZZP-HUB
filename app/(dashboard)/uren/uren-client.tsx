@@ -34,6 +34,7 @@ type UrenClientProps = {
   totalHours: number;
   weekSummaries: WeekSummary[];
   canEdit: boolean;
+  canExport: boolean;
 };
 
 const HOURS_GOAL = 1225;
@@ -85,7 +86,7 @@ const initialFormState = (): FormState => ({
   manualHours: "0",
 });
 
-export function UrenClient({ entries, totalHours, weekSummaries, canEdit }: UrenClientProps) {
+export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExport }: UrenClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
@@ -225,7 +226,7 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit }: Uren
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <ExportButton resource="time-entries" />
+            {canExport && <ExportButton resource="time-entries" />}
             {canEdit && (
               <button
                 type="button"

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireTenantContext, verifyTenantOwnership } from "@/lib/auth/tenant";
+import { getActiveCompanyContext, requirePermission } from "@/lib/auth/company-context";
 import { isTimeAfter, isBreakValid, calculateHoursFromTimes } from "@/lib/time-constants";
 
 const timeEntrySchema = z.object({
@@ -73,7 +73,9 @@ function getWeekNumber(date: Date): number {
 }
 
 export async function logTimeEntry(values: TimeEntryInput) {
-  const { userId } = await requireTenantContext();
+  // Require edit permission - accountants need canEdit to add entries
+  const context = await requirePermission("canEdit");
+  const activeCompanyId = context.activeCompanyId;
   const data = timeEntrySchema.parse(values);
 
   try {
@@ -85,7 +87,7 @@ export async function logTimeEntry(values: TimeEntryInput) {
 
     await prisma.timeEntry.create({
       data: {
-        userId,
+        userId: activeCompanyId, // Use active company ID (company owner's user ID)
         description: data.description,
         date: new Date(data.date),
         hours: new Prisma.Decimal(hours),
@@ -99,24 +101,23 @@ export async function logTimeEntry(values: TimeEntryInput) {
 
     revalidatePath("/uren");
   } catch (error) {
-    console.error("Urenregistratie opslaan mislukt", { error, userId });
+    console.error("Urenregistratie opslaan mislukt", { error, activeCompanyId });
     throw new Error("Tijdsregistratie kon niet worden opgeslagen. Controleer de invoer en probeer het opnieuw.");
   }
 }
 
 export async function updateTimeEntry(id: string, values: TimeEntryInput) {
-  const { userId } = await requireTenantContext();
+  // Require edit permission - accountants need canEdit to update entries
+  const context = await requirePermission("canEdit");
+  const activeCompanyId = context.activeCompanyId;
   const data = timeEntrySchema.parse(values);
 
   try {
     const entry = await prisma.timeEntry.findUnique({ where: { id } });
 
-    if (!entry || entry.userId !== userId) {
-      throw new Error("Tijdregistratie niet gevonden voor deze gebruiker.");
+    if (!entry || entry.userId !== activeCompanyId) {
+      throw new Error("Tijdregistratie niet gevonden voor dit bedrijf.");
     }
-
-    // Verify ownership before update
-    await verifyTenantOwnership(entry.userId, "updateTimeEntry");
 
     // Calculate hours from times if provided
     let hours = data.hours;
@@ -141,18 +142,20 @@ export async function updateTimeEntry(id: string, values: TimeEntryInput) {
     revalidatePath("/uren");
     return { success: true };
   } catch (error) {
-    console.error("Tijdregistratie bijwerken mislukt", { error, id, userId });
+    console.error("Tijdregistratie bijwerken mislukt", { error, id, activeCompanyId });
     throw new Error("Kon de tijdregistratie niet bijwerken.");
   }
 }
 
 export async function getTimeEntries(): Promise<TimeEntryDto[]> {
-  const { userId } = await requireTenantContext();
+  // Use active company context for multi-tenant support
+  const context = await getActiveCompanyContext();
+  const activeCompanyId = context.activeCompanyId;
   const { startOfYear, endOfYear } = getYearRange();
 
   try {
     const entries = await prisma.timeEntry.findMany({
-      where: { userId, date: { gte: startOfYear, lt: endOfYear } },
+      where: { userId: activeCompanyId, date: { gte: startOfYear, lt: endOfYear } },
       orderBy: { date: "desc" },
     });
 
@@ -168,57 +171,60 @@ export async function getTimeEntries(): Promise<TimeEntryDto[]> {
       notes: entry.notes,
     }));
   } catch (error) {
-    console.error("Kon tijdregistraties niet ophalen", { error, userId });
+    console.error("Kon tijdregistraties niet ophalen", { error, activeCompanyId });
     return [];
   }
 }
 
 export async function deleteTimeEntry(id: string) {
-  const { userId } = await requireTenantContext();
+  // Require edit permission - accountants need canEdit to delete entries
+  const context = await requirePermission("canEdit");
+  const activeCompanyId = context.activeCompanyId;
 
   try {
     const entry = await prisma.timeEntry.findUnique({ where: { id } });
 
-    if (!entry || entry.userId !== userId) {
-      throw new Error("Tijdregistratie niet gevonden voor deze gebruiker.");
+    if (!entry || entry.userId !== activeCompanyId) {
+      throw new Error("Tijdregistratie niet gevonden voor dit bedrijf.");
     }
-
-    // Verify ownership before delete
-    await verifyTenantOwnership(entry.userId, "deleteTimeEntry");
 
     await prisma.timeEntry.delete({ where: { id } });
     revalidatePath("/uren");
     return { success: true };
   } catch (error) {
-    console.error("Tijdregistratie verwijderen mislukt", { error, id, userId });
+    console.error("Tijdregistratie verwijderen mislukt", { error, id, activeCompanyId });
     throw new Error("Kon de tijdregistratie niet verwijderen.");
   }
 }
 
 export async function getYearlyHours() {
-  const { userId } = await requireTenantContext();
+  // Use active company context for multi-tenant support
+  const context = await getActiveCompanyContext();
+  const activeCompanyId = context.activeCompanyId;
   const { startOfYear, endOfYear } = getYearRange();
 
   try {
     const result = await prisma.timeEntry.aggregate({
-      where: { userId, date: { gte: startOfYear, lt: endOfYear } },
+      where: { userId: activeCompanyId, date: { gte: startOfYear, lt: endOfYear } },
       _sum: { hours: true },
     });
 
     return Number(result._sum.hours ?? 0);
   } catch (error) {
-    console.error("Kon totaal aantal uren niet berekenen", { error, userId });
+    console.error("Kon totaal aantal uren niet berekenen", { error, activeCompanyId });
     return 0;
   }
 }
 
 export async function getWeekSummaries(): Promise<WeekSummary[]> {
-  const { userId } = await requireTenantContext();
+  // Use active company context for multi-tenant support
+  const context = await getActiveCompanyContext();
+  const activeCompanyId = context.activeCompanyId;
   const { startOfYear, endOfYear } = getYearRange();
 
   try {
     const entries = await prisma.timeEntry.findMany({
-      where: { userId, date: { gte: startOfYear, lt: endOfYear } },
+      where: { userId: activeCompanyId, date: { gte: startOfYear, lt: endOfYear } },
       orderBy: { date: "desc" },
     });
 
@@ -252,7 +258,7 @@ export async function getWeekSummaries(): Promise<WeekSummary[]> {
       return b.weekNumber - a.weekNumber;
     });
   } catch (error) {
-    console.error("Kon weekoverzichten niet ophalen", { error, userId });
+    console.error("Kon weekoverzichten niet ophalen", { error, activeCompanyId });
     return [];
   }
 }

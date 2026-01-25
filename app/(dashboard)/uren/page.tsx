@@ -1,14 +1,17 @@
 import { getTimeEntries, getYearlyHours, getWeekSummaries } from "@/actions/time-actions";
 import { UrenClient } from "./uren-client";
-import { requireOwnerPage } from "@/lib/auth/route-guards";
+import { requireReadPage } from "@/lib/auth/route-guards";
 import { hasPermission } from "@/lib/auth/company-context";
 
 export default async function UrenPagina() {
-  // Owner-only page guard
-  await requireOwnerPage();
+  // Require read permission (owners have all permissions, accountants need canRead)
+  await requireReadPage();
   
-  // Check if user can edit (for accountant context)
-  const canEdit = await hasPermission("canEdit");
+  // Check permissions for accountant context
+  const [canEdit, canExport] = await Promise.all([
+    hasPermission("canEdit"),
+    hasPermission("canExport"),
+  ]);
   
   const [entries, totalHours, weekSummaries] = await Promise.all([
     getTimeEntries(),
@@ -22,6 +25,7 @@ export default async function UrenPagina() {
       totalHours={totalHours}
       weekSummaries={weekSummaries}
       canEdit={canEdit}
+      canExport={canExport}
     />
   );
 }
