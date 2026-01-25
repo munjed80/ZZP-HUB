@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { getVatReport } from "./actions";
+import { BtwReportDownloadButton } from "@/components/pdf/BtwReportDownloadButton";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -42,8 +43,6 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Promi
 
   const report = await getVatReport(selectedYear, selectedQuarter);
   const years = [currentYear, currentYear - 1, currentYear - 2];
-  
-  const activeCompanyId = undefined;
 
   const finalLabel = report.totalDue >= 0 ? "Te betalen" : "Terug te vragen";
   const finalVariant = report.totalDue > 0 ? "warning" : "success";
@@ -140,6 +139,7 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Promi
                 Berekenen
               </button>
             </form>
+            <BtwReportDownloadButton year={selectedYear} quarter={selectedQuarter} />
           </CardHeader>
           <CardContent className="space-y-3" aria-live="polite">
             <div className="flex items-center gap-2 rounded-xl bg-muted px-3 py-2 text-sm text-muted-foreground ring-1 ring-border">
