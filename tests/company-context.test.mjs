@@ -10,7 +10,8 @@ import assert from "node:assert/strict";
  * - Permission checks based on membership
  */
 
-// Mock UUID v4 validation regex
+// UUID v4 validation regex (duplicated from lib/auth/company-context.ts for test isolation)
+// In production tests, consider importing from a shared test utility
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function isValidUUID(value) {
@@ -146,16 +147,17 @@ describe("Company Context Resolution", () => {
   });
   
   test("COMPANY_ADMIN ignores cookie for inaccessible company", () => {
+    const inaccessibleCompanyId = "44444444-4444-4444-8444-444444444444"; // Valid UUID but no membership
     const result = resolveActiveCompanyContext({
       sessionUserId: companyAdminUserId,
       sessionRole: "COMPANY_ADMIN",
-      cookieCompanyId: "invalid-company-id", // Company user doesn't have access to
+      cookieCompanyId: inaccessibleCompanyId, // Company user doesn't have access to
       memberships: [
         { companyId: clientCompanyId, role: "ACCOUNTANT", status: "ACTIVE", canRead: true },
       ],
     });
     
-    // Falls back to own company
+    // Falls back to own company since no membership exists for the cookie company
     assert.strictEqual(result.activeCompanyId, companyAdminUserId);
     assert.strictEqual(result.isOwnerContext, true);
   });

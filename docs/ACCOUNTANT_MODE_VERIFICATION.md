@@ -60,7 +60,8 @@ model CompanyUser {
 ### 2. Accept Invite Flow
 
 1. Log in as the invited accountant (or create a new account with that email)
-2. Use the invite link: `/accept-invite?token=...`
+2. Use the invite link: `/accept-invite?token=...` (this is the primary route)
+   - Note: There's also `/invite/accept/` which serves as an alternative entry point
 3. Verify:
    - Page shows "Toegang verleend" after processing
    - For single company: auto-redirects to `/switch-company?companyId=X&next=/dashboard`
@@ -168,6 +169,6 @@ The implementation correctly uses Route Handlers for cookie operations:
 
 ## Known Limitations
 
-1. `UserRole.ACCOUNTANT` exists in the schema but is NOT used for actual accountant functionality. The proper `CompanyRole.ACCOUNTANT` from `CompanyUser` is used instead.
+1. `UserRole.ACCOUNTANT` exists in the Prisma schema's `UserRole` enum (alongside SUPERADMIN, COMPANY_ADMIN, STAFF) but is NOT used for actual accountant functionality. Instead, the `CompanyRole.ACCOUNTANT` from the `CompanyUser` model is used for company-level membership. The `UserRole.ACCOUNTANT` enum value is kept for backward compatibility but should not be assigned to users.
 
 2. The notes API (`/api/notes/*`) is not yet implemented - the `notes-list.tsx` component is a work-in-progress.
