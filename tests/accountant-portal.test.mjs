@@ -30,6 +30,10 @@ const companyScopedPrefixes = [
 // UUID validation regex
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+function isValidUUID(value) {
+  return typeof value === 'string' && UUID_REGEX.test(value);
+}
+
 function isCompanyScopedPath(pathname) {
   return companyScopedPrefixes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
@@ -47,9 +51,9 @@ function shouldRedirectAccountantToPortal({ userRole, pathname, activeCompanyCoo
     return false;
   }
   
-  // No active company cookie means redirect to portal
-  const hasActiveCompany = activeCompanyCookie && activeCompanyCookie.length > 0;
-  return !hasActiveCompany;
+  // Validate cookie value is a proper UUID, not just non-empty
+  const hasValidActiveCompany = isValidUUID(activeCompanyCookie);
+  return !hasValidActiveCompany;
 }
 
 /**
@@ -144,6 +148,16 @@ describe("Accountant Middleware Redirect Logic", () => {
     });
     
     assert.strictEqual(result, false);
+  });
+  
+  test("ACCOUNTANT with invalid UUID format cookie is redirected to portal", () => {
+    const result = shouldRedirectAccountantToPortal({
+      userRole: 'ACCOUNTANT',
+      pathname: '/dashboard',
+      activeCompanyCookie: 'invalid-not-a-uuid',
+    });
+    
+    assert.strictEqual(result, true);
   });
   
   test("ACCOUNTANT accessing /accountant (portal) is NOT redirected", () => {

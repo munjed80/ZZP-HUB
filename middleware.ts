@@ -8,6 +8,16 @@ import { safeNextUrl } from '@/lib/auth/safe-next';
 // Cookie name for active company (must match lib/auth/company-context.ts)
 const ACTIVE_COMPANY_COOKIE = 'zzp-hub-active-company';
 
+// UUID v4 validation regex for company ID validation
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Validate that a string is a valid UUID v4
+ */
+function isValidUUID(value: string | undefined): value is string {
+  return typeof value === 'string' && UUID_REGEX.test(value);
+}
+
 // Routes that should be accessible even without email verification
 const preVerificationRoutes = ['/check-email', '/verify-email', '/verify-required', '/resend-verification'];
 
@@ -141,19 +151,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(setupUrl);
   }
 
-  // For ACCOUNTANT role users: if accessing company-scoped pages without an active company cookie,
+  // For ACCOUNTANT role users: if accessing company-scoped pages without a valid active company cookie,
   // redirect them to the accountant portal to select a client
   // This ensures accountants always have an explicit company context before accessing data
   if (userRole === 'ACCOUNTANT' && isCompanyScopedPath(pathname)) {
     const activeCompanyCookie = request.cookies.get(ACTIVE_COMPANY_COOKIE)?.value;
-    const hasActiveCompany = activeCompanyCookie && activeCompanyCookie.length > 0;
+    // Validate cookie value is a proper UUID, not just non-empty
+    const hasValidActiveCompany = isValidUUID(activeCompanyCookie);
     
-    if (!hasActiveCompany) {
+    if (!hasValidActiveCompany) {
       const accountantUrl = new URL('/accountant', request.url);
       logRedirect('REDIRECT_ACCOUNTANT_NO_CONTEXT', { 
         pathname, 
         role: userRole,
-        reason: 'No active company cookie set' 
+        reason: activeCompanyCookie ? 'Invalid company ID format' : 'No active company cookie set'
       });
       return NextResponse.redirect(accountantUrl);
     }

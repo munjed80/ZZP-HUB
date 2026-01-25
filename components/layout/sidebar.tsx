@@ -29,6 +29,23 @@ import {
 import { assertUniqueHrefs, cn } from "@/lib/utils";
 import { SidebarBrand } from "@/components/sidebar/sidebar-brand";
 
+/**
+ * Handler for exiting accountant context.
+ * Clears the active company cookie and redirects to accountant portal.
+ */
+async function handleExitContext() {
+  try {
+    const response = await fetch("/api/context/clear-company", {
+      method: "POST",
+    });
+    if (response.ok) {
+      window.location.href = "/accountant";
+    }
+  } catch (error) {
+    console.error("Failed to exit context:", error);
+  }
+}
+
 type NavigatieItem = {
   href: string;
   label: string;
@@ -128,18 +145,7 @@ export function Sidebar({
         {/* Exit context button for accountants viewing a client company */}
         {isAccountantMode && (
           <button
-            onClick={async () => {
-              try {
-                const response = await fetch("/api/context/clear-company", {
-                  method: "POST",
-                });
-                if (response.ok) {
-                  window.location.href = "/accountant";
-                }
-              } catch (error) {
-                console.error("Failed to exit context:", error);
-              }
-            }}
+            onClick={handleExitContext}
             className="flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-sm font-semibold text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-500/20"
           >
             <ExitIcon className="h-4 w-4" aria-hidden />
@@ -277,18 +283,9 @@ export function MobileSidebar({
             {/* Exit context button for accountants viewing a client company */}
             {isAccountantMode && (
               <button
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/context/clear-company", {
-                      method: "POST",
-                    });
-                    if (response.ok) {
-                      onOpenChange?.(false);
-                      window.location.href = "/accountant";
-                    }
-                  } catch (error) {
-                    console.error("Failed to exit context:", error);
-                  }
+                onClick={() => {
+                  onOpenChange?.(false);
+                  handleExitContext();
                 }}
                 className="flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-sm font-semibold text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-500/20"
               >
