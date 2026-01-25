@@ -182,3 +182,80 @@ export function formatCompaniesForExport(companies: {
     "Aangemaakt": new Date(company.createdAt).toLocaleDateString("nl-NL"),
   }));
 }
+
+/**
+ * BTW Report data structure for export
+ */
+export interface BtwReportData {
+  year: number;
+  quarter: number;
+  startDate: string;
+  endDate: string;
+  companyName: string;
+  companyAddress: string;
+  companyPostalCode: string;
+  companyCity: string;
+  kvkNumber: string;
+  btwNumber: string;
+  rubriek1a: { base: number; vat: number };
+  rubriek1b: { base: number; vat: number };
+  rubriek1e: { base: number };
+  deductibleVat: number;
+  totalSalesVat: number;
+  totalDue: number;
+  revenueTotal: number;
+  expenseTotal: number;
+}
+
+/**
+ * Format BTW Report data for Excel export
+ */
+export function formatBtwReportForExport(report: BtwReportData): ExportData {
+  return [
+    {
+      "Rubriek": "1a - Omzet 21%",
+      "Omzet": report.rubriek1a.base,
+      "BTW": report.rubriek1a.vat,
+    },
+    {
+      "Rubriek": "1b - Omzet 9%",
+      "Omzet": report.rubriek1b.base,
+      "BTW": report.rubriek1b.vat,
+    },
+    {
+      "Rubriek": "1e - Omzet 0% / verlegd",
+      "Omzet": report.rubriek1e.base,
+      "BTW": 0,
+    },
+    {
+      "Rubriek": "5b - Voorbelasting",
+      "Omzet": report.expenseTotal,
+      "BTW": report.deductibleVat,
+    },
+    {
+      "Rubriek": "",
+      "Omzet": "",
+      "BTW": "",
+    },
+    {
+      "Rubriek": "Totaal omzet",
+      "Omzet": report.revenueTotal,
+      "BTW": "",
+    },
+    {
+      "Rubriek": "Totaal verschuldigde BTW",
+      "Omzet": "",
+      "BTW": report.totalSalesVat,
+    },
+    {
+      "Rubriek": "Totaal voorbelasting",
+      "Omzet": "",
+      "BTW": report.deductibleVat,
+    },
+    {
+      "Rubriek": report.totalDue >= 0 ? "Te betalen" : "Terug te vragen",
+      "Omzet": "",
+      "BTW": Math.abs(report.totalDue),
+    },
+  ];
+}
