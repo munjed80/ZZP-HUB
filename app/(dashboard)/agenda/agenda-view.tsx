@@ -434,10 +434,11 @@ export function AgendaView({ events }: AgendaViewProps) {
         </div>
       </div>
 
+      {/* Mobile FAB - positioned above bottom navigation */}
       <button
         type="button"
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground border border-primary/80 shadow-lg transition hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/20 md:hidden"
+        className="fixed bottom-24 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground border border-primary/80 shadow-lg shadow-primary/25 transition hover:bg-primary/90 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-primary/20 md:hidden"
         aria-label="Nieuwe afspraak toevoegen"
       >
         <Plus className="h-6 w-6" aria-hidden="true" />

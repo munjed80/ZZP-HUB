@@ -223,13 +223,18 @@ model Expense {
 }
 
 model TimeEntry {
-  id          String   @id @default(uuid())
-  userId      String
-  description String
-  date        DateTime
-  hours       Decimal  @db.Decimal(5, 2)
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
+  id           String   @id @default(uuid())
+  userId       String
+  description  String
+  date         DateTime
+  hours        Decimal  @db.Decimal(5, 2)
+  startTime    String?  // HH:mm format
+  endTime      String?  // HH:mm format
+  breakMinutes Int?     @default(0)
+  workType     String?  // "Project", "Client", "Internal", etc.
+  notes        String?  @db.Text
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([createdAt])
