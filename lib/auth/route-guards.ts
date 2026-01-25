@@ -243,7 +243,16 @@ export async function guardExportPermission(): Promise<{ context: ActiveCompanyC
 }
 
 /**
- * Check if user is in accountant mode viewing another company
+ * Check if user is viewing another company (as ACCOUNTANT or STAFF, not as OWNER)
+ * Returns true when user is accessing a company they don't own
+ */
+export async function isNonOwnerViewing(): Promise<boolean> {
+  const context = await getActiveCompanyContext();
+  return !context.isOwnerContext;
+}
+
+/**
+ * Check if user is in accountant mode specifically (not OWNER or STAFF)
  */
 export async function isAccountantViewing(): Promise<boolean> {
   const context = await getActiveCompanyContext();

@@ -19,7 +19,12 @@ export default async function DashboardShell({ children }: { children: ReactNode
   // Get active company context
   const companyContext = await getActiveCompanyContext();
   const activeCompanyId = companyContext.activeCompanyId;
-  const isAccountantMode = !companyContext.isOwnerContext && companyContext.activeMembership?.role === CompanyRole.ACCOUNTANT;
+  // Non-owner context means viewing another company (as ACCOUNTANT or STAFF)
+  const isNonOwnerMode = !companyContext.isOwnerContext;
+  // Get specific role badge text
+  const roleBadgeText = companyContext.activeMembership?.role === CompanyRole.ACCOUNTANT ? "Accountant" 
+    : companyContext.activeMembership?.role === CompanyRole.STAFF ? "Medewerker" 
+    : null;
 
   const userName = sessie.user.name || sessie.user.email || "Gebruiker";
   
@@ -32,8 +37,10 @@ export default async function DashboardShell({ children }: { children: ReactNode
   
   const memberships = companyContext.memberships;
 
-  // Show company switcher for users who have at least one ACCOUNTANT membership
-  const showCompanySwitcher = memberships.some((m) => m.role === CompanyRole.ACCOUNTANT);
+  // Show company switcher for users who have multi-company access (ACCOUNTANT or STAFF memberships)
+  const showCompanySwitcher = memberships.some((m) => 
+    m.role === CompanyRole.ACCOUNTANT || m.role === CompanyRole.STAFF
+  );
   
   // Generate initials: for names use first letters of words, for emails use first char + char after @
   let userInitials = "ZZ";
@@ -46,13 +53,13 @@ export default async function DashboardShell({ children }: { children: ReactNode
     userInitials = userName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
-  // Disable actions for accountants (they have limited permissions)
-  const disableActions = isAccountantMode;
+  // Disable actions for non-owners (they have limited permissions)
+  const disableActions = isNonOwnerMode;
 
   return (
     <div className="min-h-screen bg-background">
       <div className="flex min-h-screen">
-        <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl} userId={sessie.user.id} disableActions={disableActions} isAccountantMode={isAccountantMode}>
+        <DashboardClientShell userRole={sessie.user.role} avatarUrl={avatarUrl} userId={sessie.user.id} disableActions={disableActions} isAccountantMode={isNonOwnerMode}>
           <div className="flex flex-1 flex-col">
             <header className="sticky top-0 z-30 border-b border-border bg-card/80 shadow-sm backdrop-blur-xl">
               <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 pt-[env(safe-area-inset-top)] md:h-16 md:px-6">
@@ -71,10 +78,10 @@ export default async function DashboardShell({ children }: { children: ReactNode
                     <span className="truncate text-sm font-semibold text-foreground">
                       {profile?.companyName || "ZZP HUB"}
                     </span>
-                    {/* Accountant Mode Badge */}
-                    {isAccountantMode && (
+                    {/* Role Badge for non-owners */}
+                    {roleBadgeText && (
                       <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                        Accountant
+                        {roleBadgeText}
                       </span>
                     )}
                   </div>

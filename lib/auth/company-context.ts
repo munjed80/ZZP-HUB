@@ -122,8 +122,10 @@ export async function getActiveCompanyContext(): Promise<ActiveCompanyContext> {
   // Get all memberships for this user
   const memberships = await getUserMemberships(userId);
   
-  // Check if user has any ACCOUNTANT memberships (indicating they can access other companies)
-  const hasAccountantMembership = memberships.some(m => m.role === CompanyRole.ACCOUNTANT);
+  // Check if user has any non-OWNER memberships (ACCOUNTANT or STAFF can access other companies)
+  const hasMultiCompanyMembership = memberships.some(m => 
+    m.role === CompanyRole.ACCOUNTANT || m.role === CompanyRole.STAFF
+  );
   
   // Get active company from cookie
   const cookieCompanyId = await getActiveCompanyIdFromCookie();
@@ -134,8 +136,8 @@ export async function getActiveCompanyContext(): Promise<ActiveCompanyContext> {
   let isOwnerContext = false;
 
   if (session.role === "SUPERADMIN" || session.role === "COMPANY_ADMIN") {
-    // For owners, default to their own company unless they have an accountant cookie set
-    if (cookieCompanyId && hasAccountantMembership) {
+    // For owners, default to their own company unless they have a multi-company cookie set
+    if (cookieCompanyId && hasMultiCompanyMembership) {
       // Check if they have access to the cookie company
       activeMembership = memberships.find(m => m.companyId === cookieCompanyId) || null;
       if (activeMembership) {
@@ -151,13 +153,13 @@ export async function getActiveCompanyContext(): Promise<ActiveCompanyContext> {
       activeCompanyId = userId;
       isOwnerContext = true;
     }
-  } else if (hasAccountantMembership) {
-    // For accountants, use the cookie company or first available membership
+  } else if (hasMultiCompanyMembership) {
+    // For users with multi-company access (ACCOUNTANT/STAFF), use the cookie company or first available membership
     if (cookieCompanyId) {
       activeMembership = memberships.find(m => m.companyId === cookieCompanyId) || null;
       if (activeMembership) {
         activeCompanyId = cookieCompanyId;
-        isOwnerContext = false;
+        isOwnerContext = activeMembership.role === CompanyRole.OWNER;
       } else if (memberships.length > 0) {
         // Cookie company not accessible, use first available
         activeMembership = memberships[0];
@@ -179,7 +181,7 @@ export async function getActiveCompanyContext(): Promise<ActiveCompanyContext> {
       isOwnerContext = true;
     }
   } else {
-    // Regular user without accountant memberships - use own company
+    // Regular user without multi-company memberships - use own company
     activeCompanyId = userId;
     isOwnerContext = true;
   }
