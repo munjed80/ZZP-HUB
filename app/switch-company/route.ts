@@ -107,6 +107,15 @@ export async function GET(request: NextRequest) {
   // Build final redirect URL using trusted base URL
   const finalRedirectUrl = buildSecureRedirectUrl(nextPath);
 
+  // Log when forcing canonical host due to untrusted origin
+  if (isUntrustedOrigin) {
+    logSwitchEvent("FORCING_CANONICAL_HOST", {
+      requestOrigin,
+      canonicalHost: finalRedirectUrl.split('/').slice(0, 3).join('/'), // Extract base URL
+      reason: "Request origin is untrusted (localhost/0.0.0.0/non-standard port)",
+    });
+  }
+
   // Set the active company cookie via NextResponse redirect
   const response = NextResponse.redirect(finalRedirectUrl);
   response.cookies.set(COOKIE_NAME, companyId, {
