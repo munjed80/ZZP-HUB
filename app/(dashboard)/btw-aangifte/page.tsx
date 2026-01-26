@@ -5,6 +5,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { formatBedrag } from "@/lib/utils";
 import { getVatReport } from "./actions";
 import { BtwReportDownloadButton } from "@/components/pdf/BtwReportDownloadButton";
+import { BTWAccountantSnapshot, BTWAccountantChecklist } from "@/components/btw-accountant-snapshot";
+import { isAccountantViewing } from "@/lib/auth/route-guards";
+import { getActiveCompanyContext } from "@/lib/auth/company-context";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -43,6 +46,15 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Promi
 
   const report = await getVatReport(selectedYear, selectedQuarter);
   const years = [currentYear, currentYear - 1, currentYear - 2];
+
+  // Detect accountant mode for showing snapshot + checklist
+  const isAccountant = await isAccountantViewing();
+  const context = isAccountant ? await getActiveCompanyContext() : null;
+  const companyName = context?.activeMembership?.companyName ?? null;
+
+  // Determine if there is data for the checklist
+  const hasRevenue = report.revenueTotal > 0;
+  const hasExpenses = report.expenseTotal > 0;
 
   const finalLabel = report.totalDue >= 0 ? "Te betalen" : "Terug te vragen";
   const finalVariant = report.totalDue > 0 ? "warning" : "success";
@@ -88,6 +100,25 @@ export default async function BtwPagina({ searchParams }: { searchParams?: Promi
           Bereken je aangifte per kwartaal met officiële rubrieken zoals bij de Belastingdienst.
         </p>
       </div>
+
+      {/* Accountant Snapshot + Checklist (only shown for accountants viewing a client) */}
+      {isAccountant && (
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <BTWAccountantSnapshot
+            btwSaldo={report.totalDue}
+            quarter={report.quarter}
+            year={report.year}
+            hasRevenue={hasRevenue}
+            hasExpenses={hasExpenses}
+            companyName={companyName}
+          />
+          <BTWAccountantChecklist
+            hasInvoices={hasRevenue}
+            hasExpenses={hasExpenses}
+            quarter={report.quarter}
+          />
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-[1.6fr_0.9fr]">
         <Card className="shadow-lg border-2 hover:shadow-xl hover:border-primary/20 transition-all duration-300">
