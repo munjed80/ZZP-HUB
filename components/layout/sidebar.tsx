@@ -147,7 +147,7 @@ export function Sidebar({
             className="flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-sm font-semibold text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-500/20"
           >
             <ExitIcon className="h-4 w-4" aria-hidden />
-            Uit context
+            Terug naar Mijn klanten
           </button>
         )}
         <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
@@ -267,7 +267,7 @@ export function MobileSidebar({
                 className="flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-sm font-semibold text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-500/20"
               >
                 <ExitIcon className="h-4 w-4" aria-hidden />
-                Uit context
+                Terug naar Mijn klanten
               </button>
             )}
             <button

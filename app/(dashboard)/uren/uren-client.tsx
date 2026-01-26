@@ -20,13 +20,14 @@ import {
   Clock3,
   Coffee,
   Edit2,
+  Euro,
   Loader2,
   Plus,
   Timer,
   Trash2,
   X,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatBedrag } from "@/lib/utils";
 import { ExportButton } from "@/components/ui/export-button";
 
 type UrenClientProps = {
@@ -72,6 +73,9 @@ type FormState = {
   notes: string;
   useTimeRange: boolean;
   manualHours: string;
+  billable: boolean;
+  hourlyRate: string;
+  projectTag: string;
 };
 
 const initialFormState = (): FormState => ({
@@ -84,6 +88,9 @@ const initialFormState = (): FormState => ({
   notes: "",
   useTimeRange: true,
   manualHours: "0",
+  billable: true,
+  hourlyRate: "",
+  projectTag: "",
 });
 
 export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExport }: UrenClientProps) {
@@ -99,6 +106,21 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
   const goalReached = totalHours >= HOURS_GOAL;
   const badgeVariant = goalReached ? "success" : "info";
   const progressColor = goalReached ? "bg-emerald-500" : progress >= 75 ? "bg-amber-500" : "bg-sky-500";
+
+  // Calculate billable summary from entries
+  const billableSummary = useMemo(() => {
+    let billableHours = 0;
+    let estimatedAmount = 0;
+    for (const entry of entries) {
+      if (entry.billable) {
+        billableHours += entry.hours;
+        if (entry.hourlyRate) {
+          estimatedAmount += entry.hours * entry.hourlyRate;
+        }
+      }
+    }
+    return { billableHours, estimatedAmount };
+  }, [entries]);
 
   // Calculate hours for display
   const calculatedHours = useMemo(() => {
@@ -127,6 +149,9 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
       notes: entry.notes || "",
       useTimeRange: Boolean(entry.startTime && entry.endTime),
       manualHours: String(entry.hours),
+      billable: entry.billable,
+      hourlyRate: entry.hourlyRate ? String(entry.hourlyRate) : "",
+      projectTag: entry.projectTag || "",
     });
     setShowForm(true);
   };
@@ -182,6 +207,9 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
           breakMinutes: formState.useTimeRange ? Number.parseInt(formState.breakMinutes) || 0 : undefined,
           workType: formState.workType || undefined,
           notes: formState.notes.trim() || undefined,
+          billable: formState.billable,
+          hourlyRate: formState.hourlyRate ? Number.parseFloat(formState.hourlyRate) : undefined,
+          projectTag: formState.projectTag.trim() || undefined,
         };
 
         if (editingEntry) {
@@ -238,9 +266,46 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                 className={buttonVariants("primary", "inline-flex items-center gap-2")}
               >
                 <Plus className="h-4 w-4" aria-hidden />
-                Uren schrijven
+                Nieuwe registratie
               </button>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Weekly Summary Header */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-sky-500/10 p-2">
+              <Clock className="h-5 w-5 text-sky-500" aria-hidden />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Totaal uren (dit jaar)</p>
+              <p className="text-xl font-bold text-foreground">{totalHours.toFixed(2)} uur</p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-emerald-500/10 p-2">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500" aria-hidden />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Factureerbare uren</p>
+              <p className="text-xl font-bold text-foreground">{billableSummary.billableHours.toFixed(2)} uur</p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-amber-500/10 p-2">
+              <Euro className="h-5 w-5 text-amber-500" aria-hidden />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Geschatte waarde</p>
+              <p className="text-xl font-bold text-foreground">{formatBedrag(billableSummary.estimatedAmount)}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -346,9 +411,10 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                       <tr>
                         <th className="px-3 py-2">Datum</th>
                         <th className="px-3 py-2">Tijden</th>
-                        <th className="px-3 py-2">Type</th>
+                        <th className="px-3 py-2">Type/Project</th>
                         <th className="px-3 py-2">Omschrijving</th>
                         <th className="px-3 py-2 text-right">Uren</th>
+                        <th className="px-3 py-2 text-right">Bedrag</th>
                         {canEdit && <th className="px-3 py-2 text-right">Acties</th>}
                       </tr>
                     </thead>
@@ -372,11 +438,14 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                             )}
                           </td>
                           <td className="px-3 py-3">
-                            {entry.workType ? (
-                              <Badge variant="muted">{entry.workType}</Badge>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">-</span>
-                            )}
+                            <div className="flex flex-col gap-1">
+                              {entry.workType && (
+                                <Badge variant="muted">{entry.workType}</Badge>
+                              )}
+                              {entry.projectTag && (
+                                <span className="text-xs text-muted-foreground">{entry.projectTag}</span>
+                              )}
+                            </div>
                           </td>
                           <td className="px-3 py-3">
                             <div className="font-medium text-foreground">{entry.description}</div>
@@ -387,7 +456,21 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                             )}
                           </td>
                           <td className="px-3 py-3 text-right tabular-nums font-semibold text-foreground">
-                            {entry.hours.toFixed(2)} uur
+                            <div className="flex flex-col items-end gap-0.5">
+                              <span>{entry.hours.toFixed(2)} uur</span>
+                              {entry.billable ? (
+                                <Badge variant="success" className="text-xs px-1.5 py-0">Factureerbaar</Badge>
+                              ) : (
+                                <Badge variant="muted" className="text-xs px-1.5 py-0">Niet factureerbaar</Badge>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-3 text-right tabular-nums text-muted-foreground">
+                            {entry.billable && entry.hourlyRate ? (
+                              formatBedrag(entry.hours * entry.hourlyRate)
+                            ) : (
+                              <span className="text-xs">-</span>
+                            )}
                           </td>
                           {canEdit && (
                             <td className="px-3 py-3 text-right">
@@ -431,7 +514,12 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                           <p className="text-sm font-bold text-foreground">{entry.description}</p>
                           <p className="text-xs text-muted-foreground mt-1">{formatDate(entry.date)}</p>
                         </div>
-                        <span className="text-lg font-bold text-foreground">{entry.hours.toFixed(2)}u</span>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="text-lg font-bold text-foreground">{entry.hours.toFixed(2)}u</span>
+                          {entry.billable && entry.hourlyRate && (
+                            <span className="text-xs text-muted-foreground">{formatBedrag(entry.hours * entry.hourlyRate)}</span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-2">
                         {entry.startTime && entry.endTime && (
@@ -448,6 +536,14 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                         ) : null}
                         {entry.workType && (
                           <Badge variant="muted">{entry.workType}</Badge>
+                        )}
+                        {entry.projectTag && (
+                          <span className="bg-card px-2 py-1 rounded">{entry.projectTag}</span>
+                        )}
+                        {entry.billable ? (
+                          <Badge variant="success" className="text-xs">Factureerbaar</Badge>
+                        ) : (
+                          <Badge variant="muted" className="text-xs">Niet fact.</Badge>
                         )}
                       </div>
                       {entry.notes && (
@@ -506,10 +602,18 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                     key={`${week.year}-W${week.weekNumber}`}
                     className="rounded-lg border border-border bg-muted p-4"
                   >
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
                       <div>
                         <p className="text-sm font-semibold text-foreground">
                           Week {week.weekNumber}, {week.year}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {week.billableHours > 0 && (
+                            <>Factureerbaar: {week.billableHours.toFixed(2)} uur</>
+                          )}
+                          {week.estimatedAmount > 0 && (
+                            <> · {formatBedrag(week.estimatedAmount)}</>
+                          )}
                         </p>
                       </div>
                       <span className="text-lg font-bold text-foreground">
@@ -670,6 +774,51 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                       </option>
                     ))}
                   </select>
+                </div>
+
+                {/* Project Tag */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">Project tag (optioneel)</label>
+                  <input
+                    type="text"
+                    value={formState.projectTag}
+                    onChange={(e) => setFormState((prev) => ({ ...prev, projectTag: e.target.value }))}
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                    placeholder="Bijv. PRJ-001, Website, Maandafsluiting"
+                  />
+                </div>
+
+                {/* Billable section */}
+                <div className="space-y-3 rounded-lg bg-muted/50 p-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-foreground">Factureerbaar</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formState.billable}
+                        onChange={(e) => setFormState((prev) => ({ ...prev, billable: e.target.checked }))}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                  </div>
+                  {formState.billable && (
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium text-foreground">Uurtarief (optioneel)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">€</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formState.hourlyRate}
+                          onChange={(e) => setFormState((prev) => ({ ...prev, hourlyRate: e.target.value }))}
+                          className="w-full rounded-lg border border-input bg-background pl-7 pr-3 py-2 text-sm text-foreground"
+                          placeholder="75.00"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
