@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { type ReactNode } from "react";
 import { motion, type MotionProps, type TargetAndTransition, type Transition } from "framer-motion";
-import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, ShieldCheck, LineChart, Infinity, LifeBuoy, MailCheck } from "lucide-react";
+import { ArrowRight, Calculator, CheckCircle2, FileText, Timer, ShieldCheck, LineChart, Infinity, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SupportForm } from "@/components/support/support-form";
 import { cn } from "@/lib/utils";
 
 const BrandZ = ({ className }: { className?: string }) => (
@@ -33,18 +32,18 @@ const features = [
   {
     title: "BTW-aangifte",
     description:
-      "Automatische BTW-berekeningen en rapportages. Altijd klaar voor je kwartaalaangifte.",
+      "Automatische BTW-berekeningen en rapportages in PDF en Excel. Altijd klaar voor je kwartaalaangifte.",
     icon: Calculator,
   },
   {
     title: "Urenregistratie",
-    description: "Houd moeiteloos je 1225-uren criterium bij en koppel aan projecten.",
+    description: "Houd moeiteloos je uren bij, koppel aan projecten en voldoe aan het 1225-uren criterium.",
     icon: Timer,
   },
   {
-    title: "Compliance",
-    description: "AVG-proof workflows, veilige opslag en exporteerbare audit trails.",
-    icon: ShieldCheck,
+    title: "Accountant samenwerking",
+    description: "Deel overzichten met je accountant. Geef veilig toegang tot BTW-rapportages en financiële data.",
+    icon: Users,
   },
   {
     title: "Rapportages",
@@ -55,9 +54,9 @@ const features = [
 
 const elitePerks = [
   "Layered dashboards met realtime data",
-  "Midnight Shield beveiliging en 2FA",
-  "Premium support in het Nederlands",
-  "Automatische BTW en export-ready PDF's",
+  "Veilige accountant-toegang",
+  "BTW-rapportages in PDF en Excel",
+  "Urenregistratie en projectkoppeling",
   "Project timers & smart reminders",
   "14 dagen volledig gratis proberen",
 ];
@@ -240,12 +239,6 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Link href="#pricing" className="relative transition-colors duration-300 hover:text-slate-900 after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-emerald-500 after:to-teal-500 after:transition-all after:duration-300 hover:after:w-full">
                 Prijzen
               </Link>
-              <Link href="#assistant" className="relative transition-colors duration-300 hover:text-slate-900 after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-emerald-500 after:to-teal-500 after:transition-all after:duration-300 hover:after:w-full">
-                AI assistent
-              </Link>
-              <Link href="#support" className="relative transition-colors duration-300 hover:text-slate-900 after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-emerald-500 after:to-teal-500 after:transition-all after:duration-300 hover:after:w-full">
-                Support
-              </Link>
             </nav>
             {/* "Naar Dashboard" button routing logic:
                 - Unauthenticated users → /login (must log in first)
@@ -307,7 +300,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                   {...fadeUp}
                   transition={fadeUpTransition(0.1)}
                 >
-                  Facturen, BTW-aangifte en uren — alles in één overzichtelijk platform voor ZZP&apos;ers in Nederland.
+                  Facturen, BTW-aangifte, urenregistratie en accountant-samenwerking — alles in één overzichtelijk platform voor ZZP&apos;ers.
                 </motion.p>
 
                 {/* Enhanced Primary CTA */}
@@ -571,57 +564,6 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
           </div>
         </section>
 
-        <section id="support" className="bg-gradient-to-b from-slate-50 to-white py-24 sm:py-28">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-              <div className="space-y-6">
-                <motion.div
-                  className="inline-flex items-center gap-2.5 rounded-full bg-slate-100 px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-slate-700 ring-1 ring-slate-200/80 shadow-sm"
-                  {...fadeUp}
-                >
-                  <LifeBuoy className="h-4 w-4" aria-hidden />
-                  Support
-                </motion.div>
-                <motion.h2 
-                  className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl"
-                  {...fadeUp}
-                  transition={fadeUpTransition(0.05)}
-                >
-                  Premium support voor jouw gemoedsrust
-                </motion.h2>
-                <motion.p 
-                  className="text-lg leading-relaxed text-slate-700"
-                  {...fadeUp}
-                  transition={fadeUpTransition(0.1)}
-                >
-                  Bereik ons direct vanuit de landing. Naam, e-mail, onderwerp en bericht zijn genoeg. We bevestigen je aanvraag en antwoorden snel.
-                </motion.p>
-                <motion.div 
-                  className="grid gap-4 sm:grid-cols-2"
-                  {...fadeUp}
-                  transition={fadeUpTransition(0.15)}
-                >
-                  <div className="rounded-3xl border border-slate-200/60 bg-white px-5 py-4 shadow-sm">
-                    <div className="flex items-center gap-2.5 font-bold text-slate-900">
-                      <MailCheck className="h-5 w-5 text-emerald-600" aria-hidden />
-                      Bevestiging per mail
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">Heldere status na verzenden, zonder chat-widgets.</p>
-                  </div>
-                  <div className="rounded-3xl border border-slate-200/60 bg-white px-5 py-4 shadow-sm">
-                    <div className="flex items-center gap-2.5 font-bold text-slate-900">
-                      <ShieldCheck className="h-5 w-5 text-emerald-600" aria-hidden />
-                      Focus op product
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">Facturen, BTW, uren en abonnement zijn onze prioriteit.</p>
-                  </div>
-                </motion.div>
-              </div>
-              <SupportForm context="Landing" minimal />
-            </div>
-          </div>
-        </section>
-
         <section id="pricing" className="relative overflow-hidden bg-gradient-to-br from-[#0a3540] via-[#0d4a56] to-[#0a3540] py-28 sm:py-32">
           {/* Enhanced ambient background */}
           <div className="absolute inset-0">
@@ -651,7 +593,7 @@ export function LandingContent({ isLoggedIn }: { isLoggedIn: boolean }) {
                 {...fadeUp}
                 transition={fadeUpTransition(0.1)}
               >
-                Eén plan met alles erin. Inclusief Midnight Shield beveiliging, audit trails, premium support én 14 dagen gratis proberen.
+                Eén plan met alles erin. Inclusief urenregistratie, accountant-samenwerking, BTW-rapportages én 14 dagen gratis proberen.
               </motion.p>
             </div>
 
