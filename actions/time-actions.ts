@@ -661,7 +661,10 @@ export async function createInvoiceFromHours(input: InvoiceFromHoursInput) {
     if (lastInvoice?.invoiceNum) {
       const match = lastInvoice.invoiceNum.match(/(\d+)$/);
       if (match) {
-        nextNum = parseInt(match[1]) + 1;
+        const parsed = parseInt(match[1]);
+        if (!isNaN(parsed)) {
+          nextNum = parsed + 1;
+        }
       }
     }
     const invoiceNum = `INV-${String(nextNum).padStart(4, "0")}`;

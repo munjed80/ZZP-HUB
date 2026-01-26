@@ -499,7 +499,7 @@ export function UrenClient({ entries, totalHours, weekSummaries, runningTimer, c
 
       {/* Running Timer Card */}
       {runningTimer && canEdit && (
-        <Card className="border-2 border-primary/50 bg-primary/5 shadow-lg animate-pulse-slow">
+        <Card className="border-2 border-primary/50 bg-primary/5 shadow-lg">
           <CardContent className="py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
