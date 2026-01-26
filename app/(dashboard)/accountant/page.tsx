@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getUserMemberships, type CompanyMembership } from "@/lib/auth/company-context";
 import { requireSession } from "@/lib/auth/tenant";
+import { ClientBtwDownloadButton } from "@/components/accountant/ClientBtwDownloadButton";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -36,6 +37,7 @@ function PermissionBadge({
 
 function ClientCard({ membership }: { membership: CompanyMembership }) {
   const { companyId, companyName, role, permissions } = membership;
+  const canDownloadBtw = permissions.canExport || permissions.canBTW;
   
   return (
     <Card className="group hover:shadow-lg transition-all duration-300">
@@ -69,6 +71,13 @@ function ClientCard({ membership }: { membership: CompanyMembership }) {
             <PermissionBadge icon={Receipt} label="BTW" enabled={permissions.canBTW} />
           </div>
         </div>
+        
+        {/* Quick BTW download (shown next to permissions if user has export/BTW permission) */}
+        {canDownloadBtw && (
+          <div className="pt-1">
+            <ClientBtwDownloadButton companyId={companyId} />
+          </div>
+        )}
         
         {/* Open button */}
         <a
