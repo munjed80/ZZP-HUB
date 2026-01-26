@@ -53,6 +53,11 @@ enum SupportMessageStatus {
   CLOSED
 }
 
+enum TimeEntryStatus {
+  RUNNING
+  COMPLETED
+}
+
 model User {
   id          String   @id @default(uuid())
   email       String   @unique
@@ -223,24 +228,30 @@ model Expense {
 }
 
 model TimeEntry {
-  id           String   @id @default(uuid())
-  userId       String
-  description  String
-  date         DateTime
-  hours        Decimal  @db.Decimal(5, 2)
-  startTime    String?  // HH:mm format
-  endTime      String?  // HH:mm format
-  breakMinutes Int?     @default(0)
-  workType     String?  // "Project", "Client", "Internal", etc.
-  notes        String?  @db.Text
-  billable     Boolean  @default(true)
-  hourlyRate   Decimal? @db.Decimal(10, 2)
-  projectTag   String?
-  createdAt    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id])
+  id              String           @id @default(uuid())
+  userId          String
+  description     String
+  date            DateTime
+  hours           Decimal          @db.Decimal(5, 2)
+  startTime       String?          // HH:mm format
+  endTime         String?          // HH:mm format
+  breakMinutes    Int?             @default(0)
+  workType        String?          // "Project", "Client", "Internal", etc.
+  notes           String?          @db.Text
+  billable        Boolean          @default(true)
+  hourlyRate      Decimal?         @db.Decimal(10, 2)
+  projectTag      String?
+  status          TimeEntryStatus  @default(COMPLETED)
+  timerStartedAt  DateTime?        // Timestamp when timer was started
+  // Invoice linking to prevent double-billing
+  billedAt        DateTime?        // When this entry was billed
+  invoiceId       String?          // Reference to invoice if billed
+  createdAt       DateTime         @default(now())
+  user            User             @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([createdAt])
+  @@index([userId, status])
 }
 
 model Event {

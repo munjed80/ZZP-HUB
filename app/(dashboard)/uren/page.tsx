@@ -1,4 +1,4 @@
-import { getTimeEntries, getYearlyHours, getWeekSummaries } from "@/actions/time-actions";
+import { getTimeEntries, getYearlyHours, getWeekSummaries, getRunningTimer } from "@/actions/time-actions";
 import { UrenClient } from "./uren-client";
 import { requireReadPage } from "@/lib/auth/route-guards";
 import { hasPermission } from "@/lib/auth/company-context";
@@ -13,10 +13,11 @@ export default async function UrenPagina() {
     hasPermission("canExport"),
   ]);
   
-  const [entries, totalHours, weekSummaries] = await Promise.all([
+  const [entries, totalHours, weekSummaries, runningTimer] = await Promise.all([
     getTimeEntries(),
     getYearlyHours(),
     getWeekSummaries(),
+    getRunningTimer(),
   ]);
 
   return (
@@ -24,6 +25,7 @@ export default async function UrenPagina() {
       entries={entries}
       totalHours={totalHours}
       weekSummaries={weekSummaries}
+      runningTimer={runningTimer}
       canEdit={canEdit}
       canExport={canExport}
     />

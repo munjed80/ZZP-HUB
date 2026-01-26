@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,8 +9,16 @@ import {
   deleteTimeEntry,
   logTimeEntry,
   updateTimeEntry,
+  startTimer,
+  stopTimer,
+  discardTimer,
+  getClientsForInvoice,
+  getUnbilledEntriesForWeek,
+  createInvoiceFromHours,
   type TimeEntryDto,
   type WeekSummary,
+  type RunningTimerDto,
+  type ClientBasic,
 } from "@/actions/time-actions";
 import { WORK_TYPES, calculateHoursFromTimes, isTimeAfter, isBreakValid } from "@/lib/time-constants";
 import {
@@ -21,8 +29,11 @@ import {
   Coffee,
   Edit2,
   Euro,
+  FileText,
   Loader2,
+  Play,
   Plus,
+  Square,
   Timer,
   Trash2,
   X,
@@ -34,6 +45,7 @@ type UrenClientProps = {
   entries: TimeEntryDto[];
   totalHours: number;
   weekSummaries: WeekSummary[];
+  runningTimer: RunningTimerDto;
   canEdit: boolean;
   canExport: boolean;
 };
@@ -93,7 +105,7 @@ const initialFormState = (): FormState => ({
   projectTag: "",
 });
 
-export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExport }: UrenClientProps) {
+export function UrenClient({ entries, totalHours, weekSummaries, runningTimer, canEdit, canExport }: UrenClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
@@ -101,6 +113,57 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
   const [editingEntry, setEditingEntry] = useState<TimeEntryDto | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState<"entries" | "weeks">("entries");
+  
+  // Timer state
+  const [showTimerForm, setShowTimerForm] = useState(false);
+  const [timerDescription, setTimerDescription] = useState("");
+  const [timerWorkType, setTimerWorkType] = useState("Project");
+  const [timerProjectTag, setTimerProjectTag] = useState("");
+  const [timerBreakMinutes, setTimerBreakMinutes] = useState("0");
+  const [elapsedTime, setElapsedTime] = useState(runningTimer?.elapsedMinutes ?? 0);
+
+  // Invoice from hours state
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceWeek, setInvoiceWeek] = useState<{ weekNumber: number; year: number } | null>(null);
+  const [invoiceClients, setInvoiceClients] = useState<ClientBasic[]>([]);
+  const [invoiceEntries, setInvoiceEntries] = useState<TimeEntryDto[]>([]);
+  const [invoiceSelectedEntries, setInvoiceSelectedEntries] = useState<Set<string>>(new Set());
+  const [invoiceClientId, setInvoiceClientId] = useState("");
+  const [invoiceHourlyRate, setInvoiceHourlyRate] = useState("75.00");
+  const [invoiceDescription, setInvoiceDescription] = useState("");
+  const [invoiceGrouping, setInvoiceGrouping] = useState<"single" | "per-day" | "per-project">("single");
+  const [invoiceVatRate, setInvoiceVatRate] = useState<"21" | "9" | "0">("21");
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
+
+  // Update elapsed time every minute when timer is running
+  useEffect(() => {
+    if (!runningTimer) {
+      setElapsedTime(0);
+      return;
+    }
+    
+    // Calculate current elapsed time
+    const startTime = new Date(runningTimer.timerStartedAt).getTime();
+    const updateElapsed = () => {
+      const now = Date.now();
+      const minutes = Math.floor((now - startTime) / 60000);
+      setElapsedTime(minutes);
+    };
+    
+    updateElapsed();
+    const interval = setInterval(updateElapsed, 60000); // Update every minute
+    
+    return () => clearInterval(interval);
+  }, [runningTimer]);
+
+  const formatElapsedTime = useCallback((minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours > 0) {
+      return `${hours}u ${mins}m`;
+    }
+    return `${mins}m`;
+  }, []);
 
   const progress = useMemo(() => Math.min((totalHours / HOURS_GOAL) * 100, 100), [totalHours]);
   const goalReached = totalHours >= HOURS_GOAL;
@@ -240,6 +303,157 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
     });
   };
 
+  // Timer handlers
+  const handleStartTimer = () => {
+    if (!canEdit) return;
+    const trimmedDescription = timerDescription.trim();
+    if (!trimmedDescription) {
+      setFormError("Voer een omschrijving in om de timer te starten.");
+      return;
+    }
+    
+    startTransition(async () => {
+      try {
+        await startTimer({
+          description: trimmedDescription,
+          workType: timerWorkType || undefined,
+          projectTag: timerProjectTag.trim() || undefined,
+        });
+        setShowTimerForm(false);
+        setTimerDescription("");
+        setTimerProjectTag("");
+        setFormError(null);
+        router.refresh();
+      } catch (error) {
+        console.error("Timer starten mislukt", error);
+        setFormError(error instanceof Error ? error.message : "Timer starten mislukt.");
+      }
+    });
+  };
+
+  const handleStopTimer = () => {
+    if (!canEdit) return;
+    startTransition(async () => {
+      try {
+        await stopTimer(Number(timerBreakMinutes) || 0);
+        setTimerBreakMinutes("0");
+        setFormError(null);
+        router.refresh();
+      } catch (error) {
+        console.error("Timer stoppen mislukt", error);
+        setFormError(error instanceof Error ? error.message : "Timer stoppen mislukt.");
+      }
+    });
+  };
+
+  const handleDiscardTimer = () => {
+    if (!canEdit) return;
+    startTransition(async () => {
+      try {
+        await discardTimer();
+        setFormError(null);
+        router.refresh();
+      } catch (error) {
+        console.error("Timer annuleren mislukt", error);
+        setFormError(error instanceof Error ? error.message : "Timer annuleren mislukt.");
+      }
+    });
+  };
+
+  // Invoice from hours handlers
+  const openInvoiceModal = async (weekNumber: number, year: number) => {
+    if (!canEdit) return;
+    setInvoiceLoading(true);
+    setInvoiceWeek({ weekNumber, year });
+    setShowInvoiceModal(true);
+    setFormError(null);
+
+    try {
+      const [clients, unbilledEntries] = await Promise.all([
+        getClientsForInvoice(),
+        getUnbilledEntriesForWeek(weekNumber, year),
+      ]);
+      
+      setInvoiceClients(clients);
+      setInvoiceEntries(unbilledEntries);
+      setInvoiceSelectedEntries(new Set(unbilledEntries.map(e => e.id)));
+      
+      // Set default hourly rate from entries if available
+      const entryWithRate = unbilledEntries.find(e => e.hourlyRate);
+      if (entryWithRate?.hourlyRate) {
+        setInvoiceHourlyRate(String(entryWithRate.hourlyRate));
+      }
+    } catch (error) {
+      console.error("Laden mislukt", error);
+      setFormError("Kon gegevens niet laden.");
+    } finally {
+      setInvoiceLoading(false);
+    }
+  };
+
+  const closeInvoiceModal = () => {
+    setShowInvoiceModal(false);
+    setInvoiceWeek(null);
+    setInvoiceClients([]);
+    setInvoiceEntries([]);
+    setInvoiceSelectedEntries(new Set());
+    setInvoiceClientId("");
+    setInvoiceDescription("");
+    setFormError(null);
+  };
+
+  const toggleInvoiceEntry = (entryId: string) => {
+    setInvoiceSelectedEntries(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(entryId)) {
+        newSet.delete(entryId);
+      } else {
+        newSet.add(entryId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleCreateInvoice = () => {
+    if (!canEdit || !invoiceClientId || invoiceSelectedEntries.size === 0) return;
+    
+    startTransition(async () => {
+      try {
+        const result = await createInvoiceFromHours({
+          clientId: invoiceClientId,
+          hourlyRate: parseFloat(invoiceHourlyRate) || 0,
+          description: invoiceDescription.trim() || "Gewerkte uren",
+          grouping: invoiceGrouping,
+          timeEntryIds: Array.from(invoiceSelectedEntries),
+          vatRate: invoiceVatRate,
+        });
+        
+        closeInvoiceModal();
+        router.refresh();
+        
+        // Navigate to the new invoice
+        if (result.invoiceId) {
+          router.push(`/facturen/${result.invoiceId}`);
+        }
+      } catch (error) {
+        console.error("Factuur maken mislukt", error);
+        setFormError(error instanceof Error ? error.message : "Factuur maken mislukt.");
+      }
+    });
+  };
+
+  // Calculate invoice totals
+  const invoiceTotals = useMemo(() => {
+    const selectedEntries = invoiceEntries.filter(e => invoiceSelectedEntries.has(e.id));
+    const totalHours = selectedEntries.reduce((sum, e) => sum + e.hours, 0);
+    const rate = parseFloat(invoiceHourlyRate) || 0;
+    const subtotal = totalHours * rate;
+    const vatPercent = invoiceVatRate === "21" ? 0.21 : invoiceVatRate === "9" ? 0.09 : 0;
+    const vatAmount = subtotal * vatPercent;
+    const total = subtotal + vatAmount;
+    return { totalHours, subtotal, vatAmount, total };
+  }, [invoiceEntries, invoiceSelectedEntries, invoiceHourlyRate, invoiceVatRate]);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
@@ -255,6 +469,16 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
           </div>
           <div className="flex items-center gap-2">
             {canExport && <ExportButton resource="time-entries" />}
+            {canEdit && !runningTimer && (
+              <button
+                type="button"
+                onClick={() => setShowTimerForm(true)}
+                className={buttonVariants("secondary", "inline-flex items-center gap-2")}
+              >
+                <Play className="h-4 w-4" aria-hidden />
+                Start timer
+              </button>
+            )}
             {canEdit && (
               <button
                 type="button"
@@ -272,6 +496,67 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
           </div>
         </div>
       </div>
+
+      {/* Running Timer Card */}
+      {runningTimer && canEdit && (
+        <Card className="border-2 border-primary/50 bg-primary/5 shadow-lg">
+          <CardContent className="py-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-primary/20 p-2.5">
+                  <Timer className="h-6 w-6 text-primary animate-pulse" aria-hidden />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-foreground">{runningTimer.description}</p>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {runningTimer.workType && <Badge variant="muted">{runningTimer.workType}</Badge>}
+                    {runningTimer.projectTag && <span>{runningTimer.projectTag}</span>}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <p className="text-2xl font-bold tabular-nums text-primary">{formatElapsedTime(elapsedTime)}</p>
+                  <p className="text-xs text-muted-foreground">Lopende timer</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <label className="text-xs text-muted-foreground">Pauze:</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="5"
+                      value={timerBreakMinutes}
+                      onChange={(e) => setTimerBreakMinutes(e.target.value)}
+                      className="w-16 rounded border border-border bg-background px-2 py-1 text-sm"
+                      placeholder="0"
+                    />
+                    <span className="text-xs text-muted-foreground">min</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleStopTimer}
+                    disabled={isPending}
+                    className={buttonVariants("primary", "inline-flex items-center gap-1.5")}
+                  >
+                    {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Square className="h-4 w-4" />}
+                    Stop
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDiscardTimer}
+                    disabled={isPending}
+                    className={buttonVariants("destructive", "inline-flex items-center gap-1.5")}
+                    title="Timer annuleren"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Weekly Summary Header */}
       <div className="grid gap-4 sm:grid-cols-3">
@@ -616,9 +901,22 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                           )}
                         </p>
                       </div>
-                      <span className="text-lg font-bold text-foreground">
-                        {week.totalHours.toFixed(2)} uur
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg font-bold text-foreground">
+                          {week.totalHours.toFixed(2)} uur
+                        </span>
+                        {canEdit && week.billableHours > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => openInvoiceModal(week.weekNumber, week.year)}
+                            className={buttonVariants("secondary", "inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5")}
+                            title="Maak factuur van deze week"
+                          >
+                            <FileText className="h-3.5 w-3.5" aria-hidden />
+                            Factureer
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="grid grid-cols-7 gap-1">
                       {Object.entries(week.dayTotals)
@@ -874,6 +1172,349 @@ export function UrenClient({ entries, totalHours, weekSummaries, canEdit, canExp
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Start Timer Modal */}
+      {showTimerForm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/45 backdrop-blur-sm">
+          <div className="flex min-h-full items-end justify-center p-3 sm:items-center">
+            <div className="w-full max-w-md overflow-hidden rounded-xl border border-border/60 bg-card shadow-xl">
+              <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">Timer starten</h2>
+                  <p className="text-sm text-muted-foreground">Wat ga je doen?</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTimerForm(false);
+                    setTimerDescription("");
+                    setTimerProjectTag("");
+                    setFormError(null);
+                  }}
+                  className="rounded-full p-2 text-muted-foreground hover:bg-muted transition"
+                  aria-label="Sluiten"
+                >
+                  <X className="h-5 w-5" aria-hidden />
+                </button>
+              </div>
+
+              <div className="px-4 pb-4 space-y-4">
+                {/* Description */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">Omschrijving *</label>
+                  <input
+                    type="text"
+                    value={timerDescription}
+                    onChange={(e) => setTimerDescription(e.target.value)}
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                    placeholder="Waar ga je aan werken?"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Work Type */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">Werktype</label>
+                  <select
+                    value={timerWorkType}
+                    onChange={(e) => setTimerWorkType(e.target.value)}
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                  >
+                    {WORK_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Project Tag */}
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">Project tag (optioneel)</label>
+                  <input
+                    type="text"
+                    value={timerProjectTag}
+                    onChange={(e) => setTimerProjectTag(e.target.value)}
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                    placeholder="Bijv. PRJ-001, Website"
+                  />
+                </div>
+
+                {formError && <p className="text-sm text-destructive">{formError}</p>}
+
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowTimerForm(false);
+                      setTimerDescription("");
+                      setTimerProjectTag("");
+                      setFormError(null);
+                    }}
+                    className={buttonVariants("outline", "flex-1")}
+                  >
+                    Annuleren
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleStartTimer}
+                    disabled={isPending || !timerDescription.trim()}
+                    className={buttonVariants("primary", "flex-1 inline-flex items-center justify-center gap-2")}
+                  >
+                    {isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                        Starten...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="h-4 w-4" aria-hidden />
+                        Start timer
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invoice from Hours Modal */}
+      {showInvoiceModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/45 backdrop-blur-sm">
+          <div className="flex min-h-full items-end justify-center p-3 sm:items-center">
+            <div className="w-full max-w-2xl overflow-hidden rounded-xl border border-border/60 bg-card shadow-xl">
+              <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-border">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    Factuur maken van week {invoiceWeek?.weekNumber}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Selecteer uren en stel factuuropties in
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeInvoiceModal}
+                  className="rounded-full p-2 text-muted-foreground hover:bg-muted transition"
+                  aria-label="Sluiten"
+                >
+                  <X className="h-5 w-5" aria-hidden />
+                </button>
+              </div>
+
+              <div className="px-4 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
+                {invoiceLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : invoiceEntries.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">
+                      Geen factureerbare uren gevonden voor deze week, of alle uren zijn al gefactureerd.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Client Selection */}
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium text-foreground">Klant (Relatie) *</label>
+                      <select
+                        value={invoiceClientId}
+                        onChange={(e) => setInvoiceClientId(e.target.value)}
+                        className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                        required
+                      >
+                        <option value="">Selecteer een klant...</option>
+                        {invoiceClients.map((client) => (
+                          <option key={client.id} value={client.id}>
+                            {client.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Hourly Rate & VAT */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-foreground">Uurtarief *</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">€</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={invoiceHourlyRate}
+                            onChange={(e) => setInvoiceHourlyRate(e.target.value)}
+                            className="w-full rounded-lg border border-input bg-background pl-7 pr-3 py-2 text-sm text-foreground"
+                            placeholder="75.00"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-foreground">BTW-tarief</label>
+                        <select
+                          value={invoiceVatRate}
+                          onChange={(e) => setInvoiceVatRate(e.target.value as "21" | "9" | "0")}
+                          className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                        >
+                          <option value="21">21%</option>
+                          <option value="9">9%</option>
+                          <option value="0">0%</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium text-foreground">Omschrijving</label>
+                      <input
+                        type="text"
+                        value={invoiceDescription}
+                        onChange={(e) => setInvoiceDescription(e.target.value)}
+                        className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
+                        placeholder="Gewerkte uren"
+                      />
+                    </div>
+
+                    {/* Grouping Options */}
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium text-foreground">Groepering op factuur</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setInvoiceGrouping("single")}
+                          className={cn(
+                            "px-3 py-2 rounded-lg text-sm border transition-colors",
+                            invoiceGrouping === "single"
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-card hover:bg-muted"
+                          )}
+                        >
+                          Eén regel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setInvoiceGrouping("per-day")}
+                          className={cn(
+                            "px-3 py-2 rounded-lg text-sm border transition-colors",
+                            invoiceGrouping === "per-day"
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-card hover:bg-muted"
+                          )}
+                        >
+                          Per dag
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setInvoiceGrouping("per-project")}
+                          className={cn(
+                            "px-3 py-2 rounded-lg text-sm border transition-colors",
+                            invoiceGrouping === "per-project"
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-card hover:bg-muted"
+                          )}
+                        >
+                          Per project
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Time Entries Selection */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-foreground">Uren selecteren</label>
+                        <span className="text-xs text-muted-foreground">
+                          {invoiceSelectedEntries.size} van {invoiceEntries.length} geselecteerd
+                        </span>
+                      </div>
+                      <div className="max-h-48 overflow-y-auto border border-border rounded-lg divide-y divide-border">
+                        {invoiceEntries.map((entry) => (
+                          <label
+                            key={entry.id}
+                            className={cn(
+                              "flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted transition-colors",
+                              invoiceSelectedEntries.has(entry.id) && "bg-primary/5"
+                            )}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={invoiceSelectedEntries.has(entry.id)}
+                              onChange={() => toggleInvoiceEntry(entry.id)}
+                              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{entry.description}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {formatDate(entry.date)} · {entry.hours.toFixed(2)} uur
+                                {entry.projectTag && ` · ${entry.projectTag}`}
+                              </p>
+                            </div>
+                            <span className="text-sm font-semibold text-foreground">
+                              {entry.hours.toFixed(2)}u
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Totals */}
+                    <div className="rounded-lg bg-muted p-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Totaal uren:</span>
+                        <span className="font-semibold">{invoiceTotals.totalHours.toFixed(2)} uur</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Subtotaal:</span>
+                        <span className="font-semibold">{formatBedrag(invoiceTotals.subtotal)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">BTW ({invoiceVatRate}%):</span>
+                        <span className="font-semibold">{formatBedrag(invoiceTotals.vatAmount)}</span>
+                      </div>
+                      <div className="flex justify-between text-base pt-2 border-t border-border">
+                        <span className="font-semibold">Totaal incl. BTW:</span>
+                        <span className="font-bold text-primary">{formatBedrag(invoiceTotals.total)}</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {formError && <p className="text-sm text-destructive">{formError}</p>}
+              </div>
+
+              <div className="flex items-center gap-3 px-4 py-4 border-t border-border">
+                <button
+                  type="button"
+                  onClick={closeInvoiceModal}
+                  className={buttonVariants("outline", "flex-1")}
+                >
+                  Annuleren
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCreateInvoice}
+                  disabled={isPending || invoiceLoading || !invoiceClientId || invoiceSelectedEntries.size === 0}
+                  className={buttonVariants("primary", "flex-1 inline-flex items-center justify-center gap-2")}
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                      Maken...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4" aria-hidden />
+                      Maak factuur
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
