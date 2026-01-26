@@ -16,6 +16,9 @@ const timeEntrySchema = z.object({
   breakMinutes: z.number().min(0).optional(),
   workType: z.string().optional(),
   notes: z.string().optional(),
+  billable: z.boolean().optional(),
+  hourlyRate: z.number().min(0).optional(),
+  projectTag: z.string().optional(),
 }).refine(
   (data) => {
     // If both start and end time are provided, validate end > start using proper time comparison
@@ -48,12 +51,17 @@ export type TimeEntryDto = {
   breakMinutes: number | null;
   workType: string | null;
   notes: string | null;
+  billable: boolean;
+  hourlyRate: number | null;
+  projectTag: string | null;
 };
 
 export type WeekSummary = {
   weekNumber: number;
   year: number;
   totalHours: number;
+  billableHours: number;
+  estimatedAmount: number;
   dayTotals: Record<string, number>; // YYYY-MM-DD -> hours
 };
 
@@ -96,6 +104,9 @@ export async function logTimeEntry(values: TimeEntryInput) {
         breakMinutes: data.breakMinutes || null,
         workType: data.workType || null,
         notes: data.notes || null,
+        billable: data.billable ?? true,
+        hourlyRate: data.hourlyRate ? new Prisma.Decimal(data.hourlyRate) : null,
+        projectTag: data.projectTag || null,
       },
     });
 
@@ -136,6 +147,9 @@ export async function updateTimeEntry(id: string, values: TimeEntryInput) {
         breakMinutes: data.breakMinutes || null,
         workType: data.workType || null,
         notes: data.notes || null,
+        billable: data.billable ?? true,
+        hourlyRate: data.hourlyRate ? new Prisma.Decimal(data.hourlyRate) : null,
+        projectTag: data.projectTag || null,
       },
     });
 
@@ -169,6 +183,9 @@ export async function getTimeEntries(): Promise<TimeEntryDto[]> {
       breakMinutes: entry.breakMinutes,
       workType: entry.workType,
       notes: entry.notes,
+      billable: entry.billable,
+      hourlyRate: entry.hourlyRate ? Number(entry.hourlyRate) : null,
+      projectTag: entry.projectTag,
     }));
   } catch (error) {
     console.error("Kon tijdregistraties niet ophalen", { error, activeCompanyId });
@@ -243,6 +260,8 @@ export async function getWeekSummaries(): Promise<WeekSummary[]> {
           weekNumber: weekNum,
           year,
           totalHours: 0,
+          billableHours: 0,
+          estimatedAmount: 0,
           dayTotals: {},
         });
       }
@@ -251,6 +270,14 @@ export async function getWeekSummaries(): Promise<WeekSummary[]> {
       const hours = Number(entry.hours);
       weekSummary.totalHours += hours;
       weekSummary.dayTotals[dateKey] = (weekSummary.dayTotals[dateKey] || 0) + hours;
+      
+      // Track billable hours and estimated amount
+      if (entry.billable) {
+        weekSummary.billableHours += hours;
+        if (entry.hourlyRate) {
+          weekSummary.estimatedAmount += hours * Number(entry.hourlyRate);
+        }
+      }
     }
 
     return Array.from(weekMap.values()).sort((a, b) => {
