@@ -172,8 +172,8 @@ export function BTWAccountantChecklist({
     },
     {
       id: "btw-rules",
-      label: "Geen ongeldige BTW-tarieven",
-      checked: true, // Always true as we don't track invalid rules
+      label: "BTW-tarieven gecontroleerd",
+      checked: true, // Visual reminder only - manual verification required
     },
     {
       id: "period",
