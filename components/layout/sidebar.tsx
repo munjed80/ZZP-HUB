@@ -85,6 +85,9 @@ export function Sidebar({
   isAccountantMode = false,
 }: { userRole?: ExtendedUserRole; collapsed?: boolean; disableActions?: boolean; isAccountantMode?: boolean }) {
   const pathname = usePathname();
+  
+  // User has ACCOUNTANT role (not just viewing as accountant via CompanyUser)
+  const isAccountantRole = userRole === UserRole.ACCOUNTANT;
 
   return (
     <aside
@@ -102,11 +105,11 @@ export function Sidebar({
           if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
             return null;
           }
-          // Show accountant-only items only when in accountant mode
-          if (item.accountantOnly && !isAccountantMode) {
+          // Show accountant-only items when user has ACCOUNTANT role OR is in accountant mode (viewing a client)
+          if (item.accountantOnly && !isAccountantMode && !isAccountantRole) {
             return null;
           }
-          // Hide owner-only items when in accountant mode
+          // Hide owner-only items when in accountant mode (viewing a client's data)
           if (item.ownerOnly && isAccountantMode) {
             return null;
           }
@@ -188,6 +191,9 @@ export function MobileSidebar({
   isAccountantMode?: boolean;
 }) {
   const pathname = usePathname();
+  
+  // User has ACCOUNTANT role (not just viewing as accountant via CompanyUser)
+  const isAccountantRole = userRole === UserRole.ACCOUNTANT;
 
   const handleItemClick = () => {
     onOpenChange?.(false);
@@ -220,14 +226,14 @@ export function MobileSidebar({
               if (item.superAdminOnly && userRole !== UserRole.SUPERADMIN) {
                 return null;
               }
-              // Show accountant-only items only when in accountant mode
-              if (item.accountantOnly && !isAccountantMode) {
+              // Show accountant-only items when user has ACCOUNTANT role OR is in accountant mode (viewing a client)
+              if (item.accountantOnly && !isAccountantMode && !isAccountantRole) {
                 return null;
               }
               if (item.companyAdminOnly && userRole !== UserRole.COMPANY_ADMIN && userRole !== UserRole.SUPERADMIN) {
                 return null;
               }
-              // Hide owner-only items when in accountant mode
+              // Hide owner-only items when in accountant mode (viewing a client's data)
               if (item.ownerOnly && isAccountantMode) {
                 return null;
               }

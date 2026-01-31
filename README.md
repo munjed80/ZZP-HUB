@@ -45,6 +45,45 @@ Authenticatie is voorbereid voor integratie met bijvoorbeeld NextAuth of een eig
 
 De applicatie implementeert een complete Moneybird-achtige onboarding flow. Test deze met onderstaande checklist:
 
+### Accountant Portal Testing
+
+De applicatie ondersteunt twee rollen: **ZZP** (zelfstandig ondernemer) en **Accountant** (beheerder van meerdere klanten).
+
+#### Registratie als Accountant
+- [ ] **Ga naar `/register`**: Zie de rol-selectie knoppen (ZZP / Accountant)
+- [ ] **Selecteer "Accountant"**: De label past zich aan naar "Kantoor naam"
+- [ ] **Vul gegevens in**: Kantoornaam, email, wachtwoord
+- [ ] **Maak account**: Na registratie, controleer dat `role` in database `ACCOUNTANT` is
+
+#### Login & Routing
+- [ ] **Login als accountant**: Wordt automatisch doorgestuurd naar `/accountant`
+- [ ] **Login als ZZP**: Wordt automatisch doorgestuurd naar `/dashboard`
+- [ ] **Rol badge**: Zichtbaar in header (badge toont "Accountant" of "ZZP")
+
+#### Accountant Portal
+- [ ] **Mijn Klanten pagina**: Toont lijst van gekoppelde klanten (of lege state)
+- [ ] **Sidebar**: Toont "Mijn Klanten" link voor gebruikers met ACCOUNTANT rol
+- [ ] **Klant uitnodigen**: ZZP-gebruiker kan accountant uitnodigen via Instellingen
+
+#### Admin Tools (voor testing)
+- Promoot een gebruiker tot accountant (vereist SUPERADMIN):
+  ```bash
+  curl -X PATCH "https://app.example.com/api/admin/users/promote-accountant" \
+    -H "Content-Type: application/json" \
+    -H "Cookie: next-auth.session-token=..." \
+    -d '{"email": "test@example.com"}'
+  ```
+
+#### Database Verificatie
+```sql
+-- Check user role
+SELECT id, email, role FROM "User" WHERE email = 'accountant@example.com';
+-- role should be 'ACCOUNTANT'
+
+-- Check accountant-client relationships
+SELECT * FROM "CompanyUser" WHERE role = 'ACCOUNTANT';
+```
+
 ### Email Verificatie
 - [ ] **Registratie**: Ga naar `/register` en maak een nieuw account aan
 - [ ] **Email verzonden**: Controleer console logs voor verificatielink (in dev mode)

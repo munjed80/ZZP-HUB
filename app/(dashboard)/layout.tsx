@@ -8,7 +8,24 @@ import { DashboardClientShell } from "@/components/layout/dashboard-client-shell
 import { getServerAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getActiveCompanyContext } from "@/lib/auth/company-context";
-import { CompanyRole } from "@prisma/client";
+import { CompanyRole, UserRole } from "@prisma/client";
+
+/**
+ * Get display text for user role badge
+ */
+function getUserRoleBadgeText(role: UserRole): string {
+  switch (role) {
+    case UserRole.SUPERADMIN:
+      return "Admin";
+    case UserRole.ACCOUNTANT:
+      return "Accountant";
+    case UserRole.STAFF:
+      return "Medewerker";
+    case UserRole.COMPANY_ADMIN:
+    default:
+      return "ZZP";
+  }
+}
 
 export default async function DashboardShell({ children }: { children: ReactNode }) {
   const sessie = await getServerAuthSession();
@@ -16,14 +33,18 @@ export default async function DashboardShell({ children }: { children: ReactNode
     redirect("/login?type=zzp");
   }
 
+  // User's actual role from the database
+  const userRole = sessie.user.role;
+  const userRoleBadgeText = getUserRoleBadgeText(userRole);
+
   // Get active company context
   const companyContext = await getActiveCompanyContext();
   const activeCompanyId = companyContext.activeCompanyId;
   // Non-owner context means viewing another company (as ACCOUNTANT or STAFF)
   const isNonOwnerMode = !companyContext.isOwnerContext;
-  // Get specific role badge text
-  const roleBadgeText = companyContext.activeMembership?.role === CompanyRole.ACCOUNTANT ? "Accountant" 
-    : companyContext.activeMembership?.role === CompanyRole.STAFF ? "Medewerker" 
+  // Get specific role badge text for viewing context (when viewing another company)
+  const contextRoleBadgeText = companyContext.activeMembership?.role === CompanyRole.ACCOUNTANT ? "Accountant toegang" 
+    : companyContext.activeMembership?.role === CompanyRole.STAFF ? "Medewerker toegang" 
     : null;
 
   const userName = sessie.user.name || sessie.user.email || "Gebruiker";
@@ -63,7 +84,7 @@ export default async function DashboardShell({ children }: { children: ReactNode
           <div className="flex flex-1 flex-col">
             <header className="sticky top-0 z-30 border-b border-border bg-card/80 shadow-sm backdrop-blur-xl">
               <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 pt-[env(safe-area-inset-top)] md:h-16 md:px-6">
-                {/* Left: Company Badge */}
+                {/* Left: Company Badge + User Role Badge */}
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex items-center gap-2.5 rounded-xl border border-border/60 bg-card px-3 py-2 shadow-sm">
                     {/* Logo */}
@@ -78,13 +99,17 @@ export default async function DashboardShell({ children }: { children: ReactNode
                     <span className="truncate text-sm font-semibold text-foreground">
                       {profile?.companyName || "ZZP HUB"}
                     </span>
-                    {/* Role Badge for non-owners */}
-                    {roleBadgeText && (
-                      <span className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                        {roleBadgeText}
+                    {/* Context Role Badge - shown when viewing another company */}
+                    {contextRoleBadgeText && (
+                      <span className="ml-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+                        {contextRoleBadgeText}
                       </span>
                     )}
                   </div>
+                  {/* User Role Badge - always visible */}
+                  <span className="hidden rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary sm:inline-flex" title={`Uw rol: ${userRoleBadgeText}`}>
+                    {userRoleBadgeText}
+                  </span>
                 </div>
 
                 {/* Right: Actions */}
