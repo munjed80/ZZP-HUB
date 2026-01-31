@@ -32,12 +32,34 @@ function debugLogTokenCreation(details: Record<string, unknown>) {
   }));
 }
 
+/**
+ * Map registration role selection to database UserRole.
+ * - "ZZP" → COMPANY_ADMIN (ZZP freelancer with own company)
+ * - "ACCOUNTANT" → ACCOUNTANT (accountant who manages client companies)
+ */
+function mapRegistrationRole(role: "ZZP" | "ACCOUNTANT"): UserRole {
+  switch (role) {
+    case "ACCOUNTANT":
+      return UserRole.ACCOUNTANT;
+    case "ZZP":
+    default:
+      return UserRole.COMPANY_ADMIN;
+  }
+}
+
 export async function registerCompany(values: RegisterInput) {
   const data = registerSchema.parse(values);
 
   try {
     const emailMasked = data.email.replace(/(.).+(@.*)/, "$1***$2");
-    logRegistration("ATTEMPT", { emailMasked });
+    const selectedRole = data.role;
+    const dbRole = mapRegistrationRole(selectedRole);
+    
+    logRegistration("ATTEMPT", { 
+      emailMasked, 
+      selectedRole,
+      mappedDbRole: dbRole,
+    });
 
     const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (existingUser) {
@@ -75,16 +97,23 @@ export async function registerCompany(values: RegisterInput) {
       tokenHashPrefix: hashedToken.substring(0, 10),
     });
 
-    // Create user with emailVerified=false
+    // Create user with selected role (mapped from registration choice)
     const user = await prisma.user.create({
       data: {
         email: data.email,
         password,
         naam: data.bedrijfsnaam,
-        role: UserRole.COMPANY_ADMIN,
+        role: dbRole,
         emailVerified: false,
         emailVerificationSentAt: new Date(),
       },
+    });
+    
+    logRegistration("USER_CREATED", { 
+      userId: user.id, 
+      emailMasked,
+      selectedRole,
+      persistedRole: user.role,
     });
 
     logRegistration("USER_CREATED", { userId: user.id, emailMasked });

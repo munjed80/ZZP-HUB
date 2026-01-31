@@ -18,6 +18,35 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+/**
+ * Fetch user profile from /api/auth/me to get the actual role from database.
+ * Returns the role or null if the request fails.
+ */
+async function fetchUserRole(): Promise<string | null> {
+  try {
+    const response = await fetch("/api/auth/me");
+    if (!response.ok) return null;
+    const data = await response.json();
+    console.log("[LOGIN] ME endpoint response:", data);
+    return data.role || null;
+  } catch (error) {
+    console.error("[LOGIN] Failed to fetch user role:", error);
+    return null;
+  }
+}
+
+/**
+ * Determine the default landing page based on user role.
+ * - ACCOUNTANT -> /accountant (accountant portal)
+ * - Others (COMPANY_ADMIN, STAFF, SUPERADMIN) -> /dashboard
+ */
+function getDefaultLandingPage(role: string | null): string {
+  if (role === "ACCOUNTANT") {
+    return "/accountant";
+  }
+  return "/dashboard";
+}
+
 export default function LoginPagina() {
   return (
     <Suspense fallback={null}>
@@ -50,8 +79,19 @@ function LoginContent() {
       setLoading(false);
       return;
     }
+
+    // Fetch user role to determine the correct landing page
+    const userRole = await fetchUserRole();
+    const defaultLanding = getDefaultLandingPage(userRole);
+    
+    // If user explicitly requested a specific page, use that (validated)
+    // Otherwise, use role-based default landing page
     const requestedRedirect = searchParams.get("next") ?? searchParams.get("callbackUrl");
-    const target = safeNextUrl(requestedRedirect, "/dashboard");
+    const target = requestedRedirect 
+      ? safeNextUrl(requestedRedirect, defaultLanding)
+      : defaultLanding;
+    
+    console.log("[LOGIN] Redirecting to:", target, "Role:", userRole);
     router.push(target);
     router.refresh();
   };
