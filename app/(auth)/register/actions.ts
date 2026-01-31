@@ -115,8 +115,6 @@ export async function registerCompany(values: RegisterInput) {
       selectedRole,
       persistedRole: user.role,
     });
-
-    logRegistration("USER_CREATED", { userId: user.id, emailMasked });
     
     // Create verification token record
     const tokenRecord = await prisma.emailVerificationToken.create({
